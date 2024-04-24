@@ -1,0 +1,77 @@
+{
+  "name": "promotion-web3",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "npm": ">=9.0.0",
+    "node": ">=18.17.0"
+  },
+  "scripts": {
+    "dev": "next dev --experimental-https",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "start:pm2": "pm2 start pm2.config.js",
+    "stop:pm2": "pm2 stop pm2.config.js && pm2 delete pm2.config.js"
+  },
+  "dependencies": {
+    "@mantine/core": "^7.8.1",
+    "@mantine/hooks": "^7.8.1",
+    "@mantine/modals": "^7.8.1",
+    "@mantine/notifications": "^7.8.1",
+    "@portabletext/react": "^3.0.18",
+    "@privy-io/react-auth": "^1.60.7",
+    "@privy-io/server-auth": "^1.7.3",
+    "@reduxjs/toolkit": "^2.2.3",
+    "@sanity/client": "^6.15.20",
+    "@sanity/color-input": "^3.1.1",
+    "@sanity/image-url": "^1.0.2",
+    "@sanity/preview-kit": "^5.0.47",
+    "@sanity/table": "^1.1.2",
+    "@sanity/vision": "^3.39.0",
+    "@wagmi/chains": "^1.8.0",
+    "@zerodev/privy": "^1.6.1",
+    "axios": "^1.6.8",
+    "ethers": "^6.12.0",
+    "framer-motion": "^11.1.7",
+    "lodash": "^4.17.21",
+    "lottie-react": "^2.4.0",
+    "mongoose": "^8.3.2",
+    "next": "14.2.2",
+    "next-auth": "^4.24.7",
+    "next-intl": "^3.11.3",
+    "next-sanity": "^9.0.10",
+    "next-sanity-image": "^6.1.1",
+    "react": "^18.2.0",
+    "react-avatar-editor": "14.0.0-beta.2",
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.1.0",
+    "react-redux": "^9.1.1",
+    "react-use": "^17.5.0",
+    "redux-logger": "^3.0.6",
+    "redux-persist": "^6.0.0",
+    "sanity": "^3.39.0",
+    "sanity-plugin-iframe-pane": "^3.1.6",
+    "sanity-plugin-media": "^2.2.5",
+    "typescript": "5.4.5",
+    "usehooks-ts": "^3.1.0"
+  },
+  "devDependencies": {
+    "@svgr/webpack": "^8.1.0",
+    "@types/lodash": "^4.17.0",
+    "@types/node": "20.12.7",
+    "@types/react": "18.2.79",
+    "@types/react-dom": "18.2.25",
+    "@types/redux-logger": "^3.0.13",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.2",
+    "postcss": "^8.4.38",
+    "postcss-preset-mantine": "^1.14.4",
+    "postcss-simple-vars": "^7.0.1"
+  },
+  "overrides": {
+    "@privy-io/react-auth": {
+      "styled-components": "^5.3"
+    }
+  }
+}
