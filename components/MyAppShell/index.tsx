@@ -43,7 +43,7 @@ export default function MyAppShell({ children }: React.PropsWithChildren) {
     <AppShell
       header={{ height: 64 }}
       navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !opened, desktop: true } }}
-      padding="md"
+      // padding="md"
     >
       <AppShell.Header>
         <Group h="100%" px={24} gap="xs" justify="space-between">
