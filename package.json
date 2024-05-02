@@ -29,7 +29,6 @@
     "@sanity/preview-kit": "^5.0.47",
     "@sanity/table": "^1.1.2",
     "@sanity/vision": "^3.39.0",
-    "@wagmi/chains": "^1.8.0",
     "@zerodev/privy": "^1.6.1",
     "axios": "^1.6.8",
     "ethers": "^6.12.0",
@@ -54,7 +53,8 @@
     "sanity-plugin-iframe-pane": "^3.1.6",
     "sanity-plugin-media": "^2.2.5",
     "typescript": "5.4.5",
-    "usehooks-ts": "^3.1.0"
+    "usehooks-ts": "^3.1.0",
+    "viem": "^2.9.31"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",

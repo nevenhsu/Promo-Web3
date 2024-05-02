@@ -2,7 +2,6 @@
 
 import { createTheme } from '@mantine/core'
 import { colors } from './colors'
-import { Button } from '@mantine/core'
 
 const titleFF = 'var(--font-title)'
 const bodyFF = 'var(--font-body)'
@@ -15,7 +14,7 @@ export const theme = createTheme({
   primaryShade: { light: 6, dark: 5 },
   primaryColor: 'blue',
   colors,
-  fontFamily: bodyFF,
+  fontFamily: titleFF,
   fontFamilyMonospace: monoFF,
   headings: {
     fontFamily: titleFF,
@@ -35,9 +34,5 @@ export const theme = createTheme({
     lg: 'calc(1.5rem * var(--mantine-scale))',
     xl: 'calc(2rem * var(--mantine-scale))',
   },
-  components: {
-    Button: Button.extend({
-      defaultProps: { ff: titleFF },
-    }),
-  },
+  components: {},
 })

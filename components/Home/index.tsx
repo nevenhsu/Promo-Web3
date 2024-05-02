@@ -95,12 +95,10 @@ export default function Home() {
               <IoWallet color="#2C98FF" size="2rem" />
             </Avatar>
             <Stack gap={0}>
-              <Text fw={700} fz={14} ff="Inter">
+              <Text fw={700} fz={14}>
                 $ 300,000
               </Text>
-              <Text fz={12} ff="Open Sans">
-                Available balance
-              </Text>
+              <Text fz={12}>Available balance</Text>
             </Stack>
           </Flex>
           {/* action */}
@@ -110,7 +108,7 @@ export default function Home() {
               <Avatar variant="filled" radius="sm" size="md" color="#2C98FF">
                 <LiaHistorySolid color="white" size="1.5rem" />
               </Avatar>
-              <Text mt={1} fz={12} c="#1F2937" ff="Open Sans">
+              <Text mt={1} fz={12} c="#1F2937">
                 History
               </Text>
             </Stack>
@@ -140,7 +138,7 @@ export default function Home() {
     return (
       <Card mt={12} shadow="sm" padding="md" radius="xs" withBorder>
         <Group mb={18} justify="space-between">
-          <Text mt={1} fz={16} fw={700} c="#1F2937" ff="Open Sans">
+          <Text mt={1} fz={16} fw={700} c="#1F2937">
             History
           </Text>
           <Button style={{ width: '100px' }} variant="filled" radius="xl" c="#2C98FF" bg="#EAF5FF">
@@ -165,7 +163,7 @@ export default function Home() {
           })}
         </Group>
         <Progress color="yellow" radius="xl" value={_.round((points * 100) / MAX_POINTS, 0)} />
-        <Text mt={10} fz={12} fw={400} c="#1F2937" ff="Open Sans">
+        <Text mt={10} fz={12} fw={400} c="#1F2937">
           Gain more {MAX_POINTS.toLocaleString()} and wait until <b>31 Dec 2023</b> to reach
           platinum
         </Text>

@@ -1,5 +1,5 @@
-import Home from '@/components/Home'
+import Introduction from '@/components/Introduction'
 
 export default function Page() {
-  return <Home />
+  return <Introduction />
 }

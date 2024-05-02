@@ -21,5 +21,8 @@ export const i18nConfig = {
   localePrefix: 'as-needed',
 
   // all pathnames that should be localized
-  pathnames: { '/': '/' },
+  pathnames: {
+    '/': '/',
+    '/home': '/home',
+  },
 } as const
