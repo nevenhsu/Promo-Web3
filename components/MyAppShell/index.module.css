@@ -2,6 +2,13 @@
 
 .footer a {
   text-align: center;
+  padding: 8px 0 24px;
+}
+
+.footer svg {
+  display: block;
+  margin: auto;
+  margin-bottom: 4px;
 }
 
 .footer p {

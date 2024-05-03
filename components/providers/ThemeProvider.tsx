@@ -15,7 +15,7 @@ export default function ThemeProvider({ children }: React.PropsWithChildren) {
       defaultColorScheme={publicEnv.defaultColorScheme}
     >
       <Notifications />
-      <ModalsProvider modalProps={{ size: 'lg' }}>{children}</ModalsProvider>
+      <ModalsProvider modalProps={{ centered: true }}>{children}</ModalsProvider>
     </MantineProvider>
   )
 }

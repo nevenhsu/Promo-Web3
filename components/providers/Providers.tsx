@@ -2,7 +2,6 @@
 
 import '@/utils/console'
 
-import { ModalsProvider } from '@mantine/modals'
 import ReduxProvider from '@/store/ReduxProvider'
 import ThemeProvider from './ThemeProvider'
 import PrivyProvider from './PrivyProvider'
@@ -15,14 +14,12 @@ export default function Providers({ children }: React.PropsWithChildren) {
       <AuthProvider>
         <ReduxProvider>
           <ThemeProvider>
-            <ModalsProvider modalProps={{ size: 'lg' }}>
-              <PrivyProvider>
-                <>
-                  {children}
-                  <BackgroundTask />
-                </>
-              </PrivyProvider>
-            </ModalsProvider>
+            <PrivyProvider>
+              <>
+                {children}
+                <BackgroundTask />
+              </>
+            </PrivyProvider>
           </ThemeProvider>
         </ReduxProvider>
       </AuthProvider>

@@ -2,7 +2,6 @@
 
 import { usePathname } from '@/navigation'
 import { useDisclosure } from '@mantine/hooks'
-import { useAppSelector } from '@/hooks/redux'
 import { useMediaQuery } from '@mantine/hooks'
 import { AppShell } from '@mantine/core'
 import Header from './Header'
@@ -13,8 +12,6 @@ export default function MyAppShell({ children }: React.PropsWithChildren) {
 
   const [opened, { toggle }] = useDisclosure()
   const atHome = usePathname() === '/'
-
-  const { _id, data } = useAppSelector(state => state.user)
 
   return (
     <AppShell
@@ -27,9 +24,11 @@ export default function MyAppShell({ children }: React.PropsWithChildren) {
 
       <AppShell.Main>{children}</AppShell.Main>
 
-      <AppShell.Footer>
-        <MobileFooter />
-      </AppShell.Footer>
+      {atHome ? null : (
+        <AppShell.Footer>
+          <MobileFooter />
+        </AppShell.Footer>
+      )}
     </AppShell>
   )
 }

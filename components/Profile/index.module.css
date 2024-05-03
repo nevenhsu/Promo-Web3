@@ -1,0 +1,16 @@
+.root > div {
+  background: var(--mantine-color-white);
+}
+
+.menu {
+}
+
+.menu p {
+  color: var(--mantine-color-dimmed);
+  font-size: 12px;
+}
+
+.menu svg {
+  width: 20px;
+  height: 20px;
+}

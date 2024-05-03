@@ -2,6 +2,7 @@
 
 import { createTheme } from '@mantine/core'
 import { colors } from './colors'
+import { Button, ActionIcon } from '@mantine/core'
 
 const titleFF = 'var(--font-title)'
 const bodyFF = 'var(--font-body)'
@@ -10,7 +11,7 @@ const monoFF = 'var(--font-mono)'
 export const theme = createTheme({
   focusRing: 'never',
   black: '#0f0f0f',
-  white: '#f8f8f2',
+  white: 'hsl(210, 1%, 99%)',
   primaryShade: { light: 6, dark: 5 },
   primaryColor: 'blue',
   colors,
@@ -34,5 +35,8 @@ export const theme = createTheme({
     lg: 'calc(1.5rem * var(--mantine-scale))',
     xl: 'calc(2rem * var(--mantine-scale))',
   },
-  components: {},
+  components: {
+    Button: Button.extend({ defaultProps: { radius: 'xl' } }),
+    ActionIcon: ActionIcon.extend({ defaultProps: { variant: 'transparent' } }),
+  },
 })

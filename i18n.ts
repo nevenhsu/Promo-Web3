@@ -26,6 +26,7 @@ export const i18nConfig = {
     '/home': '/home',
     '/activity': '/activity',
     '/level': '/level',
+    '/wallet': '/wallet',
     '/profile': '/profile',
   },
 } as const
