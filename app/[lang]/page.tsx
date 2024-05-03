@@ -1,5 +1,5 @@
 import Introduction from '@/components/Introduction'
 
-export default function Page() {
+export default function LocalePage() {
   return <Introduction />
 }

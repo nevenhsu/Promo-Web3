@@ -10,14 +10,10 @@ export default function useForceAuth() {
   const { ready, authenticated, user } = usePrivy()
 
   const pathname = usePathname()
-  const atHome = pathname === '/'
-
-  // pathname: /u/id/subPath
-  const atU = pathname.startsWith('/u/')
-  const [, u, id, subPath] = atU ? pathname.split('/') : []
+  const atIndex = pathname === '/'
 
   const notAuth = ready && !authenticated
-  const noAuth = atHome || (atU && !subPath)
+  const noAuth = atIndex
 
   const { login } = useLogin({
     onError: () => {

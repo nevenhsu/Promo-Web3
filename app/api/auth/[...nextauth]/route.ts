@@ -11,23 +11,22 @@ const handler = NextAuth({
       name: 'Credentials',
       credentials: {
         authToken: { label: 'AuthToken', type: 'text' },
+        privyId: { label: 'PrivyId', type: 'text' },
         walletAddress: { label: 'WalletAddress', type: 'text' },
       },
       authorize: async (credentials, req) => {
-        const { authToken, walletAddress } = credentials || {}
+        const { authToken, privyId } = credentials || {}
 
-        if (authToken && walletAddress) {
+        if (authToken && privyId) {
           const claims = await verifyToken(authToken)
 
-          if (claims) {
-            const privyId = claims.userId
-
+          if (claims?.userId === privyId) {
             await dbConnect()
             const user = await UserModel.findOne({ privyId }).exec()
 
             // auto create user if not exists
             if (!user) {
-              const newUser = new UserModel({ privyId, walletAddress, username: walletAddress })
+              const newUser = new UserModel({ privyId })
               await newUser.save()
               return { id: newUser._id.toString(), privyId }
             }
@@ -61,7 +60,10 @@ export { handler as GET, handler as POST }
 
 async function verifyToken(authToken: string) {
   try {
-    const privy = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID, process.env.PRIVY_APP_SECRET)
+    const privy = new PrivyClient(
+      process.env.NEXT_PUBLIC_PRIVY_APP_ID,
+      process.env.PRIVY_APP_SECRET
+    )
     const verifiedClaims = await privy.verifyAuthToken(authToken)
 
     return verifiedClaims

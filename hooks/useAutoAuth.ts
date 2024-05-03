@@ -10,11 +10,11 @@ import { useAppDispatch, useAppSelector } from '@/hooks/redux'
 
 export default function useAutoAuth() {
   const dispatch = useAppDispatch()
-  const { fetched, _id } = useAppSelector(state => state.user)
-  const { user, getAccessToken } = usePrivy()
+  const { getAccessToken, user } = usePrivy()
+  const privyId = user?.id
 
+  const { fetched, _id } = useAppSelector(state => state.user)
   const notAuthOnServer = fetched && !_id
-  const walletAddress = user?.wallet?.address
 
   const getAuthToken = async () => {
     const token = await getAccessToken()
@@ -22,9 +22,9 @@ export default function useAutoAuth() {
     return token
   }
 
-  const startAuth = async () => {
+  const startAuth = async (privyId: string) => {
     const authToken = await getAuthToken()
-    signIn('credentials', { authToken, walletAddress, redirect: false })
+    signIn('credentials', { authToken, privyId, redirect: false })
       .then(res => {
         if (res?.error) {
           console.error(res.error)
@@ -36,10 +36,10 @@ export default function useAutoAuth() {
   }
 
   useEffect(() => {
-    if (walletAddress && notAuthOnServer) {
-      startAuth() // go auth on server
+    if (privyId && notAuthOnServer) {
+      startAuth(privyId) // go auth on server
     }
-  }, [walletAddress, notAuthOnServer])
+  }, [privyId, notAuthOnServer])
 
   // on init
   useEffect(() => {

@@ -24,5 +24,8 @@ export const i18nConfig = {
   pathnames: {
     '/': '/',
     '/home': '/home',
+    '/activity': '/activity',
+    '/level': '/level',
+    '/profile': '/profile',
   },
 } as const

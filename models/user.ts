@@ -18,17 +18,14 @@ export const userSchema = new Schema({
     unique: true,
     index: true,
   },
-  walletAddress: { type: String, required: true }, // Privy
   username: {
     type: String,
-    required: true,
+    required: false,
     unique: true,
     index: true,
   },
   name: String,
   email: String,
-  smartWalletAddress: String, // ZeroDev
-  linkedAccounts: [Schema.Types.Mixed],
   details: detailSchema,
   createdTime: { type: Date, default: Date.now },
 })

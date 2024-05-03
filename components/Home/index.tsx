@@ -172,7 +172,7 @@ export default function Home() {
   }
 
   return (
-    <Container px={0} style={{ position: 'relative' }} size="xs">
+    <Box pos="relative">
       {/* top bg */}
       <Box
         style={{
@@ -184,21 +184,15 @@ export default function Home() {
         bg="#339AF0"
       ></Box>
       {/* content */}
-      <Stack
-        px={24}
-        pt={36}
-        style={{ position: 'absolute', top: 0 }}
-        align="stretch"
-        justify="flex-start"
-      >
+      <Stack pos="relative" px={24} pt={36} align="stretch" justify="flex-start">
         {/* user profile */}
         <Group justify="space-between">
           {/* username */}
           <Stack gap={0}>
-            <Text fw={500} fz={{ base: 12, md: 12 }} c="white">
+            <Text fz={14} c="white">
               Good Morning
             </Text>
-            <Text fw={700} fz={{ base: 24, md: 24 }} c="white">
+            <Text fw={700} fz={26} c="white">
               Alycia
             </Text>
           </Stack>
@@ -210,14 +204,7 @@ export default function Home() {
 
         {/* level */}
         {renderLevel()}
-
-        <Text>
-          A new payment way to make triple wins for business based on the unique referral system.
-        </Text>
-        <Box>
-          <Button>Get Started</Button>
-        </Box>
       </Stack>
-    </Container>
+    </Box>
   )
 }

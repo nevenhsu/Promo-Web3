@@ -2,7 +2,6 @@
 
 import { useLogin as _useLogin, useLinkAccount } from '@privy-io/react-auth'
 import { usePrivy } from '@privy-io/react-auth'
-import { usePrivySmartAccount } from '@zerodev/privy'
 import type { User, CallbackError } from '@privy-io/react-auth'
 
 type CallbackComplete = (user: User, isNewUser: boolean, wasAlreadyAuthenticated: boolean) => void

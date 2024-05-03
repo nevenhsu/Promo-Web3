@@ -16,7 +16,7 @@ export default function MyPrivyProvider({ children }: React.PropsWithChildren) {
           defaultChain: chain,
           supportedChains: [chain],
           embeddedWallets: {
-            createOnLogin: 'users-without-wallets',
+            createOnLogin: 'off',
           },
           appearance: {
             // theme: env.defaultColorScheme,
