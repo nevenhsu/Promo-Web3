@@ -1,7 +1,10 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useMantineTheme } from '@mantine/core'
 import _ from 'lodash'
+// utils
+import { Level } from '@/utils/general'
+// components
 import {
   Container,
   Stack,
@@ -15,22 +18,18 @@ import {
   Flex,
   Progress,
 } from '@mantine/core'
+import LevelDetail, { LevelDetailRef } from '@/components/Home/LevelDetail'
 // icons
-import { IoWallet } from 'react-icons/io5'
+import { IoWallet, IoChevronForward, IoStar } from 'react-icons/io5'
 import { LiaHistorySolid } from 'react-icons/lia'
 import BronzeIcon from '@/components/share/icon/BronzeIcon'
 import SilverIcon from '@/components/share/icon/SilverIcon'
 import GoldIcon from '@/components/share/icon/GoldIcon'
 import PlatinumIcon from '@/components/share/icon/PlatinumIcon'
+// assets
+const InviteImg = '/images/home/invite.svg'
 
 const MAX_POINTS = 1000
-
-enum Level {
-  Bronze = 'Bronze',
-  Silver = 'Silver',
-  Gold = 'Gold',
-  Platinum = 'Platinum',
-}
 
 const LevelList = [
   {
@@ -82,6 +81,8 @@ function LevelIcon(props: { level: Level; isCurrentLevel: boolean; reached: bool
 
 export default function Home() {
   const theme = useMantineTheme()
+
+  const levelDetailRef = useRef<LevelDetailRef>(null)
 
   const [points, setPoints] = useState(850)
 
@@ -141,7 +142,14 @@ export default function Home() {
           <Text mt={1} fz={16} fw={700} c="#1F2937">
             History
           </Text>
-          <Button style={{ width: '100px' }} variant="filled" radius="xl" c="#2C98FF" bg="#EAF5FF">
+          <Button
+            style={{ width: '100px' }}
+            variant="filled"
+            radius="xl"
+            c="#2C98FF"
+            bg="#EAF5FF"
+            onClick={() => levelDetailRef.current?.open()}
+          >
             Detail
           </Button>
         </Group>
@@ -172,7 +180,7 @@ export default function Home() {
   }
 
   return (
-    <Box pos="relative">
+    <Box pos="relative" pb={100}>
       {/* top bg */}
       <Box
         style={{
@@ -204,7 +212,63 @@ export default function Home() {
 
         {/* level */}
         {renderLevel()}
+
+        <Card
+          mt={12}
+          shadow="sm"
+          padding="md"
+          radius="xs"
+          withBorder
+          style={{
+            backgroundImage:
+              'linear-gradient(75deg, #FFA51D 0.57%, rgba(255, 164, 27, 0.50) 21.11%, rgba(255, 164, 27, 0.00) 85.29%, rgba(255, 164, 27, 0.00) 98.12%)',
+          }}
+        >
+          <Group justify="space-between">
+            <Flex gap="xs" justify="center" align="center" direction="row" wrap="wrap">
+              <Avatar src={InviteImg} alt="invite" size="md" bg="white" />
+              <Text ml={8} fw={700} fz={14} c="#1E293B">
+                Invite Friends
+              </Text>
+            </Flex>
+            <IoChevronForward size="1.5rem" color="#2C98FF" />
+          </Group>
+        </Card>
+
+        <Card mt={12} shadow="sm" padding="md" radius="xs" withBorder>
+          <Group justify="space-between">
+            <Flex gap="xs" justify="center" align="center" direction="row" wrap="wrap">
+              <Avatar size="md" bg="#2C98FF">
+                <IoStar size="1.5rem" color="white" />
+              </Avatar>
+              <Text ml={8} fw={700} fz={14} c="#1E293B">
+                Gain 100 points
+              </Text>
+            </Flex>
+            <Button variant="outline" radius="xl" c="#2C98FF">
+              <Text fw={700} fz={12}>
+                Daily Check
+              </Text>
+            </Button>
+          </Group>
+        </Card>
+
+        <Card mt={12} shadow="sm" padding="md" radius="xs" withBorder>
+          <Group justify="space-between">
+            <Flex gap="xs" justify="center" align="center" direction="row" wrap="wrap">
+              <Avatar size="md" bg="#FFA41B">
+                <IoStar size="1.5rem" color="white" />
+              </Avatar>
+              <Text ml={8} fw={700} fz={14} c="#1E293B">
+                Enter referral code
+              </Text>
+            </Flex>
+            <IoChevronForward size="1.5rem" color="#2C98FF" />
+          </Group>
+        </Card>
       </Stack>
+
+      <LevelDetail ref={levelDetailRef} />
     </Box>
   )
 }
