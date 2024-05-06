@@ -1,0 +1,42 @@
+.chainIcon {
+  display: block;
+}
+
+.actions a {
+  text-align: center;
+}
+
+.actions div {
+  background: var(--mantine-color-white);
+  color: var(--mantine-primary-color-6);
+  border-radius: 10px;
+  padding: 8px;
+  margin: 0 auto 4px;
+}
+
+.actions svg {
+  display: block;
+  margin: auto;
+  margin-bottom: 4px;
+}
+
+.actions p {
+  font-size: 12px;
+}
+
+.tabs {
+  display: flex;
+  background-color: var(--mantine-color-gray-2);
+  padding: 4px;
+  border-radius: 100px;
+}
+
+.tabs button {
+  flex-grow: 1;
+  font-weight: 700;
+  color: var(--mantine-color-dimmed);
+}
+
+.tabs button[data-active] {
+  color: var(--mantine-color-white);
+}

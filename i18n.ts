@@ -26,7 +26,13 @@ export const i18nConfig = {
     '/home': '/home',
     '/activity': '/activity',
     '/level': '/level',
-    '/wallet': '/wallet',
     '/profile': '/profile',
+
+    // wallet
+    '/wallet': '/wallet',
+    '/wallet/deposit': '/wallet/deposit',
+    '/wallet/history': '/wallet/history',
+    '/wallet/pay': '/wallet/pay',
+    '/wallet/withdraw': '/wallet/withdraw',
   },
 } as const
