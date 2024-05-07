@@ -5,7 +5,12 @@ import { useAppSelector } from '@/hooks/redux'
 import { Box, Space, Group, Stack, Text, Title, Tabs } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import BaseIcon from '@/public/images/icons/base.svg'
-import { PiScan, PiPiggyBank, PiHandCoins, PiClockCountdown } from 'react-icons/pi'
+import {
+  PiArrowsLeftRight,
+  PiArrowCircleDown,
+  PiArrowCircleUpRight,
+  PiCreditCard,
+} from 'react-icons/pi'
 import { PiCurrencyBtcFill, PiCurrencyDollarFill } from 'react-icons/pi'
 import classes from './index.module.css'
 
@@ -28,29 +33,29 @@ export default function Wallet() {
         <Space h={40} />
 
         <Group className={classes.actions} grow>
-          <Link href="/wallet/pay">
+          <Link href="/wallet/send">
             <Box w={40} h={40}>
-              <PiScan size={24} />
+              <PiArrowsLeftRight size={24} />
             </Box>
-            <Text>Pay</Text>
+            <Text>Send</Text>
           </Link>
-          <Link href="/wallet/deposit">
+          <Link href="/wallet/receive">
             <Box w={40} h={40}>
-              <PiPiggyBank size={24} />
+              <PiArrowCircleDown size={24} />
             </Box>
-            <Text>Deposit</Text>
+            <Text>Receive</Text>
           </Link>
           <Link href="/wallet/withdraw">
             <Box w={40} h={40}>
-              <PiHandCoins size={24} />
+              <PiArrowCircleUpRight size={24} />
             </Box>
             <Text>Withdraw</Text>
           </Link>
-          <Link href="/wallet/history">
+          <Link href="/wallet/buy">
             <Box w={40} h={40}>
-              <PiClockCountdown size={24} />
+              <PiCreditCard size={24} />
             </Box>
-            <Text>History</Text>
+            <Text>Buy</Text>
           </Link>
         </Group>
       </RwdLayout>

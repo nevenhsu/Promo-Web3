@@ -30,9 +30,9 @@ export const i18nConfig = {
 
     // wallet
     '/wallet': '/wallet',
-    '/wallet/deposit': '/wallet/deposit',
-    '/wallet/history': '/wallet/history',
-    '/wallet/pay': '/wallet/pay',
+    '/wallet/send': '/wallet/send',
+    '/wallet/receive': '/wallet/receive',
     '/wallet/withdraw': '/wallet/withdraw',
+    '/wallet/buy': '/wallet/buy',
   },
 } as const

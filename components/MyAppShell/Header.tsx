@@ -6,7 +6,7 @@ import { usePrivy } from '@privy-io/react-auth'
 import { Group, Box, ActionIcon } from '@mantine/core'
 import { Avatar } from '@mantine/core'
 import Logo from '@/public/images/logo.svg'
-import { PiCaretLeft } from 'react-icons/pi'
+import { PiArrowLeft } from 'react-icons/pi'
 
 export default function Header() {
   const router = useRouter()
@@ -24,7 +24,7 @@ export default function Header() {
         <>
           {hasPreviousPage ? (
             <ActionIcon size="lg" onClick={() => router.back()}>
-              <PiCaretLeft />
+              <PiArrowLeft />
             </ActionIcon>
           ) : (
             <Link href="/">
