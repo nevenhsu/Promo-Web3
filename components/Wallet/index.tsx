@@ -20,7 +20,7 @@ export default function Wallet() {
           <Text fz={14} opacity={0.8}>
             Balance
           </Text>
-          <Box h={14}>
+          <Box h={12}>
             <BaseIcon className={classes.chainIcon} />
           </Box>
         </Group>
@@ -59,7 +59,7 @@ export default function Wallet() {
         <Box w="100%">
           <Tabs className={classes.tabs} variant="pills" defaultValue="asset" radius="xl">
             <Tabs.Tab value="asset">Asset</Tabs.Tab>
-            <Tabs.Tab value="activity">Activity</Tabs.Tab>
+            <Tabs.Tab value="activity">Airdrop</Tabs.Tab>
           </Tabs>
         </Box>
         <Space h={24} />
