@@ -1,30 +1,33 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { usePrivy } from '@privy-io/react-auth'
 import useLogin from './useLogin'
 
 export default function useForceAuth() {
   const [t, setT] = useState(Date.now())
-  const { ready, authenticated, user } = usePrivy()
+  const { ready, authenticated } = usePrivy()
 
   const pathname = usePathname()
-  const atIndex = pathname === '/'
 
   const notAuth = ready && !authenticated
-  const noAuth = atIndex
+  const skipAuth = pathname === '/'
+  const needAuth = notAuth && !skipAuth
+
+  const open = useCallback(() => setT(Date.now()), [])
 
   const { login } = useLogin({
     onError: () => {
-      // refresh to force login
-      setT(Date.now())
+      open()
     },
   })
 
   useEffect(() => {
-    if (!noAuth && notAuth) {
+    if (needAuth) {
       login()
     }
-  }, [t, noAuth, notAuth])
+  }, [t, needAuth])
+
+  return { authenticated: !needAuth, open }
 }

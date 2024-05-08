@@ -1,9 +1,11 @@
 'use client'
 
 import { Link } from '@/navigation'
+import { usePrivy } from '@privy-io/react-auth'
 import { useAppSelector } from '@/hooks/redux'
 import { Box, Space, Group, Stack, Text, Title, Tabs } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
+import CreateWallet from './CreateWallet'
 import BaseIcon from '@/public/images/icons/base.svg'
 import { PiArrowsLeftRight, PiArrowCircleDown, PiClock, PiCreditCard } from 'react-icons/pi'
 import { PiCurrencyBtcFill, PiCurrencyDollarFill } from 'react-icons/pi'
@@ -12,6 +14,12 @@ import classes from './index.module.css'
 export default function Wallet() {
   const { _id, fetched, data } = useAppSelector(state => state.user)
   const { username, name, details } = data
+
+  const { user } = usePrivy()
+
+  if (!user?.wallet?.address) {
+    return <CreateWallet />
+  }
 
   return (
     <>

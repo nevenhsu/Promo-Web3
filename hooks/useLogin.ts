@@ -1,6 +1,6 @@
 'use client'
 
-import { useLogin as _useLogin, useLinkAccount } from '@privy-io/react-auth'
+import { useLogin as _useLogin } from '@privy-io/react-auth'
 import { usePrivy } from '@privy-io/react-auth'
 import type { User, CallbackError } from '@privy-io/react-auth'
 
