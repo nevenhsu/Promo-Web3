@@ -32,7 +32,8 @@ export const i18nConfig = {
     '/wallet': '/wallet',
     '/wallet/send': '/wallet/send',
     '/wallet/receive': '/wallet/receive',
-    '/wallet/withdraw': '/wallet/withdraw',
+    '/wallet/history': '/wallet/history',
     '/wallet/buy': '/wallet/buy',
+    '/wallet/receive/link': '/wallet/receive/link',
   },
 } as const

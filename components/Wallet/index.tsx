@@ -5,12 +5,7 @@ import { useAppSelector } from '@/hooks/redux'
 import { Box, Space, Group, Stack, Text, Title, Tabs } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import BaseIcon from '@/public/images/icons/base.svg'
-import {
-  PiArrowsLeftRight,
-  PiArrowCircleDown,
-  PiArrowCircleUpRight,
-  PiCreditCard,
-} from 'react-icons/pi'
+import { PiArrowsLeftRight, PiArrowCircleDown, PiClock, PiCreditCard } from 'react-icons/pi'
 import { PiCurrencyBtcFill, PiCurrencyDollarFill } from 'react-icons/pi'
 import classes from './index.module.css'
 
@@ -45,11 +40,11 @@ export default function Wallet() {
             </Box>
             <Text>Receive</Text>
           </Link>
-          <Link href="/wallet/withdraw">
+          <Link href="/wallet/history">
             <Box w={40} h={40}>
-              <PiArrowCircleUpRight size={24} />
+              <PiClock size={24} />
             </Box>
-            <Text>Withdraw</Text>
+            <Text>History</Text>
           </Link>
           <Link href="/wallet/buy">
             <Box w={40} h={40}>
