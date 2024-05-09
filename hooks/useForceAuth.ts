@@ -9,11 +9,9 @@ export default function useForceAuth() {
   const [t, setT] = useState(Date.now())
   const { ready, authenticated } = usePrivy()
 
-  const pathname = usePathname()
-
   const notAuth = ready && !authenticated
-  const skipAuth = pathname === '/'
-  const needAuth = notAuth && !skipAuth
+  const skip = skipAuth(usePathname())
+  const needAuth = notAuth && !skip
 
   const open = useCallback(() => setT(Date.now()), [])
 
@@ -30,4 +28,16 @@ export default function useForceAuth() {
   }, [t, needAuth])
 
   return { authenticated: !needAuth, open }
+}
+
+function skipAuth(pathname: string) {
+  if (pathname === '/') {
+    return true
+  }
+
+  if (pathname.startsWith('/activity')) {
+    return true
+  }
+
+  return false
 }

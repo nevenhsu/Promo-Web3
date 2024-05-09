@@ -24,9 +24,12 @@ export const i18nConfig = {
   pathnames: {
     '/': '/',
     '/home': '/home',
-    '/activity': '/activity',
     '/level': '/level',
     '/profile': '/profile',
+
+    // activity
+    '/activity': '/activity',
+    '/activity/[activityId]': '/activity/[activityId]',
 
     // wallet
     '/wallet': '/wallet',

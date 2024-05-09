@@ -1,3 +1,5 @@
+/* Activity */
+
 .thumbnail {
   width: 64px;
   height: 64px;
@@ -10,4 +12,15 @@
 
 .card .logo {
   flex-shrink: 0;
+}
+
+/* Activity Detail */
+
+.cover {
+  width: 100%;
+  height: auto;
+}
+
+.embedded > div > div {
+  margin: auto;
 }

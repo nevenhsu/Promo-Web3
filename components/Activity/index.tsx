@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Link } from '@/navigation'
 import Image from 'next/image'
 import { Chip, Group, ScrollArea, Stack, Paper, Text, Space, Divider, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
@@ -10,6 +11,7 @@ import classes from './index.module.css'
 
 export default function Activity() {
   const [chip, setChip] = useState('0')
+  const activityId = 'testid' as string
 
   return (
     <>
@@ -61,7 +63,11 @@ export default function Activity() {
                 <Text fw={700} c="orange.6">
                   200 Points
                 </Text>
-                <Button>Join Now</Button>
+
+                {/* @ts-expect-error */}
+                <Link href={`/activity/${activityId}`}>
+                  <Button>Join Now</Button>
+                </Link>
               </Group>
             </Stack>
           </Paper>
