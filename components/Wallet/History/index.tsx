@@ -48,12 +48,12 @@ export default function History() {
 
             <Group justify="space-between">
               <Group>
-                <Box c="orange.6">
+                <Box c="blue">
                   <PiArrowsLeftRight size={24} />
                 </Box>
                 <Stack gap={4}>
                   <Text>Sent BTC</Text>
-                  <Text c="orange.6" fz={12} fw={500}>
+                  <Text c="blue" fz={12} fw={500}>
                     Pending
                   </Text>
                 </Stack>

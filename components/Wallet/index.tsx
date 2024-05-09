@@ -6,7 +6,7 @@ import { useAppSelector } from '@/hooks/redux'
 import { Box, Space, Group, Stack, Text, Title, Tabs } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import CreateWallet from './CreateWallet'
-import BaseIcon from '@/public/images/icons/base.svg'
+import BaseIcon from '@/public/icons/base.svg'
 import { PiArrowsLeftRight, PiArrowCircleDown, PiClock, PiCreditCard } from 'react-icons/pi'
 import { PiCurrencyBtcFill, PiCurrencyDollarFill } from 'react-icons/pi'
 import classes from './index.module.css'
@@ -94,6 +94,7 @@ export default function Wallet() {
               </Text>
             </Stack>
           </Group>
+
           {/* Item */}
           <Group justify="space-between">
             <Group>

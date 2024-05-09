@@ -1,0 +1,9 @@
+.level div {
+  width: 40px;
+  height: 40px;
+}
+
+.level p {
+  font-size: 12px;
+  text-align: center;
+}

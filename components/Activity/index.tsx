@@ -48,7 +48,7 @@ export default function Activity() {
                     <Text fz={16} fw={500}>
                       Taitra Tech Promotion
                     </Text>
-                    <PiXLogo className={classes.logo} size={20} />
+                    <PiXLogo className={classes.logo} size={24} />
                   </Group>
                   <Text fz={12} c="dimmed">
                     20 May 2024
