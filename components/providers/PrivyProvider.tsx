@@ -20,7 +20,6 @@ export default function MyPrivyProvider({ children }: React.PropsWithChildren) {
           },
           appearance: {
             // theme: env.defaultColorScheme,
-            accentColor: colors.dark[5] as `#${string}`,
           },
         }}
       >

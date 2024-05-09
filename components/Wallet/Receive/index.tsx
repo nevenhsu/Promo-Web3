@@ -31,7 +31,7 @@ export default function Receive() {
               {({ copied, copy }) => (
                 <Button
                   leftSection={<PiCopy size={20} />}
-                  color={copied ? 'teal' : 'blue'}
+                  color={copied ? 'green' : 'blue'}
                   variant="outline"
                   onClick={copy}
                 >

@@ -1,3 +1,9 @@
+import Activity from '@/components/Activity'
+
 export default function ActivityPage() {
-  return <>ActivityPage</>
+  return (
+    <>
+      <Activity />
+    </>
+  )
 }

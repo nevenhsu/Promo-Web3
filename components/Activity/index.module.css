@@ -1,0 +1,13 @@
+.thumbnail {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+}
+
+.card .content {
+  flex-grow: 1;
+}
+
+.card .logo {
+  flex-shrink: 0;
+}

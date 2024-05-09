@@ -14,3 +14,18 @@ export enum UserField {
   covers = 'covers',
   links = 'links',
 }
+
+export enum ActivityType {
+  // Default for all
+  None = 0,
+
+  // User Interactions
+  MentionInPost = 1,
+  MentionInComment = 2,
+  Follow = 3,
+
+  // Content Interactions
+  Repost = 4,
+  Like = 5,
+  Comment = 6,
+}
