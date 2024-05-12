@@ -1,5 +1,6 @@
 'use client'
 import { useState, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { useMantineTheme } from '@mantine/core'
 import _ from 'lodash'
 // utils
@@ -84,6 +85,7 @@ export default function Home() {
   const theme = useMantineTheme()
 
   const levelDetailRef = useRef<LevelDetailRef>(null)
+  const router = useRouter()
 
   const [points, setPoints] = useState(850)
   const [checkSuccessOpened, setCheckSuccessOpened] = useState(false)
@@ -263,7 +265,15 @@ export default function Home() {
         </Card>
 
         {/* Enter referral code */}
-        <Card style={{ cursor: 'pointer' }} mt={12} shadow="sm" padding="md" radius="xs" withBorder>
+        <Card
+          style={{ cursor: 'pointer' }}
+          mt={12}
+          shadow="sm"
+          padding="md"
+          radius="xs"
+          withBorder
+          onClick={() => router.push('/home/referral')}
+        >
           <Group justify="space-between">
             <Flex gap="xs" justify="center" align="center" direction="row" wrap="wrap">
               <Avatar size="md" bg="#FFA41B">
