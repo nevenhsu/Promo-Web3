@@ -3,6 +3,8 @@ import { Drawer, Text, Flex, Stack } from '@mantine/core'
 import _ from 'lodash'
 // utils
 import { Level } from '@/utils/general'
+// components
+import { Grid, Button } from '@mantine/core'
 // assets
 import BronzeIcon from '@/components/share/icon/BronzeIcon'
 import SilverIcon from '@/components/share/icon/SilverIcon'
@@ -27,15 +29,17 @@ const LevelList = [
   {
     level: Level.Silver,
     desc: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-    // icon : SilverIcon,
+    icon: <SilverIcon color="#FFA41B" />,
   },
   {
     level: Level.Gold,
     desc: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+    icon: <GoldIcon color="#FFA41B" />,
   },
   {
     level: Level.Platinum,
     desc: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+    icon: <PlatinumIcon color="#FFA41B" />,
   },
 ]
 
@@ -69,18 +73,25 @@ const LevelDetail = forwardRef<LevelDetailRef, LevelDetailProps>((props, ref) =>
         </Drawer.Header>
         <Drawer.Body>
           {_.map(LevelList, el => (
-            <Flex gap="md" justify="flex-start" align="flex-start" direction="row" wrap="wrap">
-              {el?.icon}
-              <Stack gap={0}>
-                <Text fw={700} fz={16}>
-                  {el?.level}
-                </Text>
-                <Text fz={12} style={{ lineHeight: '155%' }}>
-                  {el?.desc}
-                </Text>
-              </Stack>
-            </Flex>
+            <Grid gutter="xs" mb="16px">
+              <Grid.Col span="content">{el?.icon}</Grid.Col>
+              <Grid.Col span="auto">
+                <Stack gap={0}>
+                  <Text fw={700} fz={16}>
+                    {el?.level}
+                  </Text>
+                  <Text fz={12} c="#6B7280" style={{ lineHeight: '155%' }}>
+                    {el?.desc}
+                  </Text>
+                </Stack>
+              </Grid.Col>
+            </Grid>
           ))}
+          <Flex gap="md" justify="center" align="center" direction="row" wrap="wrap">
+            <Button size="md" radius="sx">
+              Tututp
+            </Button>
+          </Flex>
         </Drawer.Body>
       </Drawer.Content>
     </Drawer.Root>

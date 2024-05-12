@@ -10,13 +10,13 @@ import {
   Stack,
   Box,
   Group,
-  Title,
   Text,
   Button,
   Avatar,
   Card,
   Flex,
   Progress,
+  Modal,
 } from '@mantine/core'
 import LevelDetail, { LevelDetailRef } from '@/components/Home/LevelDetail'
 // icons
@@ -28,6 +28,7 @@ import GoldIcon from '@/components/share/icon/GoldIcon'
 import PlatinumIcon from '@/components/share/icon/PlatinumIcon'
 // assets
 const InviteImg = '/images/home/invite.svg'
+const CheckImg = '/images/home/check.svg'
 
 const MAX_POINTS = 1000
 
@@ -85,6 +86,7 @@ export default function Home() {
   const levelDetailRef = useRef<LevelDetailRef>(null)
 
   const [points, setPoints] = useState(850)
+  const [checkSuccessOpened, setCheckSuccessOpened] = useState(false)
 
   const renderBalance = () => {
     return (
@@ -213,6 +215,7 @@ export default function Home() {
         {/* level */}
         {renderLevel()}
 
+        {/* Invite Friends */}
         <Card
           mt={12}
           shadow="sm"
@@ -220,6 +223,7 @@ export default function Home() {
           radius="xs"
           withBorder
           style={{
+            cursor: 'pointer',
             backgroundImage:
               'linear-gradient(75deg, #FFA51D 0.57%, rgba(255, 164, 27, 0.50) 21.11%, rgba(255, 164, 27, 0.00) 85.29%, rgba(255, 164, 27, 0.00) 98.12%)',
           }}
@@ -245,7 +249,12 @@ export default function Home() {
                 Gain 100 points
               </Text>
             </Flex>
-            <Button variant="outline" radius="xl" c="#2C98FF">
+            <Button
+              variant="outline"
+              radius="xl"
+              c="#2C98FF"
+              onClick={() => setCheckSuccessOpened(true)}
+            >
               <Text fw={700} fz={12}>
                 Daily Check
               </Text>
@@ -253,7 +262,8 @@ export default function Home() {
           </Group>
         </Card>
 
-        <Card mt={12} shadow="sm" padding="md" radius="xs" withBorder>
+        {/* Enter referral code */}
+        <Card style={{ cursor: 'pointer' }} mt={12} shadow="sm" padding="md" radius="xs" withBorder>
           <Group justify="space-between">
             <Flex gap="xs" justify="center" align="center" direction="row" wrap="wrap">
               <Avatar size="md" bg="#FFA41B">
@@ -269,6 +279,29 @@ export default function Home() {
       </Stack>
 
       <LevelDetail ref={levelDetailRef} />
+
+      {/* daily check modal */}
+      <Modal
+        opened={checkSuccessOpened}
+        onClose={() => setCheckSuccessOpened(false)}
+        withCloseButton={false}
+        size="sm"
+      >
+        <Stack mt="50px" mb="50px" align="center" justify="center" gap={0}>
+          <Avatar
+            src={CheckImg}
+            alt="invite"
+            bg="white"
+            style={{ width: '150px', height: '150px' }}
+          />
+          <Text mt="32px" mb="10px" fw={700} fz={20}>
+            Complete
+          </Text>
+          <Text fw={400} fz={14} c="#94A3B8">
+            You earn 500 points!
+          </Text>
+        </Stack>
+      </Modal>
     </Box>
   )
 }
