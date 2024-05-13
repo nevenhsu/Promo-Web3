@@ -15,6 +15,11 @@ export enum UserField {
   links = 'links',
 }
 
+export enum Admin {
+  SuperAdmin = 0,
+  UserAdmin = 1,
+}
+
 export enum ActivityType {
   // Default for all
   None = 0,

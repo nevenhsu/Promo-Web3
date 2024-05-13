@@ -38,7 +38,7 @@ function CardAction(props: CardActionProps) {
   return (
     <>
       <Card withBorder>
-        <Group wrap="nowrap" mb="md">
+        <Group wrap="nowrap" mb="md" py="xs">
           <Box c="blue" style={{ flexShrink: 0 }}>
             {icon}
           </Box>
@@ -52,10 +52,8 @@ function CardAction(props: CardActionProps) {
           </Stack>
         </Group>
 
-        <Card.Section withBorder inheritPadding py="xs">
-          <Group justify="space-between">
-            <span />
-
+        <Card.Section withBorder inheritPadding py={4}>
+          <Group justify="right">
             {/* @ts-expect-error */}
             <Link href={link}>
               <ActionIcon>
