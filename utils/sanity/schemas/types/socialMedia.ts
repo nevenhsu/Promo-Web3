@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { defineType } from 'sanity'
 import { getIcon, getName, SocialIcon } from '@/utils/sanity/socialIcon'
 

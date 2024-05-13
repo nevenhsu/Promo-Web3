@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 

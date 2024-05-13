@@ -1,6 +1,6 @@
 'use client'
 
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { useEffect, useMemo } from 'react'
 import { useAppContext } from '@/store/AppContext'
 import { px, useMantineTheme } from '@mantine/core'
@@ -41,7 +41,10 @@ export function useScreenQuery() {
   }, [points, width])
 }
 
-export function useScreenQueryValue<T, K extends keyof T>(val: Data<T> | undefined, dataKey: K): T[K] | undefined {
+export function useScreenQueryValue<T, K extends keyof T>(
+  val: Data<T> | undefined,
+  dataKey: K
+): T[K] | undefined {
   const { breakPoints } = useAppContext().state
   const values: Partial<Values> = {}
 

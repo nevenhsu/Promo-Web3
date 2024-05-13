@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { Box } from '@mantine/core'
 import Lottie from 'lottie-react'
 import SanityImage from '@/components/sanity/Image'
-import type { LottieImageData } from '@/types/lottieImage'
+import type { LottieImageData } from '@/types/sanity/lottieImage'
 
 type LottieImageProps = {
   value: LottieImageData

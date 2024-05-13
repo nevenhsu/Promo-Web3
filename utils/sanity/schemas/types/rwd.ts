@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { defineType, defineField } from 'sanity'
 import { getRwdField } from '@/utils/sanity/getRwdField'
 

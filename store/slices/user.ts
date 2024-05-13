@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getUserInfo, updateUser as updateUserAPI } from '@/services/user'
 import { UserField } from '@/types/db'

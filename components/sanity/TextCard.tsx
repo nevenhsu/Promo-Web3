@@ -1,6 +1,6 @@
-import Card from '@/components/Card'
+import Card from '@/components/sanity/Card'
 import { Subtitle } from '@/components/Fonts'
-import type { TextCardData } from '@/types/textCard'
+import type { TextCardData } from '@/types/sanity/textCard'
 import classes from './index.module.css'
 
 export function TextCard({ data }: { data: Partial<TextCardData> }) {

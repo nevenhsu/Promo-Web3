@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useMantineTheme } from '@mantine/core'
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 // utils
 import { Level } from '@/utils/general'
 // components

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import clsx from 'clsx'
 import { Divider } from '@mantine/core'
 import classes from './index.module.css'

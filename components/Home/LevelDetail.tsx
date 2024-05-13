@@ -1,6 +1,6 @@
 import { forwardRef, useState, useImperativeHandle, Ref } from 'react'
 import { Drawer, Text, Flex, Stack } from '@mantine/core'
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 // utils
 import { Level } from '@/utils/general'
 // components

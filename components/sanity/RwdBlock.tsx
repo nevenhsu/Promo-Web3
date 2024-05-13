@@ -1,13 +1,13 @@
 'use client'
 
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import clsx from 'clsx'
-import useRwd from '@/hooks/useRwd'
+import useRwd from '@/hooks/sanity/useRwd'
 import { useScreenQueryValue } from '@/hooks/useScreenQuery'
 import { Box, Divider } from '@mantine/core'
-import RwdSimpleGrid from '@/components/Rwd/SimpleGrid'
+import RwdSimpleGrid from '@/components/sanity/Rwd/SimpleGrid'
 import { MyPortableText } from '@/components/common'
-import type { RwdData } from '@/types/rwd'
+import type { RwdData } from '@/types/sanity/rwd'
 import type { BreakPointData } from '@/types/common'
 import classes from './index.module.css'
 

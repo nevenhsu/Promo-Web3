@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { Box, List, Divider } from '@mantine/core'
 import { Subtitle, Caption } from '@/components/Fonts'
 import {
@@ -12,7 +12,7 @@ import {
   PiNumberCircleEightFill,
   PiNumberCircleNineFill,
 } from 'react-icons/pi'
-import type { NumberListData } from '@/types/numberList'
+import type { NumberListData } from '@/types/sanity/numberList'
 
 const icons = [
   PiNumberCircleOneFill,

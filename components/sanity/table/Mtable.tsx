@@ -1,7 +1,7 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { Box, Table, Divider } from '@mantine/core'
 import { Subtitle, Body } from '@/components/Fonts'
-import type { MTableData } from '@/types/mTable'
+import type { MTableData } from '@/types/sanity/mTable'
 import classes from './index.module.css'
 
 export function MTable({ data }: { data: Partial<MTableData> }) {

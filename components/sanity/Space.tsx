@@ -1,6 +1,6 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { Space } from '@mantine/core'
-import type { SpaceData } from '@/types/space'
+import type { SpaceData } from '@/types/sanity/space'
 
 export function MySpace({ data }: { data: Partial<SpaceData> }) {
   const { height } = data || {}

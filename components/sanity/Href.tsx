@@ -1,6 +1,6 @@
 import { MyLink } from '@/components/MyLink'
 import UnderlineMotion from '@/components/motion/Underline'
-import type { HrefData } from '@/types/href'
+import type { HrefData } from '@/types/sanity/href'
 
 export function Href({ data }: { data?: HrefData }) {
   if (!data) return null

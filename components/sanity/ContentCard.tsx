@@ -1,6 +1,6 @@
-import Card from '@/components/Card'
+import Card from '@/components/sanity/Card'
 import { MyPortableText } from '@/components/common'
-import type { ContentCardData } from '@/types/contendCard'
+import type { ContentCardData } from '@/types/sanity/contendCard'
 import classes from './index.module.css'
 
 export function ContentCard({ data }: { data: Partial<ContentCardData> }) {

@@ -1,7 +1,7 @@
 import { Box, Group } from '@mantine/core'
 import { Body, Caption } from '@/components/Fonts'
 import SanityImage from '@/components/sanity/Image'
-import type { AvatarData } from '@/types/avatar'
+import type { AvatarData } from '@/types/sanity/avatar'
 
 export default function MyAvatar({
   data,

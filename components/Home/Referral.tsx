@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useMantineTheme } from '@mantine/core'
 import { useRouter } from 'next/navigation'
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { notifications } from '@mantine/notifications'
 // components
 import {

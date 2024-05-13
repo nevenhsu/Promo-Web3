@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import type { FieldDefinition } from 'sanity'
 
 export function getRwdField(

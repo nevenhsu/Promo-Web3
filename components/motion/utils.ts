@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 
 export type MotionType = 'a' | 'b' | 'c' | 'd' | 'w' | 'x' | 'y' | 'z'
 export type Point = [number, number]

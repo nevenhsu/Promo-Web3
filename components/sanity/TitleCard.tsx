@@ -1,8 +1,8 @@
 import { Box, Divider } from '@mantine/core'
-import Card from '@/components/Card'
+import Card from '@/components/sanity/Card'
 import { Subtitle } from '@/components/Fonts'
 import { MyPortableText } from '@/components/common'
-import type { TitleCardData } from '@/types/titleCard'
+import type { TitleCardData } from '@/types/sanity/titleCard'
 import classes from './index.module.css'
 
 export function TitleCard({ data }: { data: Partial<TitleCardData> }) {

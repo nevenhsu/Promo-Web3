@@ -1,6 +1,6 @@
 'use client'
 
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { useEffect } from 'react'
 import { useLiveQuery } from '@sanity/preview-kit'
 import { useAppContext } from '@/store/AppContext'

@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { defineType } from 'sanity'
 
 export default defineType({

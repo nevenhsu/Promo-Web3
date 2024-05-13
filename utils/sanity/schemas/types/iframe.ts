@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { defineField, defineType } from 'sanity'
 import IframeInput from '@/components/sanity/IframeInput'
 import { extractIframeAttributes } from '@/utils/sanity/extractIframeAttributes'
