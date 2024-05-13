@@ -38,5 +38,10 @@ export const i18nConfig = {
     '/wallet/history': '/wallet/history',
     '/wallet/buy': '/wallet/buy',
     '/wallet/receive/link': '/wallet/receive/link',
+
+    // admin
+    '/admin': '/admin',
+    '/admin/user': '/admin/user',
+    '/admin/epoch': '/admin/epoch',
   },
 } as const

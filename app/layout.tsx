@@ -13,5 +13,6 @@ export const viewport: Viewport = {
 export * from './metadata'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  console.log('index layout')
   return <>{children}</>
 }

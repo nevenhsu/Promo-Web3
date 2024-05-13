@@ -1,7 +1,8 @@
 'use client'
 
 import { useAppSelector } from '@/hooks/redux'
-import { Group, Avatar, Stack, Title, Text, Divider, ActionIcon } from '@mantine/core'
+import { Link } from '@/navigation'
+import { Group, Avatar, Stack, Title, Text, Divider, ActionIcon, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiCaretRight } from 'react-icons/pi'
 import classes from './index.module.css'
@@ -23,6 +24,11 @@ export default function Profile() {
               </Text>
             </Stack>
           </Group>
+
+          {/* TODO: Hide from users */}
+          <Link href="/admin">
+            <Button size="compact-xs">Go Admin</Button>
+          </Link>
         </Stack>
       </RwdLayout>
 
@@ -39,6 +45,7 @@ export default function Profile() {
             </ActionIcon>
           </Group>
           <Divider />
+
           {/* Wallet */}
           <Group justify="space-between">
             <Stack gap={4}>
