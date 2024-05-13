@@ -28,8 +28,8 @@ export default function AdminUser() {
           </Box>
         )}
       </Table.Td>
-      <Table.Td ta="right">
-        <Group justify="right" gap="xs">
+      <Table.Td>
+        <Group gap="xs">
           <ActionIcon>
             <PiPencil />
           </ActionIcon>
@@ -57,7 +57,7 @@ export default function AdminUser() {
                     <Table.Th>Name</Table.Th>
                     <Table.Th>Role</Table.Th>
                     <Table.Th>Status</Table.Th>
-                    <Table.Th ta="right">Actions</Table.Th>
+                    <Table.Th>Actions</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>{rows}</Table.Tbody>
