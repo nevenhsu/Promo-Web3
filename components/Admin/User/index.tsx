@@ -4,6 +4,8 @@ import { useRef } from 'react'
 import { Stack, Button, Paper, Table, Box, Group, Divider, ActionIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import AddModel, { type AddModalRef } from './AddModal'
+import UpdateModal, { type UpdateModalRef } from './UpdateModal'
+import DeleteModal, { type DeleteModalRef } from './DeleteModal'
 import classes from './index.module.css'
 import { getRoleLabel } from './variables'
 import { PiPencil, PiTrash } from 'react-icons/pi'
@@ -16,6 +18,8 @@ const elements: Array<{ username: string; name: string; role: number; active: bo
 
 export default function AdminUser() {
   const addRef = useRef<AddModalRef>(null)
+  const updateRef = useRef<UpdateModalRef>(null)
+  const deleteRef = useRef<DeleteModalRef>(null)
 
   const rows = elements.map(element => (
     <Table.Tr key={element.username}>
@@ -34,11 +38,11 @@ export default function AdminUser() {
       </Table.Td>
       <Table.Td>
         <Group gap="xs">
-          <ActionIcon>
+          <ActionIcon onClick={() => updateRef.current?.open()}>
             <PiPencil />
           </ActionIcon>
           <Divider orientation="vertical" />
-          <ActionIcon c="red">
+          <ActionIcon c="red" onClick={() => deleteRef.current?.open()}>
             <PiTrash />
           </ActionIcon>
         </Group>
@@ -74,6 +78,8 @@ export default function AdminUser() {
       </RwdLayout>
 
       <AddModel ref={addRef} />
+      <UpdateModal ref={updateRef} username="test" name="Alex Dev" active={true} />
+      <DeleteModal ref={deleteRef} username="test" name="Alex Dev" />
     </>
   )
 }

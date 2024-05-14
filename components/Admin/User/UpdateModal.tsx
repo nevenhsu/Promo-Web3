@@ -1,26 +1,30 @@
 'use client'
 
 import { forwardRef, useImperativeHandle } from 'react'
-import { useForm, hasLength } from '@mantine/form'
+import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
-import { Modal, Stack, Box, TextInput, Button, Select } from '@mantine/core'
+import { Modal, Stack, Box, Text, Button, Select, Switch } from '@mantine/core'
 import { labelData } from './variables'
 
-export type AddModalRef = {
+export type UpdateModalRef = {
   open: () => void
 }
 
-export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
+type UpdateModalProps = {
+  username?: string
+  name?: string
+  active?: boolean
+}
+
+export default forwardRef<UpdateModalRef, UpdateModalProps>(function UpdateModal(props, ref) {
+  const { username, name, active } = props
   const [opened, { open, close }] = useDisclosure(false)
 
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      username: '',
       role: '1',
-    },
-    validate: {
-      username: hasLength({ min: 1 }, 'Username should not be empty'),
+      active,
     },
   })
 
@@ -32,7 +36,7 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
 
   return (
     <>
-      <Modal opened={opened} onClose={close} title="Add new admin" centered>
+      <Modal opened={opened} onClose={close} title="Update admin" centered>
         <Box mx="auto">
           <form
             onSubmit={form.onSubmit(
@@ -49,18 +53,20 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
             )}
           >
             <Stack>
-              <TextInput
-                data-autofocus
-                label="Username"
-                key={form.key('username')}
-                {...form.getInputProps('username')}
-              />
+              <Text fw={500}>{name}</Text>
 
               <Select
                 data={labelData}
                 label="Role"
                 key={form.key('role')}
                 {...form.getInputProps('role')}
+              />
+
+              <Switch
+                label="Active"
+                key={form.key('active')}
+                {...form.getInputProps('active')}
+                my="xs"
               />
 
               <span />
