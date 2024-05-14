@@ -5,7 +5,6 @@ import type { MemberData } from '@/types/sanity/member'
 
 export function Member({ data }: { data: Partial<MemberData> }) {
   const { avatar, content } = data
-  console.log(data)
   return (
     <Box>
       <MyAvatar data={avatar} showBio />

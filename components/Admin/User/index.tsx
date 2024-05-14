@@ -1,20 +1,24 @@
 'use client'
 
+import { useRef } from 'react'
 import { Stack, Button, Paper, Table, Box, Group, Divider, ActionIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
+import AddModel, { type AddModalRef } from './AddModal'
 import classes from './index.module.css'
 import { getRoleLabel } from './variables'
 import { PiPencil, PiTrash } from 'react-icons/pi'
 
-const elements: Array<{ name: string; role: number; active: boolean }> = [
-  { name: 'Super', role: 0, active: true },
-  { name: 'Admin', role: 1, active: true },
-  { name: 'Admin', role: 1, active: false },
+const elements: Array<{ username: string; name: string; role: number; active: boolean }> = [
+  { username: '1', name: 'Super', role: 0, active: true },
+  { username: '2', name: 'Admin', role: 1, active: true },
+  { username: '3', name: 'Admin', role: 1, active: false },
 ]
 
 export default function AdminUser() {
+  const addRef = useRef<AddModalRef>(null)
+
   const rows = elements.map(element => (
-    <Table.Tr key={element.name}>
+    <Table.Tr key={element.username}>
       <Table.Td fw={500}>{element.name}</Table.Td>
       <Table.Td>{getRoleLabel(element.role)}</Table.Td>
       <Table.Td>
@@ -47,7 +51,9 @@ export default function AdminUser() {
       <RwdLayout>
         <Stack>
           <Group justify="right">
-            <Button size="xs">Add Admin</Button>
+            <Button size="xs" onClick={() => addRef.current?.open()}>
+              Add Admin
+            </Button>
           </Group>
           <Paper withBorder>
             <Table.ScrollContainer minWidth={500}>
@@ -66,6 +72,8 @@ export default function AdminUser() {
           </Paper>
         </Stack>
       </RwdLayout>
+
+      <AddModel ref={addRef} />
     </>
   )
 }

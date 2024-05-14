@@ -48,7 +48,6 @@ const myComponents: Partial<PortableTextReactComponents> = {
     textCard: ({ value }) => <TextCard data={value} />,
     space: ({ value }) => <MySpace data={value} />,
     member: data => {
-      console.log('member', data)
       return <Member data={data.value} />
     },
     iframe: ({ value }) => <Iframe {...value} />,

@@ -10,3 +10,8 @@ export function getRoleLabel(role: number) {
       return 'Unknown'
   }
 }
+
+export const labelData = [
+  { value: `${Admin.SuperAdmin}`, label: getRoleLabel(Admin.SuperAdmin) },
+  { value: `${Admin.UserAdmin}`, label: getRoleLabel(Admin.UserAdmin) },
+] as const
