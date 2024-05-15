@@ -8,7 +8,7 @@ import { updateUser } from '@/store/slices/user'
 import { UserField } from '@/types/db'
 import { FileButton, Button, Group, Box, Stack, Text, Slider, Image } from '@mantine/core'
 import AvatarEditor from 'react-avatar-editor'
-import TitleBar from '@/components/TitleBar'
+import RwdLayout from '@/components/share/RwdLayout'
 import { BucketType } from '@/types/db'
 
 export default function Avatar() {
@@ -46,9 +46,7 @@ export default function Avatar() {
   }
 
   return (
-    <>
-      <TitleBar title="Avatar" />
-
+    <RwdLayout>
       <Stack w={340} mx="auto" gap="xl">
         <Box pos="relative" h={360}>
           <AvatarEditor
@@ -109,6 +107,6 @@ export default function Avatar() {
           />
         </Box>
       </Stack>
-    </>
+    </RwdLayout>
   )
 }

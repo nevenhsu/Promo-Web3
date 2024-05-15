@@ -2,9 +2,10 @@
 
 import { useAppSelector } from '@/hooks/redux'
 import { Link } from '@/navigation'
-import { Group, Avatar, Stack, Title, Text, Divider, ActionIcon, Button } from '@mantine/core'
+import { Group, Paper, Avatar, Stack, Space } from '@mantine/core'
+import { Title, Text, ActionIcon, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { PiCaretRight } from 'react-icons/pi'
+import { PiCaretRight, PiPencilSimple } from 'react-icons/pi'
 import classes from './index.module.css'
 
 export default function Profile() {
@@ -12,52 +13,104 @@ export default function Profile() {
   const { username, name, details } = data
 
   return (
-    <Stack className={classes.root} gap={24}>
-      <RwdLayout>
-        <Stack>
-          <Group>
-            <Avatar w={64} h={64} src={details?.avatar} />
-            <Stack gap={4}>
-              <Title order={5}>{name ? name : 'Full name'}</Title>
-              <Text fz={14} c="dimmed">
-                {username ? `@${username}` : 'Username'}
-              </Text>
-            </Stack>
-          </Group>
+    <RwdLayout>
+      <Stack gap="lg">
+        <Group justify="space-between">
+          <Title order={4}>Profile </Title>
 
           {/* TODO: Hide from users */}
           <Link href="/admin">
             <Button size="compact-xs">Go Admin</Button>
           </Link>
-        </Stack>
-      </RwdLayout>
+        </Group>
 
-      <RwdLayout>
-        <Stack className={classes.menu}>
-          {/* Profile */}
+        <Paper c="white" p="md" bg="blue">
           <Group justify="space-between">
-            <Stack gap={4}>
-              <Title order={6}>Personal information</Title>
-              <Text>Update your profile</Text>
-            </Stack>
-            <ActionIcon>
-              <PiCaretRight />
-            </ActionIcon>
-          </Group>
-          <Divider />
+            <Group>
+              <Avatar w={64} h={64} color="white" src={details?.avatar} />
+              <Stack gap={4}>
+                <Title order={5}>{name ? name : 'Hello!'}</Title>
+                <Text fz={14}>{username ? `@${username}` : '-'}</Text>
+              </Stack>
+            </Group>
 
-          {/* Wallet */}
-          <Group justify="space-between">
-            <Stack gap={4}>
-              <Title order={6}>Wallet configuration</Title>
-              <Text>Setup your wallet</Text>
-            </Stack>
-            <ActionIcon>
-              <PiCaretRight />
-            </ActionIcon>
+            <Link href="/profile/info">
+              <ActionIcon color="white">
+                <PiPencilSimple size={20} />
+              </ActionIcon>
+            </Link>
           </Group>
-        </Stack>
-      </RwdLayout>
-    </Stack>
+        </Paper>
+
+        <Paper withBorder p="md">
+          <Stack gap="xl">
+            {/* Item */}
+            <Group justify="space-between">
+              <Stack gap={4}>
+                <Text fw={500}>Linked Account</Text>
+                <Text fz={12} c="dimmed">
+                  Update your linked accounts
+                </Text>
+              </Stack>
+              <ActionIcon>
+                <PiCaretRight />
+              </ActionIcon>
+            </Group>
+
+            {/* Item */}
+            <Group justify="space-between">
+              <Stack gap={4}>
+                <Text fw={500}>Wallet Configuration</Text>
+                <Text fz={12} c="dimmed">
+                  Manage your crypto wallet
+                </Text>
+              </Stack>
+              <ActionIcon>
+                <PiCaretRight />
+              </ActionIcon>
+            </Group>
+
+            {/* Item */}
+            <Group justify="space-between">
+              <Stack gap={4}>
+                <Text fw={500}>Log Out</Text>
+                <Text fz={12} c="dimmed">
+                  Log out on this device
+                </Text>
+              </Stack>
+              <ActionIcon>
+                <PiCaretRight />
+              </ActionIcon>
+            </Group>
+          </Stack>
+        </Paper>
+
+        <Space />
+
+        <Title order={5}>More </Title>
+
+        <Paper withBorder p="md">
+          <Stack gap="xl">
+            {/* Item */}
+            <Group justify="space-between">
+              <Text fw={500}>Help & Support</Text>
+              <ActionIcon>
+                <PiCaretRight />
+              </ActionIcon>
+            </Group>
+
+            {/* Item */}
+            <Group justify="space-between">
+              <Text fw={500}>About App</Text>
+              <ActionIcon>
+                <PiCaretRight />
+              </ActionIcon>
+            </Group>
+          </Stack>
+        </Paper>
+      </Stack>
+
+      <Space h={100} />
+    </RwdLayout>
   )
 }

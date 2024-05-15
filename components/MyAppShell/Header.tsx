@@ -3,7 +3,7 @@
 import { Link, usePathname, useRouter } from '@/navigation'
 import { useAppSelector } from '@/hooks/redux'
 import { usePrivy } from '@privy-io/react-auth'
-import { Group, Box, ActionIcon } from '@mantine/core'
+import { Group, Box, Button } from '@mantine/core'
 import { Avatar } from '@mantine/core'
 import Logo from '@/public/images/logo.svg'
 import { PiArrowLeft } from 'react-icons/pi'
@@ -23,15 +23,20 @@ export default function Header() {
       <Group h="100%" px={24} gap="xs" justify="space-between">
         <>
           {hasPreviousPage ? (
-            <ActionIcon size="lg" onClick={() => router.back()}>
-              <PiArrowLeft />
-            </ActionIcon>
+            <Button
+              variant="transparent"
+              c="var(--mantine-color-text)"
+              size="sm"
+              leftSection={<PiArrowLeft size={16} />}
+              onClick={() => router.back()}
+              pl={0}
+            >
+              Back
+            </Button>
           ) : (
-            <Link href="/">
-              <Box w={40} h={40}>
-                <Logo />
-              </Box>
-            </Link>
+            <Box w={40} h={40}>
+              <Logo />
+            </Box>
           )}
         </>
 
