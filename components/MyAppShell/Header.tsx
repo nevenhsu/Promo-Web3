@@ -13,7 +13,7 @@ export default function Header() {
   const pathname = usePathname()
 
   const { authenticated } = usePrivy()
-  const { data } = useAppSelector(state => state.user)
+  const { data, _id } = useAppSelector(state => state.user)
 
   const avatar = data.details?.avatar || ''
   const hasPreviousPage = pathname.split('/').length > 2
@@ -41,7 +41,7 @@ export default function Header() {
         </>
 
         <Group>
-          {authenticated ? (
+          {authenticated && Boolean(_id) ? (
             <Link href="/profile">
               <Avatar src={avatar} />
             </Link>

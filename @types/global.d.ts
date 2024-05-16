@@ -16,7 +16,7 @@ declare global {
       // Private
       MONGO_URL: string
       DB_NAME: string
-      AUTH_SECRET: string
+      NEXTAUTH_SECRET: string
       NEXTAUTH_URL: string
       PRIVY_APP_SECRET: string
       SANITY_API_READ_TOKEN: string

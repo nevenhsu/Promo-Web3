@@ -6,7 +6,7 @@ import UserModel from '@/models/user'
 import { createUser } from '@/lib/db/user'
 
 const handler = NextAuth({
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: 'Credentials',

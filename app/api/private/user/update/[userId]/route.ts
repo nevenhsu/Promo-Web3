@@ -6,7 +6,7 @@ import { updateUserById } from '@/lib/db/user'
 export async function PUT(req: NextRequest, { params }: { params: { userId: string } }) {
   try {
     // TODO: check has authentication
-    const token = await getToken({ req, secret: process.env.AUTH_SECRET })
+    const token = await getToken({ req })
 
     const { userId } = params
     const data = await req.json()

@@ -6,7 +6,7 @@ import { getUserByUsername } from '@/lib/db/user'
 export async function GET(req: NextRequest, { params }: { params: { username: string } }) {
   try {
     // TODO: check has authentication
-    const token = await getToken({ req, secret: process.env.AUTH_SECRET })
+    const token = await getToken({ req })
 
     const { username } = params
 

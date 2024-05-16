@@ -7,7 +7,7 @@ import { cleanup } from '@/utils/helper'
 
 export async function PUT(req: NextRequest) {
   try {
-    const token = await getToken({ req, secret: process.env.AUTH_SECRET })
+    const token = await getToken({ req })
 
     const { id } = token?.user || {}
 

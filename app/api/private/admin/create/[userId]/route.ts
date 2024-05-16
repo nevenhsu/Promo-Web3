@@ -6,7 +6,7 @@ import { createAdmin } from '@/lib/db/admin'
 export async function POST(req: NextRequest, { params }: { params: { userId: string } }) {
   try {
     // TODO: check has authentication
-    const token = await getToken({ req, secret: process.env.AUTH_SECRET })
+    const token = await getToken({ req })
 
     const { userId } = params
     const { role } = await req.json()

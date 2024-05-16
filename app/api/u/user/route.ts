@@ -5,7 +5,7 @@ import { getUserById } from '@/lib/db/user'
 
 export async function GET(req: NextRequest) {
   try {
-    const token = await getToken({ req, secret: process.env.AUTH_SECRET })
+    const token = await getToken({ req })
 
     const { id } = token?.user || {}
 
