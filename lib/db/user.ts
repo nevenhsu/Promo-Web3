@@ -2,12 +2,27 @@ import UserModel, { type User } from '@/models/user'
 
 export async function createUser(privyId: string) {
   try {
-    const user = new UserModel({ privyId })
-    await user.save()
+    const user = await UserModel.create({ privyId })
     console.log('User created:', user)
     return user
   } catch (error) {
     console.error('Error creating user:', error)
+    throw error
+  }
+}
+
+export async function getUserById(_id: string) {
+  try {
+    const user = await UserModel.findById(_id)
+
+    if (!user) {
+      console.log('No user found with the id.')
+      return null // Or throw an error or handle it as per your application requirements
+    }
+
+    return user
+  } catch (error) {
+    console.error('Error finding user:', error)
     throw error
   }
 }

@@ -5,7 +5,6 @@ import { useMantineTheme } from '@mantine/core'
 import { uploadImage } from '@/services/user'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
 import { updateUser } from '@/store/slices/user'
-import { UserField } from '@/types/db'
 import { FileButton, Button, Group, Box, Stack, Text, Slider, Image } from '@mantine/core'
 import AvatarEditor from 'react-avatar-editor'
 import RwdLayout from '@/components/share/RwdLayout'
@@ -36,7 +35,7 @@ export default function Avatar() {
         const dataURI = canvasScaled.toDataURL()
 
         const gcpUrl = await uploadImage(dataURI, BucketType.avatar)
-        dispatch(updateUser({ field: UserField.avatar, value: gcpUrl }))
+        dispatch(updateUser({ details: { avatar: gcpUrl } }))
         setSaved(true)
       }
     } catch (err) {

@@ -3,13 +3,16 @@
 import { Link } from '@/navigation'
 import { Stack, Avatar, Box, Space, TextInput, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { useAppSelector } from '@/hooks/redux'
+import { updateUser } from '@/store/slices/user'
+import { useAppSelector, useAppDispatch } from '@/hooks/redux'
 import { useForm, hasLength } from '@mantine/form'
+import { cleanup } from '@/utils/helper'
 import { PiImageFill } from 'react-icons/pi'
 import classes from '../index.module.css'
 
 export default function ProfileInfo() {
-  const { _id, fetched, data } = useAppSelector(state => state.user)
+  const dispatch = useAppDispatch()
+  const { updating, data } = useAppSelector(state => state.user)
   const { username, name, details } = data
 
   const form = useForm({
@@ -23,6 +26,10 @@ export default function ProfileInfo() {
       username: hasLength({ min: 1 }, 'Username should not be empty'),
     },
   })
+
+  const handleSubmit = (name: string, username: string) => {
+    dispatch(updateUser({ name, username }))
+  }
 
   return (
     <>
@@ -41,7 +48,11 @@ export default function ProfileInfo() {
           <form
             onSubmit={form.onSubmit(
               values => {
-                console.log(values)
+                if (values.name && values.username) {
+                  const cleanUsername = cleanup(values.username)
+                  form.setFieldValue('username', cleanUsername)
+                  handleSubmit(values.name, cleanUsername)
+                }
               },
               (validationErrors, values, event) => {
                 console.log(
@@ -69,7 +80,9 @@ export default function ProfileInfo() {
 
               <span />
 
-              <Button type="submit">Update Profile</Button>
+              <Button type="submit" loading={updating}>
+                Update Profile
+              </Button>
             </Stack>
           </form>
         </Stack>

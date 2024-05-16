@@ -10,9 +10,6 @@ export enum UserField {
   name = 'name',
   // detail
   avatar = 'avatar',
-  about = 'about',
-  covers = 'covers',
-  links = 'links',
 }
 
 export enum AdminRole {

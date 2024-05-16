@@ -1,17 +1,11 @@
 import axios from 'axios'
-import type { User } from '@/models/user'
-import type { BucketType, UserField } from '@/types/db'
+import type { TUser } from '@/models/user'
+import type { BucketType } from '@/types/db'
 
-type Response = { success: boolean; error?: string }
-type GetUserInfo = Response & { user?: User }
-
-export const getUserInfo = async (): Promise<User | undefined> => {
+export const getUserInfo = async (): Promise<TUser | undefined> => {
   try {
-    const { data } = await axios.get<GetUserInfo>('/api/user/info')
-    const { user, error } = data
-    if (error) {
-      throw new Error(error)
-    }
+    const { data } = await axios.get<{ user: TUser }>('/api/u/user')
+    const { user } = data
     return user
   } catch (err) {
     console.error(err)
@@ -19,15 +13,11 @@ export const getUserInfo = async (): Promise<User | undefined> => {
   }
 }
 
-export type UpdateUserBody = { field: UserField; value: any }
-export const updateUser = async (body: UpdateUserBody) => {
+export const updateUser = async (body: Partial<TUser>) => {
   try {
-    const res = await axios.patch<Response & { data: UpdateUserBody }>(`/api/user/update`, body)
-    const { success, data } = res.data
-    if (!success) {
-      throw new Error('fail')
-    }
-    return data
+    const res = await axios.put<{ user: TUser }>(`/api/u/user/update`, body)
+    const { user } = res.data
+    return user
   } catch (err) {
     console.error(err)
     return undefined
@@ -37,7 +27,7 @@ export const updateUser = async (body: UpdateUserBody) => {
 export const uploadImage = async (dataURI: string, type: BucketType) => {
   // data:image/png;base64,iVBORw0...
   try {
-    const { data } = await axios.post<{ url: string }>('/api/user/uploadImage', {
+    const { data } = await axios.post<{ url: string }>('/api/u/user/uploadImage', {
       dataURI,
       type,
     })

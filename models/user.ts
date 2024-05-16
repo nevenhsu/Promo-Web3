@@ -3,7 +3,6 @@ import { nanoid } from 'nanoid'
 
 const detailSchema = new Schema({
   avatar: String,
-  links: [String],
 })
 
 export const userSchema = new Schema({
@@ -22,7 +21,7 @@ export const userSchema = new Schema({
     required: true,
     unique: true,
     index: true,
-    default: nanoid(),
+    default: randomUsername,
   },
   name: String,
   email: String,
@@ -31,6 +30,12 @@ export const userSchema = new Schema({
 })
 
 export type User = InferSchemaType<typeof userSchema>
+export type TUser = Omit<User, '_id'> & { _id: string }
 
 const name = 'User'
 export default (models[name] as Model<User>) || model(name, userSchema)
+
+// Function to generate a random string
+function randomUsername() {
+  return nanoid()
+}

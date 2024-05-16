@@ -3,31 +3,28 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getUserInfo, updateUser as updateUserAPI } from '@/services/user'
 import { UserField } from '@/types/db'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import type { UpdateUserBody } from '@/services/user'
-import type { User } from '@/models/user'
+import type { TUser } from '@/models/user'
 
-type TUser = Partial<Omit<User, '_id'> & { _id?: string }>
-
-export const fetchUser = createAsyncThunk<TUser>('user/fetch', async () => {
-  const fallback = {}
+export const fetchUser = createAsyncThunk<Partial<TUser>>('user/fetch', async () => {
   try {
     const data = await getUserInfo()
-    const { _id } = data || {}
-    if (_id) {
-      return { ...data, _id: _id.toString() }
-    }
-    return fallback
+    return data || {}
   } catch (err) {
     console.error(err)
-    return fallback
+    return {}
   }
 })
 
-export const updateUser = createAsyncThunk<UpdateUserBody | undefined, UpdateUserBody>(
+export const updateUser = createAsyncThunk<Partial<TUser>, Partial<TUser>>(
   'user/update',
-  async body => {
-    const res = await updateUserAPI(body)
-    return res
+  async data => {
+    try {
+      const updateData = await updateUserAPI(data)
+      return updateData || {}
+    } catch (err) {
+      console.error(err)
+      return {}
+    }
   }
 )
 
@@ -52,56 +49,50 @@ export const slice = createSlice({
     setFetched: (state, action: PayloadAction<boolean>) => {
       state.fetched = action.payload
     },
-    setNewValue: (state, action: PayloadAction<UpdateUserBody>) => {
-      const body = action.payload
-      updateState(state, body)
-    },
   },
   extraReducers: builder => {
     builder.addCase(fetchUser.fulfilled, (state, action) => {
       const data = action.payload
       state.data = data
-      state._id = data._id?.toString() || ''
+      state._id = data._id || ''
       state.fetched = true
     })
     builder.addCase(updateUser.pending, (state, action) => {
       state.updating = true
     })
     builder.addCase(updateUser.fulfilled, (state, action) => {
-      const body = action.payload
+      const newData = action.payload
       state.updating = false
-      if (body) {
-        updateState(state, body)
+      if (newData) {
+        updateState(state, newData)
       }
     })
   },
 })
 
-export const { setFetched, setNewValue } = slice.actions
+export const { setFetched } = slice.actions
 export const userReducer = slice.reducer
 
-function updateState(state: IUserState, body: UpdateUserBody) {
-  const { field, value } = body
-  switch (field) {
-    case UserField.name:
-    case UserField.username:
-      state.data[field] = value
-      break
+function updateState(state: IUserState, body: Partial<TUser>) {
+  _.forEach(body, (value, key) => {
+    switch (key) {
+      case UserField.name:
+      case UserField.username:
+        state.data[key] = value as any
+        break
 
-    // details
-    case UserField.about:
-    case UserField.links:
-    case UserField.avatar:
-    case UserField.covers: {
-      state.data.details = {
-        ...state.data.details,
-        [field]: value,
-      } as any
-      break
-    }
+      // details
+      case UserField.avatar: {
+        state.data.details = {
+          ...state.data.details,
+          [key]: value,
+        } as any
+        break
+      }
 
-    default: {
-      // throw new Error('invalid field')
+      default: {
+        // throw new Error('invalid field')
+      }
     }
-  }
+  })
 }
