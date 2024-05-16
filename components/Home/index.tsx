@@ -100,10 +100,10 @@ export default function Home() {
               <IoWallet color="#2C98FF" size="2rem" />
             </Avatar>
             <Stack gap={0}>
-              <Text fw={700} fz={14}>
+              <Text fw={700} fz="sm">
                 $ 300,000
               </Text>
-              <Text fz={12}>Available balance</Text>
+              <Text fz="xs">Available balance</Text>
             </Stack>
           </Flex>
           {/* action */}
@@ -113,7 +113,7 @@ export default function Home() {
               <Avatar variant="filled" radius="sm" size="md" color="#2C98FF">
                 <LiaHistorySolid color="white" size="1.5rem" />
               </Avatar>
-              <Text mt={1} fz={12} c="#1F2937">
+              <Text mt={1} fz="xs" c="#1F2937">
                 History
               </Text>
             </Stack>
@@ -143,7 +143,7 @@ export default function Home() {
     return (
       <Card mt={12} shadow="sm" padding="md" radius="xs" withBorder>
         <Group mb={18} justify="space-between">
-          <Text mt={1} fz={16} fw={700} c="#1F2937">
+          <Text mt={1} fz="md" fw={700} c="#1F2937">
             History
           </Text>
           <Button
@@ -167,7 +167,7 @@ export default function Home() {
                   isCurrentLevel={isCurrentLevel}
                   reached={points > el?.points}
                 />
-                <Text fz={12} fw={isCurrentLevel ? 700 : 400}>
+                <Text fz="xs" fw={isCurrentLevel ? 700 : 400}>
                   {el?.title}
                 </Text>
               </Stack>
@@ -175,7 +175,7 @@ export default function Home() {
           })}
         </Group>
         <Progress color="yellow" radius="xl" value={_.round((points * 100) / MAX_POINTS, 0)} />
-        <Text mt={10} fz={12} fw={400} c="#1F2937">
+        <Text mt={10} fz="xs" fw={400} c="#1F2937">
           Gain more {MAX_POINTS.toLocaleString()} and wait until <b>31 Dec 2023</b> to reach
           platinum
         </Text>
@@ -201,7 +201,7 @@ export default function Home() {
         <Group justify="space-between">
           {/* username */}
           <Stack gap={0}>
-            <Text fz={14} c="white">
+            <Text fz="sm" c="white">
               Good Morning
             </Text>
             <Text fw={700} fz={26} c="white">
@@ -233,7 +233,7 @@ export default function Home() {
           <Group justify="space-between">
             <Flex gap="xs" justify="center" align="center" direction="row" wrap="wrap">
               <Avatar src={InviteImg} alt="invite" size="md" bg="white" />
-              <Text ml={8} fw={700} fz={14} c="#1E293B">
+              <Text ml={8} fw={700} fz="sm" c="#1E293B">
                 Invite Friends
               </Text>
             </Flex>
@@ -247,7 +247,7 @@ export default function Home() {
               <Avatar size="md" bg="#2C98FF">
                 <IoStar size="1.5rem" color="white" />
               </Avatar>
-              <Text ml={8} fw={700} fz={14} c="#1E293B">
+              <Text ml={8} fw={700} fz="sm" c="#1E293B">
                 Gain 100 points
               </Text>
             </Flex>
@@ -257,7 +257,7 @@ export default function Home() {
               c="#2C98FF"
               onClick={() => setCheckSuccessOpened(true)}
             >
-              <Text fw={700} fz={12}>
+              <Text fw={700} fz="xs">
                 Daily Check
               </Text>
             </Button>
@@ -279,7 +279,7 @@ export default function Home() {
               <Avatar size="md" bg="#FFA41B">
                 <IoStar size="1.5rem" color="white" />
               </Avatar>
-              <Text ml={8} fw={700} fz={14} c="#1E293B">
+              <Text ml={8} fw={700} fz="sm" c="#1E293B">
                 Enter referral code
               </Text>
             </Flex>
@@ -307,7 +307,7 @@ export default function Home() {
           <Text mt="32px" mb="10px" fw={700} fz={20}>
             Complete
           </Text>
-          <Text fw={400} fz={14} c="#94A3B8">
+          <Text fw={400} fz="sm" c="#94A3B8">
             You earn 500 points!
           </Text>
         </Stack>

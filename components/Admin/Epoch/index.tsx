@@ -43,8 +43,8 @@ export default function AdminUser() {
       <Table.Td c="blue" fw={500}>
         {el.index}
       </Table.Td>
-      <Table.Td fz={14}>{formateTime(el.startTime)}</Table.Td>
-      <Table.Td fz={14}>{formateTime(el.endTime)}</Table.Td>
+      <Table.Td fz="sm">{formateTime(el.startTime)}</Table.Td>
+      <Table.Td fz="sm">{formateTime(el.endTime)}</Table.Td>
 
       <Table.Td>
         <Group gap="xs">
@@ -66,8 +66,8 @@ export default function AdminUser() {
         <Stack>
           <Group justify="space-between">
             <Stack gap={4}>
-              <Text fz={14}>{timeZone}</Text>
-              <Text fz={12} c="dimmed">
+              <Text fz="sm">{timeZone}</Text>
+              <Text fz="xs" c="dimmed">
                 {gmt}
               </Text>
             </Stack>

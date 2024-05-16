@@ -46,7 +46,7 @@ function CardAction(props: CardActionProps) {
             <Text fz={20} fw={500}>
               {title}
             </Text>
-            <Text fz={14} c="dimmed">
+            <Text fz="sm" c="dimmed">
               {description}
             </Text>
           </Stack>

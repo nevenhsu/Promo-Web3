@@ -1,10 +1,10 @@
-import { Admin } from '@/types/db'
+import { AdminRole } from '@/types/db'
 
 export function getRoleLabel(role: number) {
   switch (role) {
-    case Admin.SuperAdmin:
+    case AdminRole.SuperAdmin:
       return 'Super Admin'
-    case Admin.UserAdmin:
+    case AdminRole.UserAdmin:
       return 'User Admin'
     default:
       return 'Unknown'
@@ -12,6 +12,6 @@ export function getRoleLabel(role: number) {
 }
 
 export const labelData = [
-  { value: `${Admin.SuperAdmin}`, label: getRoleLabel(Admin.SuperAdmin) },
-  { value: `${Admin.UserAdmin}`, label: getRoleLabel(Admin.UserAdmin) },
+  { value: `${AdminRole.SuperAdmin}`, label: getRoleLabel(AdminRole.SuperAdmin) },
+  { value: `${AdminRole.UserAdmin}`, label: getRoleLabel(AdminRole.UserAdmin) },
 ] as const

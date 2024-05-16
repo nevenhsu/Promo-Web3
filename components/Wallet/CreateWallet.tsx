@@ -27,7 +27,7 @@ export default function CreateWallet() {
       <RwdLayout className={classes.content}>
         <Stack>
           <Title>Create Wallet</Title>
-          <Text fz={14} c="dimmed" mb="md">
+          <Text fz="sm" c="dimmed" mb="md">
             Get a smart wallet with advanced features
           </Text>
 

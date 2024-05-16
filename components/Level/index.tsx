@@ -18,7 +18,7 @@ export default function Activity() {
               </Center>
               <Stack gap={4}>
                 <Text fw={700}>66000 points</Text>
-                <Text fz={12}>Level Gold</Text>
+                <Text fz="xs">Level Gold</Text>
               </Stack>
             </Group>
           </Paper>
@@ -48,7 +48,7 @@ export default function Activity() {
                   </Box>
                   <Stack gap={4}>
                     <Text c="var(--mantine-color-text)">Repost on X</Text>
-                    <Text fz={12} fw={500}>
+                    <Text fz="xs" fw={500}>
                       Confirmed
                     </Text>
                   </Stack>
@@ -71,7 +71,7 @@ export default function Activity() {
                   </Box>
                   <Stack gap={4}>
                     <Text c="var(--mantine-color-text)">Refer a friend</Text>
-                    <Text fz={12} fw={500}>
+                    <Text fz="xs" fw={500}>
                       Pending
                     </Text>
                   </Stack>

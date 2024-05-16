@@ -15,7 +15,7 @@ export enum UserField {
   links = 'links',
 }
 
-export enum Admin {
+export enum AdminRole {
   SuperAdmin = 0,
   UserAdmin = 1,
 }

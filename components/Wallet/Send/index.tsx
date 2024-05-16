@@ -26,7 +26,7 @@ export default function Send() {
           <Paper p="md" withBorder>
             <Stack gap="lg">
               <Group justify="space-between">
-                <Text fz={14} fw={500}>
+                <Text fz="sm" fw={500}>
                   To
                 </Text>
                 <Button variant="outline" size="compact-xs" radius="xl">
@@ -60,12 +60,12 @@ export default function Send() {
               />
 
               <Stack gap="xs">
-                <Text fz={14} fw={500}>
+                <Text fz="sm" fw={500}>
                   Network fee
                 </Text>
 
                 <Group className={classes.field} justify="space-between">
-                  <Text fz={14}>Average</Text>
+                  <Text fz="sm">Average</Text>
                   <PiCaretDown size={16} />
                 </Group>
               </Stack>
@@ -74,12 +74,12 @@ export default function Send() {
 
               <Stack gap="xs">
                 <Group justify="space-between">
-                  <Text fz={14}>Total Amount</Text>
-                  <Text fz={14} fw={500}>
+                  <Text fz="sm">Total Amount</Text>
+                  <Text fz="sm" fw={500}>
                     1.2234 BTC
                   </Text>
                 </Group>
-                <Text ta="right" fz={12} c="dimmed">
+                <Text ta="right" fz="xs" c="dimmed">
                   USD 93232.32
                 </Text>
               </Stack>

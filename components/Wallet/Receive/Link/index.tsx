@@ -36,7 +36,7 @@ export default function Link() {
                 rightSection={<Text fw={500}>BTC</Text>}
               />
 
-              <Text fz={12} c="dimmed">
+              <Text fz="xs" c="dimmed">
                 USD 93232.32
               </Text>
             </Stack>
@@ -64,10 +64,10 @@ export default function Link() {
           <Title order={5}>Send Link</Title>
 
           <Box w={300} ta="center" mb="xl">
-            <Text fz={14} c="dimmed">
+            <Text fz="sm" c="dimmed">
               Your request link is already to send!
             </Text>
-            <Text fz={14} c="dimmed">
+            <Text fz="sm" c="dimmed">
               Send this link to a friend, and it will ask them to send 2.22 BTC
             </Text>
           </Box>
@@ -77,7 +77,7 @@ export default function Link() {
           </Center>
 
           <Box ta="center" c="blue" mb="xl">
-            <Text fz={12}>{link}</Text>
+            <Text fz="xs">{link}</Text>
           </Box>
 
           <Group w="100%" grow>

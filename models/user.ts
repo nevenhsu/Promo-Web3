@@ -1,9 +1,8 @@
 import { models, model, Model, Schema, InferSchemaType, Types } from 'mongoose'
+import { nanoid } from 'nanoid'
 
 const detailSchema = new Schema({
   avatar: String,
-  about: String,
-  covers: [String],
   links: [String],
 })
 
@@ -20,9 +19,10 @@ export const userSchema = new Schema({
   },
   username: {
     type: String,
-    required: false,
+    required: true,
     unique: true,
     index: true,
+    default: nanoid(),
   },
   name: String,
   email: String,

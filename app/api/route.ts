@@ -1,6 +1,5 @@
 import * as _ from 'lodash-es'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 
 export async function GET(req: NextRequest) {
   const msg = `Hello!`

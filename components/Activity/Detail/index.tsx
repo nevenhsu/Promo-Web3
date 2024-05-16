@@ -25,7 +25,7 @@ export default function ActivityDetail({ activityId }: ActivityDetailProps) {
         <Stack gap="lg">
           <Title order={4}>Taitra Tech Promotion</Title>
 
-          <Text fz={14} c="dimmed">
+          <Text fz="sm" c="dimmed">
             RAMAYANA BALLET at Purawisata – Jogjakarta – Indonesia, has held the record for
             every-night stage without ever being off for 42 YEARS, and received an award from The
             Indonesia Records Museum (MURI) in 2001.
@@ -42,17 +42,17 @@ export default function ActivityDetail({ activityId }: ActivityDetailProps) {
           <Stack gap="sm">
             <Group gap="sm">
               <PiLightning size={20} />
-              <Text fz={14}>Repost on X</Text>
+              <Text fz="sm">Repost on X</Text>
             </Group>
 
             <Group gap="sm">
               <PiPersonSimpleRun size={20} />
-              <Text fz={14}> 123 Participants</Text>
+              <Text fz="sm"> 123 Participants</Text>
             </Group>
 
             <Group gap="sm">
               <PiCalendarBlank size={20} />
-              <Text fz={14}>14 May 2024 ~ 14 Jun 2024</Text>
+              <Text fz="sm">14 May 2024 ~ 14 Jun 2024</Text>
             </Group>
           </Stack>
 

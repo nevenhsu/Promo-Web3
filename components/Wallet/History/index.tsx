@@ -26,7 +26,7 @@ export default function History() {
                 </Box>
                 <Stack gap={4}>
                   <Text>Received BTC</Text>
-                  <Text c="green.6" fz={12} fw={500}>
+                  <Text c="green.6" fz="xs" fw={500}>
                     Confirmed
                   </Text>
                 </Stack>
@@ -34,7 +34,7 @@ export default function History() {
 
               <Stack gap={4} ta="right">
                 <Text>2.8 BTC</Text>
-                <Text c="dimmed" fz={12}>
+                <Text c="dimmed" fz="xs">
                   USD 64393.23
                 </Text>
               </Stack>
@@ -53,7 +53,7 @@ export default function History() {
                 </Box>
                 <Stack gap={4}>
                   <Text>Sent BTC</Text>
-                  <Text c="blue" fz={12} fw={500}>
+                  <Text c="blue" fz="xs" fw={500}>
                     Pending
                   </Text>
                 </Stack>
@@ -61,7 +61,7 @@ export default function History() {
 
               <Stack gap={4} ta="right">
                 <Text>0.8 BTC</Text>
-                <Text c="dimmed" fz={12}>
+                <Text c="dimmed" fz="xs">
                   USD 34393.23
                 </Text>
               </Stack>

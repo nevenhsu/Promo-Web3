@@ -60,7 +60,7 @@ export default function LevelCard({ points }: LevelCardProps) {
             ]}
           />
 
-          <Text fz={14}>
+          <Text fz="sm">
             Gain more
             <Box component="b" c="orange">
               {` ${'19,000'} `}

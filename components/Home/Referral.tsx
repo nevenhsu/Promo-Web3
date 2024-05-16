@@ -54,7 +54,7 @@ export default function Referral() {
         </ActionIcon>
         {state !== State.ReferYourFriends && (
           <UnstyledButton onClick={() => setState(State.ReferYourFriends)}>
-            <Text fz={14} fw={600} c="#868E96">
+            <Text fz="sm" fw={600} c="#868E96">
               Skip
             </Text>
           </UnstyledButton>

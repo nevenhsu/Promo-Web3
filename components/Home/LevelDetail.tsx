@@ -66,7 +66,7 @@ const LevelDetail = forwardRef<LevelDetailRef, LevelDetailProps>((props, ref) =>
       >
         <Drawer.Header>
           <Drawer.Title>
-            <Text fz={14} fw={400} c="#8683A1">
+            <Text fz="sm" fw={400} c="#8683A1">
               List Member level
             </Text>
           </Drawer.Title>
@@ -77,10 +77,10 @@ const LevelDetail = forwardRef<LevelDetailRef, LevelDetailProps>((props, ref) =>
               <Grid.Col span="content">{el?.icon}</Grid.Col>
               <Grid.Col span="auto">
                 <Stack gap={0}>
-                  <Text fw={700} fz={16}>
+                  <Text fw={700} fz="md">
                     {el?.level}
                   </Text>
-                  <Text fz={12} c="#6B7280" style={{ lineHeight: '155%' }}>
+                  <Text fz="xs" c="#6B7280" style={{ lineHeight: '155%' }}>
                     {el?.desc}
                   </Text>
                 </Stack>

@@ -22,7 +22,7 @@ export default function Receive() {
             </AspectRatio>
           </Center>
 
-          <Text ta="center" fz={12} mb="lg">
+          <Text ta="center" fz="xs" mb="lg">
             {address}
           </Text>
 

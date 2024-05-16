@@ -45,15 +45,15 @@ export default function Activity() {
                 />
                 <Stack gap={4} className={classes.content}>
                   <Group justify="space-between" wrap="nowrap" gap="sm">
-                    <Text fz={16} fw={500}>
+                    <Text fz="md" fw={500}>
                       Taitra Tech Promotion
                     </Text>
                     <PiXLogo className={classes.logo} size={24} />
                   </Group>
-                  <Text fz={12} c="dimmed">
+                  <Text fz="xs" c="dimmed">
                     20 May 2024
                   </Text>
-                  <Text fz={12} c="dimmed">
+                  <Text fz="xs" c="dimmed">
                     Repost on X
                   </Text>
                 </Stack>

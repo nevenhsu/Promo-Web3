@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrivyClient } from '@privy-io/server-auth'
 import dbConnect from '@/lib/dbConnect'
 import UserModel from '@/models/user'
+import { createUser } from '@/lib/db/user'
 
 const handler = NextAuth({
   secret: process.env.AUTH_SECRET,
@@ -26,8 +27,7 @@ const handler = NextAuth({
 
             // auto create user if not exists
             if (!user) {
-              const newUser = new UserModel({ privyId })
-              await newUser.save()
+              const newUser = await createUser(privyId)
               return { id: newUser._id.toString(), privyId }
             }
 

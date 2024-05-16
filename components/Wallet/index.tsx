@@ -25,7 +25,7 @@ export default function Wallet() {
     <>
       <RwdLayout c="white" bg="var(--mantine-primary-color-6)">
         <Group justify="space-between">
-          <Text fz={14} opacity={0.8}>
+          <Text fz="sm" opacity={0.8}>
             Balance
           </Text>
           <Box h={12}>
@@ -77,19 +77,19 @@ export default function Wallet() {
             <Group>
               <PiCurrencyBtcFill size={32} />
               <Stack gap={4}>
-                <Text fz={14} fw={500}>
+                <Text fz="sm" fw={500}>
                   Bitcoin
                 </Text>
-                <Text fz={12} c="dimmed">
+                <Text fz="xs" c="dimmed">
                   BTC
                 </Text>
               </Stack>
             </Group>
             <Stack gap={4} ta="right">
-              <Text fz={14} fw={500}>
+              <Text fz="sm" fw={500}>
                 5.20
               </Text>
-              <Text fz={12} c="dimmed">
+              <Text fz="xs" c="dimmed">
                 USD 92000.20
               </Text>
             </Stack>
@@ -100,19 +100,19 @@ export default function Wallet() {
             <Group>
               <PiCurrencyDollarFill size={32} />
               <Stack gap={4}>
-                <Text fz={14} fw={500}>
+                <Text fz="sm" fw={500}>
                   USD Coin
                 </Text>
-                <Text fz={12} c="dimmed">
+                <Text fz="xs" c="dimmed">
                   USDC
                 </Text>
               </Stack>
             </Group>
             <Stack gap={4} ta="right">
-              <Text fz={14} fw={500}>
+              <Text fz="sm" fw={500}>
                 500.20
               </Text>
-              <Text fz={12} c="dimmed">
+              <Text fz="xs" c="dimmed">
                 USD 500.48
               </Text>
             </Stack>

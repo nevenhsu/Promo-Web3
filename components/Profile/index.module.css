@@ -1,5 +1,9 @@
 /* Index */
 
+.menu > div {
+  cursor: pointer;
+}
+
 /* ProfileInfo */
 
 .avatarIcon {
