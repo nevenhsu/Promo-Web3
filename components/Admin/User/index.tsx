@@ -1,32 +1,36 @@
 'use client'
 
 import { useRef } from 'react'
-import { Stack, Button, Paper, Table, Box, Group, Divider, ActionIcon } from '@mantine/core'
+import { useAdmin } from '@/store/contexts/AdminContext'
+import { Stack, Button, Paper, Table, Box, Group, Divider, Text, ActionIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import AddModel, { type AddModalRef } from './AddModal'
 import UpdateModal, { type UpdateModalRef } from './UpdateModal'
 import DeleteModal, { type DeleteModalRef } from './DeleteModal'
-import classes from './index.module.css'
 import { getRoleLabel } from './variables'
 import { PiPencil, PiTrash } from 'react-icons/pi'
-
-const elements: Array<{ username: string; name: string; role: number; active: boolean }> = [
-  { username: '1', name: 'Super', role: 0, active: true },
-  { username: '2', name: 'Admin', role: 1, active: true },
-  { username: '3', name: 'Admin', role: 1, active: false },
-]
+import classes from './index.module.css'
 
 export default function AdminUser() {
   const addRef = useRef<AddModalRef>(null)
   const updateRef = useRef<UpdateModalRef>(null)
   const deleteRef = useRef<DeleteModalRef>(null)
 
-  const rows = elements.map(element => (
-    <Table.Tr key={element.username}>
-      <Table.Td fw={500}>{element.name}</Table.Td>
-      <Table.Td>{getRoleLabel(element.role)}</Table.Td>
+  const { admins, setSelectedId: setSelectedAdmin } = useAdmin()
+
+  const rows = admins.map(o => (
+    <Table.Tr key={o._user._id}>
+      <Table.Td fw={500}>
+        <>
+          <Box>{o._user.name || 'No name'}</Box>
+          <Box c="dimmed" fz="xs">
+            @{o._user.username}
+          </Box>
+        </>
+      </Table.Td>
+      <Table.Td>{getRoleLabel(o.role)}</Table.Td>
       <Table.Td>
-        {element.active ? (
+        {o.active ? (
           <Box className={classes.chip} c="blue" bg="blue.1">
             Active
           </Box>
@@ -38,7 +42,12 @@ export default function AdminUser() {
       </Table.Td>
       <Table.Td>
         <Group gap="xs">
-          <ActionIcon onClick={() => updateRef.current?.open()}>
+          <ActionIcon
+            onClick={() => {
+              setSelectedAdmin(o._user._id)
+              updateRef.current?.open()
+            }}
+          >
             <PiPencil />
           </ActionIcon>
           <Divider orientation="vertical" />
@@ -59,8 +68,8 @@ export default function AdminUser() {
               Add Admin
             </Button>
           </Group>
-          <Paper withBorder>
-            <Table.ScrollContainer minWidth={500}>
+          <Paper pos="relative" withBorder>
+            <Table.ScrollContainer minWidth={500} mih={200}>
               <Table>
                 <Table.Thead>
                   <Table.Tr>
@@ -73,13 +82,21 @@ export default function AdminUser() {
                 <Table.Tbody>{rows}</Table.Tbody>
               </Table>
             </Table.ScrollContainer>
+
+            {!admins.length && (
+              <>
+                <Text className="absolute-center" ta="center" c="dimmed" mt="md">
+                  No admin yet...
+                </Text>
+              </>
+            )}
           </Paper>
         </Stack>
       </RwdLayout>
 
       <AddModel ref={addRef} />
-      <UpdateModal ref={updateRef} username="test" name="Alex Dev" active={true} />
-      <DeleteModal ref={deleteRef} username="test" name="Alex Dev" />
+      <UpdateModal ref={updateRef} />
+      <DeleteModal ref={deleteRef} />
     </>
   )
 }

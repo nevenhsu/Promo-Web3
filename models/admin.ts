@@ -1,8 +1,9 @@
-import { models, model, Model, Schema, InferSchemaType, Types } from 'mongoose'
+import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import { AdminRole } from '@/types/db'
+import type { TUser } from '@/models/user'
 
 export const schema = new Schema({
-  userId: {
+  _user: {
     type: Schema.Types.ObjectId,
     ref: 'User', // This should match the name of your user model
     required: true,
@@ -11,7 +12,6 @@ export const schema = new Schema({
   },
   active: {
     type: Boolean,
-    required: true,
     default: true,
   },
   role: {
@@ -22,6 +22,7 @@ export const schema = new Schema({
 })
 
 export type Admin = InferSchemaType<typeof schema>
+export type TAdmin = Omit<Admin, '_user'> & { _user: TUser } // with populated _user
 
 const name = 'Admin'
 export default (models[name] as Model<Admin>) || model(name, schema)

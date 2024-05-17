@@ -4,6 +4,7 @@ import { forwardRef, useImperativeHandle } from 'react'
 import { useForm, hasLength } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, TextInput, Button, Select } from '@mantine/core'
+import { useAdmin } from '@/store/contexts/AdminContext'
 import { labelData } from './variables'
 
 export type AddModalRef = {
@@ -12,6 +13,7 @@ export type AddModalRef = {
 
 export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
   const [opened, { open, close }] = useDisclosure(false)
+  const { createAdmin, loading } = useAdmin()
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -21,6 +23,7 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
     },
     validate: {
       username: hasLength({ min: 1 }, 'Username should not be empty'),
+      role: hasLength({ min: 1 }, 'Role should not be empty'),
     },
   })
 
@@ -30,14 +33,29 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
     },
   }))
 
+  const handleClose = () => {
+    form.reset()
+    close()
+  }
+
+  const handleSubmit = async (username: string, role: number) => {
+    const newAdmin = await createAdmin(username, role)
+
+    if (newAdmin) {
+      handleClose()
+    } else {
+      form.setFieldError('username', 'Wrong username')
+    }
+  }
+
   return (
     <>
-      <Modal opened={opened} onClose={close} title="Add new admin" centered>
+      <Modal opened={opened} onClose={handleClose} title="Add new admin" centered>
         <Box mx="auto">
           <form
             onSubmit={form.onSubmit(
               values => {
-                console.log(values)
+                handleSubmit(values.username, parseInt(values.role))
               },
               (validationErrors, values, event) => {
                 console.log(
@@ -65,7 +83,9 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
 
               <span />
 
-              <Button type="submit">Submit</Button>
+              <Button type="submit" loading={loading}>
+                Submit
+              </Button>
             </Stack>
           </form>
         </Box>

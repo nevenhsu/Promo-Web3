@@ -14,7 +14,7 @@ export enum UserField {
 
 export enum AdminRole {
   SuperAdmin = 0,
-  UserAdmin = 1,
+  DevAdmin = 1,
 }
 
 export enum ActivityType {

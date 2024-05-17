@@ -1,7 +1,7 @@
 import { Session } from 'next-auth'
 import { JWT } from 'next-auth/jwt'
 
-type User = { id: string; privyId: string }
+type User = { id: string; privyId: string; isAdmin?: boolean; adminRole?: number }
 
 declare module 'next-auth' {
   interface Session {

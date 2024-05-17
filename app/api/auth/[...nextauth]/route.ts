@@ -4,6 +4,7 @@ import { PrivyClient } from '@privy-io/server-auth'
 import dbConnect from '@/lib/dbConnect'
 import UserModel from '@/models/user'
 import { createUser } from '@/lib/db/user'
+import { getAdmin } from '@/lib/db/admin'
 
 const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
@@ -31,7 +32,11 @@ const handler = NextAuth({
               return { id: newUser._id.toString(), privyId }
             }
 
-            return { id: user._id.toString(), privyId }
+            const admin = await getAdmin(user._id.toString())
+            const isAdmin = Boolean(admin)
+            const adminRole = admin?.role
+
+            return { id: user._id.toString(), privyId, isAdmin, adminRole }
           }
         }
 

@@ -1,20 +1,22 @@
 'use client'
 
 import { useEffect } from 'react'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { usePrivy } from '@privy-io/react-auth'
 import { fetchUser } from '@/store/slices/user'
-import { useAppDispatch, useAppSelector } from '@/hooks/redux'
+import { useAppDispatch } from '@/hooks/redux'
 
 // auto connect privy to mongodb
 
 export default function useAutoAuth() {
   const dispatch = useAppDispatch()
+
+  const { status } = useSession()
   const { getAccessToken, user } = usePrivy()
   const privyId = user?.id
 
-  const { fetched, _id } = useAppSelector(state => state.user)
-  const notAuthOnServer = fetched && !_id
+  const authenticated = status === 'authenticated'
+  const notAuthOnServer = status === 'unauthenticated'
 
   const getAuthToken = async () => {
     const token = await getAccessToken()
@@ -24,15 +26,7 @@ export default function useAutoAuth() {
 
   const startAuth = async (privyId: string) => {
     const authToken = await getAuthToken()
-    signIn('credentials', { authToken, privyId, redirect: false })
-      .then(res => {
-        if (res?.error) {
-          console.error(res.error)
-        } else {
-          dispatch(fetchUser())
-        }
-      })
-      .catch(err => console.error(err))
+    signIn('credentials', { authToken, privyId, redirect: false }).catch(err => console.error(err))
   }
 
   useEffect(() => {
@@ -43,8 +37,10 @@ export default function useAutoAuth() {
 
   // on init
   useEffect(() => {
-    dispatch(fetchUser())
-  }, [])
+    if (authenticated) {
+      dispatch(fetchUser())
+    }
+  }, [authenticated])
 
   return null
 }

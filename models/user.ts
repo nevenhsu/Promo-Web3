@@ -1,4 +1,4 @@
-import { models, model, Model, Schema, InferSchemaType, Types } from 'mongoose'
+import { models, model, Model, Schema, InferSchemaType, Document } from 'mongoose'
 import { nanoid } from 'nanoid'
 
 const detailSchema = new Schema({
@@ -6,10 +6,6 @@ const detailSchema = new Schema({
 })
 
 export const userSchema = new Schema({
-  _id: {
-    type: Schema.Types.ObjectId,
-    default: new Types.ObjectId(),
-  },
   privyId: {
     type: String,
     required: true,
@@ -30,7 +26,7 @@ export const userSchema = new Schema({
 })
 
 export type User = InferSchemaType<typeof userSchema>
-export type TUser = Omit<User, '_id'> & { _id: string }
+export type TUser = User & { _id: string }
 
 const name = 'User'
 export default (models[name] as Model<User>) || model(name, userSchema)

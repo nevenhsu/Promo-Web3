@@ -1,38 +1,51 @@
 'use client'
 
-import { forwardRef, useImperativeHandle } from 'react'
+import { forwardRef, useImperativeHandle, useEffect } from 'react'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Text, Button, Select, Switch } from '@mantine/core'
+import { useAdmin } from '@/store/contexts/AdminContext'
 import { labelData } from './variables'
 
 export type UpdateModalRef = {
   open: () => void
 }
 
-type UpdateModalProps = {
-  username?: string
-  name?: string
-  active?: boolean
-}
-
-export default forwardRef<UpdateModalRef, UpdateModalProps>(function UpdateModal(props, ref) {
-  const { username, name, active } = props
+export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
   const [opened, { open, close }] = useDisclosure(false)
 
   const form = useForm({
-    mode: 'uncontrolled',
     initialValues: {
       role: '1',
-      active,
+      active: true,
     },
   })
+
+  const { selectedAdmin, admins, loading, updateAdmin } = useAdmin()
+
+  useEffect(() => {
+    if (opened && selectedAdmin) {
+      form.setValues({
+        role: `${selectedAdmin.role}`,
+        active: selectedAdmin.active,
+      })
+    }
+  }, [selectedAdmin, opened])
 
   useImperativeHandle(ref, () => ({
     open() {
       open()
     },
   }))
+
+  const handleSubmit = async (role: number, active: boolean) => {
+    if (selectedAdmin?._user._id) {
+      const updated = await updateAdmin(selectedAdmin._user._id, { role, active })
+      if (updated) {
+        close()
+      }
+    }
+  }
 
   return (
     <>
@@ -41,7 +54,7 @@ export default forwardRef<UpdateModalRef, UpdateModalProps>(function UpdateModal
           <form
             onSubmit={form.onSubmit(
               values => {
-                console.log(values)
+                handleSubmit(parseInt(values.role), values.active)
               },
               (validationErrors, values, event) => {
                 console.log(
@@ -53,7 +66,12 @@ export default forwardRef<UpdateModalRef, UpdateModalProps>(function UpdateModal
             )}
           >
             <Stack>
-              <Text fw={500}>{name}</Text>
+              <Box>
+                <Text fw={500}>{selectedAdmin?._user.name}</Text>
+                <Text fz="xs" c="dimmed">
+                  {selectedAdmin?._user.username ? `@${selectedAdmin?._user.username}` : '-'}
+                </Text>
+              </Box>
 
               <Select
                 data={labelData}
@@ -66,12 +84,15 @@ export default forwardRef<UpdateModalRef, UpdateModalProps>(function UpdateModal
                 label="Active"
                 key={form.key('active')}
                 {...form.getInputProps('active')}
+                checked={form.getInputProps('active').value}
                 my="xs"
               />
 
               <span />
 
-              <Button type="submit">Submit</Button>
+              <Button type="submit" loading={loading}>
+                Update
+              </Button>
             </Stack>
           </form>
         </Box>

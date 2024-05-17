@@ -4,8 +4,8 @@ export function getRoleLabel(role: number) {
   switch (role) {
     case AdminRole.SuperAdmin:
       return 'Super Admin'
-    case AdminRole.UserAdmin:
-      return 'User Admin'
+    case AdminRole.DevAdmin:
+      return 'Dev Admin'
     default:
       return 'Unknown'
   }
@@ -13,5 +13,5 @@ export function getRoleLabel(role: number) {
 
 export const labelData = [
   { value: `${AdminRole.SuperAdmin}`, label: getRoleLabel(AdminRole.SuperAdmin) },
-  { value: `${AdminRole.UserAdmin}`, label: getRoleLabel(AdminRole.UserAdmin) },
+  { value: `${AdminRole.DevAdmin}`, label: getRoleLabel(AdminRole.DevAdmin) },
 ] as const
