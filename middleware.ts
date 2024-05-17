@@ -3,6 +3,7 @@ import { withAuth } from 'next-auth/middleware'
 import { getToken } from 'next-auth/jwt'
 import createIntlMiddleware from 'next-intl/middleware'
 import { i18nConfig } from './i18n'
+import { env } from '@/utils/env'
 
 const intlMiddleware = createIntlMiddleware(i18nConfig)
 
@@ -29,9 +30,23 @@ export default async function middleware(req: NextRequest) {
   const token = await getToken({ req })
 
   if (req.nextUrl.pathname.startsWith('/api')) {
-    const response = NextResponse.next()
-    // TODO: check auth
+    // check user token
+    if (req.nextUrl.pathname.startsWith('/api/u')) {
+      const userId = token?.user?.id
+      if (!userId) {
+        return NextResponse.json({ error: 'No user id in token' }, { status: 400 })
+      }
+    }
 
+    // check admin auth
+    if (req.nextUrl.pathname.startsWith('/api/private')) {
+      const adminRole = token?.user?.adminRole ?? env.dev.adminRole
+      if (adminRole === undefined) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+    }
+
+    const response = NextResponse.next()
     return response
   }
 

@@ -8,12 +8,7 @@ import { cleanup } from '@/utils/helper'
 export async function PUT(req: NextRequest) {
   try {
     const token = await getToken({ req })
-
-    const { id } = token?.user || {}
-
-    if (!id) {
-      return NextResponse.json({ error: 'No user id in token' }, { status: 400 })
-    }
+    const userId = token?.user?.id!
 
     const data = await req.json()
     const updateData = getUpdateData(data)
@@ -22,12 +17,12 @@ export async function PUT(req: NextRequest) {
 
     if (updateData.username) {
       const existUser = await getUserByUsername(updateData.username)
-      if (existUser && existUser._id.toString() !== id) {
+      if (existUser && existUser._id.toString() !== userId) {
         return NextResponse.json({ error: 'Username already exists' }, { status: 400 })
       }
     }
 
-    const user = await updateUserById(id, updateData)
+    const user = await updateUserById(userId, updateData)
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })

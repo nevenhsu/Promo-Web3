@@ -1,13 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { deleteAdmin } from '@/lib/db/admin'
 
 export async function DELETE(req: NextRequest, { params }: { params: { userId: string } }) {
   try {
-    // TODO: check has authentication
-    const token = await getToken({ req })
-
     const { userId } = params
 
     await dbConnect()

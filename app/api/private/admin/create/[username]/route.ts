@@ -1,14 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { createAdmin } from '@/lib/db/admin'
 import { getUserByUsername } from '@/lib/db/user'
 
 export async function POST(req: NextRequest, { params }: { params: { username: string } }) {
   try {
-    // TODO: check has authentication
-    const token = await getToken({ req })
-
     await dbConnect()
 
     const { username } = params

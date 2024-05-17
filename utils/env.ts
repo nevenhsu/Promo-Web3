@@ -1,10 +1,20 @@
 // private
+
+const isProd = process.env.NODE_ENV === 'production'
+
 export const env = {
-  isProd: process.env.NODE_ENV === 'production',
+  isProd,
 
   locales: ['en', 'zh'], // next-intl
 
   sanityToken: process.env.SANITY_API_READ_TOKEN, // sanity
+
+  // only for dev
+  dev: isProd
+    ? {}
+    : {
+        adminRole: process.env.DEV_ADMIN_ROLE ? Number(process.env.DEV_ADMIN_ROLE) : undefined,
+      },
 }
 
 // for browser by prefixing with NEXT_PUBLIC_

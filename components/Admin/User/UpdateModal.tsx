@@ -1,7 +1,7 @@
 'use client'
 
 import { forwardRef, useImperativeHandle, useEffect } from 'react'
-import { useForm } from '@mantine/form'
+import { useForm, hasLength } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Text, Button, Select, Switch } from '@mantine/core'
 import { useAdmin } from '@/store/contexts/AdminContext'
@@ -18,6 +18,9 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
     initialValues: {
       role: '1',
       active: true,
+    },
+    validate: {
+      role: hasLength({ min: 1 }, 'Role should not be empty'),
     },
   })
 

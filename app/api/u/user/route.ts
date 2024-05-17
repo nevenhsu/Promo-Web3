@@ -6,16 +6,11 @@ import { getUserById } from '@/lib/db/user'
 export async function GET(req: NextRequest) {
   try {
     const token = await getToken({ req })
-
-    const { id } = token?.user || {}
-
-    if (!id) {
-      return NextResponse.json({ error: 'No user id in token' }, { status: 400 })
-    }
+    const userId = token?.user?.id!
 
     await dbConnect()
 
-    const user = await getUserById(id)
+    const user = await getUserById(userId)
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
