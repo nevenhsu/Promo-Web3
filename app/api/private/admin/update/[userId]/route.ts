@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import dbConnect from '@/lib/dbConnect'
-import { updateUserById } from '@/lib/db/admin'
+import { updateAdmin } from '@/lib/db/admin'
 
 export async function PUT(req: NextRequest, { params }: { params: { userId: string } }) {
   try {
@@ -9,7 +9,7 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 
     await dbConnect()
 
-    const admin = await updateUserById(userId, data)
+    const admin = await updateAdmin(userId, data)
 
     if (!admin) {
       return NextResponse.json({ error: 'Admin not found' }, { status: 404 })

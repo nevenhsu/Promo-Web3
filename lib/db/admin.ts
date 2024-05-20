@@ -16,7 +16,7 @@ export async function createAdmin(_user: string, role: number) {
   }
 }
 
-export async function updateUserById(_user: string, updateData: Partial<Admin>) {
+export async function updateAdmin(_user: string, updateData: Partial<Admin>) {
   try {
     const updatedAdmin = await AdminModel.findOneAndUpdate(
       { _user },
@@ -26,7 +26,7 @@ export async function updateUserById(_user: string, updateData: Partial<Admin>) 
 
     if (!updatedAdmin) {
       console.log('No admin found with the specified ID.')
-      return null // Optionally, handle the absence of the user more formally here
+      return null
     }
 
     console.log('Updated admin:', updatedAdmin)

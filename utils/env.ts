@@ -20,7 +20,7 @@ export const env = {
 // for browser by prefixing with NEXT_PUBLIC_
 export const publicEnv = {
   isProd: process.env.NEXT_PUBLIC_NODE_ENV === 'production',
-  timeZone: process.env.NEXT_PUBLIC_TIME_ZONE,
+  timezone: process.env.NEXT_PUBLIC_TIME_ZONE,
   baseUrl: getBaseUrl(),
   defaultColorScheme: process.env.NEXT_PUBLIC_COLOR_SCHEME,
   sanity: {

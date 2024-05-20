@@ -86,8 +86,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
               <Switch
                 label="Active"
                 key={form.key('active')}
-                {...form.getInputProps('active')}
-                checked={form.getInputProps('active').value}
+                {...form.getInputProps('active', { type: 'checkbox' })}
                 my="xs"
               />
 

@@ -3,7 +3,6 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { updateUserById, getUserByUsername } from '@/lib/db/user'
-import { cleanup } from '@/utils/helper'
 
 export async function PUT(req: NextRequest) {
   try {
@@ -37,8 +36,5 @@ export async function PUT(req: NextRequest) {
 
 function getUpdateData(data: any) {
   const updateData = _.pick(data, ['username', 'name'])
-  if (updateData.username) {
-    updateData.username = cleanup(updateData.username)
-  }
   return updateData
 }

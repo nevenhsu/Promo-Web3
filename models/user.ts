@@ -1,11 +1,13 @@
-import { models, model, Model, Schema, InferSchemaType, Document } from 'mongoose'
+import { models, model, Model, Schema } from 'mongoose'
 import { nanoid } from 'nanoid'
+import { cleanup } from '@/utils/helper'
+import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
 
 const detailSchema = new Schema({
   avatar: String,
 })
 
-export const userSchema = new Schema({
+export const schema = new Schema({
   privyId: {
     type: String,
     required: true,
@@ -25,13 +27,41 @@ export const userSchema = new Schema({
   createdTime: { type: Date, default: Date.now },
 })
 
-export type User = InferSchemaType<typeof userSchema>
+export type User = InferSchemaType<typeof schema>
 export type TUser = User & { _id: string }
-
-const name = 'User'
-export default (models[name] as Model<User>) || model(name, userSchema)
 
 // Function to generate a random string
 function randomUsername() {
   return nanoid()
 }
+
+// Middleware before saving
+schema.pre<User>('save', async function (next) {
+  this.username = cleanup(this.username)
+
+  /* @ts-expect-error */
+  await this.validate()
+  next()
+})
+
+// Middleware before updating
+const handleUpdate = async function (next: CallbackWithoutResultAndOptionalError) {
+  /* @ts-expect-error */
+  const update = this.getUpdate()
+  if (update && update.username) {
+    update.username = cleanup(update.username)
+    /* @ts-expect-error */
+    this.setUpdate(update)
+  }
+
+  /* @ts-expect-error */
+  await this.validate()
+  next()
+}
+
+schema.pre<User>('findOneAndUpdate', handleUpdate)
+schema.pre<User>('updateOne', handleUpdate)
+schema.pre<User>('updateMany', handleUpdate)
+
+const name = 'User'
+export default (models[name] as Model<User>) || model(name, schema)

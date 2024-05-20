@@ -1,58 +1,63 @@
 'use client'
 
-import { format } from 'date-fns-tz'
+import { isAfter } from 'date-fns'
+import { useRef } from 'react'
 import { Stack, Button, Paper, Table, Group, Divider, ActionIcon, Text } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
+import { useEpoch } from '@/store/contexts/EpochContext'
+import AddModel, { type AddModalRef } from './AddModal'
+import UpdateModal, { type UpdateModalRef } from './UpdateModal'
+import DeleteModal, { type DeleteModalRef } from './DeleteModal'
 import { PiPencil, PiTrash } from 'react-icons/pi'
+import { formateDate } from '@/utils/helper'
 import { publicEnv } from '@/utils/env'
 
-const { timeZone } = publicEnv
+export default function AdminEpoch() {
+  const addRef = useRef<AddModalRef>(null)
+  const updateRef = useRef<UpdateModalRef>(null)
+  const deleteRef = useRef<DeleteModalRef>(null)
 
-const elements: Array<{ index: number; startTime: Date; endTime: Date }> = [
-  {
-    index: 1,
-    startTime: new Date('2024-03-25T05:00:00Z'),
-    endTime: new Date('2024-04-01T05:00:00Z'),
-  },
-  {
-    index: 0,
-    startTime: new Date('2024-03-18T05:00:00Z'),
-    endTime: new Date('2024-03-25T05:00:00Z'),
-  },
-]
+  const { epochs, setSelectedIndex } = useEpoch()
+  const lastEpoch = epochs[0] // possibly undefined
 
-function getGMT(date: Date) {
-  const formattedDate = format(date, 'h:mm aa zzz', {
-    timeZone,
-  })
-  return formattedDate
-}
-
-function formateTime(date: Date) {
-  const formattedDate = format(date, 'MMM dd yyyy', {
-    timeZone,
-  })
-  return formattedDate
-}
-
-export default function AdminUser() {
-  const gmt = elements.length ? getGMT(elements[0].startTime) : ''
-
-  const rows = elements.map(el => (
-    <Table.Tr key={el.index}>
+  const rows = epochs.map(o => (
+    <Table.Tr key={o.index}>
       <Table.Td c="blue" fw={500}>
-        {el.index}
+        {o.index}
       </Table.Td>
-      <Table.Td fz="sm">{formateTime(el.startTime)}</Table.Td>
-      <Table.Td fz="sm">{formateTime(el.endTime)}</Table.Td>
+      <Table.Td fz="sm">
+        <Text fz={14}>{formateDate(o.startTime)}</Text>
+        <Text fz={12} c="dimmed">
+          {formateDate(o.startTime, 'h:mm aa zzz')}
+        </Text>
+      </Table.Td>
+      <Table.Td fz="sm">
+        <Text fz={14}> {formateDate(o.endTime)}</Text>
+        <Text fz={12} c="dimmed">
+          {formateDate(o.endTime, 'h:mm aa zzz')}
+        </Text>
+      </Table.Td>
 
       <Table.Td>
         <Group gap="xs">
-          <ActionIcon>
+          <ActionIcon
+            onClick={() => {
+              setSelectedIndex(o.index)
+              updateRef.current?.open()
+            }}
+            disabled={isAfter(new Date(), o.endTime)}
+          >
             <PiPencil />
           </ActionIcon>
           <Divider orientation="vertical" />
-          <ActionIcon c="red">
+          <ActionIcon
+            color="red"
+            onClick={() => {
+              setSelectedIndex(o.index)
+              deleteRef.current?.open()
+            }}
+            disabled={o.index !== lastEpoch?.index || isAfter(new Date(), o.startTime)}
+          >
             <PiTrash />
           </ActionIcon>
         </Group>
@@ -66,16 +71,15 @@ export default function AdminUser() {
         <Stack>
           <Group justify="space-between">
             <Stack gap={4}>
-              <Text fz="sm">{timeZone}</Text>
-              <Text fz="xs" c="dimmed">
-                {gmt}
-              </Text>
+              <Text fz="sm">{publicEnv.timezone}</Text>
             </Stack>
 
-            <Button size="xs">Add Epoch</Button>
+            <Button size="xs" onClick={() => addRef.current?.open()}>
+              Add Epoch
+            </Button>
           </Group>
-          <Paper withBorder>
-            <Table.ScrollContainer minWidth={400}>
+          <Paper pos="relative" withBorder>
+            <Table.ScrollContainer minWidth={400} mih={200}>
               <Table>
                 <Table.Thead>
                   <Table.Tr>
@@ -88,9 +92,21 @@ export default function AdminUser() {
                 <Table.Tbody>{rows}</Table.Tbody>
               </Table>
             </Table.ScrollContainer>
+
+            {!epochs.length && (
+              <>
+                <Text className="absolute-center" ta="center" c="dimmed" mt="md">
+                  No epoch yet...
+                </Text>
+              </>
+            )}
           </Paper>
         </Stack>
       </RwdLayout>
+
+      <AddModel ref={addRef} />
+      <UpdateModal ref={updateRef} />
+      <DeleteModal ref={deleteRef} />
     </>
   )
 }

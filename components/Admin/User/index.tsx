@@ -51,7 +51,13 @@ export default function AdminUser() {
             <PiPencil />
           </ActionIcon>
           <Divider orientation="vertical" />
-          <ActionIcon c="red" onClick={() => deleteRef.current?.open()}>
+          <ActionIcon
+            color="red"
+            onClick={() => {
+              setSelectedAdmin(o._user._id)
+              deleteRef.current?.open()
+            }}
+          >
             <PiTrash />
           </ActionIcon>
         </Group>
