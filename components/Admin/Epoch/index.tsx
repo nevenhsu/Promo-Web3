@@ -11,6 +11,7 @@ import DeleteModal, { type DeleteModalRef } from './DeleteModal'
 import { PiPencil, PiTrash } from 'react-icons/pi'
 import { formateDate } from '@/utils/helper'
 import { publicEnv } from '@/utils/env'
+import classes from './index.module.css'
 
 export default function AdminEpoch() {
   const addRef = useRef<AddModalRef>(null)
@@ -39,7 +40,7 @@ export default function AdminEpoch() {
       </Table.Td>
 
       <Table.Td>
-        <Group gap="xs">
+        <Group gap="xs" wrap="nowrap">
           <ActionIcon
             onClick={() => {
               setSelectedIndex(o.index)
@@ -79,7 +80,7 @@ export default function AdminEpoch() {
             </Button>
           </Group>
           <Paper pos="relative" withBorder>
-            <Table.ScrollContainer minWidth={400} mih={200}>
+            <Table.ScrollContainer className={classes.table} minWidth={400} mih={200}>
               <Table>
                 <Table.Thead>
                   <Table.Tr>

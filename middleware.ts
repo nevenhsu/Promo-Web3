@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { withAuth } from 'next-auth/middleware'
-import { getToken } from 'next-auth/jwt'
+import { getToken, type JWT } from 'next-auth/jwt'
 import createIntlMiddleware from 'next-intl/middleware'
 import { i18nConfig } from './i18n'
 import { env } from '@/utils/env'
@@ -16,10 +16,17 @@ const authMiddleware = withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => token != null,
+      authorized: ({ req, token }) => {
+        if (isAdminPage(req.nextUrl.pathname)) {
+          return isAdmin(token)
+        }
+
+        return token != null
+      },
     },
     pages: {
       signIn: '/',
+      signOut: '/',
       error: '/',
     },
   }
@@ -40,8 +47,7 @@ export default async function middleware(req: NextRequest) {
 
     // check admin auth
     if (req.nextUrl.pathname.startsWith('/api/private')) {
-      const adminRole = token?.user?.adminRole ?? env.dev.adminRole
-      if (adminRole === undefined) {
+      if (!isAdmin(token)) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
     }
@@ -79,4 +85,21 @@ function isPublicPage(pathname: string) {
     'i'
   )
   return publicPathnameRegex.test(pathname)
+}
+
+function isAdminPage(pathname: string) {
+  const pages = ['/admin']
+  const locales = ['en', 'zh']
+
+  const adminPathnameRegex = RegExp(
+    `^(/(${locales.join('|')}))?(${pages.flatMap(p => [p, `${p}/.*`]).join('|')})/?$`,
+    'i'
+  )
+
+  return adminPathnameRegex.test(pathname)
+}
+
+function isAdmin(token: JWT | null) {
+  const adminRole = token?.user?.adminRole ?? env.dev.adminRole
+  return adminRole !== undefined
 }

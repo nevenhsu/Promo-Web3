@@ -1,50 +1,60 @@
 'use client'
 
 import { useRef } from 'react'
-import { useAdmin } from '@/store/contexts/AdminContext'
-import { Stack, Button, Paper, Table, Box, Group, Divider, Text, ActionIcon } from '@mantine/core'
+import Image from 'next/image'
+import { Stack, Button, Paper, Table, Group, Divider, ActionIcon, Text } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
+import { useEpoch } from '@/store/contexts/EpochContext'
 import AddModel, { type AddModalRef } from './AddModal'
 import UpdateModal, { type UpdateModalRef } from './UpdateModal'
 import DeleteModal, { type DeleteModalRef } from './DeleteModal'
-import { getRoleLabel } from './variables'
 import { PiPencil, PiTrash } from 'react-icons/pi'
+import { formateDate } from '@/utils/helper'
+import { publicEnv } from '@/utils/env'
 import classes from './index.module.css'
 
-export default function AdminUser() {
+export default function AdminEpoch() {
   const addRef = useRef<AddModalRef>(null)
   const updateRef = useRef<UpdateModalRef>(null)
   const deleteRef = useRef<DeleteModalRef>(null)
 
-  const { admins, setSelectedId: setSelectedAdmin } = useAdmin()
+  const { epochs, setSelectedIndex } = useEpoch()
+  const lastEpoch = epochs[0] // possibly undefined
 
-  const rows = admins.map(o => (
-    <Table.Tr key={o._user._id}>
-      <Table.Td fw={500}>
-        <>
-          <Box>{o._user.name || 'No name'}</Box>
-          <Box c="dimmed" fz="xs">
-            @{o._user.username}
-          </Box>
-        </>
+  const rows = epochs.map(o => (
+    <Table.Tr key={o.index}>
+      <Table.Td c="blue" fw={500}>
+        <Image
+          className={classes.thumbnail}
+          src="/images/activity-thumbnail.png"
+          width={60}
+          height={60}
+          alt="thumbnail"
+        />
       </Table.Td>
-      <Table.Td>{getRoleLabel(o.role)}</Table.Td>
       <Table.Td>
-        {o.active ? (
-          <Box className={classes.chip} c="blue" bg="blue.1">
-            Active
-          </Box>
-        ) : (
-          <Box className={classes.chip} c="gray" bg="gray.1">
-            Inactive
-          </Box>
-        )}
+        <Text style={{ textOverflow: 'ellipsis', width: 200, overflow: 'hidden' }}>
+          Activity Title Activity Title Activity Title
+        </Text>
       </Table.Td>
+      <Table.Td fz="sm">
+        <Text fz={14}>{formateDate(o.startTime)}</Text>
+        <Text fz={12} c="dimmed">
+          {formateDate(o.startTime, 'h:mm aa zzz')}
+        </Text>
+      </Table.Td>
+      <Table.Td fz="sm">
+        <Text fz={14}> {formateDate(o.endTime)}</Text>
+        <Text fz={12} c="dimmed">
+          {formateDate(o.endTime, 'h:mm aa zzz')}
+        </Text>
+      </Table.Td>
+
       <Table.Td>
         <Group gap="xs" wrap="nowrap">
           <ActionIcon
             onClick={() => {
-              setSelectedAdmin(o._user._id)
+              setSelectedIndex(o.index)
               updateRef.current?.open()
             }}
           >
@@ -54,7 +64,7 @@ export default function AdminUser() {
           <ActionIcon
             color="red"
             onClick={() => {
-              setSelectedAdmin(o._user._id)
+              setSelectedIndex(o.index)
               deleteRef.current?.open()
             }}
           >
@@ -69,33 +79,28 @@ export default function AdminUser() {
     <>
       <RwdLayout>
         <Stack>
-          <Group justify="right">
+          <Group justify="space-between">
+            <span />
+
             <Button size="xs" onClick={() => addRef.current?.open()}>
-              Add Admin
+              Add Activity
             </Button>
           </Group>
           <Paper pos="relative" withBorder>
-            <Table.ScrollContainer className={classes.table} minWidth={500} mih={200}>
+            <Table.ScrollContainer className={classes.table} minWidth={400} mih={200}>
               <Table>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th>Name</Table.Th>
-                    <Table.Th>Role</Table.Th>
-                    <Table.Th>Status</Table.Th>
+                    <Table.Th></Table.Th>
+                    <Table.Th>Title</Table.Th>
+                    <Table.Th>Start</Table.Th>
+                    <Table.Th>End</Table.Th>
                     <Table.Th>Actions</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>{rows}</Table.Tbody>
               </Table>
             </Table.ScrollContainer>
-
-            {!admins.length && (
-              <>
-                <Text className="absolute-center" ta="center" c="dimmed" mt="md">
-                  No admin yet...
-                </Text>
-              </>
-            )}
           </Paper>
         </Stack>
       </RwdLayout>

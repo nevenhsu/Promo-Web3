@@ -3,7 +3,7 @@
 import { Link } from '@/navigation'
 import { Group, Stack, Text, Card, Box, ActionIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { PiArrowRight, PiCactus, PiBalloon } from 'react-icons/pi'
+import { PiArrowRight, PiCactus, PiBalloon, PiLightning } from 'react-icons/pi'
 
 export default function Admin() {
   return (
@@ -20,6 +20,12 @@ export default function Admin() {
           title="Epoch Dashboard"
           description="Manage epoch periods, settings"
           link="/admin/epoch"
+        />
+        <CardAction
+          icon={<PiLightning size={32} />}
+          title="Activity Dashboard"
+          description="Manage activities"
+          link="/admin/activity"
         />
       </Stack>
     </RwdLayout>

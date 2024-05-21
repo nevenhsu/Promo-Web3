@@ -2,3 +2,7 @@
 .table td {
   white-space: nowrap;
 }
+
+.thumbnail {
+  border-radius: 8px;
+}

@@ -45,7 +45,7 @@ const handler = NextAuth({
     }),
   ],
   session: {
-    maxAge: 365 * 24 * 60 * 60,
+    maxAge: 1 * 24 * 60 * 60,
   },
   callbacks: {
     async session({ session, token }) {

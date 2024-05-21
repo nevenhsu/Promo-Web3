@@ -42,6 +42,7 @@ export const i18nConfig = {
     '/admin': '/admin',
     '/admin/user': '/admin/user',
     '/admin/epoch': '/admin/epoch',
+    '/admin/activity': '/admin/activity',
 
     // profile
     '/profile': '/profile',

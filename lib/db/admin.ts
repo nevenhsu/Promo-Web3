@@ -68,7 +68,7 @@ export async function getAllAdmins() {
 
 export async function getAdmin(userId: string) {
   try {
-    const admin = await AdminModel.findOne({ _user: userId }).orFail()
+    const admin = await AdminModel.findOne({ _user: userId, active: true }).orFail()
     return admin
   } catch (error) {
     console.error('Error fetching admin:', error)

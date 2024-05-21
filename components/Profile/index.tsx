@@ -94,7 +94,7 @@ export default function Profile() {
           <Title order={5}>More </Title>
 
           <Paper withBorder p="md">
-            <Stack gap="xl">
+            <Stack className={classes.menu} gap="xl">
               {/* Item */}
               <Group justify="space-between">
                 <Text fw={500}>Help & Support</Text>

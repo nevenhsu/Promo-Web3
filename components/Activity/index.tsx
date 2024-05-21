@@ -39,8 +39,8 @@ export default function Activity() {
                 <Image
                   className={classes.thumbnail}
                   src="/images/activity-thumbnail.png"
-                  width={200}
-                  height={200}
+                  width={64}
+                  height={64}
                   alt="thumbnail"
                 />
                 <Stack gap={4} className={classes.content}>
