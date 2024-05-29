@@ -1,7 +1,6 @@
 import * as _ from 'lodash-es'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getUserInfo, updateUser as updateUserAPI } from '@/services/user'
-import { UserField } from '@/types/db'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { TUser } from '@/models/user'
 
@@ -74,25 +73,9 @@ export const { setFetched } = slice.actions
 export const userReducer = slice.reducer
 
 function updateState(state: IUserState, body: Partial<TUser>) {
-  _.forEach(body, (value, key) => {
-    switch (key) {
-      case UserField.name:
-      case UserField.username:
-        state.data[key] = value as any
-        break
-
-      // details
-      case UserField.avatar: {
-        state.data.details = {
-          ...state.data.details,
-          [key]: value,
-        } as any
-        break
-      }
-
-      default: {
-        // throw new Error('invalid field')
-      }
-    }
+  const merged = _.merge({}, state.data, body)
+  _.forEach(merged, (value, key) => {
+    // @ts-ignore
+    state.data[key] = value
   })
 }

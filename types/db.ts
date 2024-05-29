@@ -5,13 +5,6 @@ export enum BucketType {
   cover = 'cover',
 }
 
-export enum UserField {
-  username = 'username',
-  name = 'name',
-  // detail
-  avatar = 'avatar',
-}
-
 export enum AdminRole {
   SuperAdmin = 0,
   DevAdmin = 1,
@@ -30,6 +23,11 @@ export enum ActivityType {
   Repost = 4,
   Like = 5,
   Comment = 6,
+}
+
+export enum SocialMedia {
+  Instagram = 'instagram',
+  X = 'x',
 }
 
 export const levelPoints = {

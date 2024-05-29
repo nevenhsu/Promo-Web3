@@ -14,6 +14,7 @@ export async function PUT(req: NextRequest) {
 
     await dbConnect()
 
+    // Check if username already exists
     if (updateData.username) {
       const existUser = await getUserByUsername(updateData.username)
       if (existUser && existUser._id.toString() !== userId) {
@@ -35,6 +36,6 @@ export async function PUT(req: NextRequest) {
 }
 
 function getUpdateData(data: any) {
-  const updateData = _.pick(data, ['username', 'name'])
+  const updateData = _.pick(data, ['username', 'name', 'details'])
   return updateData
 }
