@@ -15,16 +15,23 @@ export const schema = new Schema({
   title: String,
   description: String,
   points: Number,
-  details: detailSchema,
   activityType: { type: String, enum: ActivityType, required: true },
   socialMedia: { type: String, enum: SocialMedia, required: true },
+  details: detailSchema,
 })
 
 export type Activity = InferSchemaType<typeof schema>
+export type ActivityDetail = InferSchemaType<typeof detailSchema>
 export type TActivity = {
   index: number // auto increase
   startTime: string // ISO 8601 date string
   endTime: string // ISO 8601 date string
+  title: string
+  description: string
+  points: number
+  activityType: number // ActivityType
+  socialMedia: string // SocialMedia
+  details: ActivityDetail
 }
 
 schema.set('validateBeforeSave', false)

@@ -63,7 +63,7 @@ export const slice = createSlice({
       const newData = action.payload
       state.updating = false
       if (newData) {
-        updateState(state, newData)
+        _.merge(state.data, newData)
       }
     })
   },
@@ -71,11 +71,3 @@ export const slice = createSlice({
 
 export const { setFetched } = slice.actions
 export const userReducer = slice.reducer
-
-function updateState(state: IUserState, body: Partial<TUser>) {
-  const merged = _.merge({}, state.data, body)
-  _.forEach(merged, (value, key) => {
-    // @ts-ignore
-    state.data[key] = value
-  })
-}
