@@ -15,7 +15,7 @@ export const schema = new Schema({
   title: String,
   description: String,
   points: Number,
-  activityType: { type: String, enum: ActivityType, required: true },
+  activityType: { type: Number, enum: ActivityType, required: true },
   socialMedia: { type: String, enum: SocialMedia, required: true },
   details: detailSchema,
 })

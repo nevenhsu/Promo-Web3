@@ -6,9 +6,9 @@ export async function GET(req: NextRequest) {
   try {
     await dbConnect()
 
-    const epochs = await getAllActivity()
+    const activities = await getAllActivity()
 
-    return NextResponse.json({ epochs })
+    return NextResponse.json({ activities })
   } catch (error) {
     console.error(error)
     NextResponse.json({ error: 'Internal server error' }, { status: 500 })
