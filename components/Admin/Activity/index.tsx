@@ -4,13 +4,12 @@ import { useRef } from 'react'
 import Image from 'next/image'
 import { Stack, Button, Paper, Table, Group, Divider, ActionIcon, Text } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { useEpoch } from '@/store/contexts/EpochContext'
+import { useActivity } from '@/store/contexts/ActivityContext'
 import AddModel, { type AddModalRef } from './AddModal'
 import UpdateModal, { type UpdateModalRef } from './UpdateModal'
 import DeleteModal, { type DeleteModalRef } from './DeleteModal'
 import { PiPencil, PiTrash } from 'react-icons/pi'
 import { formateDate } from '@/utils/helper'
-import { publicEnv } from '@/utils/env'
 import classes from './index.module.css'
 
 export default function AdminEpoch() {
@@ -18,10 +17,9 @@ export default function AdminEpoch() {
   const updateRef = useRef<UpdateModalRef>(null)
   const deleteRef = useRef<DeleteModalRef>(null)
 
-  const { epochs, setSelectedIndex } = useEpoch()
-  const lastEpoch = epochs[0] // possibly undefined
+  const { activities, setSelectedIndex } = useActivity()
 
-  const rows = epochs.map(o => (
+  const rows = activities.map(o => (
     <Table.Tr key={o.index}>
       <Table.Td c="blue" fw={500}>
         <Image
@@ -33,9 +31,7 @@ export default function AdminEpoch() {
         />
       </Table.Td>
       <Table.Td>
-        <Text style={{ textOverflow: 'ellipsis', width: 200, overflow: 'hidden' }}>
-          Activity Title Activity Title Activity Title
-        </Text>
+        <Text style={{ textOverflow: 'ellipsis', width: 200, overflow: 'hidden' }}>{o.title}</Text>
       </Table.Td>
       <Table.Td fz="sm">
         <Text fz={14}>{formateDate(o.startTime)}</Text>
@@ -101,6 +97,14 @@ export default function AdminEpoch() {
                 <Table.Tbody>{rows}</Table.Tbody>
               </Table>
             </Table.ScrollContainer>
+
+            {!activities.length && (
+              <>
+                <Text className="absolute-center" ta="center" c="dimmed" mt="md">
+                  No activity yet...
+                </Text>
+              </>
+            )}
           </Paper>
         </Stack>
       </RwdLayout>
