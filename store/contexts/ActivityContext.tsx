@@ -19,7 +19,7 @@ interface ActivityContextType {
   createActivity: (newData: Omit<Activity, 'index'>) => Promise<TActivity | undefined>
   updateActivity: (
     index: number,
-    updateData: Partial<Omit<Activity, 'details'>>,
+    updateData: Partial<Omit<Activity, 'details' | 'index'>>,
     updateDetails: Partial<ActivityDetail>
   ) => Promise<TActivity | undefined>
   deleteActivity: (index: number) => Promise<TActivity | undefined>
@@ -67,7 +67,7 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const updateActivity = async (
     index: number,
-    updateData: Partial<Omit<Activity, 'details'>>,
+    updateData: Partial<Omit<Activity, 'details' | 'index'>>,
     updateDetails: Partial<ActivityDetail>
   ) => {
     try {

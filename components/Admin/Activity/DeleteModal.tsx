@@ -4,7 +4,7 @@ import { useRef } from 'react'
 import { forwardRef, useImperativeHandle } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Button, Checkbox, Text } from '@mantine/core'
-import { useEpoch } from '@/store/contexts/EpochContext'
+import { useActivity } from '@/store/contexts/ActivityContext'
 import { formateDate } from '@/utils/helper'
 
 export type DeleteModalRef = {
@@ -14,7 +14,7 @@ export type DeleteModalRef = {
 export default forwardRef<DeleteModalRef, {}>(function AddModal(props, ref) {
   const checkRef = useRef<HTMLInputElement>(null)
   const [opened, { open, close }] = useDisclosure(false)
-  const { selectedEpoch, loading, deleteEpoch } = useEpoch()
+  const { selectedActivity, loading, deleteActivity } = useActivity()
 
   useImperativeHandle(ref, () => ({
     open() {
@@ -23,8 +23,8 @@ export default forwardRef<DeleteModalRef, {}>(function AddModal(props, ref) {
   }))
 
   const handleDelete = async () => {
-    if (checkRef.current?.checked && selectedEpoch) {
-      const deleted = await deleteEpoch(selectedEpoch.index)
+    if (checkRef.current?.checked && selectedActivity) {
+      const deleted = await deleteActivity(selectedActivity.index)
       if (deleted) {
         close()
       } else {
@@ -39,18 +39,21 @@ export default forwardRef<DeleteModalRef, {}>(function AddModal(props, ref) {
         <Box mx="auto">
           <Stack>
             <Box>
-              <Text fw={500}>Index: {selectedEpoch?.index}</Text>
+              <Text fw={500}>Title: {selectedActivity?.title}</Text>
               <Text fz="xs" c="dimmed">
-                {selectedEpoch?.startTime ? formateDate(selectedEpoch.startTime) : ''}
+                Index: {selectedActivity?.index}
+              </Text>
+              <Text fz="xs" c="dimmed">
+                {selectedActivity?.startTime ? formateDate(selectedActivity.startTime) : ''}
                 {` ~ `}
-                {selectedEpoch?.endTime ? formateDate(selectedEpoch.endTime) : ''}
+                {selectedActivity?.endTime ? formateDate(selectedActivity.endTime) : ''}
               </Text>
             </Box>
 
             <Checkbox
               color="red"
               ref={checkRef}
-              label="Confirm to delete this admin forever"
+              label="Confirm to delete this activity forever"
               mb="lg"
             />
 

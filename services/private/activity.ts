@@ -21,7 +21,7 @@ export const createActivity = async (
 
 export const updateActivity = async (
   index: number,
-  updateData: Partial<Omit<Activity, 'details'>>,
+  updateData: Partial<Omit<Activity, 'details' | 'index'>>,
   updateDetail: Partial<ActivityDetail>
 ): Promise<TActivity | undefined> => {
   try {

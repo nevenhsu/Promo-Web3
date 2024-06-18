@@ -50,7 +50,7 @@ export default forwardRef<DeleteModalRef, {}>(function AddModal(props, ref) {
             <Checkbox
               color="red"
               ref={checkRef}
-              label="Confirm to delete this admin forever"
+              label="Confirm to delete this epoch forever"
               mb="lg"
             />
 

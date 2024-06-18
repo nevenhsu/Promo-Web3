@@ -1,15 +1,19 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import { isBefore, isAfter } from 'date-fns'
+import { isBefore } from 'date-fns'
 import { forwardRef, useImperativeHandle, useEffect } from 'react'
-import { useEpoch } from '@/store/contexts/EpochContext'
+import { useActivity } from '@/store/contexts/ActivityContext'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Text, Button } from '@mantine/core'
+import { TextInput, Textarea, NumberInput, Select } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
-import { formateDate, getStartOfDate } from '@/utils/helper'
+import { formateDate } from '@/utils/helper'
 import { publicEnv } from '@/utils/env'
+import { ActivityType, SocialMedia } from '@/types/db'
+import { activityTypes } from './variables'
+import type { Activity, ActivityDetail } from '@/models/activity'
 
 export type UpdateModalRef = {
   open: () => void
@@ -17,29 +21,37 @@ export type UpdateModalRef = {
 
 export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
   const [opened, { open, close }] = useDisclosure(false)
-  const { updateEpoch, epochs, selectedIndex, selectedEpoch, loading } = useEpoch()
-
-  const prevEpoch = selectedIndex ? _.find(epochs, { index: selectedIndex - 1 }) : undefined
-  const nextEpoch = _.isNumber(selectedIndex)
-    ? _.find(epochs, { index: selectedIndex + 1 })
-    : undefined
+  const { updateActivity, selectedIndex, selectedActivity, loading } = useActivity()
 
   const form = useForm<{
+    title: string
     startTime: null | Date
     endTime: null | Date
+    description: string
+    points: number
+    activityType: string
+    socialMedia: string
+    link: string
+    coverUrl: string
+    thumbnailUrl: string
   }>({
     mode: 'uncontrolled',
     initialValues: {
+      title: '',
       startTime: null,
       endTime: null,
+      description: '',
+      points: 0,
+      activityType: `${ActivityType.None}`,
+      socialMedia: SocialMedia.X,
+      link: '',
+      coverUrl: '',
+      thumbnailUrl: '',
     },
     validate: {
       startTime: (value, values) => {
         if (!value) {
           return 'Should not be empty'
-        }
-        if (prevEpoch && isBefore(value, prevEpoch.endTime)) {
-          return `Should not before ${formateDate(prevEpoch.endTime, 'MMM dd yyyy h:mm aa')}`
         }
         if (values.endTime && !isBefore(value, values.endTime)) {
           return `Should before ${formateDate(values.endTime, 'MMM dd yyyy h:mm aa')}`
@@ -50,25 +62,34 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
         if (!value) {
           return 'Should not be empty'
         }
-        if (nextEpoch && isAfter(value, nextEpoch.startTime)) {
-          return `Should not after ${formateDate(nextEpoch.startTime, 'MMM dd yyyy h:mm aa')}`
-        }
         if (values.startTime && isBefore(value, values.startTime)) {
           return `Should after ${formateDate(values.startTime, 'MMM dd yyyy h:mm aa')}`
         }
         return null
       },
+      title: value => (value ? null : 'Should not be empty'),
+      activityType: value => (value ? null : 'Should not be empty'),
+      socialMedia: value => (value ? null : 'Should not be empty'),
+      points: value => (value >= 0 ? null : 'Should be greater than or equal to 0'),
     },
   })
 
   useEffect(() => {
-    if (opened && selectedEpoch) {
+    if (opened && selectedActivity) {
       form.setValues({
-        startTime: new Date(selectedEpoch.startTime),
-        endTime: new Date(selectedEpoch.endTime),
+        startTime: new Date(selectedActivity.startTime),
+        endTime: new Date(selectedActivity.endTime),
+        title: selectedActivity.title,
+        description: selectedActivity.description,
+        points: selectedActivity.points,
+        activityType: `${selectedActivity.activityType}`,
+        socialMedia: selectedActivity.socialMedia,
+        link: selectedActivity.details.link || '',
+        coverUrl: selectedActivity.details.coverUrl || '',
+        thumbnailUrl: selectedActivity.details.thumbnailUrl || '',
       })
     }
-  }, [selectedEpoch, opened])
+  }, [selectedActivity, opened])
 
   useImperativeHandle(ref, () => ({
     open() {
@@ -76,9 +97,12 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
     },
   }))
 
-  const handleSubmit = async (startTime: Date, endTime: Date) => {
-    if (selectedEpoch) {
-      const updated = await updateEpoch(selectedEpoch.index, { startTime, endTime })
+  const handleSubmit = async (
+    data: Omit<Activity, 'details' | 'index'>,
+    details: Partial<ActivityDetail>
+  ) => {
+    if (selectedActivity) {
+      const updated = await updateActivity(selectedActivity.index, data, details)
       if (updated) {
         close()
       } else {
@@ -94,8 +118,18 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
           <form
             onSubmit={form.onSubmit(
               values => {
-                if (values.startTime && values.endTime) {
-                  handleSubmit(values.startTime, values.endTime)
+                const { link, coverUrl, thumbnailUrl, ...rest } = values
+                const { startTime, endTime, activityType } = rest
+                if (startTime && endTime) {
+                  handleSubmit(
+                    {
+                      ...rest,
+                      startTime,
+                      endTime,
+                      activityType: Number(activityType),
+                    },
+                    { link, coverUrl, thumbnailUrl }
+                  )
                 }
               },
               (validationErrors, values, event) => {
@@ -117,17 +151,6 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
                 label="Start Time"
                 key={form.key('startTime')}
                 {...form.getInputProps('startTime')}
-                excludeDate={date => {
-                  const { endTime } = form.getValues()
-                  const d = getStartOfDate(date)
-                  if (endTime && prevEpoch) {
-                    return isBefore(endTime, d) || isBefore(d, getStartOfDate(prevEpoch.endTime))
-                  }
-                  if (endTime) {
-                    return isBefore(endTime, d)
-                  }
-                  return false
-                }}
               />
 
               <DateTimePicker
@@ -135,19 +158,57 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
                 label="End Time"
                 key={form.key('endTime')}
                 {...form.getInputProps('endTime')}
-                excludeDate={date => {
-                  const { startTime } = form.getValues()
-                  const d = getStartOfDate(date)
-                  if (startTime && nextEpoch) {
-                    return (
-                      isBefore(d, startTime) || isBefore(getStartOfDate(nextEpoch.startTime), d)
-                    )
-                  }
-                  if (startTime) {
-                    return isBefore(d, startTime)
-                  }
-                  return false
-                }}
+                excludeDate={date =>
+                  Boolean(form.getValues().startTime && isBefore(date, form.getValues().startTime!))
+                }
+              />
+
+              <TextInput
+                label="Title"
+                placeholder="Activity title"
+                {...form.getInputProps('title')}
+              />
+
+              <Textarea
+                label="Description"
+                placeholder="Activity description"
+                {...form.getInputProps('description')}
+              />
+
+              <NumberInput
+                label="Points"
+                placeholder="0"
+                min={0}
+                {...form.getInputProps('points')}
+              />
+
+              <Select
+                label="Activity Type"
+                placeholder="Pick one"
+                withCheckIcon={false}
+                data={_.map(activityTypes, ({ value, label }) => ({ value: `${value}`, label }))}
+                {...form.getInputProps('activityType')}
+              />
+              <Select
+                label="Social Media"
+                placeholder="Pick one"
+                withCheckIcon={false}
+                data={_.map(SocialMedia, (value, label) => ({ value, label }))}
+                {...form.getInputProps('socialMedia')}
+              />
+
+              <TextInput label="Link" placeholder="Activity link" {...form.getInputProps('link')} />
+
+              <TextInput
+                label="Cover URL"
+                placeholder="Cover image URL"
+                {...form.getInputProps('coverUrl')}
+              />
+
+              <TextInput
+                label="Thumbnail URL"
+                placeholder="Thumbnail image URL"
+                {...form.getInputProps('thumbnailUrl')}
               />
 
               <Box mb="md" />

@@ -33,6 +33,9 @@ export default function AdminEpoch() {
       <Table.Td>
         <Text style={{ textOverflow: 'ellipsis', width: 200, overflow: 'hidden' }}>{o.title}</Text>
       </Table.Td>
+      <Table.Td>
+        <Text>{o.points}</Text>
+      </Table.Td>
       <Table.Td fz="sm">
         <Text fz={14}>{formateDate(o.startTime)}</Text>
         <Text fz={12} c="dimmed">
@@ -89,6 +92,7 @@ export default function AdminEpoch() {
                   <Table.Tr>
                     <Table.Th></Table.Th>
                     <Table.Th>Title</Table.Th>
+                    <Table.Th miw={80}>Points</Table.Th>
                     <Table.Th>Start</Table.Th>
                     <Table.Th>End</Table.Th>
                     <Table.Th>Actions</Table.Th>

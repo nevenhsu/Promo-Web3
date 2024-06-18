@@ -30,7 +30,7 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
     description: string
     points: number
     activityType: string
-    socialMedia: SocialMedia
+    socialMedia: string
     link: string
     coverUrl: string
     thumbnailUrl: string
