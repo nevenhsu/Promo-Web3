@@ -4,7 +4,7 @@ import { useRef } from 'react'
 import { forwardRef, useImperativeHandle } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Button, Checkbox, Text } from '@mantine/core'
-import { useAdmin } from '@/store/contexts/AdminContext'
+import { useAdmin } from '@/store/contexts/admin/AdminContext'
 
 export type DeleteModalRef = {
   open: () => void

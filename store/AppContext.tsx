@@ -31,7 +31,7 @@ const initValue: AppValue = {
 const AppContext = createContext(initValue)
 
 // Create a provider component
-type AppProviderProps = { isPreview: boolean; children: React.ReactNode }
+export type AppProviderProps = { isPreview: boolean; children: React.ReactNode }
 
 export const AppProvider = ({ isPreview, children }: AppProviderProps) => {
   const [state, setState] = useState({ ...initialState, isPreview })

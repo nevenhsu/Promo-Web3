@@ -1,8 +1,19 @@
-import { MockToken, MockToken__factory } from './typechain-types'
+import * as _ from 'lodash-es'
+import { Erc20Permit, Erc20Permit__factory } from './typechain-types'
+import { permitTokens } from './tokens'
+
+export type PermitTokens = { [symbol: string]: Erc20Permit | undefined }
 
 export type Contracts = {
-  token: MockToken
+  permitTokens?: PermitTokens
 }
 
-export const getToken = (signer: any) =>
-  new MockToken__factory(signer).attach(process.env.NEXT_PUBLIC_TOKEN) as MockToken
+export const getPermitTokens = (signer: any) => {
+  const tokens: PermitTokens = {}
+
+  _.forEach(permitTokens, o => {
+    tokens[o.symbol] = new Erc20Permit__factory(signer).attach(o.address) as Erc20Permit
+  })
+
+  return tokens
+}

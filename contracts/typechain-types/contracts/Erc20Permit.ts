@@ -23,7 +23,7 @@ import type {
   TypedContractMethod,
 } from "../common";
 
-export interface MockTokenInterface extends Interface {
+export interface Erc20PermitInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "DOMAIN_SEPARATOR"
@@ -32,7 +32,6 @@ export interface MockTokenInterface extends Interface {
       | "balanceOf"
       | "decimals"
       | "eip712Domain"
-      | "mint"
       | "name"
       | "nonces"
       | "permit"
@@ -66,10 +65,6 @@ export interface MockTokenInterface extends Interface {
   encodeFunctionData(
     functionFragment: "eip712Domain",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "mint",
-    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
@@ -111,7 +106,6 @@ export interface MockTokenInterface extends Interface {
     functionFragment: "eip712Domain",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
@@ -173,11 +167,11 @@ export namespace TransferEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export interface MockToken extends BaseContract {
-  connect(runner?: ContractRunner | null): MockToken;
+export interface Erc20Permit extends BaseContract {
+  connect(runner?: ContractRunner | null): Erc20Permit;
   waitForDeployment(): Promise<this>;
 
-  interface: MockTokenInterface;
+  interface: Erc20PermitInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
@@ -248,12 +242,6 @@ export interface MockToken extends BaseContract {
       }
     ],
     "view"
-  >;
-
-  mint: TypedContractMethod<
-    [to: AddressLike, amount: BigNumberish],
-    [void],
-    "nonpayable"
   >;
 
   name: TypedContractMethod<[], [string], "view">;
@@ -333,13 +321,6 @@ export interface MockToken extends BaseContract {
       }
     ],
     "view"
-  >;
-  getFunction(
-    nameOrSignature: "mint"
-  ): TypedContractMethod<
-    [to: AddressLike, amount: BigNumberish],
-    [void],
-    "nonpayable"
   >;
   getFunction(
     nameOrSignature: "name"

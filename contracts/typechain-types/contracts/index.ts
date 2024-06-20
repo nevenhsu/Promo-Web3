@@ -2,4 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type { MockToken } from './MockToken'
+export type { Erc20Permit } from './Erc20Permit'

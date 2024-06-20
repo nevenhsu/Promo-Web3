@@ -3,7 +3,7 @@
 import * as _ from 'lodash-es'
 import { isBefore, isAfter } from 'date-fns'
 import { forwardRef, useImperativeHandle, useEffect } from 'react'
-import { useEpoch } from '@/store/contexts/EpochContext'
+import { useEpoch } from '@/store/contexts/admin/EpochContext'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Text, Button } from '@mantine/core'

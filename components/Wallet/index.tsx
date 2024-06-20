@@ -7,7 +7,7 @@ import { Box, Space, Group, Stack, Text, Title, Tabs } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import CreateWallet from './CreateWallet'
 import BaseIcon from '@/public/icons/base.svg'
-import { PiArrowsLeftRight, PiArrowCircleDown, PiClock, PiCreditCard } from 'react-icons/pi'
+import { PiArrowCircleUp, PiArrowCircleDown, PiClock, PiCreditCard } from 'react-icons/pi'
 import { PiCurrencyBtcFill, PiCurrencyDollarFill } from 'react-icons/pi'
 import classes from './index.module.css'
 
@@ -38,7 +38,7 @@ export default function Wallet() {
         <Group className={classes.actions} grow>
           <Link href="/wallet/send">
             <Box w={40} h={40}>
-              <PiArrowsLeftRight size={24} />
+              <PiArrowCircleUp size={24} />
             </Box>
             <Text>Send</Text>
           </Link>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import { useAdmin } from '@/store/contexts/AdminContext'
+import { useAdmin } from '@/store/contexts/admin/AdminContext'
 import { Stack, Button, Paper, Table, Box, Group, Divider, Text, ActionIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import AddModel, { type AddModalRef } from './AddModal'

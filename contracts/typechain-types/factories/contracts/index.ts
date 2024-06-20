@@ -2,4 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export { MockToken__factory } from './MockToken__factory'
+export { Erc20Permit__factory } from './Erc20Permit__factory'

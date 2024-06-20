@@ -4,7 +4,7 @@ import { forwardRef, useImperativeHandle, useEffect } from 'react'
 import { useForm, hasLength } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Text, Button, Select, Switch } from '@mantine/core'
-import { useAdmin } from '@/store/contexts/AdminContext'
+import { useAdmin } from '@/store/contexts/admin/AdminContext'
 import { labelData } from './variables'
 
 export type UpdateModalRef = {

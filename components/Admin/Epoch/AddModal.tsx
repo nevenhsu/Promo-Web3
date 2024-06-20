@@ -2,7 +2,7 @@
 
 import { isBefore } from 'date-fns'
 import { forwardRef, useImperativeHandle } from 'react'
-import { useEpoch } from '@/store/contexts/EpochContext'
+import { useEpoch } from '@/store/contexts/admin/EpochContext'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Button, Text } from '@mantine/core'

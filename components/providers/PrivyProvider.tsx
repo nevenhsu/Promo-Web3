@@ -1,11 +1,11 @@
 // Replace this with any of the networks listed at https://wagmi.sh/core/chains#supported-chains
-import { base, baseSepolia } from 'viem/chains'
+import { base, localhost } from 'viem/chains'
 import { PrivyProvider } from '@privy-io/react-auth'
 import { ZeroDevProvider } from '@zerodev/privy'
 import { colors } from '@/theme/colors'
 import { publicEnv } from '@/utils/env'
 
-const chain = publicEnv.isProd ? base : baseSepolia
+const chain = publicEnv.isProd ? base : localhost
 
 export default function MyPrivyProvider({ children }: React.PropsWithChildren) {
   return (
