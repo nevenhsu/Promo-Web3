@@ -1,12 +1,14 @@
 'use client'
 
 import * as _ from 'lodash-es'
+import Decimal from 'decimal.js'
 import Image from 'next/image'
+import PullToRefresh from 'react-simple-pull-to-refresh'
 import { Link } from '@/navigation'
 import { usePrivy } from '@privy-io/react-auth'
 import { useAppSelector } from '@/hooks/redux'
 import { useContractContext } from '@/wallet/ContractContext'
-import { Box, Space, Group, Stack, Text, Title, Tabs } from '@mantine/core'
+import { Box, Space, Group, Stack, Text, Title, Tabs, Loader } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import CreateWallet from './CreateWallet'
 import BaseIcon from '@/public/icons/base.svg'
@@ -18,7 +20,7 @@ export default function Wallet() {
   const { _id, fetched, data } = useAppSelector(state => state.user)
   const { username, name, details } = data
 
-  const { balances, prices } = useContractContext()
+  const { balances, prices, updateBalances } = useContractContext()
 
   const { user } = usePrivy()
 
@@ -68,48 +70,53 @@ export default function Wallet() {
         </Group>
       </RwdLayout>
 
-      <RwdLayout>
-        <Box w="100%">
-          <Tabs className={classes.tabs} variant="pills" defaultValue="asset" radius="xl">
-            <Tabs.Tab value="asset">Asset</Tabs.Tab>
-            <Tabs.Tab value="activity">Airdrop</Tabs.Tab>
-          </Tabs>
-        </Box>
-        <Space h={24} />
-        <Stack>
-          {/* Item */}
+      <PullToRefresh onRefresh={updateBalances}>
+        <RwdLayout mih={400}>
+          <Box w="100%">
+            <Tabs className={classes.tabs} variant="pills" defaultValue="asset" radius="xl">
+              <Tabs.Tab value="asset">Asset</Tabs.Tab>
+              <Tabs.Tab value="activity">Airdrop</Tabs.Tab>
+            </Tabs>
+          </Box>
+          <Space h={24} />
+          <Stack>
+            {/* Item */}
 
-          {tokens.map(o => {
-            // TODO: convert uint
-            const balance = balances[o.symbol]
-            const price = prices[o.symbol]
-            return (
-              <Group key={o.symbol} justify="space-between">
-                <Group>
-                  <Image className={classes.icon} src={o.icon} width={32} height={32} alt="" />
+            {tokens.map(o => {
+              // TODO: convert uint
+              const balance = balances[o.symbol]
+              const price = prices[o.symbol]
+              const bal = Decimal.div(balance?.toString() || 0, 10 ** o.decimal)
+              const p = price ? Decimal.mul(bal, price) : undefined
 
-                  <Stack gap={4}>
+              return (
+                <Group key={o.symbol} justify="space-between">
+                  <Group>
+                    <Image className={classes.icon} src={o.icon} width={32} height={32} alt="" />
+
+                    <Stack gap={4}>
+                      <Text fz="sm" fw={500}>
+                        {o.name}
+                      </Text>
+                      <Text fz="xs" c="dimmed">
+                        {o.symbol}
+                      </Text>
+                    </Stack>
+                  </Group>
+                  <Stack gap={4} ta="right">
                     <Text fz="sm" fw={500}>
-                      {o.name}
+                      {bal.toDP(4).toString()}
                     </Text>
                     <Text fz="xs" c="dimmed">
-                      {o.symbol}
+                      {p ? `USD ${p.toDP(2).toString()}` : 'No price yet'}
                     </Text>
                   </Stack>
                 </Group>
-                <Stack gap={4} ta="right">
-                  <Text fz="sm" fw={500}>
-                    {balance?.toString()}
-                  </Text>
-                  <Text fz="xs" c="dimmed">
-                    {price ? 'USD 92000.20' : 'No price yet'}
-                  </Text>
-                </Stack>
-              </Group>
-            )
-          })}
-        </Stack>
-      </RwdLayout>
+              )
+            })}
+          </Stack>
+        </RwdLayout>
+      </PullToRefresh>
     </>
   )
 }

@@ -35,11 +35,6 @@ export default function Send() {
               </Group>
               <TextInput
                 placeholder="Public Address (0x)"
-                rightSection={
-                  <ActionIcon>
-                    <PiScan size={24} />
-                  </ActionIcon>
-                }
               />
               <Checkbox label="Save to address book" variant="outline" size="xs" />
             </Stack>

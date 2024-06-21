@@ -13,7 +13,7 @@ interface ContractsContextType {
   contracts?: Contracts
   balances: Balances
   prices: Prices
-  updateBalances: () => void
+  updateBalances: () => Promise<void>
 }
 
 const ContractContext = createContext<ContractsContextType | undefined>(undefined)
