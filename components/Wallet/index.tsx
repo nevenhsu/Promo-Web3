@@ -1,19 +1,24 @@
 'use client'
 
+import * as _ from 'lodash-es'
+import Image from 'next/image'
 import { Link } from '@/navigation'
 import { usePrivy } from '@privy-io/react-auth'
 import { useAppSelector } from '@/hooks/redux'
+import { useContractContext } from '@/wallet/ContractContext'
 import { Box, Space, Group, Stack, Text, Title, Tabs } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import CreateWallet from './CreateWallet'
 import BaseIcon from '@/public/icons/base.svg'
 import { PiArrowCircleUp, PiArrowCircleDown, PiClock, PiCreditCard } from 'react-icons/pi'
-import { PiCurrencyBtcFill, PiCurrencyDollarFill } from 'react-icons/pi'
+import { tokens } from '@/contracts/tokens'
 import classes from './index.module.css'
 
 export default function Wallet() {
   const { _id, fetched, data } = useAppSelector(state => state.user)
   const { username, name, details } = data
+
+  const { balances, prices } = useContractContext()
 
   const { user } = usePrivy()
 
@@ -73,50 +78,36 @@ export default function Wallet() {
         <Space h={24} />
         <Stack>
           {/* Item */}
-          <Group justify="space-between">
-            <Group>
-              <PiCurrencyBtcFill size={32} />
-              <Stack gap={4}>
-                <Text fz="sm" fw={500}>
-                  Bitcoin
-                </Text>
-                <Text fz="xs" c="dimmed">
-                  BTC
-                </Text>
-              </Stack>
-            </Group>
-            <Stack gap={4} ta="right">
-              <Text fz="sm" fw={500}>
-                5.20
-              </Text>
-              <Text fz="xs" c="dimmed">
-                USD 92000.20
-              </Text>
-            </Stack>
-          </Group>
 
-          {/* Item */}
-          <Group justify="space-between">
-            <Group>
-              <PiCurrencyDollarFill size={32} />
-              <Stack gap={4}>
-                <Text fz="sm" fw={500}>
-                  USD Coin
-                </Text>
-                <Text fz="xs" c="dimmed">
-                  USDC
-                </Text>
-              </Stack>
-            </Group>
-            <Stack gap={4} ta="right">
-              <Text fz="sm" fw={500}>
-                500.20
-              </Text>
-              <Text fz="xs" c="dimmed">
-                USD 500.48
-              </Text>
-            </Stack>
-          </Group>
+          {tokens.map(o => {
+            // TODO: convert uint
+            const balance = balances[o.symbol]
+            const price = prices[o.symbol]
+            return (
+              <Group key={o.symbol} justify="space-between">
+                <Group>
+                  <Image className={classes.icon} src={o.icon} width={32} height={32} alt="" />
+
+                  <Stack gap={4}>
+                    <Text fz="sm" fw={500}>
+                      {o.name}
+                    </Text>
+                    <Text fz="xs" c="dimmed">
+                      {o.symbol}
+                    </Text>
+                  </Stack>
+                </Group>
+                <Stack gap={4} ta="right">
+                  <Text fz="sm" fw={500}>
+                    {balance?.toString()}
+                  </Text>
+                  <Text fz="xs" c="dimmed">
+                    {price ? 'USD 92000.20' : 'No price yet'}
+                  </Text>
+                </Stack>
+              </Group>
+            )
+          })}
         </Stack>
       </RwdLayout>
     </>

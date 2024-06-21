@@ -16,7 +16,7 @@ export default function Receive() {
   return (
     <>
       <RwdLayout>
-        <Stack>
+        <Stack gap="lg">
           <Title order={5}>Receive Tokens</Title>
 
           <Center>
@@ -25,9 +25,17 @@ export default function Receive() {
             </AspectRatio>
           </Center>
 
-          <Text ta="center" fz="xs" mb="lg">
-            {address}
-          </Text>
+          <div>
+            <Text fz="sm">Address</Text>
+            <Text fz="sm">{address}</Text>
+          </div>
+
+          <div>
+            <Text fz="sm">Network</Text>
+            <Text fz="sm">{getNetworkName(wallet?.chainId)}</Text>
+          </div>
+
+          <div />
 
           <Group grow>
             <CopyButton value={address}>
@@ -37,6 +45,7 @@ export default function Receive() {
                   color={copied ? 'green' : 'blue'}
                   variant="outline"
                   onClick={copy}
+                  disabled={!address}
                 >
                   {copied ? 'Copied' : 'Copy'}
                 </Button>
@@ -58,4 +67,17 @@ export default function Receive() {
       </RwdLayout>
     </>
   )
+}
+
+function getNetworkName(chainId?: string) {
+  switch (chainId) {
+    case 'eip155:1':
+      return 'Ethereum Mainnet'
+    case 'eip155:5':
+      return 'Goerli Testnet'
+    case 'eip155:1337':
+      return 'Localhost Testnet'
+    default:
+      return 'Unknown Network'
+  }
 }

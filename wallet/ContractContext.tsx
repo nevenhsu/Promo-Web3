@@ -7,10 +7,12 @@ import { useWallet } from '@/wallet/hooks/useWallet'
 import type { Contracts } from '@/contracts'
 
 type Balances = { [symbol: string]: bigint | undefined }
+type Prices = { [symbol: string]: number | undefined }
 
 interface ContractsContextType {
   contracts?: Contracts
   balances: Balances
+  prices: Prices
   updateBalances: () => void
 }
 
@@ -19,8 +21,12 @@ const ContractContext = createContext<ContractsContextType | undefined>(undefine
 export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const contracts = useContracts()
   const wallet = useWallet()
-  const [balances, setBalances] = useState<Balances>({})
 
+  // states
+  const [balances, setBalances] = useState<Balances>({})
+  const [prices, setPrices] = useState<Prices>({ MOCKT: 1 })
+
+  // methods
   const updateBalances = async () => {
     if (!wallet) return
 
@@ -40,7 +46,7 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [wallet, contracts.tokens])
 
   return (
-    <ContractContext.Provider value={{ contracts, balances, updateBalances }}>
+    <ContractContext.Provider value={{ contracts, balances, prices, updateBalances }}>
       {children}
     </ContractContext.Provider>
   )

@@ -3,7 +3,7 @@ type Erc20 = {
   symbol: string
   decimal: number
   address: string
-  logo: string
+  icon: string
   isPermit: boolean
 }
 
@@ -12,7 +12,7 @@ const MOCKT: Erc20 = {
   symbol: 'MOCKT',
   decimal: 18,
   address: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
-  logo: '',
+  icon: '/icons/mock-token.svg',
   isPermit: true,
 }
 
