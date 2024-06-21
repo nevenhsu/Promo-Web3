@@ -6,7 +6,7 @@ import { CopyButton, Button } from '@mantine/core'
 import QRCode from 'react-qr-code'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiCopy, PiShareFat, PiLink } from 'react-icons/pi'
-import { useWallet } from '@/hooks/useWallet'
+import { useWallet } from '@/wallet/hooks/useWallet'
 import classes from './index.module.css'
 
 export default function Receive() {

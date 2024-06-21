@@ -1,17 +1,16 @@
-import * as _ from 'lodash-es'
 import { Erc20Permit, Erc20Permit__factory } from './typechain-types'
-import { permitTokens } from './tokens'
+import { tokens as _tokens } from './tokens'
 
-export type PermitTokens = { [symbol: string]: Erc20Permit | undefined }
+export type Tokens = { [symbol: string]: Erc20Permit | undefined }
 
 export type Contracts = {
-  permitTokens?: PermitTokens
+  tokens: Tokens
 }
 
-export const getPermitTokens = (signer: any) => {
-  const tokens: PermitTokens = {}
+export const getTokens = (signer: any) => {
+  const tokens: Tokens = {}
 
-  _.forEach(permitTokens, o => {
+  _tokens.map(o => {
     tokens[o.symbol] = new Erc20Permit__factory(signer).attach(o.address) as Erc20Permit
   })
 

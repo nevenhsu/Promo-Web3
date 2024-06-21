@@ -1,13 +1,10 @@
-export type Erc20 = {
+type Erc20 = {
   name: string
   symbol: string
   decimal: number
   address: string
   logo: string
-}
-
-type Tokens = {
-  [symbol: string]: Erc20
+  isPermit: boolean
 }
 
 const MOCKT: Erc20 = {
@@ -16,6 +13,7 @@ const MOCKT: Erc20 = {
   decimal: 18,
   address: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
   logo: '',
+  isPermit: true,
 }
 
-export const permitTokens: Tokens = { MOCKT } as const
+export const tokens = [MOCKT] as const

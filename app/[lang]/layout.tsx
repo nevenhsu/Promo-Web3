@@ -4,7 +4,7 @@ import Script from 'next/script'
 import dynamic from 'next/dynamic'
 import { draftMode } from 'next/headers'
 import { ColorSchemeScript } from '@mantine/core'
-import ContextProvider from '@/components/providers/ContextProvider'
+import { AppProvider } from '@/store/AppContext'
 import Providers from '@/components/providers/Providers'
 import MyAppShell from '@/components/MyAppShell'
 import { fontVariables } from '@/theme/font'
@@ -57,13 +57,13 @@ export default function LocaleLayout({
       <body style={{ width: '100vw', overflowX: 'hidden' }}>
         <NextIntlClientProvider locale={lang} messages={messages}>
           <Providers>
-            <ContextProvider isPreview={isEnabled}>
+            <AppProvider isPreview={isEnabled}>
               {isEnabled ? (
                 <PreviewProvider token={env.sanityToken}>{renderContent()}</PreviewProvider>
               ) : (
                 <>{renderContent()}</>
               )}
-            </ContextProvider>
+            </AppProvider>
           </Providers>
         </NextIntlClientProvider>
       </body>

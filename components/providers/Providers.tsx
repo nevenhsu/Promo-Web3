@@ -4,7 +4,7 @@ import '@/utils/console'
 
 import ReduxProvider from '@/store/ReduxProvider'
 import ThemeProvider from './ThemeProvider'
-import PrivyProvider from './PrivyProvider'
+import PrivyProvider from '../../wallet/PrivyProvider'
 import AuthProvider from './AuthProvider'
 import BackgroundTask from './BackgroundTask'
 

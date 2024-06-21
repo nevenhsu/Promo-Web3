@@ -1,21 +1,23 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useWallet } from '@/hooks/useWallet'
-import { getPermitTokens, type Contracts } from '@/contracts'
+import { useWallet } from '@/wallet/hooks/useWallet'
+import { getTokens, type Contracts } from '@/contracts'
 
 export default function useContracts() {
-  const [contracts, setContracts] = useState<Contracts>({})
+  const [contracts, setContracts] = useState<Contracts>({ tokens: {} })
 
   const wallet = useWallet()
 
   const getContracts = async () => {
-    const provider = await wallet!.getEthersProvider()
+    if (!wallet) return
+
+    const provider = await wallet.getEthersProvider()
     const signer = await provider.getSigner()
-    const permitTokens = getPermitTokens(signer)
+    const tokens = getTokens(signer)
 
     setContracts({
-      permitTokens,
+      tokens,
     })
   }
 

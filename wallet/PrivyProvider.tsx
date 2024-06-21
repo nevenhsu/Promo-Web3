@@ -2,7 +2,7 @@
 import { base, localhost } from 'viem/chains'
 import { PrivyProvider } from '@privy-io/react-auth'
 import { ZeroDevProvider } from '@zerodev/privy'
-import { colors } from '@/theme/colors'
+import { ContractProvider } from './ContractContext'
 import { publicEnv } from '@/utils/env'
 
 const chain = publicEnv.isProd ? base : localhost
@@ -23,7 +23,7 @@ export default function MyPrivyProvider({ children }: React.PropsWithChildren) {
           },
         }}
       >
-        {children}
+        <ContractProvider>{children}</ContractProvider>
       </PrivyProvider>
     </ZeroDevProvider>
   )

@@ -2,8 +2,8 @@
 
 import * as _ from 'lodash-es'
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import useContracts from '@/hooks/useContracts'
-import { useWallet } from '@/hooks/useWallet'
+import useContracts from '@/wallet/hooks/useContracts'
+import { useWallet } from '@/wallet/hooks/useWallet'
 import type { Contracts } from '@/contracts'
 
 type Balances = { [symbol: string]: bigint | undefined }
@@ -22,10 +22,10 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [balances, setBalances] = useState<Balances>({})
 
   const updateBalances = async () => {
-    if (!wallet || !contracts.permitTokens) return
+    if (!wallet) return
 
     await Promise.all(
-      _.map(contracts.permitTokens, async (token, symbol) => {
+      _.map(contracts.tokens, async (token, symbol) => {
         if (token) {
           const balance = await token.balanceOf(wallet.address)
           setBalances(prev => ({ ...prev, [symbol]: balance }))
@@ -36,8 +36,8 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }
 
   useEffect(() => {
-    if (wallet && contracts.permitTokens) updateBalances()
-  }, [wallet, contracts.permitTokens])
+    if (wallet) updateBalances()
+  }, [wallet, contracts.tokens])
 
   return (
     <ContractContext.Provider value={{ contracts, balances, updateBalances }}>
