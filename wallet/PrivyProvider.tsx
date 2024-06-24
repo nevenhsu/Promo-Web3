@@ -1,11 +1,11 @@
 // Replace this with any of the networks listed at https://wagmi.sh/core/chains#supported-chains
-import { base, localhost } from 'viem/chains'
+import { base, hardhat } from 'viem/chains'
 import { PrivyProvider } from '@privy-io/react-auth'
 import { ZeroDevProvider } from '@zerodev/privy'
 import { ContractProvider } from './ContractContext'
 import { publicEnv } from '@/utils/env'
 
-const chain = publicEnv.isProd ? base : localhost
+const chain = publicEnv.isProd ? base : hardhat
 
 export default function MyPrivyProvider({ children }: React.PropsWithChildren) {
   return (
@@ -16,7 +16,7 @@ export default function MyPrivyProvider({ children }: React.PropsWithChildren) {
           defaultChain: chain,
           supportedChains: [chain],
           embeddedWallets: {
-            createOnLogin: 'off',
+            createOnLogin: 'users-without-wallets',
           },
           appearance: {
             // theme: env.defaultColorScheme,

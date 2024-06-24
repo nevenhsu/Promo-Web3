@@ -77,6 +77,8 @@ function getNetworkName(chainId?: string) {
       return 'Goerli Testnet'
     case 'eip155:1337':
       return 'Localhost Testnet'
+    case 'eip155:31337':
+      return 'Hardhat Testnet'
     default:
       return 'Unknown Network'
   }

@@ -18,10 +18,10 @@ const mono = Roboto_Mono({
   variable: '--next-mono',
 })
 
-const tc = Noto_Sans_TC({
-  weight: ['200', '400', '700'],
-  subsets: ['latin'],
-  variable: '--next-tc',
-})
+// const tc = Noto_Sans_TC({
+//   weight: ['200', '400', '700'],
+//   subsets: ['latin'],
+//   variable: '--next-tc',
+// })
 
-export const fontVariables = `${title.variable} ${body.variable} ${mono.variable} ${tc.variable}`
+export const fontVariables = `${title.variable} ${body.variable} ${mono.variable}`

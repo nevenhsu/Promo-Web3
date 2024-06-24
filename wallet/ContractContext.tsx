@@ -10,7 +10,8 @@ type Balances = { [symbol: string]: bigint | undefined }
 type Prices = { [symbol: string]: number | undefined }
 
 interface ContractsContextType {
-  contracts?: Contracts
+  from?: string // signer address
+  contracts: Contracts
   balances: Balances
   prices: Prices
   updateBalances: () => Promise<void>
@@ -46,7 +47,9 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [wallet, contracts.tokens])
 
   return (
-    <ContractContext.Provider value={{ contracts, balances, prices, updateBalances }}>
+    <ContractContext.Provider
+      value={{ from: wallet?.address, contracts, balances, prices, updateBalances }}
+    >
       {children}
     </ContractContext.Provider>
   )

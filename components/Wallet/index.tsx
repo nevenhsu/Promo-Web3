@@ -8,7 +8,7 @@ import { Link } from '@/navigation'
 import { usePrivy } from '@privy-io/react-auth'
 import { useAppSelector } from '@/hooks/redux'
 import { useContractContext } from '@/wallet/ContractContext'
-import { Box, Space, Group, Stack, Text, Title, Tabs, Loader } from '@mantine/core'
+import { Box, Space, Group, Stack, Text, Title } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import CreateWallet from './CreateWallet'
 import BaseIcon from '@/public/icons/base.svg'
@@ -71,17 +71,9 @@ export default function Wallet() {
       </RwdLayout>
 
       <PullToRefresh onRefresh={updateBalances}>
-        <RwdLayout mih={400}>
-          <Box w="100%">
-            <Tabs className={classes.tabs} variant="pills" defaultValue="asset" radius="xl">
-              <Tabs.Tab value="asset">Asset</Tabs.Tab>
-              <Tabs.Tab value="activity">Airdrop</Tabs.Tab>
-            </Tabs>
-          </Box>
-          <Space h={24} />
+        <RwdLayout mih="calc(100vh - 300px)">
           <Stack>
             {/* Item */}
-
             {tokens.map(o => {
               // TODO: convert uint
               const balance = balances[o.symbol]
@@ -115,6 +107,8 @@ export default function Wallet() {
               )
             })}
           </Stack>
+
+          <Space h={100} />
         </RwdLayout>
       </PullToRefresh>
     </>
