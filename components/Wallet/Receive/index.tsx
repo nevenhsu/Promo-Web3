@@ -7,6 +7,7 @@ import QRCode from 'react-qr-code'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiCopy, PiShareFat, PiLink } from 'react-icons/pi'
 import { useWallet } from '@/wallet/hooks/useWallet'
+import { getNetworkName } from '@/wallet/utils/network'
 import classes from './index.module.css'
 
 export default function Receive() {
@@ -67,19 +68,4 @@ export default function Receive() {
       </RwdLayout>
     </>
   )
-}
-
-function getNetworkName(chainId?: string) {
-  switch (chainId) {
-    case 'eip155:1':
-      return 'Ethereum Mainnet'
-    case 'eip155:5':
-      return 'Goerli Testnet'
-    case 'eip155:1337':
-      return 'Localhost Testnet'
-    case 'eip155:31337':
-      return 'Hardhat Testnet'
-    default:
-      return 'Unknown Network'
-  }
 }

@@ -1,19 +1,20 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useWallet } from '@/wallet/hooks/useWallet'
 import { getTokens, type Contracts } from '@/contracts'
+import { Web3Provider } from '@ethersproject/providers'
+import { useWalletProvider } from '@/wallet/hooks/useWalletProvider'
 
 export default function useContracts() {
   const [contracts, setContracts] = useState<Contracts>({ tokens: {} })
-
-  const wallet = useWallet()
+  const { provider, walletAddress } = useWalletProvider()
 
   const getContracts = async () => {
-    if (!wallet) return
+    if (!provider) return
 
-    const provider = await wallet.getEthersProvider()
-    const signer = await provider.getSigner()
+    // The "any" network will allow spontaneous network changes
+    const ethersProvider = new Web3Provider(provider, 'any')
+    const signer = await ethersProvider.getSigner()
     const tokens = getTokens(signer)
 
     setContracts({
@@ -22,10 +23,10 @@ export default function useContracts() {
   }
 
   useEffect(() => {
-    if (wallet) {
+    if (provider) {
       getContracts()
     }
-  }, [wallet]) // assuming signer is a dependency
+  }, [provider]) // assuming signer is a dependency
 
-  return contracts
+  return { contracts, walletAddress }
 }

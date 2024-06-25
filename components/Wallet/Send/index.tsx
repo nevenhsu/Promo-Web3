@@ -11,6 +11,7 @@ import { PiCaretDown } from 'react-icons/pi'
 import { tokens } from '@/contracts/tokens'
 import { formatBalance, formatAmount } from '@/utils/math'
 import { useWallet } from '@/wallet/hooks/useWallet'
+import { classifyError } from '@/wallet/utils/handleError'
 import classes from './index.module.css'
 
 type FormData = {
@@ -80,6 +81,7 @@ export default function Send() {
         console.log(`Transaction hash: ${hash}`)
       } catch (err) {
         console.error(err)
+        classifyError(err)
       } finally {
         setLoading(false)
         updateBalances()

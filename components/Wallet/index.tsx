@@ -9,9 +9,9 @@ import { usePrivy } from '@privy-io/react-auth'
 import { useAppSelector } from '@/hooks/redux'
 import { useContractContext } from '@/wallet/ContractContext'
 import { Box, Space, Group, Stack, Text, Title } from '@mantine/core'
+import NetworkButton from '@/components/Wallet/NetworkButton'
 import RwdLayout from '@/components/share/RwdLayout'
 import CreateWallet from './CreateWallet'
-import BaseIcon from '@/public/icons/base.svg'
 import { PiArrowCircleUp, PiArrowCircleDown, PiClock, PiCreditCard } from 'react-icons/pi'
 import { tokens } from '@/contracts/tokens'
 import classes from './index.module.css'
@@ -36,7 +36,7 @@ export default function Wallet() {
             Balance
           </Text>
           <Box h={12}>
-            <BaseIcon className={classes.chainIcon} />
+            <NetworkButton />
           </Box>
         </Group>
         <Title order={2}>USD 13220.42</Title>
