@@ -1,5 +1,3 @@
-import type { SupportedChainIds } from '@/wallet/variables'
-
 type ZeroDev = {
   projectId: string
   bundlerRpc: string

@@ -6,13 +6,12 @@ import { CopyButton, Button } from '@mantine/core'
 import QRCode from 'react-qr-code'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiCopy, PiShareFat, PiLink } from 'react-icons/pi'
-import { useWallet } from '@/wallet/hooks/useWallet'
+import { useContractContext } from '@/wallet/ContractContext'
 import { getNetworkName } from '@/wallet/utils/network'
 import classes from './index.module.css'
 
 export default function Receive() {
-  const wallet = useWallet()
-  const address = wallet?.address || ''
+  const { walletAddress, chainId, isSmartAccount } = useContractContext()
 
   return (
     <>
@@ -22,31 +21,31 @@ export default function Receive() {
 
           <Center>
             <AspectRatio className={classes.qrcode} ratio={1}>
-              <QRCode value={address} size={200} />
+              <QRCode value={walletAddress} size={200} />
             </AspectRatio>
           </Center>
 
           <div>
-            <Text fz="sm">Address</Text>
-            <Text fz="sm">{address}</Text>
+            <Text fz="sm">{isSmartAccount ? 'Smart Wallet' : 'Wallet'}</Text>
+            <Text fz="sm">{walletAddress}</Text>
           </div>
 
           <div>
             <Text fz="sm">Network</Text>
-            <Text fz="sm">{getNetworkName(wallet?.chainId)}</Text>
+            <Text fz="sm">{getNetworkName(chainId)}</Text>
           </div>
 
           <div />
 
           <Group grow>
-            <CopyButton value={address}>
+            <CopyButton value={walletAddress}>
               {({ copied, copy }) => (
                 <Button
                   leftSection={<PiCopy size={20} />}
                   color={copied ? 'green' : 'blue'}
                   variant="outline"
                   onClick={copy}
-                  disabled={!address}
+                  disabled={!walletAddress}
                 >
                   {copied ? 'Copied' : 'Copy'}
                 </Button>

@@ -4,15 +4,16 @@ import * as _ from 'lodash-es'
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import useContracts from '@/wallet/hooks/useContracts'
 import { useWallet } from '@/wallet/hooks/useWallet'
-import { toChainId } from './utils/network'
-import { defaultChain, supportedChains, type SupportedChainIds } from './variables'
+import { supportedChains } from './variables'
 import type { Contracts } from '@/contracts'
 
 type Balances = { [symbol: string]: bigint | undefined }
 type Prices = { [symbol: string]: number | undefined }
 
 interface ContractsContextType {
-  chainId: SupportedChainIds
+  chainId?: number
+  walletAddress: string
+  isSmartAccount: boolean
   contracts: Contracts
   balances: Balances
   prices: Prices
@@ -24,23 +25,26 @@ const ContractContext = createContext<ContractsContextType | undefined>(undefine
 
 export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // states
-  const [chainId, setChainId] = useState<SupportedChainIds>(defaultChain.id)
   const [balances, setBalances] = useState<Balances>({})
   const [prices, setPrices] = useState<Prices>({ MOCKT: 1 })
 
   const wallet = useWallet()
-  const { contracts, walletAddress } = useContracts()
+  const { chainId, contracts, walletAddress, isSmartAccount } = useContracts()
 
   // methods
   const updateBalances = async () => {
-    if (!wallet) return
+    if (!walletAddress) return
 
     await Promise.all(
       _.map(contracts.tokens, async (token, symbol) => {
         if (token) {
-          const balance = await token.balanceOf(walletAddress)
-          setBalances(prev => ({ ...prev, [symbol]: balance }))
-          console.log(`Balance of ${symbol}: ${balance}`)
+          try {
+            const balance = await token.balanceOf(walletAddress)
+            setBalances(prev => ({ ...prev, [symbol]: balance }))
+            console.log(`Balance of ${symbol}: ${balance}`)
+          } catch (err) {
+            console.error(err)
+          }
         }
       })
     )
@@ -52,7 +56,6 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       if (_.some(supportedChains, { id: chainId })) {
         await wallet.switchChain(chainId)
-        setChainId(chainId as SupportedChainIds)
       } else {
         throw new Error('Unsupported chain')
       }
@@ -64,13 +67,21 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     if (wallet) {
       updateBalances()
-      setChainId(toChainId(wallet.chainId) as SupportedChainIds)
     }
-  }, [wallet, contracts.tokens])
+  }, [wallet, chainId, walletAddress])
 
   return (
     <ContractContext.Provider
-      value={{ chainId, contracts, balances, prices, updateBalances, switchChain }}
+      value={{
+        chainId,
+        walletAddress,
+        isSmartAccount,
+        contracts,
+        balances,
+        prices,
+        updateBalances,
+        switchChain,
+      }}
     >
       {children}
     </ContractContext.Provider>

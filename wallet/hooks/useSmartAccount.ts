@@ -4,44 +4,54 @@ import { useState, useEffect } from 'react'
 import { useWallet } from '@/wallet/hooks/useWallet'
 import { createPublicClient, http } from 'viem'
 import { providerToSmartAccountSigner, ENTRYPOINT_ADDRESS_V07 } from 'permissionless'
+
 import {
   createZeroDevPaymasterClient,
   createKernelAccount,
   createKernelAccountClient,
 } from '@zerodev/sdk'
 import { signerToEcdsaValidator } from '@zerodev/ecdsa-validator'
+import { KernelEIP1193Provider } from '@zerodev/sdk/providers'
 import { supportedChains } from '@/wallet/variables'
-import { getZeroDev } from '@/wallet/zerodev'
+import { getZeroDev } from '@/wallet/zeroDev'
 import { KERNEL_V3_1 } from '@zerodev/sdk/constants'
+import type { ConnectedWallet } from '@privy-io/react-auth'
+import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types'
+
+export type KernelProvider = KernelEIP1193Provider<ENTRYPOINT_ADDRESS_V07_TYPE>
 
 const kernelVersion = KERNEL_V3_1
-
-type WalletType = ReturnType<typeof useWallet>
-export type AccountClient = Awaited<ReturnType<typeof getAccountClient>>
 
 export function useSmartAccount(chainId?: number) {
   // Find the embedded wallet and get its EIP1193 provider
   const wallet = useWallet()
 
-  const [accountClient, setAccountClient] = useState<AccountClient>()
+  const [accountAddress, setAccountAddress] = useState('')
+  const [kernelProvider, setKernelProvider] = useState<KernelProvider>()
 
   useEffect(() => {
     const zeroDev = getZeroDev(chainId)
     if (wallet && zeroDev) {
       getAccountClient(wallet, chainId)
-        .then(accountClient => {
-          if (accountClient) {
-            setAccountClient(accountClient)
+        .then(res => {
+          if (res) {
+            const { kernelProvider, accountAddress } = res
+            if (kernelProvider && accountAddress) {
+              setKernelProvider(kernelProvider)
+              setAccountAddress(accountAddress)
+            }
           }
         })
         .catch(console.error)
+    } else {
+      setKernelProvider(undefined)
     }
   }, [wallet, chainId])
 
-  return accountClient
+  return { kernelProvider, accountAddress }
 }
 
-async function getAccountClient(wallet: WalletType, chainId: number | undefined) {
+async function getAccountClient(wallet: ConnectedWallet, chainId: number | undefined) {
   const zeroDev = getZeroDev(chainId)
 
   if (wallet && zeroDev) {
@@ -95,8 +105,10 @@ async function getAccountClient(wallet: WalletType, chainId: number | undefined)
       },
     })
 
-    console.log('Smart account created:', kernelClient.account.address)
+    const accountAddress = kernelClient.account.address
+    const kernelProvider = new KernelEIP1193Provider(kernelClient)
+    console.log('Smart account created:', accountAddress)
 
-    return kernelClient
+    return { kernelProvider, accountAddress }
   }
 }

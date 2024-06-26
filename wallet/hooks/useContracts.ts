@@ -7,15 +7,16 @@ import { useWalletProvider } from '@/wallet/hooks/useWalletProvider'
 
 export default function useContracts() {
   const [contracts, setContracts] = useState<Contracts>({ tokens: {} })
-  const { provider, walletAddress } = useWalletProvider()
+  const { chainId, provider, walletAddress, isSmartAccount } = useWalletProvider()
 
   const getContracts = async () => {
-    if (!provider) return
+    if (!chainId || !provider) return
 
     // The "any" network will allow spontaneous network changes
     const ethersProvider = new Web3Provider(provider, 'any')
     const signer = await ethersProvider.getSigner()
-    const tokens = getTokens(signer)
+    // @ts-expect-error JsonRpcSigner does not exist on type Signer
+    const tokens = getTokens(chainId, signer)
 
     setContracts({
       tokens,
@@ -23,10 +24,12 @@ export default function useContracts() {
   }
 
   useEffect(() => {
-    if (provider) {
+    if (chainId && provider) {
       getContracts()
+    } else {
+      setContracts({ tokens: {} })
     }
-  }, [provider]) // assuming signer is a dependency
+  }, [chainId, provider, walletAddress]) // assuming signer is a dependency
 
-  return { contracts, walletAddress }
+  return { chainId, contracts, walletAddress, isSmartAccount }
 }

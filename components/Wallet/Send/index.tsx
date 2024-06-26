@@ -1,16 +1,16 @@
 'use client'
 
 import Decimal from 'decimal.js'
-import { useState, useMemo } from 'react'
+import { useRouter } from '@/navigation'
+import { useState, useMemo, useEffect } from 'react'
 import { useForm } from '@mantine/form'
 import { useContractContext } from '@/wallet/ContractContext'
 import { Paper, Stack, Group, Title, Text, Divider, Space } from '@mantine/core'
 import { Button, Checkbox, TextInput, NumberInput, Select } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiCaretDown } from 'react-icons/pi'
-import { tokens } from '@/contracts/tokens'
+import { getTokens } from '@/contracts/tokens'
 import { formatBalance, formatAmount } from '@/utils/math'
-import { useWallet } from '@/wallet/hooks/useWallet'
 import { classifyError } from '@/wallet/utils/handleError'
 import classes from './index.module.css'
 
@@ -22,15 +22,17 @@ type FormData = {
 }
 
 export default function Send() {
-  const wallet = useWallet()
+  const router = useRouter()
 
   const [loading, setLoading] = useState(false)
-  const { balances, prices, updateBalances, contracts } = useContractContext()
+  const { chainId, walletAddress, balances, prices, updateBalances, contracts } =
+    useContractContext()
+  const tokens = useMemo(() => getTokens(chainId), [chainId])
 
   const form = useForm<FormData>({
     mode: 'controlled',
     initialValues: {
-      symbol: tokens[0].symbol,
+      symbol: '',
       to: '',
       amount: '',
       networkFee: 'Average',
@@ -48,6 +50,12 @@ export default function Send() {
     const token = tokens.find(o => o.symbol === symbol)
     return { token, balance: balances[symbol], price: prices[symbol] }
   }, [symbol, balances, prices])
+
+  useEffect(() => {
+    if (tokens.length > 0) {
+      form.setFieldValue('symbol', tokens[0].symbol)
+    }
+  }, [tokens])
 
   const handlePaste = async () => {
     try {
@@ -67,8 +75,7 @@ export default function Send() {
   }
 
   const handleSubmit = async (values: FormData) => {
-    console.log(values)
-    if (!wallet) return
+    if (!walletAddress) return
 
     const tokenContract = contracts.tokens[values.symbol]
     if (token && tokenContract) {
@@ -79,12 +86,14 @@ export default function Send() {
       try {
         const { hash } = await tokenContract.transfer(values.to, amount)
         console.log(`Transaction hash: ${hash}`)
+        setLoading(false)
+        updateBalances()
+
+        router.push('/wallet')
       } catch (err) {
         console.error(err)
         classifyError(err)
-      } finally {
         setLoading(false)
-        updateBalances()
       }
     }
   }

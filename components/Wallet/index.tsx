@@ -20,7 +20,7 @@ export default function Wallet() {
   const { _id, fetched, data } = useAppSelector(state => state.user)
   const { username, name, details } = data
 
-  const { balances, prices, updateBalances } = useContractContext()
+  const { chainId, balances, prices, updateBalances } = useContractContext()
 
   const { user } = usePrivy()
 
@@ -74,38 +74,47 @@ export default function Wallet() {
         <RwdLayout mih="calc(100vh - 300px)">
           <Stack>
             {/* Item */}
-            {tokens.map(o => {
-              // TODO: convert uint
-              const balance = balances[o.symbol]
-              const price = prices[o.symbol]
-              const bal = Decimal.div(balance?.toString() || 0, 10 ** o.decimal)
-              const p = price ? Decimal.mul(bal, price) : undefined
+            {Boolean(chainId) &&
+              tokens
+                .filter(o => o.chainId === chainId)
+                .map(o => {
+                  // TODO: convert uint
+                  const balance = balances[o.symbol]
+                  const price = prices[o.symbol]
+                  const bal = Decimal.div(balance?.toString() || 0, 10 ** o.decimal)
+                  const p = price ? Decimal.mul(bal, price) : undefined
 
-              return (
-                <Group key={o.symbol} justify="space-between">
-                  <Group>
-                    <Image className={classes.icon} src={o.icon} width={32} height={32} alt="" />
+                  return (
+                    <Group key={o.symbol} justify="space-between">
+                      <Group>
+                        <Image
+                          className={classes.icon}
+                          src={o.icon}
+                          width={32}
+                          height={32}
+                          alt=""
+                        />
 
-                    <Stack gap={4}>
-                      <Text fz="sm" fw={500}>
-                        {o.name}
-                      </Text>
-                      <Text fz="xs" c="dimmed">
-                        {o.symbol}
-                      </Text>
-                    </Stack>
-                  </Group>
-                  <Stack gap={4} ta="right">
-                    <Text fz="sm" fw={500}>
-                      {bal.toDP(4).toString()}
-                    </Text>
-                    <Text fz="xs" c="dimmed">
-                      {p ? `USD ${p.toDP(2).toString()}` : 'No price yet'}
-                    </Text>
-                  </Stack>
-                </Group>
-              )
-            })}
+                        <Stack gap={4}>
+                          <Text fz="sm" fw={500}>
+                            {o.name}
+                          </Text>
+                          <Text fz="xs" c="dimmed">
+                            {o.symbol}
+                          </Text>
+                        </Stack>
+                      </Group>
+                      <Stack gap={4} ta="right">
+                        <Text fz="sm" fw={500}>
+                          {bal.toDP(4).toString()}
+                        </Text>
+                        <Text fz="xs" c="dimmed">
+                          {p ? `USD ${p.toDP(2).toString()}` : 'No price yet'}
+                        </Text>
+                      </Stack>
+                    </Group>
+                  )
+                })}
           </Stack>
 
           <Space h={100} />
