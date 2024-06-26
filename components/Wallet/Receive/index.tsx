@@ -6,12 +6,12 @@ import { CopyButton, Button } from '@mantine/core'
 import QRCode from 'react-qr-code'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiCopy, PiShareFat, PiLink } from 'react-icons/pi'
-import { useContractContext } from '@/wallet/ContractContext'
+import { useWeb3 } from '@/wallet/Web3Context'
 import { getNetworkName } from '@/wallet/utils/network'
 import classes from './index.module.css'
 
 export default function Receive() {
-  const { walletAddress, chainId, isSmartAccount } = useContractContext()
+  const { walletAddress, chainId, isSmartAccount } = useWeb3()
 
   return (
     <>

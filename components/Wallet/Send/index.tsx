@@ -4,7 +4,7 @@ import Decimal from 'decimal.js'
 import { useRouter } from '@/navigation'
 import { useState, useMemo, useEffect } from 'react'
 import { useForm } from '@mantine/form'
-import { useContractContext } from '@/wallet/ContractContext'
+import { useWeb3 } from '@/wallet/Web3Context'
 import { Paper, Stack, Group, Title, Text, Divider, Space } from '@mantine/core'
 import { Button, Checkbox, TextInput, NumberInput, Select } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
@@ -25,8 +25,7 @@ export default function Send() {
   const router = useRouter()
 
   const [loading, setLoading] = useState(false)
-  const { chainId, walletAddress, balances, prices, updateBalances, contracts } =
-    useContractContext()
+  const { chainId, walletAddress, balances, prices, updateBalances, contracts } = useWeb3()
   const tokens = useMemo(() => getTokens(chainId), [chainId])
 
   const form = useForm<FormData>({

@@ -10,7 +10,7 @@ import type { Contracts } from '@/contracts'
 type Balances = { [symbol: string]: bigint | undefined }
 type Prices = { [symbol: string]: number | undefined }
 
-interface ContractsContextType {
+interface Web3ContextType {
   chainId?: number
   walletAddress: string
   isSmartAccount: boolean
@@ -21,9 +21,9 @@ interface ContractsContextType {
   switchChain: (chainId: number) => Promise<void>
 }
 
-const ContractContext = createContext<ContractsContextType | undefined>(undefined)
+const Web3Context = createContext<Web3ContextType | undefined>(undefined)
 
-export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // states
   const [balances, setBalances] = useState<Balances>({})
   const [prices, setPrices] = useState<Prices>({ MOCKT: 1 })
@@ -71,7 +71,7 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [wallet, chainId, walletAddress])
 
   return (
-    <ContractContext.Provider
+    <Web3Context.Provider
       value={{
         chainId,
         walletAddress,
@@ -84,14 +84,14 @@ export const ContractProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }}
     >
       {children}
-    </ContractContext.Provider>
+    </Web3Context.Provider>
   )
 }
 
-export const useContractContext = (): ContractsContextType => {
-  const context = useContext(ContractContext)
+export const useWeb3 = (): Web3ContextType => {
+  const context = useContext(Web3Context)
   if (context === undefined) {
-    throw new Error('useContractContext must be used within an ContractProvider')
+    throw new Error('useWeb3 must be used within an Web3Provider')
   }
   return context
 }

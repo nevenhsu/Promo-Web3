@@ -7,7 +7,7 @@ import PullToRefresh from 'react-simple-pull-to-refresh'
 import { Link } from '@/navigation'
 import { usePrivy } from '@privy-io/react-auth'
 import { useAppSelector } from '@/hooks/redux'
-import { useContractContext } from '@/wallet/ContractContext'
+import { useWeb3 } from '@/wallet/Web3Context'
 import { Box, Space, Group, Stack, Text, Title } from '@mantine/core'
 import NetworkButton from '@/components/Wallet/NetworkButton'
 import RwdLayout from '@/components/share/RwdLayout'
@@ -20,7 +20,7 @@ export default function Wallet() {
   const { _id, fetched, data } = useAppSelector(state => state.user)
   const { username, name, details } = data
 
-  const { chainId, balances, prices, updateBalances } = useContractContext()
+  const { chainId, balances, prices, updateBalances } = useWeb3()
 
   const { user } = usePrivy()
 
