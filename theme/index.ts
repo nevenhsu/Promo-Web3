@@ -10,12 +10,12 @@ const monoFF = 'var(--font-mono)'
 
 export const theme = createTheme({
   focusRing: 'never',
-  black: '#0f0f0f',
-  white: 'hsl(210, 1%, 99%)',
-  primaryShade: { light: 6, dark: 5 },
-  primaryColor: 'blue',
+  black: '#090A0A',
+  white: '#F7F9FA',
+  primaryShade: { light: 5, dark: 4 },
+  primaryColor: 'orange',
   colors,
-  fontFamily: titleFF,
+  fontFamily: bodyFF,
   fontFamilyMonospace: monoFF,
   headings: {
     fontFamily: titleFF,

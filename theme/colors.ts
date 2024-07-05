@@ -1,8 +1,90 @@
 import type { MantineColorsTuple } from '@mantine/core'
 
-export type MantineColor = ''
+export type MantineColor = 'orange' | 'blue' | 'green' | 'red' | 'yellow' | 'dark' | 'gray'
 
-// export const colors: Record<MantineColor, MantineColorsTuple> = {
-// }
-
-export const colors = {}
+export const colors: Record<MantineColor, MantineColorsTuple> = {
+  orange: [
+    '#ffede5',
+    '#ffdace',
+    '#fbb5a0',
+    '#f78e6d',
+    '#f36b42',
+    '#f15626',
+    '#f14a17',
+    '#d63b0b',
+    '#c03206',
+    '#a82700',
+  ],
+  blue: [
+    '#e2f9ff',
+    '#ceeeff',
+    '#a2daf7',
+    '#71c6f0',
+    '#4ab4ea',
+    '#30a9e7',
+    '#19a4e7',
+    '#008fce',
+    '#0080ba',
+    '#006ea5',
+  ],
+  green: [
+    '#e2fff7',
+    '#d1faed',
+    '#a7f1dc',
+    '#7ae7c8',
+    '#54e0b7',
+    '#3bdcad',
+    '#2adaa8',
+    '#15c091',
+    '#00ac81',
+    '#00956e',
+  ],
+  red: [
+    '#ffe8e8',
+    '#ffd2d2',
+    '#f8a4a4',
+    '#f27272',
+    '#ed4848',
+    '#ea2d2d',
+    '#ea1e1f',
+    '#cf0f13',
+    '#ba050f',
+    '#a30009',
+  ],
+  yellow: [
+    '#fff8e1',
+    '#feeecc',
+    '#fadc9f',
+    '#f6c86d',
+    '#f3b842',
+    '#f1ad26',
+    '#f0a814',
+    '#d69304',
+    '#be8200',
+    '#a56f00',
+  ],
+  gray: [
+    '#e6e7e8',
+    '#e1e2e3',
+    '#dcddde',
+    '#d7d9d9',
+    '#d2d4d5',
+    '#cdcfd0',
+    '#a4a6a6',
+    '#7b7c7d',
+    '#525353',
+    '#29292a',
+  ],
+  dark: [
+    '#c6c7c8',
+    '#b3b4b5',
+    '#8c8f90',
+    '#797c7e',
+    '#66696b',
+    '#404446',
+    '#2d3031',
+    '#202223',
+    '#1a1b1c',
+    '#131415',
+  ],
+}

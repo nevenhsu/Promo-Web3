@@ -7,6 +7,12 @@ const detailSchema = new Schema({
   avatar: String,
 })
 
+const linkedAccountsSchema = new Schema({
+  userId: String,
+  username: String,
+  platform: String,
+})
+
 export const schema = new Schema({
   privyId: {
     type: String,
@@ -24,6 +30,7 @@ export const schema = new Schema({
   name: String,
   email: String,
   details: detailSchema,
+  linkedAccounts: linkedAccountsSchema,
   createdTime: { type: Date, default: Date.now },
 })
 

@@ -2,7 +2,7 @@ import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import { ActivityType, SocialMedia } from '@/types/db'
 
 const detailSchema = new Schema({
-  link: String,
+  link: String, // post id
   coverUrl: String,
   thumbnailUrl: String,
   participants: Number,

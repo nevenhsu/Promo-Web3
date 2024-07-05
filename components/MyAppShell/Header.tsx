@@ -3,10 +3,9 @@
 import { Link, usePathname, useRouter } from '@/navigation'
 import { useAppSelector } from '@/hooks/redux'
 import { usePrivy } from '@privy-io/react-auth'
-import { Group, Box, Button } from '@mantine/core'
-import { Avatar } from '@mantine/core'
-import Logo from '@/public/images/logo.svg'
-import { PiArrowLeft } from 'react-icons/pi'
+import { Group, Box, ActionIcon, Avatar } from '@mantine/core'
+import Logo from '@/public/icons/logo.svg'
+import { PiCaretLeft } from 'react-icons/pi'
 
 export default function Header() {
   const router = useRouter()
@@ -15,35 +14,30 @@ export default function Header() {
   const { authenticated } = usePrivy()
   const { data, _id } = useAppSelector(state => state.user)
 
-  const avatar = data.details?.avatar || ''
+  const { name, details } = data
+  const avatar = details?.avatar || ''
+
   const hasPreviousPage = pathname.split('/').length > 2
 
   return (
     <>
-      <Group h="100%" px={24} gap="xs" justify="space-between">
-        <>
+      <Group h="100%" px={16} justify="space-between">
+        <Group gap="xs">
           {hasPreviousPage ? (
-            <Button
-              variant="transparent"
-              c="var(--mantine-color-text)"
-              size="sm"
-              leftSection={<PiArrowLeft size={16} />}
-              onClick={() => router.back()}
-              pl={0}
-            >
-              Back
-            </Button>
-          ) : (
-            <Box w={40} h={40}>
-              <Logo />
-            </Box>
-          )}
-        </>
+            <ActionIcon variant="transparent" color="dark" aria-label="Back">
+              <PiCaretLeft />
+            </ActionIcon>
+          ) : null}
+
+          <Box w={64} h={64}>
+            <Logo width="100%" height="100%" />
+          </Box>
+        </Group>
 
         <Group>
           {authenticated && Boolean(_id) ? (
             <Link href="/profile">
-              <Avatar src={avatar} />
+              <Avatar src={avatar}>{name}</Avatar>
             </Link>
           ) : null}
         </Group>

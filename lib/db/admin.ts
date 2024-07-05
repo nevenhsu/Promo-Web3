@@ -1,4 +1,5 @@
 import * as _ from 'lodash-es'
+import mongoose from 'mongoose'
 import AdminModel, { type Admin } from '@/models/admin'
 import type { TUser } from '@/models/user'
 
@@ -71,7 +72,11 @@ export async function getAdmin(userId: string) {
     const admin = await AdminModel.findOne({ _user: userId, active: true }).orFail()
     return admin
   } catch (error) {
-    console.error('Error fetching admin:', error)
+    if (error instanceof mongoose.Error.DocumentNotFoundError) {
+      // No admin found with the specified ID
+    } else {
+      console.error('Error fetching admin:', error)
+    }
     return null
   }
 }
