@@ -24,7 +24,7 @@ export const i18nConfig = {
   pathnames: {
     '/': '/',
     '/home': '/home',
-    '/level': '/level',
+    '/record': '/record',
 
     // activity
     '/activity': '/activity',
@@ -48,5 +48,8 @@ export const i18nConfig = {
     '/profile': '/profile',
     '/profile/info': '/profile/info',
     '/profile/info/avatar': '/profile/info/avatar',
+
+    // refer
+    '/refer': '/refer',
   },
 } as const

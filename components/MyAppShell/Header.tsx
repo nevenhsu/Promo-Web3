@@ -37,7 +37,9 @@ export default function Header() {
         <Group>
           {authenticated && Boolean(_id) ? (
             <Link href="/profile">
-              <Avatar src={avatar}>{name}</Avatar>
+              <Avatar src={avatar} color="gray">
+                {name}
+              </Avatar>
             </Link>
           ) : null}
         </Group>

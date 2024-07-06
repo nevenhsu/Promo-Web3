@@ -6,7 +6,7 @@ import LevelCard from '@/components/share/LevelCard'
 import { PiMedalFill, PiLightning } from 'react-icons/pi'
 import classes from './index.module.css'
 
-export default function Activity() {
+export default function Record() {
   return (
     <>
       <RwdLayout>

@@ -17,6 +17,7 @@ export default function MyAppShell({ children }: React.PropsWithChildren) {
     <AppShell
       header={{ height: 64 }}
       navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !opened, desktop: true } }}
+      withBorder={false}
     >
       <AppShell.Header>
         <Header />

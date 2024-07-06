@@ -1,4 +1,5 @@
 import { models, model, Model, Schema } from 'mongoose'
+import { SocialMedia } from '@/types/db'
 import { nanoid } from 'nanoid'
 import { cleanup } from '@/utils/helper'
 import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
@@ -8,9 +9,9 @@ const detailSchema = new Schema({
 })
 
 const linkedAccountsSchema = new Schema({
-  userId: String,
-  username: String,
-  platform: String,
+  userId: { type: String, required: true },
+  username: { type: String, required: true },
+  platform: { type: String, enum: SocialMedia, required: true },
 })
 
 export const schema = new Schema({
@@ -30,7 +31,7 @@ export const schema = new Schema({
   name: String,
   email: String,
   details: detailSchema,
-  linkedAccounts: linkedAccountsSchema,
+  linkedAccounts: { type: [linkedAccountsSchema], default: [] },
   createdTime: { type: Date, default: Date.now },
 })
 

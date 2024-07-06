@@ -15,6 +15,7 @@ export const schema = new Schema({
   },
   newSelfScore: { type: Number, required: true }, // The new self score added for the activity
   createdAt: { type: Date, default: Date.now },
+  updated: { type: Boolean, default: false, index: true },
 })
 
 export type ActivityUserStatus = InferSchemaType<typeof schema>
