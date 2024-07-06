@@ -22,14 +22,19 @@ export default function Header() {
   return (
     <>
       <Group h="100%" px={16} justify="space-between">
-        <Group gap="xs">
+        <Group gap="md">
           {hasPreviousPage ? (
-            <ActionIcon variant="transparent" color="dark" aria-label="Back">
+            <ActionIcon
+              onClick={() => router.back()}
+              variant="transparent"
+              color="dark"
+              aria-label="Back"
+            >
               <PiCaretLeft />
             </ActionIcon>
           ) : null}
 
-          <Box w={64} h={64}>
+          <Box w={64} h={64} ml={-16}>
             <Logo width="100%" height="100%" />
           </Box>
         </Group>
@@ -37,9 +42,7 @@ export default function Header() {
         <Group>
           {authenticated && Boolean(_id) ? (
             <Link href="/profile">
-              <Avatar src={avatar} color="gray">
-                {name}
-              </Avatar>
+              <Avatar src={avatar}>{name}</Avatar>
             </Link>
           ) : null}
         </Group>

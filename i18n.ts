@@ -51,5 +51,6 @@ export const i18nConfig = {
 
     // refer
     '/refer': '/refer',
+    '/refer/list': '/refer/list',
   },
 } as const

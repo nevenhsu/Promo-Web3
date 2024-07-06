@@ -36,7 +36,7 @@ export const theme = createTheme({
     xl: 'calc(2rem * var(--mantine-scale))',
   },
   components: {
-    Button: Button.extend({ defaultProps: { radius: 'xl' } }),
+    Button: Button.extend({ defaultProps: { radius: 'xl', fw: 500 } }),
     ActionIcon: ActionIcon.extend({ defaultProps: { variant: 'transparent' } }),
   },
 })
