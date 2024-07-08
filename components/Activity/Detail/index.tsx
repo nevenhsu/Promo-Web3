@@ -165,9 +165,9 @@ export default function ActivityDetail({ activityId, children }: ActivityDetailP
           {/* Embedded Post */}
           {children}
         </Stack>
-
-        <Space h={100} />
       </RwdLayout>
+
+      <Space h={100} />
     </>
   )
 }

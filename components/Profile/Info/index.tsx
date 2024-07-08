@@ -86,9 +86,9 @@ export default function ProfileInfo() {
             </Stack>
           </form>
         </Stack>
-
-        <Space h={100} />
       </RwdLayout>
+
+      <Space h={100} />
     </>
   )
 }

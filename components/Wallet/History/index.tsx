@@ -68,9 +68,9 @@ export default function History() {
             </Group>
           </Paper>
         </Stack>
-
-        <Space h={100} />
       </RwdLayout>
+
+      <Space h={100} />
     </>
   )
 }

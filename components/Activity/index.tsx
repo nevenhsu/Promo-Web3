@@ -1,3 +1,5 @@
+'use client'
+
 import { Link } from '@/navigation'
 import { Tabs, Group, Stack, Paper, Box, Space, Divider } from '@mantine/core'
 import { Title, Text, Button } from '@mantine/core'
@@ -26,23 +28,32 @@ export default function Activity() {
             <Stack py={40}>
               <Paper px="md" radius="sm" shadow="xs">
                 <Group wrap="nowrap" align="stretch">
-                  <Stack py="md" justify="space-between">
+                  {/* Left */}
+                  <Stack py="md" justify="space-between" w={56} flex="1 0 auto">
                     <Box ta="center">
-                      <Text fz="sm">USDC</Text>
-                      <Title c="orange">100</Title>
+                      <Text fz="sm" lh={1}>
+                        USDC
+                      </Text>
+                      <Title order={3} c="orange">
+                        100
+                      </Title>
                     </Box>
-                    <Text fz="xs" c="dimmed">
+                    <Text ta="center" fz="xs" c="dimmed">
                       6 Jun 2024
                     </Text>
                   </Stack>
+
                   <Divider orientation="vertical" />
-                  <Stack gap={32} py="md">
+
+                  {/* Right */}
+                  <Stack gap={32} py="md" w="100%">
                     <Box>
                       <Title order={4} fw={500} lh={1} mb={8}>
                         Headline
                       </Title>
-                      <Text fz="sm" c="dark">
-                        Please add your content here. Keep it short and simple. And smile
+                      <Text fz="xs" c="dark" lineClamp={2}>
+                        Please add your content here. Keep it short and simple. And smile Please add
+                        your content here. Keep it short and simple.
                       </Text>
                     </Box>
 
@@ -76,9 +87,9 @@ export default function Activity() {
             </Stack>
           </Tabs.Panel>
         </Tabs>
-
-        <Space h={100} />
       </RwdLayout>
+
+      <Space h={100} />
     </>
   )
 }

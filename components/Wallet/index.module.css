@@ -7,7 +7,7 @@
 .actions div {
   background: var(--mantine-color-white);
   color: var(--mantine-primary-color-6);
-  border-radius: var(--mantine-radius-xs);
+  border-radius: var(--mantine-radius-sm);
   padding: 8px;
   margin: 0 auto 4px;
 }
@@ -16,10 +16,6 @@
   display: block;
   margin: auto;
   margin-bottom: 4px;
-}
-
-.actions p {
-  font-size: 12px;
 }
 
 .tabs {

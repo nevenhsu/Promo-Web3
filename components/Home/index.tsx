@@ -136,9 +136,9 @@ export default function Home() {
             </Paper>
           </Link>
         </Stack>
-
-        <Space h={100} />
       </RwdLayout>
+
+      <Space h={100} />
     </>
   )
 }

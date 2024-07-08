@@ -4,9 +4,19 @@ type NetworkInfo = {
   icon: string
 }
 
-export function getNetworkName(chainId?: string | number) {
+export const networks: NetworkInfo[] = [
+  { chainId: 1, name: 'Ethereum Mainnet', icon: '/icons/base.svg' },
+  { chainId: 8453, name: 'Base', icon: '/icons/base.svg' },
+  { chainId: 84532, name: 'Base Sepolia', icon: '/icons/base-testnet.svg' },
+  { chainId: 1337, name: 'Localhost', icon: '/icons/hardhat.svg' },
+  { chainId: 31337, name: 'Hardhat', icon: '/icons/hardhat.svg' },
+]
+
+export function getNetwork(chainId?: string | number) {
   const chainIdNum = toChainId(chainId || '0')
-  return toNetworkName(chainIdNum)
+  const network = networks.find(o => o.chainId === chainIdNum)
+  const fallback = { chainId: chainIdNum, name: 'Unknown', icon: '/icons/base.svg' }
+  return network || fallback
 }
 
 export function toChainId(chainId?: string | number) {
@@ -19,23 +29,6 @@ export function toChainId(chainId?: string | number) {
   }
 
   return chainId
-}
-
-function toNetworkName(chainId?: number) {
-  switch (chainId) {
-    case 1:
-      return 'Ethereum Mainnet'
-    case 8453:
-      return 'Base'
-    case 84532:
-      return 'Base Sepolia'
-    case 1337:
-      return 'Localhost'
-    case 31337:
-      return 'Hardhat'
-    default:
-      return 'Unknown Network'
-  }
 }
 
 export function toHex(num: number) {

@@ -17,6 +17,7 @@ interface Web3ContextType {
   contracts: Contracts
   balances: Balances
   prices: Prices
+  loading: boolean
   updateBalances: () => Promise<void>
   switchChain: (chainId: number) => Promise<void>
 }
@@ -26,7 +27,8 @@ const Web3Context = createContext<Web3ContextType | undefined>(undefined)
 export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // states
   const [balances, setBalances] = useState<Balances>({})
-  const [prices, setPrices] = useState<Prices>({ MOCKT: 1 })
+  const [prices, setPrices] = useState<Prices>({ USDC: 1 })
+  const [loading, setLoading] = useState(false)
 
   const wallet = useWallet()
   const { chainId, contracts, walletAddress, isSmartAccount } = useContracts()
@@ -34,6 +36,8 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   // methods
   const updateBalances = async () => {
     if (!walletAddress) return
+
+    setLoading(true)
 
     await Promise.all(
       _.map(contracts.tokens, async (token, symbol) => {
@@ -48,6 +52,8 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       })
     )
+
+    setLoading(false)
   }
 
   const switchChain = async (chainId: number) => {
@@ -79,6 +85,7 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
         contracts,
         balances,
         prices,
+        loading,
         updateBalances,
         switchChain,
       }}

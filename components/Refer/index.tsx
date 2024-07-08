@@ -58,9 +58,9 @@ export default function Refer() {
             </Link>
           </Stack>
         </Stack>
-
-        <Space h={100} />
       </RwdLayout>
+
+      <Space h={100} />
     </>
   )
 }

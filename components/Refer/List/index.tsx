@@ -80,9 +80,9 @@ export default function ReferList() {
             </Box>
           </Tabs.Panel>
         </Tabs>
-
-        <Space h={100} />
       </RwdLayout>
+
+      <Space h={100} />
     </>
   )
 }

@@ -113,9 +113,9 @@ export default function Profile() {
             </Stack>
           </Paper>
         </Stack>
-
-        <Space h={100} />
       </RwdLayout>
+
+      <Space h={100} />
     </>
   )
 }

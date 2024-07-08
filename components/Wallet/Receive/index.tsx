@@ -7,11 +7,13 @@ import QRCode from 'react-qr-code'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiCopy, PiShareFat, PiLink } from 'react-icons/pi'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { getNetworkName } from '@/wallet/utils/network'
+import { getNetwork } from '@/wallet/utils/network'
 import classes from './index.module.css'
 
 export default function Receive() {
   const { walletAddress, chainId, isSmartAccount } = useWeb3()
+
+  const network = getNetwork(chainId)
 
   return (
     <>
@@ -32,7 +34,7 @@ export default function Receive() {
 
           <div>
             <Text fz="sm">Network</Text>
-            <Text fz="sm">{getNetworkName(chainId)}</Text>
+            <Text fz="sm">{network.name}</Text>
           </div>
 
           <div />
@@ -62,9 +64,9 @@ export default function Receive() {
             </Button>
           </Link>
         </Stack>
-
-        <Space h={100} />
       </RwdLayout>
+
+      <Space h={100} />
     </>
   )
 }
