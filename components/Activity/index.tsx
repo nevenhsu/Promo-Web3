@@ -1,80 +1,84 @@
-'use client'
-
-import { useState } from 'react'
 import { Link } from '@/navigation'
-import Image from 'next/image'
-import { Chip, Group, ScrollArea, Stack, Paper, Text, Space, Divider, Button } from '@mantine/core'
+import { Tabs, Group, Stack, Paper, Box, Space, Divider } from '@mantine/core'
+import { Title, Text, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiXLogo } from 'react-icons/pi'
-import { chips } from './variables'
 import classes from './index.module.css'
 
-export default function Activity() {
-  const [chip, setChip] = useState('0')
-  const activityId = 'testid' as string
+enum TabValue {
+  All = 'all',
+  Joined = 'joined',
+  Unjoin = 'unjoin',
+}
 
+export default function Activity() {
   return (
     <>
-      <ScrollArea scrollbars="x" type="never">
-        <Chip.Group multiple={false} value={chip} onChange={setChip}>
-          <Group p="md" gap={4} wrap="nowrap">
-            {chips.map(el => (
-              <Chip
-                key={el.value}
-                variant={el.value === chip ? 'filled' : 'outline'}
-                value={el.value}
-              >
-                {el.label}
-              </Chip>
-            ))}
-          </Group>
-        </Chip.Group>
-      </ScrollArea>
+      <RwdLayout>
+        <Tabs defaultValue={TabValue.All}>
+          <Tabs.List>
+            <Tabs.Tab value={TabValue.All}>All</Tabs.Tab>
+            <Tabs.Tab value={TabValue.Joined}>Joined</Tabs.Tab>
+            <Tabs.Tab value={TabValue.Unjoin}>Unjoin</Tabs.Tab>
+          </Tabs.List>
 
-      <RwdLayout pt={16}>
-        <Stack>
-          <Paper p="sm" className={classes.card}>
-            <Stack>
-              <Group gap="sm" wrap="nowrap">
-                <Image
-                  className={classes.thumbnail}
-                  src="/images/activity-thumbnail.png"
-                  width={64}
-                  height={64}
-                  alt="thumbnail"
-                />
-                <Stack gap={4} className={classes.content}>
-                  <Group justify="space-between" wrap="nowrap" gap="sm">
-                    <Text fz="md" fw={500}>
-                      Taitra Tech Promotion
+          <Tabs.Panel value={TabValue.All}>
+            <Stack py={40}>
+              <Paper px="md" radius="sm" shadow="xs">
+                <Group wrap="nowrap" align="stretch">
+                  <Stack py="md" justify="space-between">
+                    <Box ta="center">
+                      <Text fz="sm">USDC</Text>
+                      <Title c="orange">100</Title>
+                    </Box>
+                    <Text fz="xs" c="dimmed">
+                      6 Jun 2024
                     </Text>
-                    <PiXLogo className={classes.logo} size={24} />
-                  </Group>
-                  <Text fz="xs" c="dimmed">
-                    20 May 2024
-                  </Text>
-                  <Text fz="xs" c="dimmed">
-                    Repost on X
-                  </Text>
-                </Stack>
-              </Group>
-              <Divider />
-              <Group justify="space-between">
-                <Text fw={700} c="orange.6">
-                  200 Points
-                </Text>
+                  </Stack>
+                  <Divider orientation="vertical" />
+                  <Stack gap={32} py="md">
+                    <Box>
+                      <Title order={4} fw={500} lh={1} mb={8}>
+                        Headline
+                      </Title>
+                      <Text fz="sm" c="dark">
+                        Please add your content here. Keep it short and simple. And smile
+                      </Text>
+                    </Box>
 
-                {/* @ts-expect-error */}
-                <Link href={`/activity/${activityId}`}>
-                  <Button>Join Now</Button>
-                </Link>
-              </Group>
+                    <Group justify="space-between">
+                      <Group gap={24}>
+                        <Box ta="center">
+                          <Text fz="xs" c="dimmed">
+                            Platform
+                          </Text>
+                          <Text fz="sm">X</Text>
+                        </Box>
+                        <Box ta="center">
+                          <Text fz="xs" c="dimmed">
+                            Action
+                          </Text>
+                          <Text fz="sm">Repost</Text>
+                        </Box>
+                      </Group>
+                      <Link
+                        href={{
+                          pathname: '/activity/[activityId]',
+                          params: { activityId: '1' },
+                        }}
+                      >
+                        <Button>Join</Button>
+                      </Link>
+                    </Group>
+                  </Stack>
+                </Group>
+              </Paper>
             </Stack>
-          </Paper>
-        </Stack>
-      </RwdLayout>
+          </Tabs.Panel>
+        </Tabs>
 
-      <Space h={100} />
+        <Space h={100} />
+      </RwdLayout>
     </>
   )
 }

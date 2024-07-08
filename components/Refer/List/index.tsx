@@ -1,7 +1,7 @@
 'use client'
 
 import { Space, Stack, Group, Box, Paper, Tabs } from '@mantine/core'
-import { ThemeIcon, Text, Title, Avatar } from '@mantine/core'
+import { Text, Title, Avatar } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 
 export default function ReferList() {

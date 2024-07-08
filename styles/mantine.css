@@ -1,1 +1,9 @@
 /* Override @mantine/core */
+
+.mantine-Tabs-tab {
+  color: var(--mantine-color-gray-5);
+
+  &[data-active] {
+    color: var(--tabs-color);
+  }
+}

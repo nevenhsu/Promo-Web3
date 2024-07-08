@@ -1,80 +1,68 @@
-'use client'
-
-import Image from 'next/image'
+import { getTweet as _getTweet } from 'react-tweet/api'
 import { Group, Stack, Box, Title, Text, Space, Divider, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { PiLightning, PiCalendarBlank, PiPersonSimpleRun } from 'react-icons/pi'
+import { PiLightning, PiPersonSimpleRun, PiTrophy } from 'react-icons/pi'
 import classes from '../index.module.css'
 
-type ActivityDetailProps = { activityId: string }
+type ActivityDetailProps = { activityId: string; children?: React.ReactNode }
 
-export default function ActivityDetail({ activityId }: ActivityDetailProps) {
+export default function ActivityDetail({ activityId, children }: ActivityDetailProps) {
+  console.log({ activityId })
+
   return (
     <>
-      <Box>
-        <Image
-          className={classes.cover}
-          src="/images/activity-cover.png"
-          width={1179}
-          height={648}
-          alt="cover"
-        />
-      </Box>
-
-      <RwdLayout pt={24}>
+      <RwdLayout>
         <Stack gap="lg">
-          <Title order={4}>Taitra Tech Promotion</Title>
+          <Box>
+            <Text c="dimmed" fz="xs">
+              6 Jun 2024 ~ 31 Jul 2024
+            </Text>
+            <Title order={3}>Taitra Tech Promotion</Title>
+          </Box>
 
-          <Text fz="sm" c="dimmed">
+          <Text fz="sm" c="dark">
             RAMAYANA BALLET at Purawisata – Jogjakarta – Indonesia, has held the record for
             every-night stage without ever being off for 42 YEARS, and received an award from The
             Indonesia Records Museum (MURI) in 2001.
           </Text>
 
-          <Text fw={700} c="orange.6">
-            200 Points
-          </Text>
+          <Title order={4} c="orange">
+            200 USDC
+          </Title>
 
-          <Divider />
+          <>
+            <Divider />
+            <Title order={6}>Event Details</Title>
+            <Stack gap="xs">
+              <Group gap="xs">
+                <PiLightning size={20} />
+                <Text fz="sm">Repost on X</Text>
+              </Group>
 
-          <Title order={5}>Event Details</Title>
+              <Group gap="xs">
+                <PiPersonSimpleRun size={20} />
+                <Text fz="sm"> 123 Participants</Text>
+              </Group>
 
-          <Stack gap="sm">
-            <Group gap="sm">
-              <PiLightning size={20} />
-              <Text fz="sm">Repost on X</Text>
-            </Group>
+              <Group gap="xs">
+                <PiTrophy size={20} />
+                <Text fz="sm">1.8k Total score</Text>
+              </Group>
+            </Stack>
+            <Divider />
+          </>
 
-            <Group gap="sm">
-              <PiPersonSimpleRun size={20} />
-              <Text fz="sm"> 123 Participants</Text>
-            </Group>
-
-            <Group gap="sm">
-              <PiCalendarBlank size={20} />
-              <Text fz="sm">14 May 2024 ~ 14 Jun 2024</Text>
-            </Group>
+          <Stack>
+            <Button variant="outline">Open link</Button>
+            <Button>Mark completed</Button>
           </Stack>
 
-          <Group grow wrap="nowrap">
-            <Button>Mark complete</Button>
-            <Button variant="outline">Open link</Button>
-          </Group>
-
-          <Divider />
-
           {/* Embedded Post */}
-          <Box className={classes.embedded}>
-            <Box
-              dangerouslySetInnerHTML={{
-                __html: `<blockquote class="twitter-tweet"><p lang="en" dir="ltr">NEW: 🇺🇸 US Congressman Patrick McHenry also gives speech supporting overturning SEC rule that prevents regulated financial firms from custodying <a href="https://twitter.com/hashtag/Bitcoin?src=hash&amp;ref_src=twsrc%5Etfw">#Bitcoin</a> and crypto. 👏<br><br>He argues that banks should also be custodying spot Bitcoin ETF funds 👀<br> <a href="https://t.co/N5uINTkHT6">pic.twitter.com/N5uINTkHT6</a></p>&mdash; Bitcoin Magazine (@BitcoinMagazine) <a href="https://twitter.com/BitcoinMagazine/status/1788327051520278708?ref_src=twsrc%5Etfw">May 8, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
-              }}
-            />
-          </Box>
+          {children}
         </Stack>
-      </RwdLayout>
 
-      <Space h={100} />
+        <Space h={100} />
+      </RwdLayout>
     </>
   )
 }

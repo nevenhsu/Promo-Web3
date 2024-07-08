@@ -6,6 +6,7 @@ const detailSchema = new Schema({
   coverUrl: String,
   thumbnailUrl: String,
   participants: Number,
+  totalScore: Number,
 })
 
 export const schema = new Schema({
