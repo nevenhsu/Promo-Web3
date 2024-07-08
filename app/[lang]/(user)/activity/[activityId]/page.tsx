@@ -4,8 +4,10 @@ import { getTweet as _getTweet } from 'react-tweet/api'
 import { TweetSkeleton, EmbeddedTweet, TweetNotFound } from 'react-tweet'
 import ActivityDetail from '@/components/Activity/Detail'
 
+export const revalidate = 3600 // revalidate at most every hour
+
 const getTweet = unstable_cache(async (id: string) => _getTweet(id), ['tweet'], {
-  revalidate: 3600 * 12,
+  revalidate,
 })
 
 export default function ActivityDetailPage({
@@ -13,6 +15,7 @@ export default function ActivityDetailPage({
 }: {
   params: { lang: string; activityId: string }
 }) {
+  // TODO: get post link from db
   return (
     <>
       <ActivityDetail activityId={activityId}>
@@ -27,7 +30,6 @@ export default function ActivityDetailPage({
 
 async function TweetPage({ id }: { id: string }) {
   try {
-    // TODO: get post link from db
     const tweet = await getTweet(id)
     console.log('Successfully fetch tweet', id)
     return tweet ? <EmbeddedTweet tweet={tweet} /> : <TweetNotFound />
