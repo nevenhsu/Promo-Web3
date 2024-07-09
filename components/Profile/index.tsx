@@ -33,8 +33,12 @@ export default function Profile() {
               <Group>
                 <Avatar w={64} h={64} color="white" src={details?.avatar} />
                 <Stack gap={4}>
-                  <Title order={5}>{name ? name : 'Hello!'}</Title>
-                  <Text fz="sm">{username ? `@${username}` : '-'}</Text>
+                  <Title order={5} lh={1}>
+                    {name ? name : 'Hello!'}
+                  </Title>
+                  <Text fz="sm" lh={1}>
+                    {username ? `@${username}` : '-'}
+                  </Text>
                 </Stack>
               </Group>
 

@@ -114,15 +114,19 @@ export default function Wallet() {
                         />
 
                         <Stack gap={4}>
-                          <Text fw={500}>{o.name}</Text>
-                          <Text fz="xs" c="dimmed">
+                          <Text fw={500} lh={1}>
+                            {o.name}
+                          </Text>
+                          <Text fz="xs" c="dimmed" lh={1}>
                             {o.symbol}
                           </Text>
                         </Stack>
                       </Group>
                       <Stack gap={4} ta="right">
-                        <Text fw={500}>{bal.toDP(4).toString()}</Text>
-                        <Text fz="xs" c="dimmed">
+                        <Text fw={500} lh={1}>
+                          {bal.toDP(4).toString()}
+                        </Text>
+                        <Text fz="xs" c="dimmed" lh={1}>
                           {p ? `USD ${p.toDP(2).toString()}` : 'No price yet'}
                         </Text>
                       </Stack>

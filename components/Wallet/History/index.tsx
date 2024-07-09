@@ -1,73 +1,102 @@
 'use client'
 
-import { Paper, Stack, Group, Title, Text, Space, Box } from '@mantine/core'
+import Image from 'next/image'
+import { Link } from '@/navigation'
+import { Tabs, Paper, Stack, Group, Text, Space, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { PiArrowsLeftRight, PiArrowCircleDown } from 'react-icons/pi'
+import { PiArrowCircleUp, PiArrowCircleDown } from 'react-icons/pi'
+import classes from './index.module.css'
+
+enum TabValue {
+  Transaction = 'transaction',
+  Airdrop = 'airdrop',
+}
 
 export default function History() {
   return (
     <>
       <RwdLayout>
-        <Title order={5} mb="lg">
-          History
-        </Title>
+        <Tabs defaultValue={TabValue.Transaction}>
+          <Tabs.List>
+            <Tabs.Tab value={TabValue.Transaction}>Transaction</Tabs.Tab>
+            <Tabs.Tab value={TabValue.Airdrop}>Airdrop</Tabs.Tab>
+          </Tabs.List>
 
-        <Stack>
-          {/* Item */}
-          <Paper p="sm">
-            <Text fz={10} c="dimmed" mb="xs">
-              4 Mar 2024 10:04 AM
-            </Text>
+          <Tabs.Panel value={TabValue.Transaction}>
+            <Stack py={40}>
+              <Link
+                href={{
+                  pathname: '/wallet/history/[tx]',
+                  params: { tx: '1' },
+                }}
+              >
+                <Paper radius="md" p="md" shadow="xs">
+                  <Group justify="space-between">
+                    <Group>
+                      <ThemeIcon size={32} variant="white" color="blue">
+                        <PiArrowCircleDown size={32} />
+                      </ThemeIcon>
 
-            <Group justify="space-between">
-              <Group>
-                <Box c="green.6">
-                  <PiArrowCircleDown size={24} />
-                </Box>
-                <Stack gap={4}>
-                  <Text>Received BTC</Text>
-                  <Text c="green.6" fz="xs" fw={500}>
-                    Confirmed
-                  </Text>
-                </Stack>
-              </Group>
+                      <Stack gap={4}>
+                        <Text fw={500} lh={1}>
+                          USDC
+                        </Text>
+                        <Text fz="xs" c="dimmed" lh={1}>
+                          USC Coin
+                        </Text>
+                      </Stack>
+                    </Group>
 
-              <Stack gap={4} ta="right">
-                <Text>2.8 BTC</Text>
-                <Text c="dimmed" fz="xs">
-                  USD 64393.23
-                </Text>
-              </Stack>
-            </Group>
-          </Paper>
+                    <Stack gap={4} ta="right">
+                      <Text fw={500} lh={1}>
+                        +350.48
+                      </Text>
+                      <Text fz="xs" c="dimmed" lh={1}>
+                        6 Jul 2024 09:41
+                      </Text>
+                    </Stack>
+                  </Group>
+                </Paper>
+              </Link>
+            </Stack>
+          </Tabs.Panel>
 
-          <Paper p="sm">
-            <Text fz={10} c="dimmed" mb="xs">
-              2 Mar 2024 8:04 AM
-            </Text>
+          <Tabs.Panel value={TabValue.Airdrop}>
+            <Stack py={40}>
+              <Paper radius="md" p="md" shadow="xs">
+                <Group justify="space-between">
+                  <Group>
+                    <Image
+                      className={classes.icon}
+                      src="/icons/usdc-token.svg"
+                      width={32}
+                      height={32}
+                      alt="usd coin"
+                    />
 
-            <Group justify="space-between">
-              <Group>
-                <Box c="blue">
-                  <PiArrowsLeftRight size={24} />
-                </Box>
-                <Stack gap={4}>
-                  <Text>Sent BTC</Text>
-                  <Text c="blue" fz="xs" fw={500}>
-                    Pending
-                  </Text>
-                </Stack>
-              </Group>
+                    <Stack gap={4}>
+                      <Text fw={500} lh={1}>
+                        USDC
+                      </Text>
+                      <Text fz="xs" c="dimmed" lh={1}>
+                        USC Coin
+                      </Text>
+                    </Stack>
+                  </Group>
 
-              <Stack gap={4} ta="right">
-                <Text>0.8 BTC</Text>
-                <Text c="dimmed" fz="xs">
-                  USD 34393.23
-                </Text>
-              </Stack>
-            </Group>
-          </Paper>
-        </Stack>
+                  <Stack gap={4} ta="right">
+                    <Text fw={500} lh={1}>
+                      +350.48
+                    </Text>
+                    <Text fz="xs" c="dimmed" lh={1}>
+                      6 Jul 2024 09:41
+                    </Text>
+                  </Stack>
+                </Group>
+              </Paper>
+            </Stack>
+          </Tabs.Panel>
+        </Tabs>
       </RwdLayout>
 
       <Space h={100} />

@@ -49,10 +49,10 @@ function CardAction(props: CardActionProps) {
             {icon}
           </Box>
           <Stack gap={4}>
-            <Text fz={20} fw={500}>
+            <Text fz={20} fw={500} lh={1}>
               {title}
             </Text>
-            <Text fz="sm" c="dimmed">
+            <Text fz="sm" c="dimmed" lh={1}>
               {description}
             </Text>
           </Stack>
