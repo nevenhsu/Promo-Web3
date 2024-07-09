@@ -1,11 +1,11 @@
 'use client'
 
-import { Link } from '@/navigation'
-import { Center, AspectRatio, Stack, Group, Title, Text, Space } from '@mantine/core'
+import Image from 'next/image'
+import { AspectRatio, Paper, Stack, Group, Box, Title, Text, Space } from '@mantine/core'
 import { CopyButton, Button } from '@mantine/core'
+import { modals } from '@mantine/modals'
 import QRCode from 'react-qr-code'
 import RwdLayout from '@/components/share/RwdLayout'
-import { PiCopy, PiShareFat, PiLink } from 'react-icons/pi'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { getNetwork } from '@/wallet/utils/network'
 import classes from './index.module.css'
@@ -18,51 +18,87 @@ export default function Receive() {
   return (
     <>
       <RwdLayout>
-        <Stack gap="lg">
-          <Title order={5}>Receive Tokens</Title>
+        <Stack gap="xl">
+          <Title order={3}>Receive</Title>
 
-          <Center>
-            <AspectRatio className={classes.qrcode} ratio={1}>
-              <QRCode value={walletAddress} size={200} />
-            </AspectRatio>
-          </Center>
+          <Stack>
+            {/* Token */}
+            <Paper p="md" shadow="xs" radius="sm">
+              <Group>
+                <Image src="/icons/usdc-token.svg" width={40} height={40} alt="usdc" />
+                <Stack gap={4}>
+                  <Text fz="lg" fw={500} lh={1}>
+                    USDC
+                  </Text>
+                  <Text fz="xs" c="dimmed" lh={1}>
+                    USD Coin
+                  </Text>
+                </Stack>
+              </Group>
+            </Paper>
 
-          <div>
-            <Text fz="sm">{isSmartAccount ? 'Smart Wallet' : 'Wallet'}</Text>
-            <Text fz="sm">{walletAddress}</Text>
-          </div>
+            {/* Network */}
+            <Paper p="md" shadow="xs" radius="sm">
+              <Group>
+                <Image src={network.icon} width={40} height={40} alt={network.name} />
+                <Stack gap={4}>
+                  <Text fz="lg" fw={500} lh={1}>
+                    {network.name}
+                  </Text>
+                  <Text fz="xs" c="dimmed" lh={1}>
+                    {network.subtitle}
+                  </Text>
+                </Stack>
+              </Group>
+            </Paper>
+          </Stack>
 
-          <div>
-            <Text fz="sm">Network</Text>
-            <Text fz="sm">{network.name}</Text>
-          </div>
-
-          <div />
-
-          <Group grow>
-            <CopyButton value={walletAddress}>
-              {({ copied, copy }) => (
-                <Button
-                  leftSection={<PiCopy size={20} />}
-                  color={copied ? 'green' : 'blue'}
-                  variant="outline"
-                  onClick={copy}
-                  disabled={!walletAddress}
+          <Paper p="md" shadow="xs" radius="sm">
+            <Stack>
+              <Box>
+                <Text fz="lg" fw={500}>
+                  My wallet address
+                </Text>
+                <Text
+                  fz="sm"
+                  w={200}
+                  style={{
+                    wordWrap: 'break-word',
+                  }}
                 >
-                  {copied ? 'Copied' : 'Copy'}
-                </Button>
-              )}
-            </CopyButton>
-            <Button leftSection={<PiShareFat size={20} />} variant="outline">
-              Share
-            </Button>
-          </Group>
+                  {walletAddress}
+                </Text>
+              </Box>
 
-          <Link href="/wallet/receive/link">
-            <Button w="100%" leftSection={<PiLink size={20} />}>
-              Create Link
-            </Button>
-          </Link>
+              <Group grow>
+                <Button
+                  variant="light"
+                  onClick={() =>
+                    modals.open({
+                      title: 'My wallet',
+                      children: (
+                        <>
+                          <AspectRatio className={classes.qrcode} ratio={1}>
+                            <QRCode value={walletAddress} size={200} />
+                          </AspectRatio>
+                        </>
+                      ),
+                    })
+                  }
+                >
+                  Show QR Code
+                </Button>
+
+                <CopyButton value={walletAddress}>
+                  {({ copied, copy }) => (
+                    <Button onClick={copy} disabled={!walletAddress}>
+                      {copied ? 'Copied' : 'Copy Address'}
+                    </Button>
+                  )}
+                </CopyButton>
+              </Group>
+            </Stack>
+          </Paper>
         </Stack>
       </RwdLayout>
 

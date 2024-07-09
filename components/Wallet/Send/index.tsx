@@ -1,24 +1,24 @@
 'use client'
 
+import Image from 'next/image'
 import Decimal from 'decimal.js'
 import { useRouter } from '@/navigation'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { useForm } from '@mantine/form'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { Paper, Stack, Group, Title, Text, Divider, Space } from '@mantine/core'
-import { Button, Checkbox, TextInput, NumberInput, Select } from '@mantine/core'
+import { Paper, Stack, Group, Title, Text, Space } from '@mantine/core'
+import { Button, TextInput, NumberInput } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { PiCaretDown } from 'react-icons/pi'
 import { getTokens } from '@/contracts/tokens'
 import { formatBalance, formatAmount } from '@/utils/math'
 import { classifyError } from '@/wallet/utils/handleError'
+import { getNetwork } from '@/wallet/utils/network'
 import classes from './index.module.css'
 
 type FormData = {
   symbol: string // token
   to: string
   amount: string
-  networkFee: 'Slow' | 'Average' | 'Fast'
 }
 
 export default function Send() {
@@ -26,35 +26,37 @@ export default function Send() {
 
   const [loading, setLoading] = useState(false)
   const { chainId, walletAddress, balances, prices, updateBalances, contracts } = useWeb3()
+
+  // Get tokens and network info
   const tokens = useMemo(() => getTokens(chainId), [chainId])
+  const network = useMemo(() => getNetwork(chainId), [chainId])
 
   const form = useForm<FormData>({
     mode: 'controlled',
     initialValues: {
-      symbol: '',
+      symbol: tokens[0].symbol || 'USDC',
       to: '',
       amount: '',
-      networkFee: 'Average',
     },
     validate: {
       symbol: value => (value ? null : 'Should not be empty'),
-      to: value => (value ? null : 'Should not be empty'),
+      to: value =>
+        value
+          ? value !== walletAddress
+            ? null
+            : 'Should not be the same wallet'
+          : 'Should not be empty',
       amount: value => (value ? null : 'Should not be empty'),
-      networkFee: value => (value ? null : 'Should not be empty'),
     },
   })
 
   const { symbol } = form.values
+
+  // Get token info
   const { token, balance, price } = useMemo(() => {
     const token = tokens.find(o => o.symbol === symbol)
     return { token, balance: balances[symbol], price: prices[symbol] }
-  }, [symbol, balances, prices])
-
-  useEffect(() => {
-    if (tokens.length > 0) {
-      form.setFieldValue('symbol', tokens[0].symbol)
-    }
-  }, [tokens])
+  }, [symbol, tokens, balances, prices])
 
   const handlePaste = async () => {
     try {
@@ -76,14 +78,24 @@ export default function Send() {
   const handleSubmit = async (values: FormData) => {
     if (!walletAddress) return
 
+    if (!balance) {
+      form.setFieldError('amount', 'Insufficient balance')
+      return
+    }
+
     const tokenContract = contracts.tokens[values.symbol]
     if (token && tokenContract) {
-      const amount = formatAmount(values.amount, token.decimal).toString()
+      const amount = formatAmount(values.amount, token.decimal)
+      // check balance
+      if (new Decimal(amount).gt(balance.toString())) {
+        form.setFieldError('amount', 'Insufficient balance')
+        return
+      }
 
       setLoading(true)
 
       try {
-        const { hash } = await tokenContract.transfer(values.to, amount)
+        const { hash } = await tokenContract.transfer(values.to, amount.toString())
         console.log(`Transaction hash: ${hash}`)
         setLoading(false)
         updateBalances()
@@ -109,105 +121,97 @@ export default function Send() {
         })}
       >
         <RwdLayout>
-          <Stack>
-            <Paper p="md" withBorder>
-              <Stack gap="lg">
-                <Title order={5}>Send Tokens</Title>
-                <Select
-                  data={tokens.map(o => o.symbol)}
-                  withCheckIcon={false}
-                  key={form.key('symbol')}
-                  {...form.getInputProps('symbol')}
-                ></Select>
-              </Stack>
-            </Paper>
+          <Stack gap="xl">
+            <Title order={3}>Send</Title>
 
-            <Paper p="md" withBorder>
-              <Stack gap="lg">
-                <Group justify="space-between">
-                  <Text fz="sm" fw={500}>
-                    To
-                  </Text>
-                  <Button variant="outline" size="compact-xs" radius="xl">
-                    Address book
-                  </Button>
+            <Stack>
+              {/* Token */}
+              <Paper p="md" shadow="xs" radius="sm">
+                <Group>
+                  <Image src="/icons/usdc-token.svg" width={40} height={40} alt="usdc" />
+                  <Stack gap={4}>
+                    <Text fz="lg" fw={500} lh={1}>
+                      USDC
+                    </Text>
+                    <Text fz="xs" c="dimmed" lh={1}>
+                      USD Coin
+                    </Text>
+                  </Stack>
                 </Group>
-                <TextInput
-                  placeholder="Public Address (0x)"
-                  rightSectionWidth={56}
-                  rightSection={
-                    <Button size="compact-xs" variant="transparent" onClick={handlePaste}>
-                      Paste
-                    </Button>
-                  }
-                  key={form.key('to')}
-                  {...form.getInputProps('to')}
-                />
-                <Checkbox label="Save to address book" variant="outline" size="xs" />
-              </Stack>
-            </Paper>
+              </Paper>
 
-            <Paper p="md" withBorder>
-              <Stack>
+              {/* Network */}
+              <Paper p="md" shadow="xs" radius="sm">
+                <Group>
+                  <Image src={network.icon} width={40} height={40} alt={network.name} />
+                  <Stack gap={4}>
+                    <Text fz="lg" fw={500} lh={1}>
+                      {network.name}
+                    </Text>
+                    <Text fz="xs" c="dimmed" lh={1}>
+                      {network.subtitle}
+                    </Text>
+                  </Stack>
+                </Group>
+              </Paper>
+            </Stack>
+
+            <Stack>
+              <TextInput
+                label="Transfer Address"
+                placeholder="Public Address (0x...)"
+                rightSectionWidth={56}
+                rightSection={
+                  <Button size="compact-sm" variant="transparent" onClick={handlePaste}>
+                    Paste
+                  </Button>
+                }
+                size="md"
+                key={form.key('to')}
+                {...form.getInputProps('to')}
+              />
+
+              <Stack gap={4}>
                 <NumberInput
                   label="Amount"
-                  description={
-                    token && balance
-                      ? `Available Balance: ${formatBalance(balance, token.decimal).toDP(6)}`
-                      : ''
-                  }
                   placeholder=""
                   rightSectionWidth={48}
                   rightSection={
-                    <Button onClick={handleMax} size="compact-xs" variant="transparent">
+                    <Button onClick={handleMax} size="compact-sm" variant="transparent">
                       Max
                     </Button>
                   }
+                  size="md"
                   key={form.key('amount')}
                   {...form.getInputProps('amount')}
                 />
 
-                <Stack gap="xs">
-                  <Text fz="sm" fw={500}>
-                    Network fee
+                <Group justify="space-between">
+                  <Text fz="xs" c="dimmed">
+                    {token
+                      ? `Available Balance: ${formatBalance(balance || 0, token.decimal).toDP(6)}`
+                      : ''}
                   </Text>
 
-                  <Group className={classes.field} justify="space-between">
-                    <Text fz="sm">Average</Text>
-                    <PiCaretDown size={16} />
-                  </Group>
-                </Stack>
-
-                <Divider my="xs" />
-
-                <Stack gap="xs">
-                  <Group justify="space-between">
-                    <Text fz="sm">Total Amount</Text>
-                    <Text fz="sm" fw={500}>
-                      {`${form.values.amount} ${symbol}`}
-                    </Text>
-                  </Group>
-                  <Text ta="right" fz="xs" c="dimmed">
+                  <Text fz="xs" c="dimmed">
                     {price
                       ? `USD ${new Decimal(price).mul(form.values.amount || '0').toDP(2)}`
                       : 'No price yet'}
                   </Text>
-                </Stack>
+                </Group>
               </Stack>
-            </Paper>
-
-            <Space h={0} />
+            </Stack>
 
             <Group grow>
               <Button type="submit" loading={loading}>
-                Send
+                Confirm Transfer
               </Button>
             </Group>
           </Stack>
-
-          <Space h={100} />
         </RwdLayout>
       </form>
+
+      <Space h={100} />
     </>
   )
 }

@@ -64,7 +64,7 @@ export const colors: Record<MantineColor, MantineColorsTuple> = {
     '#a56f00',
   ],
   gray: [
-    '#e6e7e8',
+    '#f8f9fa',
     '#e1e2e3',
     '#dcddde',
     '#cccecf',
