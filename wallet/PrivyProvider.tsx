@@ -1,5 +1,6 @@
 import { PrivyProvider } from '@privy-io/react-auth'
 import { Web3Provider } from './Web3Context'
+import { TxProvider } from './TxContext'
 import { defaultChain, supportedChains } from './variables'
 
 export default function MyPrivyProvider({ children }: React.PropsWithChildren) {
@@ -17,7 +18,9 @@ export default function MyPrivyProvider({ children }: React.PropsWithChildren) {
         },
       }}
     >
-      <Web3Provider>{children}</Web3Provider>
+      <Web3Provider>
+        <TxProvider>{children}</TxProvider>
+      </Web3Provider>
     </PrivyProvider>
   )
 }

@@ -1,12 +1,9 @@
-import { Erc20Permit, Erc20Permit__factory } from './typechain-types'
+import { Erc20Permit__factory, type Erc20Permit } from './typechain-types'
 import { tokens as _tokens } from './tokens'
+import { unifyAddress } from '@/wallet/utils/helpers'
 import type { Signer } from 'ethers'
 
-export type Tokens = { [symbol: string]: Erc20Permit | undefined }
-
-export type Contracts = {
-  tokens: Tokens
-}
+export type Tokens = { [address: string]: Erc20Permit | undefined }
 
 export const getTokens = (chainId: number, signer: Signer) => {
   const tokens: Tokens = {}
@@ -14,7 +11,9 @@ export const getTokens = (chainId: number, signer: Signer) => {
   _tokens
     .filter(o => o.chainId === chainId)
     .map(o => {
-      tokens[o.symbol] = new Erc20Permit__factory(signer).attach(o.address) as Erc20Permit
+      tokens[unifyAddress(o.address)] = new Erc20Permit__factory(signer).attach(
+        o.address
+      ) as Erc20Permit
     })
 
   return tokens

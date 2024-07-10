@@ -1,11 +1,13 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react'
 import useContracts from '@/wallet/hooks/useContracts'
 import { useWallet } from '@/wallet/hooks/useWallet'
 import { supportedChains } from './variables'
-import type { Contracts } from '@/contracts'
+import { unifyAddress } from '@/wallet/utils/helpers'
+import { getTokens, type Erc20 } from '@/contracts/tokens'
+import type, { Contracts, Contract } from '@/wallet/hooks/useContracts'
 
 type Balances = { [symbol: string]: bigint | undefined }
 type Prices = { [symbol: string]: number | undefined }
@@ -14,12 +16,14 @@ interface Web3ContextType {
   chainId?: number
   walletAddress: string
   isSmartAccount: boolean
+  tokens: Erc20[]
   contracts: Contracts
   balances: Balances
   prices: Prices
   loading: boolean
   updateBalances: () => Promise<void>
   switchChain: (chainId: number) => Promise<void>
+  getContract: (address?: string) => Contract | undefined
 }
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined)
@@ -33,6 +37,13 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   const wallet = useWallet()
   const { chainId, contracts, walletAddress, isSmartAccount } = useContracts()
 
+  const tokens = useMemo(() => getTokens(chainId), [chainId])
+
+  const getContract = (address?: string) => {
+    if (!address) return
+    return contracts[unifyAddress(address)]
+  }
+
   // methods
   const updateBalances = async () => {
     if (!walletAddress) return
@@ -40,15 +51,16 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true)
 
     await Promise.all(
-      _.map(contracts.tokens, async (token, symbol) => {
-        if (token) {
-          try {
-            const balance = await token.balanceOf(walletAddress)
-            setBalances(prev => ({ ...prev, [symbol]: balance }))
-            console.log(`Balance of ${symbol}: ${balance}`)
-          } catch (err) {
-            console.error(err)
-          }
+      _.map(tokens, async token => {
+        try {
+          const contract = getContract(token.address)
+          if (!contract) throw new Error(`Contract not found: ${token.symbol}`)
+
+          const balance = await contract.balanceOf(walletAddress)
+          setBalances(prev => ({ ...prev, [token.symbol]: balance }))
+          console.log(`Balance of ${token.symbol}: ${balance}`)
+        } catch (err) {
+          console.error(err)
         }
       })
     )
@@ -71,10 +83,10 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   useEffect(() => {
-    if (wallet) {
+    if (wallet && !_.isEmpty(contracts)) {
       updateBalances()
     }
-  }, [wallet, chainId, walletAddress])
+  }, [wallet, chainId, walletAddress, contracts])
 
   return (
     <Web3Context.Provider
@@ -82,10 +94,12 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
         chainId,
         walletAddress,
         isSmartAccount,
+        tokens,
         contracts,
         balances,
         prices,
         loading,
+        getContract,
         updateBalances,
         switchChain,
       }}

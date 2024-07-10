@@ -1,4 +1,4 @@
-type Erc20 = {
+export type Erc20 = {
   chainId: number
   name: string
   symbol: string
@@ -35,6 +35,10 @@ export const tokens = [MOCKT, USDC] as const
 
 export function getTokens(chainId?: number) {
   if (!chainId) return []
-
   return tokens.filter(o => o.chainId === chainId)
+}
+
+export function getToken(chainId?: number, symbol?: string) {
+  const tokens = getTokens(chainId)
+  return tokens.find(o => o.chainId === chainId && o.symbol === symbol)
 }

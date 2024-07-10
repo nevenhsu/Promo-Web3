@@ -56,7 +56,7 @@ export default function Receive() {
           <Paper p="md" shadow="xs" radius="sm">
             <Stack>
               <Box>
-                <Text fz="lg" fw={500}>
+                <Text fz="lg" fw={500} mb="xs">
                   My wallet address
                 </Text>
                 <Text

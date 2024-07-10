@@ -1,12 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getTokens, type Contracts } from '@/contracts'
+import { getTokens } from '@/contracts'
 import { Web3Provider } from '@ethersproject/providers'
 import { useWalletProvider } from '@/wallet/hooks/useWalletProvider'
+import type { Erc20Permit } from '@/contracts/typechain-types'
+
+export type Contract = Erc20Permit // | OtherContractType
+export type Contracts = { [address: string]: Contract | undefined }
 
 export default function useContracts() {
-  const [contracts, setContracts] = useState<Contracts>({ tokens: {} })
+  const [contracts, setContracts] = useState<Contracts>({})
   const { chainId, provider, walletAddress, isSmartAccount } = useWalletProvider()
 
   const getContracts = async () => {
@@ -19,7 +23,7 @@ export default function useContracts() {
     const tokens = getTokens(chainId, signer)
 
     setContracts({
-      tokens,
+      ...tokens,
     })
   }
 
@@ -27,7 +31,7 @@ export default function useContracts() {
     if (chainId && provider) {
       getContracts()
     } else {
-      setContracts({ tokens: {} })
+      setContracts({})
     }
   }, [chainId, provider, walletAddress]) // assuming signer is a dependency
 
