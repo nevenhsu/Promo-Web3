@@ -12,7 +12,7 @@ import type { Web3Provider } from '@ethersproject/providers'
 
 type TxFunction = (...arg: any[]) => Promise<ContractTransactionResponse>
 
-enum TxStatus {
+export enum TxStatus {
   Init = 'init', // not yet called
   Pending = 'pending', // called but not yet confirmed
   Confirming = 'confirming', // waiting for confirmations
@@ -22,14 +22,16 @@ enum TxStatus {
 }
 
 type Tx = {
+  timestamp: number // unique id
   chainId: number
   contractAddress: string
   fnName: string
   status: TxStatus
-  timestamp: number
   hash?: string
   description?: string
 }
+
+type AddTxResponse = { timestamp: number }
 
 interface TxContextType {
   txs: Tx[]
@@ -38,7 +40,7 @@ interface TxContextType {
     fnName: string,
     args: any[],
     description?: string
-  ) => Promise<string | undefined>
+  ) => AddTxResponse | undefined
 }
 
 const TxContext = createContext<TxContextType | undefined>(undefined)
@@ -50,41 +52,44 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [txs, setTxs] = useState<Tx[]>([])
   const txsRef = useRef<{ [hash: string]: boolean }>({}) // hash: isHandled
 
-  const addTx = async (contractAddr: string, fnName: string, args: any[], description?: string) => {
+  const addTx = (contractAddr: string, fnName: string, args: any[], description?: string) => {
     if (!chainId) return
 
     const contractAddress = unifyAddress(contractAddr)
     const contract = contracts[contractAddress]
     const fn = _.get(contract, [fnName])
     const status = contract && fn ? TxStatus.Init : TxStatus.Error
-    const timestamp = Date.now()
+    const timestamp = Date.now() // unique id
 
     const tx: Tx = {
+      timestamp,
       chainId,
       contractAddress,
       fnName,
       status,
-      timestamp,
       description,
     }
 
+    // add tx to list
     setTxs(prev => [...prev, tx])
 
-    if (contract && fn) {
-      try {
-        const txFn = fn as TxFunction
+    // call tx function
+    const txFn = fn as TxFunction
+    callTx(timestamp, txFn, args)
 
-        // update tx hash
-        const { hash } = await txFn(...args)
-        updateTx(timestamp, { hash, status: TxStatus.Pending })
-        console.log(`Transaction hash: ${hash}`)
+    return { timestamp }
+  }
 
-        return hash
-      } catch (err) {
-        // update tx status
-        console.error(`Call ${fnName} on ${contractAddress}`, err)
-        updateTx(timestamp, { status: TxStatus.Failed })
-      }
+  const callTx = async (timestamp: number, txFn: TxFunction, args: any[]) => {
+    try {
+      // update tx hash
+      const { hash } = await txFn(...args)
+      updateTx(timestamp, { hash, status: TxStatus.Pending })
+      console.log(`Transaction hash: ${hash}`)
+    } catch (err) {
+      // update tx status
+      console.error(err)
+      updateTx(timestamp, { status: TxStatus.Failed })
     }
   }
 

@@ -1,19 +1,19 @@
 'use client'
 
+import * as _ from 'lodash-es'
 import Image from 'next/image'
 import Decimal from 'decimal.js'
 import { useRouter } from '@/navigation'
 import { useState, useMemo, useEffect } from 'react'
 import { useForm } from '@mantine/form'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { useTx } from '@/wallet/TxContext'
+import { useTx, TxStatus } from '@/wallet/TxContext'
 import { modals } from '@mantine/modals'
 import { Paper, Stack, Group, Title, Text, Space } from '@mantine/core'
 import { Button, TextInput, NumberInput } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { getTokens, getToken } from '@/contracts/tokens'
 import { formatBalance, formatAmount } from '@/utils/math'
-import { classifyError } from '@/wallet/utils/handleError'
 import { getNetwork } from '@/wallet/utils/network'
 
 type FormData = {
@@ -26,8 +26,13 @@ export default function Send() {
   const router = useRouter()
 
   const [loading, setLoading] = useState(false)
+  const [txTimestamp, setTxTimestamp] = useState(0)
   const { chainId, walletAddress, balances, prices, updateBalances, getContract } = useWeb3()
-  const { addTx } = useTx()
+  const { txs, addTx } = useTx()
+
+  const tx = useMemo(() => {
+    return txTimestamp ? _.find(txs, { timestamp: txTimestamp }) : undefined
+  }, [txs, txTimestamp])
 
   // Get tokens and network info
   const tokens = useMemo(() => getTokens(chainId), [chainId])
@@ -57,6 +62,15 @@ export default function Send() {
       form.setFieldValue('symbol', tokens[0].symbol)
     }
   }, [tokens])
+
+  useEffect(() => {
+    if (tx && tx.status === TxStatus.Success) {
+      updateBalances()
+      setLoading(false)
+    } else if (tx && tx.status === TxStatus.Failed) {
+      setLoading(false)
+    }
+  }, [tx])
 
   const { symbol } = form.values
 
@@ -141,17 +155,12 @@ export default function Send() {
     if (!token) return
     setLoading(true)
 
-    try {
-      const val = formatBalance(amount, token.decimal).toString()
-      const result = await addTx(token.address, 'transfer', [to, amount], `Transfer ${val} USDC`)
+    const val = formatBalance(amount, token.decimal).toString()
+    const result = addTx(token.address, 'transfer', [to, amount], `Transfer ${val} USDC`)
 
-      setLoading(false)
-      updateBalances()
-
-      // router.push('/wallet')
-    } catch (err) {
-      console.error(err)
-      classifyError(err)
+    if (result) {
+      setTxTimestamp(result.timestamp)
+    } else {
       setLoading(false)
     }
   }
