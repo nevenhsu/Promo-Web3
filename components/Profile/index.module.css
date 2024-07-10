@@ -6,15 +6,6 @@
 
 /* ProfileInfo */
 
-.avatarIcon {
-  position: absolute;
-  right: -4px;
-  bottom: -4px;
-  padding: 4px;
-  border-radius: 100px;
-  background: var(--mantine-color-white);
-}
-
 .avatarIcon svg {
   display: block;
 }

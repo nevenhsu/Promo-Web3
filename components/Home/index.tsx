@@ -114,7 +114,7 @@ export default function Home() {
 
           {/* Refer */}
           <Link href="/refer">
-            <Paper p={16} shadow="xs">
+            <Paper p="md" shadow="xs">
               <Group justify="space-between">
                 <Group>
                   <ThemeIcon size="xl" radius="md">

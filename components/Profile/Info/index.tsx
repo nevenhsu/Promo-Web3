@@ -1,14 +1,14 @@
 'use client'
 
 import { Link } from '@/navigation'
-import { Stack, Avatar, Box, Space, TextInput, Button } from '@mantine/core'
+import { Stack, Box, Space, Divider } from '@mantine/core'
+import { Avatar, TextInput, Button, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { updateUser } from '@/store/slices/user'
 import { useAppSelector, useAppDispatch } from '@/hooks/redux'
 import { useForm, hasLength } from '@mantine/form'
 import { cleanup } from '@/utils/helper'
 import { PiImageFill } from 'react-icons/pi'
-import classes from '../index.module.css'
 
 export default function ProfileInfo() {
   const dispatch = useAppDispatch()
@@ -35,15 +35,27 @@ export default function ProfileInfo() {
     <>
       <RwdLayout>
         <Stack gap="xl">
+          {/* Avatar */}
           <Box pos="relative" w={64} h={64} mx="auto">
             <Link href="/profile/info/avatar">
               <Avatar w="100%" h="100%" color="white" src={details?.avatar} />
 
-              <Box className={classes.avatarIcon}>
+              <ThemeIcon
+                size="sm"
+                variant="light"
+                color="black"
+                style={{
+                  position: 'absolute',
+                  bottom: -4,
+                  right: -4,
+                }}
+              >
                 <PiImageFill size={16} />
-              </Box>
+              </ThemeIcon>
             </Link>
           </Box>
+
+          <Divider />
 
           <form
             onSubmit={form.onSubmit(
@@ -66,7 +78,7 @@ export default function ProfileInfo() {
             <Stack>
               <TextInput
                 data-autofocus
-                label="Name"
+                label="Full Name"
                 key={form.key('name')}
                 {...form.getInputProps('name')}
               />

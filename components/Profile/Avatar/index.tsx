@@ -5,10 +5,12 @@ import { useMantineTheme } from '@mantine/core'
 import { uploadImage } from '@/services/user'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
 import { updateUser } from '@/store/slices/user'
-import { FileButton, Button, Group, Box, Stack, Text, Slider, Image } from '@mantine/core'
+import { Group, Box, Stack, Paper, Space } from '@mantine/core'
+import { FileButton, Button, Text, Slider, ActionIcon } from '@mantine/core'
 import AvatarEditor from 'react-avatar-editor'
 import RwdLayout from '@/components/share/RwdLayout'
 import { BucketType } from '@/types/db'
+import { PiImageFill } from 'react-icons/pi'
 
 export default function Avatar() {
   const dispatch = useAppDispatch()
@@ -23,6 +25,7 @@ export default function Avatar() {
   const [saved, setSaved] = useState<boolean>()
   const [uploading, setUploading] = useState(false)
   const [scale, setScale] = useState(1)
+  const [rotate, setRotate] = useState(0)
 
   const hasAvatar = !file && Boolean(avatar)
   const uploaded = saved === true
@@ -34,8 +37,9 @@ export default function Avatar() {
         const canvasScaled = editor.current.getImageScaledToCanvas()
         const dataURI = canvasScaled.toDataURL()
 
-        const gcpUrl = await uploadImage(dataURI, BucketType.avatar)
-        dispatch(updateUser({ details: { avatar: gcpUrl } }))
+        // TODO: Uncomment this after implementing GCP
+        //  const gcpUrl = await uploadImage(dataURI, BucketType.avatar)
+        //  dispatch(updateUser({ details: { avatar: gcpUrl } }))
         setSaved(true)
       }
     } catch (err) {
@@ -45,67 +49,97 @@ export default function Avatar() {
   }
 
   return (
-    <RwdLayout>
-      <Stack w={340} mx="auto" gap="xl">
-        <Box pos="relative" h={360}>
-          <AvatarEditor
-            ref={editor}
-            image={file || ''}
-            width={300}
-            height={300}
-            border={20}
-            scale={scale}
-            borderRadius={999}
-            backgroundColor={theme.colors.dark[6]}
-            style={{
-              borderRadius: 16,
-              position: 'relative',
-              zIndex: 1,
-              pointerEvents: uploaded ? 'none' : 'all',
-            }}
-            onImageReady={() => setSaved(false)}
-            onMouseUp={() => {
-              if (!file && fileBtn.current) {
-                fileBtn.current.click()
-              }
-            }}
-          />
-          {hasAvatar ? (
-            <Box pos="absolute" top={30} left={30} style={{ pointerEvents: 'none' }}>
-              <Image width={300} height={300} src={avatar || ''} alt="" />
+    <>
+      <RwdLayout>
+        <Stack w={300} mx="auto" gap="xl">
+          <Paper pos="relative" radius="md" shadow="xs" style={{ overflow: 'hidden' }}>
+            <AvatarEditor
+              ref={editor}
+              image={file || avatar}
+              width={300}
+              height={300}
+              border={0}
+              scale={scale}
+              rotate={rotate}
+              borderRadius={1000}
+              backgroundColor={theme.colors.white}
+              color={[255, 255, 255, 0.6]}
+              style={{
+                display: 'block',
+                pointerEvents: uploaded ? 'none' : 'all',
+              }}
+              onImageReady={() => setSaved(false)}
+              onMouseUp={() => {
+                if (!file && fileBtn.current) {
+                  fileBtn.current.click()
+                }
+              }}
+            />
+
+            <FileButton onChange={v => (v ? setFile(v) : null)} accept="image/png,image/jpeg">
+              {props => (
+                <ActionIcon
+                  {...props}
+                  ref={fileBtn}
+                  size="lg"
+                  radius="xl"
+                  variant="light"
+                  color="black"
+                  style={{
+                    position: 'absolute',
+                    bottom: 10,
+                    right: 12,
+                  }}
+                >
+                  <PiImageFill size={20} />
+                </ActionIcon>
+              )}
+            </FileButton>
+          </Paper>
+
+          <Stack>
+            <Box>
+              <Text size="sm">Zoom</Text>
+              <Slider
+                value={scale}
+                onChange={v => {
+                  setScale(v)
+                  setSaved(false)
+                }}
+                min={1}
+                max={3}
+                label={value => value.toFixed(1)}
+                step={0.1}
+                disabled={!file || uploaded}
+              />
             </Box>
-          ) : null}
-        </Box>
 
-        <Group justify="space-between">
-          <FileButton onChange={v => (v ? setFile(v) : null)} accept="image/png,image/jpeg">
-            {props => (
-              <Button {...props} ref={fileBtn} variant="default">
-                Select image
-              </Button>
-            )}
-          </FileButton>
-          <Button onClick={getImageUrl} loading={uploading || updating} disabled={!file || saved}>
-            {saved || hasAvatar ? 'Saved' : 'Save'}
-          </Button>
-        </Group>
+            <Box>
+              <Text size="sm">Rotate</Text>
+              <Slider
+                value={rotate}
+                onChange={v => {
+                  setRotate(v)
+                  setSaved(false)
+                }}
+                min={0}
+                max={360}
+                label={value => value.toFixed(1)}
+                step={1}
+                disabled={!file || uploaded}
+              />
+            </Box>
+          </Stack>
 
-        <Box>
-          <Text size="sm">Zoom</Text>
-          <Slider
-            value={scale}
-            onChange={v => {
-              setScale(v)
-              setSaved(false)
-            }}
-            min={1}
-            max={3}
-            label={value => value.toFixed(1)}
-            step={0.1}
-            disabled={!file || uploaded}
-          />
-        </Box>
-      </Stack>
-    </RwdLayout>
+          <Group grow>
+            <Button onClick={getImageUrl} loading={uploading || updating} disabled={!file || saved}>
+              {saved || hasAvatar ? 'Saved' : 'Save'}
+            </Button>
+          </Group>
+        </Stack>
+      </RwdLayout>
+
+      <Space h={100} />
+    </>
   )
 }

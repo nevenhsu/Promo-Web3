@@ -1,34 +1,38 @@
 'use client'
 
 import { Link } from '@/navigation'
-import { Group, Stack, Text, Card, Box, ActionIcon } from '@mantine/core'
+import { Group, Stack, Space, Card, Text, ActionIcon, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiArrowRight, PiCactus, PiBalloon, PiLightning } from 'react-icons/pi'
 
 export default function Admin() {
   return (
-    <RwdLayout>
-      <Stack gap="xl">
-        <CardAction
-          icon={<PiCactus size={32} />}
-          title="Admin Dashboard"
-          description="Manage admin accounts, settings"
-          link="/admin/user"
-        />
-        <CardAction
-          icon={<PiBalloon size={32} />}
-          title="Epoch Dashboard"
-          description="Manage epoch periods, settings"
-          link="/admin/epoch"
-        />
-        <CardAction
-          icon={<PiLightning size={32} />}
-          title="Activity Dashboard"
-          description="Manage activities"
-          link="/admin/activity"
-        />
-      </Stack>
-    </RwdLayout>
+    <>
+      <RwdLayout>
+        <Stack gap="xl">
+          <CardAction
+            icon={<PiCactus size={32} />}
+            title="Admin Dashboard"
+            description="Manage admin accounts, settings"
+            link="/admin/user"
+          />
+          <CardAction
+            icon={<PiBalloon size={32} />}
+            title="Epoch Dashboard"
+            description="Manage epoch periods, settings"
+            link="/admin/epoch"
+          />
+          <CardAction
+            icon={<PiLightning size={32} />}
+            title="Activity Dashboard"
+            description="Manage activities"
+            link="/admin/activity"
+          />
+        </Stack>
+      </RwdLayout>
+
+      <Space h={100} />
+    </>
   )
 }
 
@@ -43,11 +47,11 @@ function CardAction(props: CardActionProps) {
   const { title, description, icon, link } = props
   return (
     <>
-      <Card withBorder>
+      <Card shadow="xs">
         <Group wrap="nowrap" mb="md" py="xs">
-          <Box c="blue" style={{ flexShrink: 0 }}>
+          <ThemeIcon variant="white" style={{ flexShrink: 0 }}>
             {icon}
-          </Box>
+          </ThemeIcon>
           <Stack gap={4}>
             <Text fz={20} fw={500} lh={1}>
               {title}
