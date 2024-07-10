@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 import useContracts from '@/wallet/hooks/useContracts'
 import { useWallet } from '@/wallet/hooks/useWallet'
 import { supportedChains } from './variables'
-import { unifyAddress } from '@/wallet/utils/helpers'
+import { unifyAddress } from '@/wallet/utils/helper'
 import { getTokens, type Erc20 } from '@/contracts/tokens'
 import type, { Contracts, Contract } from '@/wallet/hooks/useContracts'
 

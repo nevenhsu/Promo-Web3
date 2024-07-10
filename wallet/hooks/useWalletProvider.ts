@@ -26,6 +26,7 @@ export function useWalletProvider() {
         setIsSmartAccount(true)
       } else if (wallet) {
         const provider = await wallet.getEthereumProvider()
+
         setProvider(provider)
         setWalletAddress(wallet.address)
         setIsSmartAccount(false)
