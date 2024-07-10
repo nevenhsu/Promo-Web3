@@ -21,7 +21,7 @@ export enum TxStatus {
   Error = 'error', // ex: no contract, no function
 }
 
-type Tx = {
+export type Tx = {
   timestamp: number // unique id
   chainId: number
   contractAddress: string
@@ -31,8 +31,6 @@ type Tx = {
   description?: string
 }
 
-type AddTxResponse = { timestamp: number }
-
 interface TxContextType {
   txs: Tx[]
   addTx: (
@@ -40,7 +38,7 @@ interface TxContextType {
     fnName: string,
     args: any[],
     description?: string
-  ) => AddTxResponse | undefined
+  ) => { timestamp: number } | undefined
 }
 
 const TxContext = createContext<TxContextType | undefined>(undefined)

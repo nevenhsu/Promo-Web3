@@ -4,17 +4,19 @@ import * as _ from 'lodash-es'
 import Image from 'next/image'
 import Decimal from 'decimal.js'
 import { useRouter } from '@/navigation'
-import { useState, useMemo, useEffect } from 'react'
+import { useRef, useState, useMemo, useEffect } from 'react'
 import { useForm } from '@mantine/form'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { useTx, TxStatus } from '@/wallet/TxContext'
+import { useTx, TxStatus, type Tx } from '@/wallet/TxContext'
 import { modals } from '@mantine/modals'
-import { Paper, Stack, Group, Title, Text, Space } from '@mantine/core'
-import { Button, TextInput, NumberInput } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
+import { Paper, Stack, Group, Title, Text, Space, Divider, Box } from '@mantine/core'
+import { Button, TextInput, NumberInput, Modal } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { getTokens, getToken } from '@/contracts/tokens'
 import { formatBalance, formatAmount } from '@/utils/math'
 import { getNetwork } from '@/wallet/utils/network'
+import { type Erc20 } from '@/contracts/tokens'
 
 type FormData = {
   symbol: string // token
@@ -25,9 +27,10 @@ type FormData = {
 export default function Send() {
   const router = useRouter()
 
-  const [loading, setLoading] = useState(false)
+  const mounted = useRef(false)
+  const [opened, { open, close }] = useDisclosure(false)
   const [txTimestamp, setTxTimestamp] = useState(0)
-  const { chainId, walletAddress, balances, prices, updateBalances, getContract } = useWeb3()
+  const { chainId, walletAddress, balances, prices, updateBalances } = useWeb3()
   const { txs, addTx } = useTx()
 
   const tx = useMemo(() => {
@@ -58,6 +61,13 @@ export default function Send() {
   })
 
   useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true
+      updateBalances()
+    }
+  }, [])
+
+  useEffect(() => {
     if (tokens.length) {
       form.setFieldValue('symbol', tokens[0].symbol)
     }
@@ -66,9 +76,7 @@ export default function Send() {
   useEffect(() => {
     if (tx && tx.status === TxStatus.Success) {
       updateBalances()
-      setLoading(false)
     } else if (tx && tx.status === TxStatus.Failed) {
-      setLoading(false)
     }
   }, [tx])
 
@@ -153,16 +161,24 @@ export default function Send() {
 
   const handleSubmit = async (to: string, amount: string) => {
     if (!token) return
-    setLoading(true)
 
     const val = formatBalance(amount, token.decimal).toString()
     const result = addTx(token.address, 'transfer', [to, amount], `Transfer ${val} USDC`)
 
     if (result) {
       setTxTimestamp(result.timestamp)
-    } else {
-      setLoading(false)
+      open()
     }
+  }
+
+  const handleOnOk = () => {
+    router.push('/wallet')
+  }
+
+  const handleOnBack = () => {
+    close()
+    setTxTimestamp(0)
+    form.reset()
   }
 
   return (
@@ -184,7 +200,7 @@ export default function Send() {
               {/* Token */}
               <Paper p="md" shadow="xs" radius="sm">
                 <Group>
-                  <Image src="/icons/usdc-token.svg" width={32} height={32} alt="usdc" />
+                  <Image src={token?.icon || ''} width={32} height={32} alt={token?.symbol || ''} />
                   <Stack gap={4}>
                     <Title order={4} fw={500} lh={1}>
                       USDC
@@ -259,7 +275,7 @@ export default function Send() {
             </Stack>
 
             <Group grow>
-              <Button type="submit" loading={loading}>
+              <Button type="submit" disabled={Boolean(txTimestamp)}>
                 Confirm Transfer
               </Button>
             </Group>
@@ -267,7 +283,98 @@ export default function Send() {
         </RwdLayout>
       </form>
 
+      <Modal opened={opened} onClose={() => {}} withCloseButton={false} size="xl" centered>
+        <Transaction
+          tx={tx}
+          token={token}
+          values={form.values}
+          onOk={handleOnOk}
+          onBack={handleOnBack}
+        />
+      </Modal>
+
       <Space h={100} />
+    </>
+  )
+}
+
+function Transaction({
+  tx,
+  token,
+  values,
+  onOk,
+  onBack,
+}: {
+  tx?: Tx
+  token?: Erc20
+  values: FormData
+  onOk: () => void
+  onBack: () => void
+}) {
+  const { to, amount, symbol } = values
+
+  const loading =
+    tx?.status === TxStatus.Init ||
+    tx?.status === TxStatus.Pending ||
+    tx?.status === TxStatus.Confirming
+  const isFinished = tx?.status === TxStatus.Success || tx?.status === TxStatus.Failed
+
+  return (
+    <>
+      <Stack gap="lg" py="md">
+        <Stack gap="sm" align="center">
+          <Image src={token?.icon || ''} width={80} height={80} alt={symbol} />
+          <Title order={4} lh={1}>
+            {symbol || 'No Token'}
+          </Title>
+          <Text fz="xs" c="dimmed" lh={1}>
+            {token?.name || 'Error'}
+          </Text>
+        </Stack>
+
+        <Divider />
+
+        {tx && (
+          <>
+            <Stack gap="sm" align="center">
+              <Title order={3}>
+                {tx.status === TxStatus.Success
+                  ? 'Successful!'
+                  : tx.status === TxStatus.Failed
+                    ? 'Failed!'
+                    : tx.status === TxStatus.Confirming
+                      ? 'Confirming'
+                      : 'Sending'}
+              </Title>
+              <Box ta="center">
+                <Text fz="sm" c="dimmed" mb="xs">
+                  {`${amount} ${symbol} ${
+                    tx.status === TxStatus.Success
+                      ? 'has been sent'
+                      : tx.status === TxStatus.Failed
+                        ? 'failed to send'
+                        : 'is being sent'
+                  } to the address:`}
+                </Text>
+                <Text fz="xs" c="dimmed">
+                  {to || 'address'}
+                </Text>
+              </Box>
+            </Stack>
+          </>
+        )}
+
+        <Stack>
+          <Button onClick={onOk} loading={loading}>
+            Okay, done
+          </Button>
+          {isFinished && (
+            <Button variant="light" onClick={onBack}>
+              Back to send
+            </Button>
+          )}
+        </Stack>
+      </Stack>
     </>
   )
 }
