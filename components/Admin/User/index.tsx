@@ -2,7 +2,8 @@
 
 import { useRef } from 'react'
 import { useAdmin } from '@/store/contexts/admin/AdminContext'
-import { Stack, Button, Paper, Table, Box, Group, Divider, Text, ActionIcon } from '@mantine/core'
+import { Stack, Button, Paper, Box, Group, Divider } from '@mantine/core'
+import { Table, Text, ActionIcon, Badge } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import AddModel, { type AddModalRef } from './AddModal'
 import UpdateModal, { type UpdateModalRef } from './UpdateModal'
@@ -22,27 +23,20 @@ export default function AdminUser() {
     <Table.Tr key={o._user._id}>
       <Table.Td fw={500}>
         <>
-          <Box>{o._user.name || 'No name'}</Box>
-          <Box c="dimmed" fz="xs">
+          <Box lh={1} mb={4}>
+            {o._user.name || 'No name'}
+          </Box>
+          <Box c="dimmed" fz="xs" lh={1}>
             @{o._user.username}
           </Box>
         </>
       </Table.Td>
       <Table.Td>{getRoleLabel(o.role)}</Table.Td>
-      <Table.Td>
-        {o.active ? (
-          <Box className={classes.chip} c="blue" bg="blue.1">
-            Active
-          </Box>
-        ) : (
-          <Box className={classes.chip} c="gray" bg="gray.1">
-            Inactive
-          </Box>
-        )}
-      </Table.Td>
+      <Table.Td>{o.active ? <Badge>Active</Badge> : <Badge color="gray">Inactive</Badge>}</Table.Td>
       <Table.Td>
         <Group gap="xs" wrap="nowrap">
           <ActionIcon
+            color="dark"
             onClick={() => {
               setSelectedAdmin(o._user._id)
               updateRef.current?.open()

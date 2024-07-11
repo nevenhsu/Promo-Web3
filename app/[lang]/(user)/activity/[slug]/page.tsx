@@ -11,14 +11,14 @@ const getTweet = unstable_cache(async (id: string) => _getTweet(id), ['tweet'], 
 })
 
 export default function ActivityDetailPage({
-  params: { lang, activityId },
+  params: { lang, slug },
 }: {
-  params: { lang: string; activityId: string }
+  params: { lang: string; slug: string }
 }) {
   // TODO: get post link from db
   return (
     <>
-      <ActivityDetail activityId={activityId}>
+      <ActivityDetail slug={slug}>
         {/* Embedded Post */}
         <Suspense fallback={<TweetSkeleton />}>
           <TweetPage id="1629307668568633344" />

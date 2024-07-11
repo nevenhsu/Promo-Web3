@@ -67,8 +67,8 @@ export default function Record() {
                       </Group>
                       <Link
                         href={{
-                          pathname: '/activity/[activityId]',
-                          params: { activityId: '1' },
+                          pathname: '/activity/[slug]',
+                          params: { slug: '1' },
                         }}
                       >
                         <Button>View</Button>

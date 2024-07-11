@@ -4,6 +4,7 @@ import { customAlphabet } from 'nanoid'
 import { cleanup } from '@/utils/helper'
 import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
 
+// no sensitive data here
 const detailSchema = new Schema({
   avatar: String,
 })

@@ -42,7 +42,7 @@ export default function Header() {
         <Group>
           {authenticated && Boolean(_id) ? (
             <Link href="/profile">
-              <Avatar src={avatar}>{name}</Avatar>
+              <Avatar src={avatar}>{name ? name.substring(0, 1).toUpperCase() : ''}</Avatar>
             </Link>
           ) : null}
         </Group>

@@ -37,3 +37,16 @@ export const uploadImage = async (dataURI: string, type: BucketType) => {
     return undefined
   }
 }
+
+type PublicUser = Pick<TUser, 'name' | 'username' | 'details'>
+
+export const getPublicUser = async (username: string): Promise<PublicUser | undefined> => {
+  try {
+    const { data } = await axios.get<{ user: PublicUser }>(`/api/public/user/${username}`)
+    const { user } = data
+    return user
+  } catch (err) {
+    console.error(err)
+    return undefined
+  }
+}

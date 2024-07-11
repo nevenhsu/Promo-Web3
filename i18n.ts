@@ -28,7 +28,7 @@ export const i18nConfig = {
 
     // activity
     '/activity': '/activity',
-    '/activity/[activityId]': '/activity/[activityId]',
+    '/activity/[slug]': '/activity/[slug]',
 
     // wallet
     '/wallet': '/wallet',
@@ -52,5 +52,6 @@ export const i18nConfig = {
     // refer
     '/refer': '/refer',
     '/refer/list': '/refer/list',
+    '/refer/code': '/refer/code',
   },
 } as const

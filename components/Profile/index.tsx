@@ -1,6 +1,7 @@
 'use client'
 
 import { useAppSelector } from '@/hooks/redux'
+import { useSession } from 'next-auth/react'
 import { Link } from '@/navigation'
 import { Group, Paper, Avatar, Stack, Space, Box, Divider } from '@mantine/core'
 import { Title, Text, ActionIcon, Button, ThemeIcon } from '@mantine/core'
@@ -8,10 +9,11 @@ import RwdLayout from '@/components/share/RwdLayout'
 import useLogout from '@/hooks/useLogout'
 import { PiCaretRight, PiPencilSimpleLine, PiRocketLaunch } from 'react-icons/pi'
 import { PiUserCircle, PiLinkSimpleHorizontal, PiSignOut } from 'react-icons/pi'
-import classes from './index.module.css'
 
 export default function Profile() {
   const { openLogoutModal } = useLogout()
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.isAdmin
 
   const { _id, fetched, data } = useAppSelector(state => state.user)
   const { username, name, details } = data
@@ -23,12 +25,14 @@ export default function Profile() {
           <Group justify="space-between" mb="md">
             <Title order={3}>Profile </Title>
 
-            {/* TODO: Hide from users */}
-            <Link href="/admin">
-              <Button size="xs" variant="outline" color="black">
-                Go Admin
-              </Button>
-            </Link>
+            {/* Hide from users */}
+            {isAdmin ? (
+              <Link href="/admin">
+                <Button size="xs" variant="outline" color="black">
+                  Go Admin
+                </Button>
+              </Link>
+            ) : null}
           </Group>
 
           <Paper p="md" radius="sm" shadow="xs">
@@ -37,7 +41,7 @@ export default function Profile() {
                 <Avatar w={40} h={40} src={details?.avatar} />
                 <Stack gap={4}>
                   <Title order={5} fw={500} lh={1}>
-                    {name || 'Unset name'}
+                    {name || 'No name'}
                   </Title>
                   <Text fz="xs" lh={1} c="dimmed">
                     {username ? `@${username}` : '-'}

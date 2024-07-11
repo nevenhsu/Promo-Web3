@@ -13,6 +13,7 @@ export const schema = new Schema({
   active: {
     type: Boolean,
     default: true,
+    index: true,
   },
   role: {
     type: Number,

@@ -1,8 +1,9 @@
-import UserModel, { type User } from '@/models/user'
+import UserModel from '@/models/user'
+import type { User, TUser } from '@/models/user'
 
-export async function createUser(privyId: string) {
+export async function createUser(privyId: string, data?: Partial<TUser>) {
   try {
-    const user = await UserModel.create({ privyId })
+    const user = await UserModel.create({ privyId, ...data })
     console.log('User created:', user)
     return user
   } catch (error) {

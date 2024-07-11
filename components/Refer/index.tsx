@@ -9,7 +9,7 @@ export default function Refer() {
       <RwdLayout>
         <Space h={16} />
 
-        <Stack gap={40}>
+        <Stack gap="xl">
           <Title order={3} ta="center">
             Invite Friends
             <br />

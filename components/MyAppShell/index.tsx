@@ -9,9 +9,9 @@ import MobileFooter from './MobileFooter'
 
 export default function MyAppShell({ children }: React.PropsWithChildren) {
   const matches = useMediaQuery('(min-width: 36em)')
+  const atHome = usePathname() === '/'
 
   const [opened, { toggle }] = useDisclosure()
-  const atHome = usePathname() === '/'
 
   return (
     <AppShell

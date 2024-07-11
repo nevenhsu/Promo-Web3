@@ -7,10 +7,10 @@ import RwdLayout from '@/components/share/RwdLayout'
 import { PiLightning, PiPersonSimpleRun, PiTrophy, PiCheckBold } from 'react-icons/pi'
 import classes from '../index.module.css'
 
-type ActivityDetailProps = { activityId: string; children?: React.ReactNode }
+type ActivityDetailProps = { slug: string; children?: React.ReactNode }
 
-export default function ActivityDetail({ activityId, children }: ActivityDetailProps) {
-  console.log({ activityId })
+export default function ActivityDetail({ slug, children }: ActivityDetailProps) {
+  console.log({ slug })
 
   return (
     <>

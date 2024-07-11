@@ -6,6 +6,8 @@ import UserModel from '@/models/user'
 import { createUser } from '@/lib/db/user'
 import { getAdmin } from '@/lib/db/admin'
 
+const privy = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID, process.env.PRIVY_APP_SECRET)
+
 const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
@@ -28,7 +30,11 @@ const handler = NextAuth({
 
             // auto create user if not exists
             if (!user) {
-              const newUser = await createUser(privyId)
+              // Get user details from Privy
+              const privyUser = await getPrivyUser(privyId)
+              const name = privyUser?.google?.name || privyUser?.twitter?.name || ''
+              const newUser = await createUser(privyId, { name })
+
               return { id: newUser._id.toString(), privyId }
             }
 
@@ -65,14 +71,20 @@ export { handler as GET, handler as POST }
 
 async function verifyToken(authToken: string) {
   try {
-    const privy = new PrivyClient(
-      process.env.NEXT_PUBLIC_PRIVY_APP_ID,
-      process.env.PRIVY_APP_SECRET
-    )
     const verifiedClaims = await privy.verifyAuthToken(authToken)
 
     return verifiedClaims
   } catch (error) {
     console.log(`Token verification failed with error ${error}.`)
+  }
+}
+
+async function getPrivyUser(userId: string) {
+  try {
+    const user = await privy.getUser(userId)
+
+    return user
+  } catch (error) {
+    console.error(`Get privy user failed with error ${error}.`)
   }
 }

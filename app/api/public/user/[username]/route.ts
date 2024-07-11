@@ -23,5 +23,5 @@ export async function GET(req: NextRequest, { params }: { params: { username: st
 }
 
 function filterData(data: any) {
-  return _.pick(data, ['username', 'name'])
+  return _.pick(data, ['username', 'name', 'details'])
 }
