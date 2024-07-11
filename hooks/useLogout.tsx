@@ -28,7 +28,7 @@ export default function useLogout() {
           Are you sure you want to logout?
         </Text>
       ),
-      labels: { confirm: 'Logout', cancel: 'Cancel' },
+      labels: { confirm: 'Yes, logout', cancel: 'Cancel' },
       onConfirm: handleConfirm,
     })
 

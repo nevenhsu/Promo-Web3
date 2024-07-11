@@ -13,6 +13,7 @@ export const schema = new Schema({
   index: { type: Number, required: true, unique: true, index: true },
   startTime: { type: Date, required: true, index: true },
   endTime: { type: Date, required: true, index: true },
+  slug: { type: String, required: true, unique: true, index: true },
   title: String,
   description: String,
   points: Number,
@@ -27,6 +28,7 @@ export type TActivity = {
   index: number // auto increase
   startTime: string // ISO 8601 date string
   endTime: string // ISO 8601 date string
+  slug: string
   title: string
   description: string
   points: number

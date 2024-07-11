@@ -1,6 +1,6 @@
 import { models, model, Model, Schema } from 'mongoose'
 import { SocialMedia } from '@/types/db'
-import { nanoid } from 'nanoid'
+import { customAlphabet } from 'nanoid'
 import { cleanup } from '@/utils/helper'
 import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
 
@@ -30,22 +30,31 @@ export const schema = new Schema({
   },
   name: String,
   email: String,
-  details: detailSchema,
-  linkedAccounts: { type: [linkedAccountsSchema], default: [] },
+  details: { type: detailSchema, required: true, default: {} },
+  linkedAccounts: { type: [linkedAccountsSchema], default: [], required: true },
   createdTime: { type: Date, default: Date.now },
 })
 
+// Types for redux store
+type LinkedAccounts = InferSchemaType<typeof linkedAccountsSchema>
+type TLinkedAccounts = LinkedAccounts & { _id: string }
 export type User = InferSchemaType<typeof schema>
-export type TUser = User & { _id: string }
+export type TUser = Omit<User, 'linkedAccounts'> & {
+  _id: string
+  linkedAccounts: TLinkedAccounts[]
+}
 
 // Function to generate a random string
 function randomUsername() {
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  const nanoid = customAlphabet(alphabet, 8)
   return nanoid()
 }
 
 // Middleware before saving
 schema.pre<User>('save', async function (next) {
-  this.username = cleanup(this.username)
+  const cleaned = cleanup(this.username)
+  this.username = await uniqueUsername(cleaned)
 
   /* @ts-expect-error */
   await this.validate()
@@ -72,4 +81,18 @@ schema.pre<User>('updateOne', handleUpdate)
 schema.pre<User>('updateMany', handleUpdate)
 
 const name = 'User'
-export default (models[name] as Model<User>) || model(name, schema)
+const UserModel = (models[name] as Model<User>) || model(name, schema)
+export default UserModel
+
+// Middleware to ensure unique username
+async function uniqueUsername(username: string) {
+  try {
+    const user = await UserModel.findOne({ username })
+    if (!user) return username
+
+    throw new Error('Username already exists')
+  } catch {
+    const name = randomUsername()
+    return uniqueUsername(name)
+  }
+}
