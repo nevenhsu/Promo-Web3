@@ -6,6 +6,7 @@ type NewActivityData = {
   startTime: any
   endTime: any
   title: string
+  slug: string
   description: string
   points: number
   activityType: number // ActivityType
@@ -15,12 +16,22 @@ type NewActivityData = {
 
 export async function createActivity(data: NewActivityData) {
   try {
+    if (!data.slug) {
+      throw new Error('Slug is required.')
+    }
+
+    const existing = await getActivity(data.slug)
+    if (existing) {
+      throw new Error('Activity with the same slug already exists.')
+    }
+
     const activity = new ActivityModel({
       ...data,
       startTime: setMilliseconds(data.startTime, 0),
       endTime: setMilliseconds(data.endTime, 0),
     })
     await activity.save()
+
     console.log('Activity created:', activity)
     return activity
   } catch (error) {
@@ -92,9 +103,9 @@ export async function getAllActivity() {
   }
 }
 
-export async function getActivity(index: number) {
+export async function getActivity(slug: string) {
   try {
-    const activity = await ActivityModel.findOne({ index }).orFail()
+    const activity = await ActivityModel.findOne({ slug }).orFail()
     return activity
   } catch (error) {
     console.error('Error fetching activity:', error)

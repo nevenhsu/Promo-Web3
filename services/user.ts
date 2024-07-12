@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { TUser } from '@/models/user'
-import type { BucketType } from '@/types/db'
+import type { BucketType, PublicUser } from '@/types/db'
 
 export const getUserInfo = async (): Promise<TUser | undefined> => {
   try {
@@ -37,8 +37,6 @@ export const uploadImage = async (dataURI: string, type: BucketType) => {
     return undefined
   }
 }
-
-type PublicUser = Pick<TUser, 'name' | 'username' | 'details'>
 
 export const getPublicUser = async (username: string): Promise<PublicUser | undefined> => {
   try {

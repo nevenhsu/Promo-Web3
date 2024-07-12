@@ -26,11 +26,3 @@ export function getStartOfDate(date: string | number | Date) {
   const d = format(date, 'yyyy-MM-dd')
   return fromZonedTime(d, timezone)
 }
-
-export function wait(milliseconds = 1000, any: any = undefined) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(any)
-    }, milliseconds)
-  })
-}

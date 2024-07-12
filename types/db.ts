@@ -1,3 +1,7 @@
+import { TUser } from '@/models/user'
+
+export type PublicUser = Pick<TUser, 'name' | 'username' | 'details'>
+
 export type Nullable<T> = T | null
 
 export enum BucketType {
@@ -28,6 +32,11 @@ export enum ActivityType {
 export enum SocialMedia {
   Instagram = 'instagram',
   X = 'x',
+}
+
+export enum ReferralLevel {
+  First = 1,
+  Second = 2,
 }
 
 export const levelPoints = {
