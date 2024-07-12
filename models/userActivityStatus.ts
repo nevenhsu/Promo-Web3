@@ -21,7 +21,7 @@ export const schema = new Schema({
   updatedAt: { type: Date, default: Date.now }, // last updated date
 })
 
-export type ActivityUserStatus = InferSchemaType<typeof schema>
+export type UserActivityStatus = InferSchemaType<typeof schema>
 
 const name = 'UserActivityStatus'
-export default (models[name] as Model<ActivityUserStatus>) || model(name, schema)
+export default (models[name] as Model<UserActivityStatus>) || model(name, schema)

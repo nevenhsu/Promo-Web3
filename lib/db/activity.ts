@@ -1,6 +1,6 @@
 import ActivityModel from '@/models/activity'
 import { setMilliseconds } from 'date-fns'
-import type { Activity, ActivityDetail } from '@/models/activity'
+import type { Activity, ActivityDetail, ActivityAirDrop } from '@/models/activity'
 
 type NewActivityData = {
   startTime: any
@@ -8,10 +8,10 @@ type NewActivityData = {
   title: string
   slug: string
   description: string
-  points: number
   activityType: number // ActivityType
   socialMedia: string // SocialMedia
   details: ActivityDetail
+  airdrop: ActivityAirDrop
 }
 
 export async function createActivity(data: NewActivityData) {

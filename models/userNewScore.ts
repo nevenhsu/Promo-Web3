@@ -18,7 +18,7 @@ export const schema = new Schema({
   updated: { type: Boolean, default: false, index: true },
 })
 
-export type ActivityUserStatus = InferSchemaType<typeof schema>
+export type UserNewScore = InferSchemaType<typeof schema>
 
-const name = 'userNewScore'
-export default (models[name] as Model<ActivityUserStatus>) || model(name, schema)
+const name = 'UserNewScore'
+export default (models[name] as Model<UserNewScore>) || model(name, schema)

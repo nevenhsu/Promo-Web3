@@ -1,5 +1,6 @@
 import * as _ from 'lodash-es'
 import ReferralModel from '@/models/referral'
+import { addReferralNumber } from './userStatus'
 import { ReferralLevel } from '@/types/db'
 import type { TUser } from '@/models/user'
 
@@ -41,6 +42,8 @@ export async function _createReferral(referrer: string, referee: string, level: 
 
     const referral = new ReferralModel({ referrer, referee, level })
     await referral.save()
+
+    await addReferralNumber(referrer, level)
 
     console.log('Referral created:', referral)
 

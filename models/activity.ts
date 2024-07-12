@@ -9,6 +9,11 @@ const detailSchema = new Schema({
   totalScore: Number,
 })
 
+const airdropSchema = new Schema({
+  symbol: String,
+  amount: String,
+})
+
 export const schema = new Schema({
   index: { type: Number, required: true, unique: true, index: true },
   startTime: { type: Date, required: true, index: true },
@@ -16,14 +21,15 @@ export const schema = new Schema({
   slug: { type: String, required: true, unique: true, index: true },
   title: String,
   description: String,
-  points: Number,
   activityType: { type: Number, enum: ActivityType, required: true },
   socialMedia: { type: String, enum: SocialMedia, required: true },
   details: detailSchema,
+  airdrop: airdropSchema,
 })
 
 export type Activity = InferSchemaType<typeof schema>
 export type ActivityDetail = InferSchemaType<typeof detailSchema>
+export type ActivityAirDrop = InferSchemaType<typeof detailSchema>
 export type TActivity = {
   index: number // auto increase
   startTime: string // ISO 8601 date string
@@ -31,10 +37,10 @@ export type TActivity = {
   slug: string
   title: string
   description: string
-  points: number
   activityType: number // ActivityType
   socialMedia: string // SocialMedia
   details: ActivityDetail
+  airdrop: ActivityAirDrop
 }
 
 schema.set('validateBeforeSave', false)
@@ -51,4 +57,5 @@ schema.pre<Activity>('save', async function (next) {
 
 const name = 'Activity'
 const ActivityModel = (models[name] as Model<Activity>) || model(name, schema)
+
 export default ActivityModel
