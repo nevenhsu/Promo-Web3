@@ -4,16 +4,17 @@ import * as _ from 'lodash-es'
 import { isBefore } from 'date-fns'
 import { forwardRef, useImperativeHandle, useEffect } from 'react'
 import { useActivity } from '@/store/contexts/admin/ActivityContext'
+import { useWeb3 } from '@/wallet/Web3Context'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Text, Button } from '@mantine/core'
-import { TextInput, Textarea, NumberInput, Select } from '@mantine/core'
+import { TextInput, Textarea, Select } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
 import { formateDate } from '@/utils/helper'
 import { publicEnv } from '@/utils/env'
 import { ActivityType, SocialMedia } from '@/types/db'
-import { activityTypes } from './variables'
-import type { Activity, ActivityDetail } from '@/models/activity'
+import { activityTypes, createSlug } from './variables'
+import type { Activity, ActivityDetail, ActivityAirDrop } from '@/models/activity'
 
 export type UpdateModalRef = {
   open: () => void
@@ -22,13 +23,16 @@ export type UpdateModalRef = {
 export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
   const [opened, { open, close }] = useDisclosure(false)
   const { updateActivity, selectedIndex, selectedActivity, loading } = useActivity()
+  const { tokens } = useWeb3()
 
   const form = useForm<{
     title: string
+    slug: string
     startTime: null | Date
     endTime: null | Date
     description: string
-    points: number
+    token: string
+    amount: string // Base unit, not wei, ex: 10 USDC
     activityType: string
     socialMedia: string
     link: string
@@ -38,11 +42,13 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
     mode: 'uncontrolled',
     initialValues: {
       title: '',
+      slug: '',
       startTime: null,
       endTime: null,
       description: '',
-      points: 0,
-      activityType: `${ActivityType.None}`,
+      token: tokens[0]?.symbol || '',
+      amount: '0',
+      activityType: `${ActivityType.Repost}`,
       socialMedia: SocialMedia.X,
       link: '',
       coverUrl: '',
@@ -68,9 +74,11 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
         return null
       },
       title: value => (value ? null : 'Should not be empty'),
+      slug: value => (value ? null : 'Should not be empty'),
       activityType: value => (value ? null : 'Should not be empty'),
       socialMedia: value => (value ? null : 'Should not be empty'),
-      points: value => (value >= 0 ? null : 'Should be greater than or equal to 0'),
+      token: value => (value ? null : 'Should not be empty'),
+      amount: value => (Number(value) >= 0 ? null : 'Should be greater than or equal to 0'),
     },
   })
 
@@ -80,8 +88,10 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
         startTime: new Date(selectedActivity.startTime),
         endTime: new Date(selectedActivity.endTime),
         title: selectedActivity.title,
+        slug: selectedActivity.slug,
         description: selectedActivity.description,
-        points: selectedActivity.points,
+        token: selectedActivity.airdrop.symbol,
+        amount: selectedActivity.airdrop.amount,
         activityType: `${selectedActivity.activityType}`,
         socialMedia: selectedActivity.socialMedia,
         link: selectedActivity.details.link || '',
@@ -98,11 +108,12 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
   }))
 
   const handleSubmit = async (
-    data: Omit<Activity, 'details' | 'index'>,
-    details: Partial<ActivityDetail>
+    data: Omit<Activity, 'index' | 'details' | 'airdrop'>,
+    details: Partial<ActivityDetail>,
+    airdrop: Partial<ActivityAirDrop>
   ) => {
     if (selectedActivity) {
-      const updated = await updateActivity(selectedActivity.index, data, details)
+      const updated = await updateActivity(selectedActivity.index, data, details, airdrop)
       if (updated) {
         close()
       } else {
@@ -118,9 +129,10 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
           <form
             onSubmit={form.onSubmit(
               values => {
-                const { link, coverUrl, thumbnailUrl, ...rest } = values
+                const { link, coverUrl, thumbnailUrl, amount, token, ...rest } = values
                 const { startTime, endTime, activityType } = rest
-                if (startTime && endTime) {
+                const tokenData = tokens.find(({ symbol }) => symbol === values.token)
+                if (startTime && endTime && tokenData) {
                   handleSubmit(
                     {
                       ...rest,
@@ -128,7 +140,8 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
                       endTime,
                       activityType: Number(activityType),
                     },
-                    { link, coverUrl, thumbnailUrl }
+                    { link, coverUrl, thumbnailUrl },
+                    { symbol: tokenData.symbol, decimal: tokenData.decimal, amount }
                   )
                 }
               },
@@ -169,18 +182,39 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
                 {...form.getInputProps('title')}
               />
 
+              <TextInput
+                label="Slug"
+                placeholder="Activity URL slug"
+                rightSectionWidth={60}
+                rightSection={
+                  <Button
+                    variant="transparent"
+                    size="compact-xs"
+                    onClick={() => {
+                      form.setFieldValue('slug', createSlug(form.getValues().title))
+                    }}
+                  >
+                    Create
+                  </Button>
+                }
+                {...form.getInputProps('slug')}
+              />
+
               <Textarea
                 label="Description"
                 placeholder="Activity description"
                 {...form.getInputProps('description')}
               />
 
-              <NumberInput
-                label="Points"
-                placeholder="0"
-                min={0}
-                {...form.getInputProps('points')}
+              <Select
+                label="Airdrop Token"
+                placeholder="Pick one"
+                withCheckIcon={false}
+                data={_.map(tokens, ({ symbol }) => ({ value: symbol, label: symbol }))}
+                {...form.getInputProps('token')}
               />
+
+              <TextInput label="Airdrop Amount" placeholder="0" {...form.getInputProps('amount')} />
 
               <Select
                 label="Activity Type"
@@ -189,6 +223,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
                 data={_.map(activityTypes, ({ value, label }) => ({ value: `${value}`, label }))}
                 {...form.getInputProps('activityType')}
               />
+
               <Select
                 label="Social Media"
                 placeholder="Pick one"
@@ -197,7 +232,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
                 {...form.getInputProps('socialMedia')}
               />
 
-              <TextInput label="Link" placeholder="Activity link" {...form.getInputProps('link')} />
+              <TextInput label="Link" placeholder="Post ID" {...form.getInputProps('link')} />
 
               <TextInput
                 label="Cover URL"

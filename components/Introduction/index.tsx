@@ -1,6 +1,8 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useRouter } from '@/navigation'
+import { useLocalStorage } from 'react-use'
 import { useSearchParams } from 'next/navigation'
 import useLogin from '@/hooks/useLogin'
 import { useAppSelector } from '@/hooks/redux'
@@ -10,13 +12,24 @@ import RwdLayout from '@/components/share/RwdLayout'
 export default function Index() {
   const router = useRouter()
   const { _id } = useAppSelector(state => state.user)
-
   const searchParams = useSearchParams()
+  const [promo] = useLocalStorage<string>('promo')
+
+  console.log({ promo })
 
   const { login, authenticated } = useLogin({
     onComplete: (user, isNewUser, wasAlreadyAuthenticated) => {
       // If the user was already authenticated, do nothing
       if (wasAlreadyAuthenticated) return
+
+      // If the user is new and has a promo code, redirect to the referral code page
+      if (isNewUser && promo) {
+        router.push('/refer/code')
+        return
+      } else if (isNewUser) {
+        router.push('/activity')
+        return
+      }
 
       // handle auth callbackUrl
       const callbackUrl = searchParams.get('callbackUrl')

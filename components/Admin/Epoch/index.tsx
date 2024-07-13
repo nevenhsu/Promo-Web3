@@ -47,6 +47,7 @@ export default function AdminEpoch() {
               updateRef.current?.open()
             }}
             disabled={isAfter(new Date(), o.endTime)}
+            color="blue"
           >
             <PiPencil />
           </ActionIcon>

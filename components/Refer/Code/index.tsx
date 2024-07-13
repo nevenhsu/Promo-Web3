@@ -2,7 +2,7 @@
 
 import { useRouter } from '@/navigation'
 import { useState } from 'react'
-import { useAsyncFn } from 'react-use'
+import { useAsyncFn, useLocalStorage } from 'react-use'
 import { useAppSelector } from '@/hooks/redux'
 import { useDisclosure } from '@mantine/hooks'
 import { useReferral } from '@/store/contexts/user/referralContext'
@@ -16,7 +16,10 @@ export default function ReferCode() {
   const router = useRouter()
   const { data, _id } = useAppSelector(state => state.user)
   const { referer, isReferred, createState, createReferral } = useReferral()
-  const [value, setValue] = useState('')
+
+  // Get promo code from local storage
+  const [promo] = useLocalStorage<string>('promo')
+  const [value, setValue] = useState(promo || '')
   const [opened, { open, close }] = useDisclosure(false)
 
   const [userState, fetchUser] = useAsyncFn(
@@ -80,7 +83,7 @@ export default function ReferCode() {
                 </Box>
               </Stack>
 
-              <Button onClick={() => router.back()}>Back</Button>
+              <Button onClick={() => router.push('/activity')}>Back</Button>
             </>
           ) : (
             <>
@@ -89,7 +92,7 @@ export default function ReferCode() {
                 leftSection={<PiBarcode size={24} />}
                 placeholder="Enter referral code"
                 value={value}
-                error={userState.error?.message}
+                error={userState.error?.message || createState.error?.response?.data.error}
                 onChange={event => {
                   setValue(event.currentTarget.value)
                 }}

@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef } from 'react'
-import Image from 'next/image'
 import { Stack, Button, Paper, Table, Group, Divider, ActionIcon, Text } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { useActivity } from '@/store/contexts/admin/ActivityContext'
@@ -21,20 +20,11 @@ export default function AdminEpoch() {
 
   const rows = activities.map(o => (
     <Table.Tr key={o.index}>
-      <Table.Td c="blue" fw={500}>
-        <Image
-          className={classes.thumbnail}
-          src="/images/activity-thumbnail.png"
-          width={60}
-          height={60}
-          alt="thumbnail"
-        />
-      </Table.Td>
       <Table.Td>
         <Text style={{ textOverflow: 'ellipsis', width: 200, overflow: 'hidden' }}>{o.title}</Text>
       </Table.Td>
       <Table.Td>
-        <Text>{o.points}</Text>
+        <Text>{`${o.airdrop.amount} ${o.airdrop.symbol}`}</Text>
       </Table.Td>
       <Table.Td fz="sm">
         <Text fz={14}>{formateDate(o.startTime)}</Text>
@@ -56,6 +46,7 @@ export default function AdminEpoch() {
               setSelectedIndex(o.index)
               updateRef.current?.open()
             }}
+            color="blue"
           >
             <PiPencil />
           </ActionIcon>
@@ -90,9 +81,8 @@ export default function AdminEpoch() {
               <Table>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th></Table.Th>
                     <Table.Th>Title</Table.Th>
-                    <Table.Th miw={80}>Points</Table.Th>
+                    <Table.Th>Airdrop</Table.Th>
                     <Table.Th>Start</Table.Th>
                     <Table.Th>End</Table.Th>
                     <Table.Th>Actions</Table.Th>

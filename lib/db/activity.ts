@@ -42,8 +42,9 @@ export async function createActivity(data: NewActivityData) {
 
 export async function updateActivity(
   index: number,
-  updateData: Partial<Omit<Activity, 'details'>>,
-  updateDetails: Partial<ActivityDetail>
+  updateData: Partial<Omit<Activity, 'details' | 'airdrop'>>,
+  updateDetails: Partial<ActivityDetail>,
+  updateAirdrop: Partial<ActivityAirDrop>
 ) {
   try {
     if (updateData.startTime) {
@@ -54,10 +55,11 @@ export async function updateActivity(
     }
 
     const parsedDetails = parseDetails(updateDetails)
+    const parsedAirdrop = parseAirdrop(updateAirdrop)
 
     const updated = await ActivityModel.findOneAndUpdate(
       { index },
-      { $set: { ...updateData, ...parsedDetails } },
+      { $set: { ...updateData, ...parsedDetails, ...parsedAirdrop } },
       { new: true } // Options to return the updated document
     )
 
@@ -118,6 +120,16 @@ function parseDetails(newDetail: Partial<ActivityDetail>) {
 
   for (const [key, value] of Object.entries(newDetail)) {
     parsed[`details.${key}`] = value
+  }
+
+  return parsed
+}
+
+function parseAirdrop(newDetail: Partial<ActivityAirDrop>) {
+  const parsed: { [key: string]: any } = {}
+
+  for (const [key, value] of Object.entries(newDetail)) {
+    parsed[`airdrop.${key}`] = value
   }
 
   return parsed

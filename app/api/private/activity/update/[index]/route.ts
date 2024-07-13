@@ -9,9 +9,9 @@ export async function PUT(req: NextRequest, { params }: { params: { index: strin
 
     await dbConnect()
 
-    const { data, details } = await req.json()
+    const { data, details, airdrop } = await req.json()
 
-    const updated = await updateActivity(index, data, details)
+    const updated = await updateActivity(index, data, details, airdrop)
 
     if (!updated) {
       return NextResponse.json({ error: 'activity not found' }, { status: 404 })

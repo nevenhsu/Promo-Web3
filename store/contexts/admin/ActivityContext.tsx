@@ -7,7 +7,7 @@ import {
   updateActivity as _updateActivity,
   deleteActivity as _deleteActivity,
 } from '@/services/private/activity'
-import type { TActivity, Activity, ActivityDetail } from '@/models/activity'
+import type { TActivity, Activity, ActivityDetail, ActivityAirDrop } from '@/models/activity'
 
 interface ActivityContextType {
   activities: TActivity[]
@@ -20,7 +20,8 @@ interface ActivityContextType {
   updateActivity: (
     index: number,
     updateData: Partial<Omit<Activity, 'details' | 'index'>>,
-    updateDetails: Partial<ActivityDetail>
+    updateDetails: Partial<ActivityDetail>,
+    updateAirdrop: Partial<ActivityAirDrop>
   ) => Promise<TActivity | undefined>
   deleteActivity: (index: number) => Promise<TActivity | undefined>
 }
@@ -67,12 +68,13 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const updateActivity = async (
     index: number,
-    updateData: Partial<Omit<Activity, 'details' | 'index'>>,
-    updateDetails: Partial<ActivityDetail>
+    updateData: Partial<Omit<Activity, 'index' | 'details' | 'airdrop'>>,
+    updateDetails: Partial<ActivityDetail>,
+    updateAirdrop: Partial<ActivityAirDrop>
   ) => {
     try {
       setLoading(true)
-      const updated = await _updateActivity(index, updateData, updateDetails)
+      const updated = await _updateActivity(index, updateData, updateDetails, updateAirdrop)
       if (updated) {
         setActivities(prev => prev.map(o => (o.index === index ? { ...o, ...updated } : o)))
         return updated

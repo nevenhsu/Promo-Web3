@@ -32,7 +32,10 @@ export async function PUT(req: NextRequest) {
 
     const referral = await createReferral(referrerId, refereeId)
     if (!referral) {
-      return NextResponse.json({ error: 'Referral already exists' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Referral already exists. Please try another code.' },
+        { status: 400 }
+      )
     }
 
     return NextResponse.json({ referrer: filterUserData(referrerUser) })

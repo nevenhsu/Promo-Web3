@@ -36,7 +36,7 @@ export default function AdminUser() {
       <Table.Td>
         <Group gap="xs" wrap="nowrap">
           <ActionIcon
-            color="dark"
+            color="blue"
             onClick={() => {
               setSelectedAdmin(o._user._id)
               updateRef.current?.open()

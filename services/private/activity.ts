@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { Activity, TActivity, ActivityDetail } from '@/models/activity'
+import type { Activity, TActivity, ActivityDetail, ActivityAirDrop } from '@/models/activity'
 
 const api = '/api/private/activity'
 
@@ -21,13 +21,15 @@ export const createActivity = async (
 
 export const updateActivity = async (
   index: number,
-  updateData: Partial<Omit<Activity, 'details' | 'index'>>,
-  updateDetail: Partial<ActivityDetail>
+  updateData: Partial<Omit<Activity, 'index' | 'details' | 'airdrop'>>,
+  updateDetail: Partial<ActivityDetail>,
+  updateAirdrop: Partial<ActivityAirDrop>
 ): Promise<TActivity | undefined> => {
   try {
     const { data } = await axios.put<{ activity: TActivity }>(`${api}/update/${index}`, {
       data: updateData,
       details: updateDetail,
+      airdrop: updateAirdrop,
     })
     return data.activity
   } catch (err) {

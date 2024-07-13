@@ -1,9 +1,16 @@
+'use client'
+
+import { useAppSelector } from '@/hooks/redux'
 import { Link } from '@/navigation'
-import { Space, Divider, Stack, Group, Box, ThemeIcon, Text, Title, Button } from '@mantine/core'
+import { Space, Divider, Stack, Group, Box, Paper } from '@mantine/core'
+import { ThemeIcon, Text, Title, Button, CopyButton } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiRocketLaunch } from 'react-icons/pi'
 
 export default function Refer() {
+  const { data } = useAppSelector(state => state.user)
+  const link = `${window.location.origin}/?promo=${data.username}`
+
   return (
     <>
       <RwdLayout>
@@ -17,6 +24,8 @@ export default function Refer() {
           </Title>
 
           <Divider />
+
+          {/* Contents */}
 
           <Stack gap={24}>
             <Group wrap="nowrap" align="start">
@@ -48,8 +57,24 @@ export default function Refer() {
             </Group>
           </Stack>
 
+          {/* Link */}
+
+          <Paper p="xs" ta="center" c="orange" bd="1px dashed red">
+            <Text fz="sm" fw={500}>
+              {link}
+            </Text>
+          </Paper>
+
+          {/* Actions */}
+
           <Stack gap={24}>
-            <Button size="md">Share my invite link</Button>
+            <CopyButton value={link}>
+              {({ copied, copy }) => (
+                <Button size="md" onClick={copy}>
+                  {copied ? 'Copied' : 'Copy my invite link'}
+                </Button>
+              )}
+            </CopyButton>
 
             <Link href="/refer/list">
               <Button size="md" variant="light" w="100%">

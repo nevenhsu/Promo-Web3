@@ -1,10 +1,15 @@
 import type { Mongoose } from 'mongoose'
+import type { AxiosResponse } from 'axios'
 import en from '../messages/en.json'
 
 type Messages = typeof en // for next-intl
 
 declare global {
   interface IntlMessages extends Messages {}
+
+  interface Error {
+    response?: AxiosResponse
+  }
 
   var mongoose: {
     promise: Promise<Mongoose> | null

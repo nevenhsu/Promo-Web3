@@ -1,9 +1,9 @@
 'use client'
 
 import { Link } from '@/navigation'
-import { Group, Stack, Space, Card, Text, ActionIcon, ThemeIcon } from '@mantine/core'
+import { Group, Stack, Space, Card, Text, Title, ActionIcon, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { PiArrowRight, PiCactus, PiBalloon, PiLightning } from 'react-icons/pi'
+import { PiArrowRight, PiCactus, PiBalloon, PiRocket } from 'react-icons/pi'
 
 export default function Admin() {
   return (
@@ -23,7 +23,7 @@ export default function Admin() {
             link="/admin/epoch"
           />
           <CardAction
-            icon={<PiLightning size={32} />}
+            icon={<PiRocket size={32} />}
             title="Activity Dashboard"
             description="Manage activities"
             link="/admin/activity"
@@ -53,10 +53,10 @@ function CardAction(props: CardActionProps) {
             {icon}
           </ThemeIcon>
           <Stack gap={4}>
-            <Text fz={20} fw={500} lh={1}>
+            <Title fz={20} fw={500} lh={1}>
               {title}
-            </Text>
-            <Text fz="sm" c="dimmed" lh={1}>
+            </Title>
+            <Text fz="sm" c="dimmed">
               {description}
             </Text>
           </Stack>
