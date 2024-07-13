@@ -11,6 +11,7 @@ const detailSchema = new Schema({
 
 const airdropSchema = new Schema({
   symbol: String,
+  decimal: Number,
   amount: String,
 })
 

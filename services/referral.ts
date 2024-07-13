@@ -13,18 +13,12 @@ export const getReferrer = async (): Promise<PublicUser | undefined> => {
   }
 }
 
-// referrer is the username
-export const createReferral = async (referrer: string) => {
-  try {
-    const res = await axios.put<{ referral: TReferral }>('/api/u/referral/create', {
-      referrer,
-    })
-    const { referral } = res.data
-    return referral
-  } catch (err) {
-    console.error(err)
-    return undefined
-  }
+export const createReferral = async (username: string) => {
+  const res = await axios.put<{ referrer: PublicUser }>('/api/u/referral/create', {
+    referrer: username,
+  })
+  const { referrer } = res.data
+  return referrer
 }
 
 export const getReferralByLevel = async (

@@ -28,6 +28,7 @@ export const schema = new Schema({
   airdrops: { type: [airdropSchema], default: [] },
 })
 
+export type Airdrop = InferSchemaType<typeof airdropSchema>
 export type UserStatus = InferSchemaType<typeof schema>
 
 const name = 'UserStatus'

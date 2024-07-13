@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { getReferralByLevel } from '@/lib/db/referral'
+import { filterUserData } from '@/lib/db/user'
 import { ReferralLevel } from '@/types/db'
 
 // Get the referrals of the current user
@@ -24,15 +25,11 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       referrals: referrals.map(o => {
-        return { ...o, referee: filterData(o._referee) }
+        return { ...o, referee: filterUserData(o._referee) }
       }),
     })
   } catch (error) {
     console.error(error)
     NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
-}
-
-function filterData(data: any) {
-  return _.pick(data, ['username', 'name', 'details'])
 }

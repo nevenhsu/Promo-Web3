@@ -1,6 +1,7 @@
 'use client'
 
 import { useAppSelector } from '@/hooks/redux'
+import { useReferral } from '@/store/contexts/user/referralContext'
 import { Link } from '@/navigation'
 import { Stack, Group, Box, Paper, SimpleGrid, Divider, Space } from '@mantine/core'
 import { Title, Text, ThemeIcon, ActionIcon } from '@mantine/core'
@@ -11,6 +12,8 @@ import { PiCaretRight, PiBarcode } from 'react-icons/pi'
 export default function Home() {
   const { data, _id } = useAppSelector(state => state.user)
   const { name } = data
+
+  const { isReferred } = useReferral()
 
   return (
     <>
@@ -138,28 +141,30 @@ export default function Home() {
           </Link>
 
           {/* Referral code */}
-          <Link href="/refer/code">
-            <Paper p="md" shadow="xs">
-              <Group justify="space-between" wrap="nowrap">
-                <Group wrap="nowrap">
-                  <ThemeIcon size="xl" radius="md">
-                    <PiBarcode size={24} />
-                  </ThemeIcon>
-                  <Box>
-                    <Title order={4} fw={500}>
-                      Enter referral code
-                    </Title>
-                    <Text size="xs" c="dimmed">
-                      The code provided by your friend
-                    </Text>
-                  </Box>
+          {isReferred ? null : (
+            <Link href="/refer/code">
+              <Paper p="md" shadow="xs">
+                <Group justify="space-between" wrap="nowrap">
+                  <Group wrap="nowrap">
+                    <ThemeIcon size="xl" radius="md">
+                      <PiBarcode size={24} />
+                    </ThemeIcon>
+                    <Box>
+                      <Title order={4} fw={500}>
+                        Enter referral code
+                      </Title>
+                      <Text size="xs" c="dimmed">
+                        The code provided by your friend
+                      </Text>
+                    </Box>
+                  </Group>
+                  <ActionIcon color="dark">
+                    <PiCaretRight size={24} />
+                  </ActionIcon>
                 </Group>
-                <ActionIcon color="dark">
-                  <PiCaretRight size={24} />
-                </ActionIcon>
-              </Group>
-            </Paper>
-          </Link>
+              </Paper>
+            </Link>
+          )}
         </Stack>
       </RwdLayout>
 

@@ -1,95 +1,128 @@
 'use client'
 
+import { useRouter } from '@/navigation'
 import { useState } from 'react'
+import { useAsyncFn } from 'react-use'
 import { useAppSelector } from '@/hooks/redux'
 import { useDisclosure } from '@mantine/hooks'
+import { useReferral } from '@/store/contexts/user/referralContext'
 import { Space, Stack, Modal, Avatar, Group, Box } from '@mantine/core'
 import { Text, Title, Button, TextInput } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { getPublicUser } from '@/services/user'
 import { PiBarcode } from 'react-icons/pi'
-import type { PublicUser } from '@/types/db'
 
 export default function ReferCode() {
+  const router = useRouter()
   const { data, _id } = useAppSelector(state => state.user)
-
+  const { referer, isReferred, createState, createReferral } = useReferral()
   const [value, setValue] = useState('')
-  const [error, setError] = useState('')
   const [opened, { open, close }] = useDisclosure(false)
-  const [user, setUser] = useState<PublicUser>()
-  const [loading, setLoading] = useState(false)
 
-  const fetchUser = async () => {
-    try {
-      setLoading(true)
-      const user = await getPublicUser(value)
+  const [userState, fetchUser] = useAsyncFn(
+    async (username: string) => {
+      if (username === data.username) {
+        throw new Error('You cannot refer yourself.')
+      }
+
+      const user = await getPublicUser(username)
+
       if (user) {
-        setUser(user)
         open()
       } else {
-        setError('User not found. Please try another code.')
+        throw new Error('User not found. Please check the code.')
       }
-    } catch (err) {
-      console.error(err)
-      setError('An error occurred. Please try again later.')
-    } finally {
-      setLoading(false)
-    }
-  }
+
+      return user
+    },
+    [data]
+  )
 
   const handleSubmit = () => {
-    if (value === data.username) {
-      setError('You cannot refer yourself.')
-      return
-    }
+    if (isReferred) return
 
-    if (value === user?.username) {
+    if (value === userState.value?.username) {
       open()
       return
     }
 
     if (value) {
-      fetchUser()
+      fetchUser(value)
     }
+  }
+
+  const handleConfirm = async () => {
+    if (value) {
+      await createReferral(value)
+    }
+    close()
   }
 
   return (
     <>
       <RwdLayout>
         <Stack gap="xl">
-          <Title order={3}>Referral Code</Title>
+          {isReferred ? (
+            <>
+              <Title order={3}>Your Referer</Title>
 
-          <TextInput
-            leftSection={<PiBarcode size={24} />}
-            placeholder="Enter referral code"
-            value={value}
-            error={error}
-            onChange={event => {
-              setValue(event.currentTarget.value)
-              setError('')
-            }}
-          />
-          <Button disabled={opened} loading={loading} onClick={handleSubmit}>
-            Submit referral code
-          </Button>
+              <Stack align="center">
+                <Avatar size="lg" src={referer!.details.avatar}>
+                  {referer!.name?.substring(0, 1).toUpperCase()}
+                </Avatar>
+                <Box ta="center">
+                  <Title order={4} fw={500}>
+                    {referer!.name || 'No name'}
+                  </Title>
+                  <Text fz="xs" c="dimmed">
+                    {referer!.username ? `@${referer!.username}` : 'Error'}
+                  </Text>
+                </Box>
+              </Stack>
+
+              <Button onClick={() => router.back()}>Back</Button>
+            </>
+          ) : (
+            <>
+              <Title order={3}>Referral Code</Title>
+              <TextInput
+                leftSection={<PiBarcode size={24} />}
+                placeholder="Enter referral code"
+                value={value}
+                error={userState.error?.message}
+                onChange={event => {
+                  setValue(event.currentTarget.value)
+                }}
+              />
+              <Button disabled={opened} loading={userState.loading} onClick={handleSubmit}>
+                Submit referral code
+              </Button>
+            </>
+          )}
         </Stack>
       </RwdLayout>
 
       <Space h={100} />
 
       {/* Modal content */}
-      <Modal opened={opened} onClose={close} title="Confirm your friend" size="lg" centered>
+      <Modal
+        opened={opened && !isReferred}
+        onClose={close}
+        title="Confirm your friend"
+        size="lg"
+        centered
+      >
         <Stack gap="xl">
           <Stack align="center">
-            <Avatar size="lg" src={user?.details.avatar}>
-              {user?.name?.substring(0, 1).toUpperCase()}
+            <Avatar size="lg" src={userState.value?.details.avatar}>
+              {userState.value?.name?.substring(0, 1).toUpperCase()}
             </Avatar>
             <Box ta="center">
               <Title order={4} fw={500}>
-                {user?.name || 'No name'}
+                {userState.value?.name || 'No name'}
               </Title>
               <Text fz="xs" c="dimmed">
-                {user?.username ? `@${user.username}` : 'Error'}
+                {userState.value?.username ? `@${userState.value.username}` : 'Error'}
               </Text>
             </Box>
           </Stack>
@@ -98,7 +131,9 @@ export default function ReferCode() {
             <Button variant="outline" color="black" onClick={close}>
               Cancel
             </Button>
-            <Button>Confirm</Button>
+            <Button onClick={handleConfirm} disabled={isReferred} loading={createState.loading}>
+              Confirm
+            </Button>
           </Group>
         </Stack>
       </Modal>

@@ -1,7 +1,7 @@
 import * as _ from 'lodash-es'
 import { NextResponse, type NextRequest } from 'next/server'
 import dbConnect from '@/lib/dbConnect'
-import { getUserByUsername } from '@/lib/db/user'
+import { getUserByUsername, filterUserData } from '@/lib/db/user'
 
 export async function GET(req: NextRequest, { params }: { params: { username: string } }) {
   try {
@@ -15,13 +15,9 @@ export async function GET(req: NextRequest, { params }: { params: { username: st
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ user: filterData(user) })
+    return NextResponse.json({ user: filterUserData(user) })
   } catch (error) {
     console.error(error)
     NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
-}
-
-function filterData(data: any) {
-  return _.pick(data, ['username', 'name', 'details'])
 }

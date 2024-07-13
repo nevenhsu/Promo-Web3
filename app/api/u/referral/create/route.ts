@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { createReferral } from '@/lib/db/referral'
-import { getUserByUsername } from '@/lib/db/user'
+import { getUserByUsername, filterUserData } from '@/lib/db/user'
 
 // Create a referral for the current user
 export async function PUT(req: NextRequest) {
@@ -31,8 +31,11 @@ export async function PUT(req: NextRequest) {
     }
 
     const referral = await createReferral(referrerId, refereeId)
+    if (!referral) {
+      return NextResponse.json({ error: 'Referral already exists' }, { status: 400 })
+    }
 
-    return NextResponse.json({ referral })
+    return NextResponse.json({ referrer: filterUserData(referrerUser) })
   } catch (error) {
     console.error(error)
     NextResponse.json({ error: 'Internal server error' }, { status: 500 })

@@ -1,3 +1,4 @@
+import * as _ from 'lodash-es'
 import UserModel from '@/models/user'
 import type { User, TUser } from '@/models/user'
 
@@ -63,4 +64,8 @@ export async function updateUserById(_id: string, updateData: Partial<User>) {
     console.error('Error updating user:', error)
     throw error
   }
+}
+
+export function filterUserData(data: any) {
+  return _.pick(data, ['username', 'name', 'details'])
 }

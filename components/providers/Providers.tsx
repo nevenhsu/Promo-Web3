@@ -4,8 +4,9 @@ import '@/utils/console'
 
 import ReduxProvider from '@/store/ReduxProvider'
 import ThemeProvider from './ThemeProvider'
-import PrivyProvider from '../../wallet/PrivyProvider'
+import PrivyProvider from '@/wallet/PrivyProvider'
 import AuthProvider from './AuthProvider'
+import { ReferralProvider } from '@/store/contexts/user/referralContext'
 import BackgroundTask from './BackgroundTask'
 
 export default function Providers({ children }: React.PropsWithChildren) {
@@ -15,14 +16,24 @@ export default function Providers({ children }: React.PropsWithChildren) {
         <ReduxProvider>
           <ThemeProvider>
             <PrivyProvider>
-              <>
-                {children}
-                <BackgroundTask />
-              </>
+              <DataProviders>
+                <>
+                  {children}
+                  <BackgroundTask />
+                </>
+              </DataProviders>
             </PrivyProvider>
           </ThemeProvider>
         </ReduxProvider>
       </AuthProvider>
+    </>
+  )
+}
+
+function DataProviders({ children }: React.PropsWithChildren) {
+  return (
+    <>
+      <ReferralProvider>{children}</ReferralProvider>
     </>
   )
 }
