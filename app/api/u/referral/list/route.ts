@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid referral level' }, { status: 400 })
     }
 
-    const referrals = await getReferralByLevel(userId, level, limit, skip, sort)
+    const referrals = await getReferralByLevel(userId, level, skip, sort, limit)
 
     return NextResponse.json({
       referrals: referrals.map(o => {

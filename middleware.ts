@@ -5,6 +5,8 @@ import createIntlMiddleware from 'next-intl/middleware'
 import { i18nConfig } from './i18n'
 import { env } from '@/utils/env'
 
+export const publicPages = ['/', '/activity(/.*)?']
+
 const intlMiddleware = createIntlMiddleware(i18nConfig)
 
 const authMiddleware = withAuth(
@@ -74,8 +76,7 @@ export const config = {
   ],
 }
 
-function isPublicPage(pathname: string) {
-  const publicPages = ['/']
+export function isPublicPage(pathname: string) {
   const { locales } = i18nConfig
 
   const publicPathnameRegex = RegExp(

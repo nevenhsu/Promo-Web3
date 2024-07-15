@@ -1,30 +1,27 @@
 'use client'
 
+import { useEffect } from 'react'
 import { Link } from '@/navigation'
 import { Tabs, Group, Stack, Paper, Box, Space, Divider } from '@mantine/core'
 import { Title, Text, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { PiXLogo } from 'react-icons/pi'
-import classes from './index.module.css'
 
 enum TabValue {
-  All = 'all',
-  Joined = 'joined',
-  Unjoin = 'unjoin',
+  New = 'new',
+  Ended = 'ended',
 }
 
 export default function Activity() {
   return (
     <>
       <RwdLayout>
-        <Tabs defaultValue={TabValue.All}>
+        <Tabs defaultValue={TabValue.New}>
           <Tabs.List>
-            <Tabs.Tab value={TabValue.All}>All</Tabs.Tab>
-            <Tabs.Tab value={TabValue.Joined}>Joined</Tabs.Tab>
-            <Tabs.Tab value={TabValue.Unjoin}>Unjoin</Tabs.Tab>
+            <Tabs.Tab value={TabValue.New}>New</Tabs.Tab>
+            <Tabs.Tab value={TabValue.Ended}>Ended</Tabs.Tab>
           </Tabs.List>
 
-          <Tabs.Panel value={TabValue.All}>
+          <Tabs.Panel value={TabValue.New}>
             <Stack py={40}>
               <Paper px="md" radius="sm" shadow="xs">
                 <Group wrap="nowrap" align="stretch">

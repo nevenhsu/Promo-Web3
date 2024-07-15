@@ -105,9 +105,9 @@ export async function updateReferralScore(
 export async function getReferralByLevel(
   _referrer: string,
   level: number,
-  limit: number = 10,
   skip: number = 0,
-  sort: 'desc' | 'asc' = 'desc'
+  sort: 'desc' | 'asc' = 'desc',
+  limit: number = 10
 ) {
   const createdAt = sort === 'desc' ? -1 : 1
   const n = _.min([limit, 100]) || 1
@@ -115,8 +115,8 @@ export async function getReferralByLevel(
   try {
     const referral = await ReferralModel.find({ _referrer, level })
       .sort({ createdAt })
-      .limit(n)
       .skip(skip)
+      .limit(n)
       .populate<{ _referee: TUser }>('_referee')
       .exec()
 

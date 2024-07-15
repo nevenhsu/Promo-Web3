@@ -1,6 +1,63 @@
+import * as _ from 'lodash-es'
 import ActivityModel from '@/models/activity'
+import UserActivityStatusModel from '@/models/userActivityStatus'
 import { setMilliseconds } from 'date-fns'
 import type { Activity, ActivityDetail, ActivityAirDrop } from '@/models/activity'
+
+// ========================
+// Public functions to fetch activities
+// ========================
+
+export async function getPublicActivities(
+  ongoing: boolean = true,
+  skip: number = 0,
+  sort: 'desc' | 'asc' = 'desc',
+  limit: number = 10,
+  userId?: string // for joined status
+) {
+  const index = sort === 'asc' ? 1 : -1
+  const n = _.min([limit, 100]) || 1
+
+  try {
+    const now = new Date()
+    const activities = await ActivityModel.find({
+      published: true,
+      endTime: ongoing ? { $gt: now } : { $lte: now },
+    })
+      .sort({ index })
+      .skip(skip)
+      .limit(n)
+      .exec()
+
+    const joinedIds: { [id: string]: boolean } = {}
+
+    if (userId && activities.length > 0) {
+      const activityIds = activities.map(activity => activity._id)
+      const activityStatus = await UserActivityStatusModel.find({
+        _activity: { $in: activityIds },
+        _user: userId,
+        status: { $gte: 0 },
+      })
+      activityStatus.forEach(o => {
+        joinedIds[o._activity.toString()] = true
+      })
+    }
+
+    // add join status to activities
+    return activities.map(activity => {
+      const joined = joinedIds[activity._id.toString()] || false
+      const doc = activity.toJSON()
+      return { ...doc, joined }
+    })
+  } catch (error) {
+    console.error('Error getting activities:', error)
+    throw error
+  }
+}
+
+// ========================
+// Only for admin to create, update, delete activities
+// ========================
 
 type NewActivityData = {
   startTime: any

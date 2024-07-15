@@ -39,6 +39,13 @@ export enum ReferralLevel {
   Second = 2,
 }
 
+export enum ActivityStatus {
+  Unjoined = -1, // Created by referees
+  Initial = 0,
+  Completed = 1,
+  Error = 2,
+}
+
 export const levelPoints = {
   0: { min: 0, max: 25000 },
   1: { min: 25000, max: 50000 },

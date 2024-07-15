@@ -1,0 +1,26 @@
+import * as _ from 'lodash-es'
+import { NextResponse, type NextRequest } from 'next/server'
+import { getToken } from 'next-auth/jwt'
+import dbConnect from '@/lib/dbConnect'
+import { getPublicActivities } from '@/lib/db/activity'
+
+export async function POST(req: NextRequest) {
+  try {
+    const token = await getToken({ req })
+    const userId = token?.user?.id
+
+    const { ongoing, skip = 0, sort = 'desc', limit = 10 } = await req.json()
+
+    await dbConnect()
+
+    const activities = await getPublicActivities(ongoing, skip, sort, limit, userId)
+
+    const hasMore = activities.length === limit
+    const nextSkip = hasMore ? skip + limit : undefined
+
+    return NextResponse.json({ data: activities, hasMore, nextSkip })
+  } catch (error) {
+    console.error(error)
+    NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}

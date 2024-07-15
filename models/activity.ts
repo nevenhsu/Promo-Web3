@@ -26,6 +26,7 @@ export const schema = new Schema({
   socialMedia: { type: String, enum: SocialMedia, required: true },
   details: { type: detailSchema, required: true },
   airdrop: { type: airdropSchema, required: true },
+  published: { type: Boolean, default: false },
 })
 
 export type Activity = InferSchemaType<typeof schema>
@@ -42,7 +43,9 @@ export type TActivity = {
   socialMedia: string // SocialMedia
   details: ActivityDetail
   airdrop: ActivityAirDrop
+  published: boolean // for public view
 }
+export type TPublicActivity = TActivity & { joined: boolean }
 
 schema.set('validateBeforeSave', false)
 
