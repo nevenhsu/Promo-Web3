@@ -4,8 +4,8 @@ import { lang } from './fields/lang'
 import { isPostUnique } from './lib/isPostUnique'
 
 export default defineType({
-  name: 'activity',
-  title: 'Activity',
+  name: 'page',
+  title: 'Page',
   type: 'document',
   fieldsets: [
     { name: 'password', title: 'Password', options: { collapsible: false, columns: 1 } },

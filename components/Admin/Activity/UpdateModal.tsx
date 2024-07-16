@@ -8,7 +8,7 @@ import { useWeb3 } from '@/wallet/Web3Context'
 import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Text, Button } from '@mantine/core'
-import { TextInput, Textarea, Select } from '@mantine/core'
+import { TextInput, Textarea, Select, Switch } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
 import { formateDate } from '@/utils/helper'
 import { publicEnv } from '@/utils/env'
@@ -38,6 +38,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
     link: string
     coverUrl: string
     thumbnailUrl: string
+    published: boolean
   }>({
     mode: 'uncontrolled',
     initialValues: {
@@ -53,6 +54,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
       link: '',
       coverUrl: '',
       thumbnailUrl: '',
+      published: false,
     },
     validate: {
       startTime: (value, values) => {
@@ -97,6 +99,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
         link: selectedActivity.details.link || '',
         coverUrl: selectedActivity.details.coverUrl || '',
         thumbnailUrl: selectedActivity.details.thumbnailUrl || '',
+        published: selectedActivity.published || false,
       })
     }
   }, [selectedActivity, opened])
@@ -245,6 +248,8 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
                 placeholder="Thumbnail image URL"
                 {...form.getInputProps('thumbnailUrl')}
               />
+
+              <Switch label="Published" {...form.getInputProps('published')} />
 
               <Box mb="md" />
 

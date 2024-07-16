@@ -9,3 +9,22 @@ export const chips = [
   { label: '@ in Post', value: `${ActivityType.MentionInPost}` },
   { label: '@ in Comment', value: `${ActivityType.MentionInComment}` },
 ]
+
+export const getActionLabel = (type: number) => {
+  switch (type) {
+    case ActivityType.Follow:
+      return 'Follow'
+    case ActivityType.Repost:
+      return 'Repost'
+    case ActivityType.Like:
+      return 'Like'
+    case ActivityType.Comment:
+      return 'Comment'
+    case ActivityType.MentionInPost:
+      return '@ in Post'
+    case ActivityType.MentionInComment:
+      return '@ in Comment'
+    default:
+      return 'All'
+  }
+}

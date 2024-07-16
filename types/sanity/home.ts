@@ -1,5 +1,5 @@
 import type { HrefData } from './href'
-import type { ActivityData } from './activity'
+import type { PageData } from './page'
 
 export type HomeData = {
   header: string
@@ -12,5 +12,5 @@ export type HomeData = {
   captionHref: HrefData
   newsTitle: string
   arrowText: string
-  activities: Array<Omit<ActivityData, 'content'> & { _id: string }>
+  pages: Array<Omit<PageData, 'content'> & { _id: string }>
 }

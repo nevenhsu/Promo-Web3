@@ -10,14 +10,19 @@ type Response = {
 export const getPublicActivities = async (
   ongoing: boolean,
   skip = 0,
-  sort = 'desc',
-  limit = 10
+  limit = 10,
+  sort: 'desc' | 'asc' = 'desc'
 ): Promise<Response> => {
   const { data } = await axios.post<Response>('/api/public/activity', {
     ongoing,
     skip,
-    sort,
     limit,
+    sort,
   })
+  return data
+}
+
+export const getPublicActivitiesTotal = async () => {
+  const { data } = await axios.get<{ ongoing: number; past: number }>('/api/public/activity/total')
   return data
 }

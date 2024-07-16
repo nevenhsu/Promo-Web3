@@ -26,7 +26,7 @@ export const schema = new Schema({
   socialMedia: { type: String, enum: SocialMedia, required: true },
   details: { type: detailSchema, required: true },
   airdrop: { type: airdropSchema, required: true },
-  published: { type: Boolean, default: false },
+  published: { type: Boolean, default: false, index: true },
 })
 
 export type Activity = InferSchemaType<typeof schema>

@@ -1,13 +1,14 @@
 'use client'
 
 import { useRef } from 'react'
-import { Stack, Button, Paper, Table, Group, Divider, ActionIcon, Text } from '@mantine/core'
+import { Stack, Paper, Table, Group, Divider } from '@mantine/core'
+import { Button, ActionIcon, Text, Box } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { useActivity } from '@/store/contexts/admin/ActivityContext'
 import AddModel, { type AddModalRef } from './AddModal'
 import UpdateModal, { type UpdateModalRef } from './UpdateModal'
 import DeleteModal, { type DeleteModalRef } from './DeleteModal'
-import { PiPencil, PiTrash } from 'react-icons/pi'
+import { PiPencil, PiTrash, PiPauseFill, PiPlayFill } from 'react-icons/pi'
 import { formateDate } from '@/utils/helper'
 import classes from './index.module.css'
 
@@ -21,7 +22,12 @@ export default function AdminEpoch() {
   const rows = activities.map(o => (
     <Table.Tr key={o.index}>
       <Table.Td>
-        <Text style={{ textOverflow: 'ellipsis', width: 200, overflow: 'hidden' }}>{o.title}</Text>
+        <Box c={o.published ? 'green' : 'red'}>
+          {o.published ? <PiPlayFill size={20} /> : <PiPauseFill size={20} />}
+        </Box>
+      </Table.Td>
+      <Table.Td>
+        <Text style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{o.title}</Text>
       </Table.Td>
       <Table.Td>
         <Text>{`${o.airdrop.amount} ${o.airdrop.symbol}`}</Text>
@@ -81,6 +87,7 @@ export default function AdminEpoch() {
               <Table>
                 <Table.Thead>
                   <Table.Tr>
+                    <Table.Th></Table.Th>
                     <Table.Th>Title</Table.Th>
                     <Table.Th>Airdrop</Table.Th>
                     <Table.Th>Start</Table.Th>

@@ -11,7 +11,7 @@ import socialMedia from './types/socialMedia'
 import blockContent from './types/blockContent'
 import content from './types/content'
 import home from './home'
-import activity from './activity'
+import page from './page'
 import category from './category'
 import footer from './footer'
 import avatar from './avatar'
@@ -38,7 +38,7 @@ export const schemaTypes = [
   blockContent,
   content,
   home,
-  activity,
+  page,
   footer,
   avatar,
   member,

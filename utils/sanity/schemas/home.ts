@@ -68,9 +68,9 @@ export default defineType({
       fieldset: 'news',
     }),
     defineField({
-      name: 'activities',
+      name: 'pages',
       type: 'array',
-      of: [{ type: 'reference', to: { type: 'activity' } }],
+      of: [{ type: 'reference', to: { type: 'page' } }],
     }),
   ],
   preview: {

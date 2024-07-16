@@ -16,7 +16,7 @@ export function getGMT(date: string | number | Date) {
   return formattedDate
 }
 
-export function formateDate(date: string | number | Date, formatStr = 'MMM dd yyyy') {
+export function formateDate(date: string | number | Date, formatStr = 'dd MMM yyyy') {
   const time = toZonedTime(date, timezone)
   const formattedDate = format(time, formatStr, { timeZone: timezone })
   return formattedDate

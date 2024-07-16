@@ -9,11 +9,11 @@ export async function POST(req: NextRequest) {
     const token = await getToken({ req })
     const userId = token?.user?.id
 
-    const { ongoing, skip = 0, sort = 'desc', limit = 10 } = await req.json()
+    const { ongoing, skip = 0, limit = 10, sort = 'desc' } = await req.json()
 
     await dbConnect()
 
-    const activities = await getPublicActivities(ongoing, skip, sort, limit, userId)
+    const activities = await getPublicActivities(ongoing, skip, limit, sort, userId)
 
     const hasMore = activities.length === limit
     const nextSkip = hasMore ? skip + limit : undefined

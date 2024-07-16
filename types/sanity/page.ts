@@ -4,7 +4,7 @@ import type { CategoryData } from './category'
 import type { AvatarData } from './avatar'
 import type { SanityArray, SanitySlug } from './common'
 
-export type ActivityData = SanitySlug & {
+export type PageData = SanitySlug & {
   title: string
   description: string
   locked: boolean

@@ -8,11 +8,26 @@ import type { Activity, ActivityDetail, ActivityAirDrop } from '@/models/activit
 // Public functions to fetch activities
 // ========================
 
+export async function getPublicActivitiesTotal(ongoing: boolean = true) {
+  try {
+    const now = new Date()
+    const total = await ActivityModel.countDocuments({
+      published: true,
+      endTime: ongoing ? { $gt: now } : { $lte: now },
+    }).exec()
+
+    return total
+  } catch (error) {
+    console.error('Error getting activities total:', error)
+    throw error
+  }
+}
+
 export async function getPublicActivities(
   ongoing: boolean = true,
   skip: number = 0,
-  sort: 'desc' | 'asc' = 'desc',
   limit: number = 10,
+  sort: 'desc' | 'asc' = 'desc',
   userId?: string // for joined status
 ) {
   const index = sort === 'asc' ? 1 : -1

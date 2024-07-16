@@ -33,7 +33,7 @@ const memberQuery = groq`
   }
 `
 
-const activityDataQuery = groq`
+const pageDataQuery = groq`
   ...,
   categories[]->,
   mainImage {
@@ -67,7 +67,7 @@ export const homeQuery = groq`
 {
   ...,
   activities[]-> {
-    ${activityDataQuery}
+    ${pageDataQuery}
     "content": null,
   },
   gallery {
@@ -125,7 +125,7 @@ export async function getFooterData(): Promise<Partial<FooterData>> {
 }
 
 export const slugQuery = groq`
-*[_type=='activity']
+*[_type=='page']
 {
   slug
 }
@@ -190,25 +190,25 @@ const blockContent = groq`
 }
 `
 
-export const activityQuery = groq`
-*[_type=='activity' && slug.current==$slug && lang==$lang][0]
+export const pageQuery = groq`
+*[_type=='page' && slug.current==$slug && lang==$lang][0]
 { 
-  ${activityDataQuery}
+  ${pageDataQuery}
   content[] ${blockContent},
 }
 `
 
-export const activityMetaQuery = groq`
-*[_type=='activity' && slug.current==$slug && lang==$lang][0]
+export const pageMetaQuery = groq`
+*[_type=='page' && slug.current==$slug && lang==$lang][0]
 { 
-  ${activityDataQuery}
+  ${pageDataQuery}
   "content": null
 }
 `
 
-export async function getActivityData(slug: string, lang: string) {
+export async function getPageData(slug: string, lang: string) {
   try {
-    const data = await client.fetch(activityQuery, { slug, lang })
+    const data = await client.fetch(pageQuery, { slug, lang })
     return data
   } catch (err) {
     console.error(err)
@@ -216,17 +216,17 @@ export async function getActivityData(slug: string, lang: string) {
   }
 }
 
-export const activitiesQuery = groq`
-*[_type=='activity' && lang==$lang && hidden!=true] | order(publishedAt desc)
+export const pagesQuery = groq`
+*[_type=='page' && lang==$lang && hidden!=true] | order(publishedAt desc)
 { 
-  ${activityDataQuery} 
+  ${pageDataQuery} 
   "content": null
 }
 `
 
-export async function getActivitiesData(lang: string) {
+export async function getPagesData(lang: string) {
   try {
-    const data = await client.fetch(activitiesQuery, { lang })
+    const data = await client.fetch(pagesQuery, { lang })
     return data
   } catch (err) {
     console.error(err)
