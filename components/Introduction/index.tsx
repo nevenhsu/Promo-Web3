@@ -1,9 +1,8 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useRouter } from '@/navigation'
-import { useLocalStorage } from 'react-use'
 import { useSearchParams } from 'next/navigation'
+import { usePromo } from '@/hooks/usePromo'
 import useLogin from '@/hooks/useLogin'
 import { useAppSelector } from '@/hooks/redux'
 import { Button } from '@mantine/core'
@@ -13,9 +12,7 @@ export default function Index() {
   const router = useRouter()
   const { _id } = useAppSelector(state => state.user)
   const searchParams = useSearchParams()
-  const [promo] = useLocalStorage<string>('promo')
-
-  console.log({ promo })
+  const promo = usePromo()
 
   const { login, authenticated } = useLogin({
     onComplete: (user, isNewUser, wasAlreadyAuthenticated) => {

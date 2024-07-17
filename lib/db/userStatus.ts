@@ -1,4 +1,4 @@
-import UserStatusModel, { type UserStatus } from '@/models/userStatus'
+import UserStatusModel from '@/models/userStatus'
 import { ReferralLevel } from '@/types/db'
 
 export async function getUserStatus(userId: string) {
@@ -20,22 +20,16 @@ export async function getUserStatus(userId: string) {
 
 export async function addReferralNumber(userId: string, level: ReferralLevel) {
   try {
-    const userStatus = await getUserStatus(userId)
+    // Increase the referral number based on the level
+    const inc = level === ReferralLevel.First ? { referral1stNumber: 1 } : { referral2ndNumber: 1 }
 
-    switch (level) {
-      case ReferralLevel.First:
-        userStatus.referral1stNumber++
-        console.log('userStatus: increase referral1stNumber', userId)
-        break
-      case ReferralLevel.Second:
-        userStatus.referral2ndNumber++
-        console.log('userStatus: increase referral2ndNumber', userId)
-        break
-      default:
-        break
-    }
+    const status = await UserStatusModel.findOneAndUpdate(
+      { _user: userId },
+      { $inc: inc },
+      { upsert: true, new: true }
+    )
 
-    await userStatus.save()
+    return status
   } catch (error) {
     console.error('Error increasing user status:', error)
     throw error

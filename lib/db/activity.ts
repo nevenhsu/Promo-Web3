@@ -104,6 +104,21 @@ export async function getPublicActivityDetails(slug: string) {
 // Only for admin to create, update, delete activities
 // ========================
 
+export async function getActivityId(slug: string) {
+  try {
+    const data = await ActivityModel.findOne({
+      slug,
+    })
+      .select('index')
+      .exec()
+
+    return data?._id.toString()
+  } catch (error) {
+    console.error('Error getting activity details:', error)
+    throw error
+  }
+}
+
 type NewActivityData = {
   startTime: any
   endTime: any

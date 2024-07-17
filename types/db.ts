@@ -43,7 +43,7 @@ export enum ActivityStatus {
   Unjoined = -1, // Created by referees
   Initial = 0,
   Completed = 1,
-  Error = 2,
+  Error = 4,
 }
 
 export const levelPoints = {

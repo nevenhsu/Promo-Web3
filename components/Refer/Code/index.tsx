@@ -2,7 +2,9 @@
 
 import { useRouter } from '@/navigation'
 import { useState } from 'react'
-import { useAsyncFn, useLocalStorage } from 'react-use'
+import { useAsyncFn } from 'react-use'
+import { useSearchParams } from 'next/navigation'
+import { usePromo } from '@/hooks/usePromo'
 import { useAppSelector } from '@/hooks/redux'
 import { useDisclosure } from '@mantine/hooks'
 import { useReferral } from '@/store/contexts/user/referralContext'
@@ -14,11 +16,12 @@ import { PiBarcode } from 'react-icons/pi'
 
 export default function ReferCode() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { data, _id } = useAppSelector(state => state.user)
   const { referer, isReferred, createState, createReferral } = useReferral()
 
-  // Get promo code from local storage
-  const [promo] = useLocalStorage<string>('promo')
+  // Get promo code
+  const promo = usePromo()
   const [value, setValue] = useState(promo || '')
   const [opened, { open, close }] = useDisclosure(false)
 
@@ -61,6 +64,17 @@ export default function ReferCode() {
     close()
   }
 
+  const handleBack = () => {
+    // handle auth callbackUrl
+    const callbackUrl = searchParams.get('callbackUrl')
+    if (callbackUrl?.startsWith('/')) {
+      // @ts-ignore
+      router.push(callbackUrl)
+    } else {
+      router.push('/activity')
+    }
+  }
+
   return (
     <>
       <RwdLayout>
@@ -83,7 +97,7 @@ export default function ReferCode() {
                 </Box>
               </Stack>
 
-              <Button onClick={() => router.push('/activity')}>Back</Button>
+              <Button onClick={handleBack}>Back</Button>
             </>
           ) : (
             <>

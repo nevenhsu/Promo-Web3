@@ -24,6 +24,8 @@ export const schema = new Schema({
   createdAt: { type: Date, default: Date.now, index: true },
 })
 
+schema.index({ _referrer: 1, _referee: 1 }, { unique: true }) // unique index for referrer and referee
+
 export type Referral = InferSchemaType<typeof schema>
 export type TReferral = {
   _referrer: string

@@ -1,11 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
 import { Link, usePathname, useRouter } from '@/navigation'
-import { useSearchParams } from 'next/navigation'
-import { useLocalStorage } from 'react-use'
 import { useAppSelector } from '@/hooks/redux'
 import { usePrivy } from '@privy-io/react-auth'
+import { usePromo } from '@/hooks/usePromo'
 import { Group, Box, ActionIcon, Avatar } from '@mantine/core'
 import Logo from '@/public/icons/logo.svg'
 import { PiCaretLeft } from 'react-icons/pi'
@@ -13,6 +11,7 @@ import { PiCaretLeft } from 'react-icons/pi'
 export default function Header() {
   const router = useRouter()
   const pathname = usePathname()
+  usePromo() // Save promo code
 
   const { authenticated } = usePrivy()
   const { data, _id } = useAppSelector(state => state.user)
@@ -21,17 +20,6 @@ export default function Header() {
   const avatar = details?.avatar || ''
 
   const hasPreviousPage = pathname.split('/').length > 2
-
-  // Get promo code from query params
-  const searchParams = useSearchParams()
-  const promo = searchParams.get('promo') || ''
-  const [_promo, setPromo] = useLocalStorage<string>('promo', promo)
-
-  useEffect(() => {
-    if (promo && promo !== _promo) {
-      setPromo(promo)
-    }
-  }, [promo, _promo])
 
   return (
     <>

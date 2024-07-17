@@ -8,6 +8,7 @@ type Response = {
 }
 
 export const getPublicActivityDetails = async (slug: string) => {
+  if (!slug) return null
   const { data } = await axios.get<{ details: ActivityDetail }>(`/api/public/activity/data/${slug}`)
   return data.details
 }

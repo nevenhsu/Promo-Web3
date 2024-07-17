@@ -2,9 +2,9 @@ import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 
 const airdropSchema = new Schema({
   chainId: Number,
-  tokenAddress: String,
-  receivedAmount: String,
-  pendingAmount: String,
+  symbol: String,
+  receivedAmount: { type: String, default: '0' },
+  pendingAmount: { type: String, default: '0' },
 })
 
 export const schema = new Schema({
