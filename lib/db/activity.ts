@@ -70,6 +70,36 @@ export async function getPublicActivities(
   }
 }
 
+export async function getPublicActivity(slug: string) {
+  try {
+    const activity = await ActivityModel.findOne({
+      slug,
+      published: true,
+    }).exec()
+
+    return activity
+  } catch (error) {
+    console.error('Error getting activity:', error)
+    throw error
+  }
+}
+
+export async function getPublicActivityDetails(slug: string) {
+  try {
+    const data = await ActivityModel.findOne({
+      slug,
+      published: true,
+    })
+      .select('details')
+      .exec()
+
+    return data?.details
+  } catch (error) {
+    console.error('Error getting activity details:', error)
+    throw error
+  }
+}
+
 // ========================
 // Only for admin to create, update, delete activities
 // ========================

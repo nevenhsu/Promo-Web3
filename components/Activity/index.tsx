@@ -8,6 +8,7 @@ import { Title, Text, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { getActionLabel } from './variables'
 import { formatDate } from '@/utils/date'
+import { formatNumber } from '@/utils/math'
 import type { TPublicActivity } from '@/models/activity'
 
 enum TabValue {
@@ -80,7 +81,7 @@ function ActivityItem({ data }: { data: TPublicActivity }) {
                 {data.airdrop.symbol}
               </Text>
               <Title order={3} c="orange">
-                {data.airdrop.amount}
+                {formatNumber(data.airdrop.amount)}
               </Title>
             </Box>
             <Text ta="center" fz="xs" c="dimmed">

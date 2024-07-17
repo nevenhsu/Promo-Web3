@@ -1,16 +1,34 @@
 'use client'
 
-import { getTweet as _getTweet } from 'react-tweet/api'
+import { useEffect } from 'react'
+import { useAsyncFn } from 'react-use'
+import { getPublicActivityDetails } from '@/services/activity'
 import { Group, Stack, Box, Space, Divider, Paper } from '@mantine/core'
 import { Title, Text, Button, ThemeIcon, Progress } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiLightning, PiPersonSimpleRun, PiTrophy, PiCheckBold } from 'react-icons/pi'
-import classes from '../index.module.css'
+import { formatDate } from '@/utils/date'
+import { formatNumber } from '@/utils/math'
+import { getActionLabel } from '../variables'
+import type { TPublicActivity } from '@/models/activity'
 
-type ActivityDetailProps = { slug: string; children?: React.ReactNode }
+type ActivityDetailProps = { data: TPublicActivity; children?: React.ReactNode }
 
-export default function ActivityDetail({ slug, children }: ActivityDetailProps) {
-  console.log({ slug })
+export default function ActivityDetail({ data, children }: ActivityDetailProps) {
+  const { slug } = data
+
+  const [fetchDetailsState, fetchDetails] = useAsyncFn(async (slug: string) => {
+    const details = await getPublicActivityDetails(slug)
+    return details
+  }, [])
+
+  const { value: details } = fetchDetailsState
+
+  useEffect(() => {
+    if (slug) {
+      fetchDetails(slug)
+    }
+  }, [slug])
 
   return (
     <>
@@ -18,19 +36,17 @@ export default function ActivityDetail({ slug, children }: ActivityDetailProps) 
         <Stack gap="lg">
           <Box>
             <Text c="dimmed" fz="xs">
-              6 Jun 2024 ~ 31 Jul 2024
+              {formatDate(new Date(data.startTime))} ~ {formatDate(new Date(data.endTime))}
             </Text>
-            <Title order={3}>Taitra Tech Promotion</Title>
+            <Title order={3}>{data.title}</Title>
           </Box>
 
           <Text fz="sm" c="dark">
-            RAMAYANA BALLET at Purawisata – Jogjakarta – Indonesia, has held the record for
-            every-night stage without ever being off for 42 YEARS, and received an award from The
-            Indonesia Records Museum (MURI) in 2001.
+            {data.description}
           </Text>
 
           <Title order={4} c="orange">
-            200 USDC
+            {formatNumber(data.airdrop.amount)} {data.airdrop.symbol}
           </Title>
 
           <Stack gap="sm">
@@ -141,25 +157,31 @@ export default function ActivityDetail({ slug, children }: ActivityDetailProps) 
             <Stack gap="xs">
               <Group gap="xs">
                 <PiLightning size={20} />
-                <Text fz="sm">Repost on X</Text>
+                <Text fz="sm">
+                  {getActionLabel(data.activityType)} on {data.socialMedia.toUpperCase()}
+                </Text>
               </Group>
 
-              <Group gap="xs">
-                <PiPersonSimpleRun size={20} />
-                <Text fz="sm"> 123 Participants</Text>
-              </Group>
+              {details ? (
+                <>
+                  <Group gap="xs">
+                    <PiPersonSimpleRun size={20} />
+                    <Text fz="sm">{formatNumber(details.participants)} Participants</Text>
+                  </Group>
 
-              <Group gap="xs">
-                <PiTrophy size={20} />
-                <Text fz="sm">1.8m Total score</Text>
-              </Group>
+                  <Group gap="xs">
+                    <PiTrophy size={20} />
+                    <Text fz="sm">{formatNumber(details.totalScore)} Total score</Text>
+                  </Group>
+                </>
+              ) : null}
             </Stack>
             <Divider />
           </>
 
           <Stack>
             <Button variant="outline">Open link</Button>
-            <Button>Mark completed</Button>
+            <Button>{getActionLabel(data.activityType)} completed</Button>
           </Stack>
 
           {/* Embedded Post */}

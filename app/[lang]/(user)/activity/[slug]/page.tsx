@@ -3,6 +3,8 @@ import { unstable_cache } from 'next/cache'
 import { getTweet as _getTweet } from 'react-tweet/api'
 import { TweetSkeleton, EmbeddedTweet, TweetNotFound } from 'react-tweet'
 import ActivityDetail from '@/components/Activity/Detail'
+import dbConnect from '@/lib/dbConnect'
+import { getPublicActivity } from '@/lib/db/activity'
 
 export const revalidate = 3600 // revalidate at most every hour
 
@@ -10,18 +12,27 @@ const getTweet = unstable_cache(async (id: string) => _getTweet(id), ['tweet'], 
   revalidate,
 })
 
-export default function ActivityDetailPage({
+export default async function ActivityDetailPage({
   params: { lang, slug },
 }: {
   params: { lang: string; slug: string }
 }) {
-  // TODO: get post link from db
+  await dbConnect()
+  const activity = await getPublicActivity(slug)
+  const postLink = activity?.details.link || ''
+
+  if (!activity) {
+    // TODO: Show 404 page
+    return null
+  }
+
+  //  Warning: Only plain objects can be passed to Client Components
   return (
     <>
-      <ActivityDetail slug={slug}>
+      <ActivityDetail data={JSON.parse(JSON.stringify(activity))}>
         {/* Embedded Post */}
         <Suspense fallback={<TweetSkeleton />}>
-          <TweetPage id="1629307668568633344" />
+          <TweetPage id={postLink} />
         </Suspense>
       </ActivityDetail>
     </>
@@ -30,8 +41,11 @@ export default function ActivityDetailPage({
 
 async function TweetPage({ id }: { id: string }) {
   try {
+    if (!id) {
+      return <TweetNotFound />
+    }
+
     const tweet = await getTweet(id)
-    console.log('Successfully fetch tweet', id)
     return tweet ? <EmbeddedTweet tweet={tweet} /> : <TweetNotFound />
   } catch (error) {
     console.error(error)

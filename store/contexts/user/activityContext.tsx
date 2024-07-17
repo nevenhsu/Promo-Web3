@@ -1,5 +1,6 @@
 'use client'
 
+import * as _ from 'lodash-es'
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { getPublicActivities, getPublicActivitiesTotal } from '@/services/activity'
 import { useAsyncFn } from 'react-use'
@@ -35,7 +36,6 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const [fetchOngoingState, fetchOngoingActivities] = useAsyncFn(async () => {
     const { hasMore, nextSkip } = dataRef.current
-
     if (!hasMore.ongoing) return
 
     const res = await getPublicActivities(true, nextSkip.ongoing, limit)
@@ -43,13 +43,14 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     dataRef.current.nextSkip.ongoing = res.nextSkip || 0
 
     setOngoing(prev => {
-      return { data: [...prev.data, ...res.data], times: prev.times + 1 }
+      const data = _.uniqBy([...prev.data, ...res.data], 'index')
+      const times = _.ceil(data.length / limit)
+      return { data, times }
     })
   }, [])
 
   const [fetchPastState, fetchPastActivities] = useAsyncFn(async () => {
     const { hasMore, nextSkip } = dataRef.current
-
     if (!hasMore.past) return
 
     const res = await getPublicActivities(true, nextSkip.past, limit)
@@ -57,7 +58,9 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     dataRef.current.nextSkip.past = res.nextSkip || 0
 
     setPast(prev => {
-      return { data: [...prev.data, ...res.data], times: prev.times + 1 }
+      const data = _.uniqBy([...prev.data, ...res.data], 'index')
+      const times = _.ceil(data.length / limit)
+      return { data, times }
     })
   }, [])
 

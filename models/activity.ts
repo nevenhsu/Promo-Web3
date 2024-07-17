@@ -2,11 +2,11 @@ import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import { ActivityType, SocialMedia } from '@/types/db'
 
 const detailSchema = new Schema({
-  link: { type: String, require: true }, // post id
-  coverUrl: String,
-  thumbnailUrl: String,
+  link: { type: String, required: true }, // post id
   participants: { type: Number, default: 0 },
   totalScore: { type: Number, default: 0 },
+  coverUrl: String,
+  thumbnailUrl: String,
 })
 
 const airdropSchema = new Schema({

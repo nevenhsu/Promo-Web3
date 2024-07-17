@@ -1,10 +1,15 @@
 import axios from 'axios'
-import type { TPublicActivity } from '@/models/activity'
+import type { TPublicActivity, ActivityDetail } from '@/models/activity'
 
 type Response = {
   data: TPublicActivity[]
   hasMore: boolean
   nextSkip?: number
+}
+
+export const getPublicActivityDetails = async (slug: string) => {
+  const { data } = await axios.get<{ details: ActivityDetail }>(`/api/public/activity/data/${slug}`)
+  return data.details
 }
 
 export const getPublicActivities = async (
