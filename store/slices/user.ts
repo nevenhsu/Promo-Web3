@@ -48,6 +48,10 @@ export const slice = createSlice({
     setFetched: (state, action: PayloadAction<boolean>) => {
       state.fetched = action.payload
     },
+    clearData: state => {
+      // for logout
+      _.merge(state, initialState)
+    },
   },
   extraReducers: builder => {
     builder.addCase(fetchUser.fulfilled, (state, action) => {
@@ -69,5 +73,5 @@ export const slice = createSlice({
   },
 })
 
-export const { setFetched } = slice.actions
+export const { setFetched, clearData } = slice.actions
 export const userReducer = slice.reducer

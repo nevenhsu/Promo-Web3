@@ -48,6 +48,7 @@ export const i18nConfig = {
     '/profile': '/profile',
     '/profile/info': '/profile/info',
     '/profile/info/avatar': '/profile/info/avatar',
+    '/profile/account': '/profile/account',
 
     // refer
     '/refer': '/refer',

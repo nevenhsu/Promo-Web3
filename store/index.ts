@@ -7,7 +7,6 @@ import { logger } from './logger'
 const userPersistConfig = {
   key: 'user',
   storage,
-  whitelist: ['_id'],
   version: 1,
 }
 

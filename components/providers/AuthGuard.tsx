@@ -2,27 +2,32 @@
 
 import { useEffect } from 'react'
 import { useRouter, usePathname } from '@/navigation'
+import { usePrivy } from '@privy-io/react-auth'
 import { useSession } from 'next-auth/react'
 import { isPublicPage } from '@/middleware'
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { status } = useSession()
   const router = useRouter()
   const pathname = usePathname()
+  const { ready, authenticated } = usePrivy()
+  const { status } = useSession()
 
   const isPublic = isPublicPage(pathname)
-  const authenticated = status === 'authenticated'
+  const authOnServer = status === 'authenticated'
+  const authOnBoth = authOnServer && authenticated
+  const notAuthOnPrivy = ready && !authenticated
 
   useEffect(() => {
     if (isPublic) {
       return
     }
 
-    if (status === 'unauthenticated') {
+    if (notAuthOnPrivy) {
       // Redirect to index if not authenticated
       router.push('/')
     }
-  }, [status, isPublic])
+  }, [isPublic, notAuthOnPrivy])
 
-  return <>{isPublic || authenticated ? <>{children}</> : <></>}</>
+  // TODO: show loading screen
+  return <>{isPublic || authOnBoth ? <>{children}</> : <></>}</>
 }

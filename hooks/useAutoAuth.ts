@@ -15,7 +15,7 @@ export default function useAutoAuth() {
   const { getAccessToken, user } = usePrivy()
   const privyId = user?.id
 
-  const authenticated = status === 'authenticated'
+  const authOnServer = status === 'authenticated'
   const notAuthOnServer = status === 'unauthenticated'
 
   const getAuthToken = async () => {
@@ -37,10 +37,10 @@ export default function useAutoAuth() {
 
   // on init
   useEffect(() => {
-    if (authenticated) {
+    if (authOnServer) {
       dispatch(fetchUser())
     }
-  }, [authenticated])
+  }, [authOnServer])
 
   return null
 }

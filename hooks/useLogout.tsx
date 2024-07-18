@@ -1,24 +1,22 @@
 'use client'
 
-import { useRouter } from '@/navigation'
+import { useAppDispatch } from '@/hooks/redux'
+import { clearData } from '@/store/slices/user'
 import { signOut } from 'next-auth/react'
 import { useLogout as _useLogout } from '@privy-io/react-auth'
 import { modals } from '@mantine/modals'
 import { Text } from '@mantine/core'
 
 export default function useLogout() {
-  const router = useRouter()
+  const dispatch = useAppDispatch()
 
+  // Privy logout
   const { logout } = _useLogout({
     onSuccess: () => {
-      router.push('/')
+      dispatch(clearData())
+      signOut({ callbackUrl: '/home' }) // NextAuth logout
     },
   })
-
-  const handleConfirm = () => {
-    logout()
-    signOut()
-  }
 
   const openLogoutModal = () =>
     modals.openConfirmModal({
@@ -29,7 +27,7 @@ export default function useLogout() {
         </Text>
       ),
       labels: { confirm: 'Yes, logout', cancel: 'Cancel' },
-      onConfirm: handleConfirm,
+      onConfirm: logout,
     })
 
   return { openLogoutModal }

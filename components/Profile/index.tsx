@@ -8,7 +8,7 @@ import { Title, Text, ActionIcon, Button, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import useLogout from '@/hooks/useLogout'
 import { PiCaretRight, PiPencilSimpleLine, PiRocketLaunch } from 'react-icons/pi'
-import { PiUserCircle, PiLinkSimpleHorizontal, PiSignOut } from 'react-icons/pi'
+import { PiLinkSimpleHorizontal, PiSignOut } from 'react-icons/pi'
 
 export default function Profile() {
   const { openLogoutModal } = useLogout()
@@ -83,15 +83,15 @@ export default function Profile() {
 
           <Divider my="md" />
 
-          {/* Personal Info */}
-          <Link href="/profile/info">
+          {/* Account */}
+          <Link href="/profile/account">
             <Paper p="md" shadow="xs">
               <Group justify="space-between">
                 <Group gap={20}>
                   <ThemeIcon size="lg" radius="xl" variant="light">
-                    <PiUserCircle size={24} />
+                    <PiLinkSimpleHorizontal size={24} />
                   </ThemeIcon>
-                  <Text fw={500}>Personal Info</Text>
+                  <Text fw={500}>Linked Accounts</Text>
                 </Group>
                 <ActionIcon color="dark">
                   <PiCaretRight size={20} />
@@ -100,25 +100,10 @@ export default function Profile() {
             </Paper>
           </Link>
 
-          {/* Account */}
-          <Paper p="md" shadow="xs">
-            <Group justify="space-between">
-              <Group gap={20}>
-                <ThemeIcon size="lg" radius="xl" variant="light">
-                  <PiLinkSimpleHorizontal size={24} />
-                </ThemeIcon>
-                <Text fw={500}>Linked Accounts</Text>
-              </Group>
-              <ActionIcon color="dark">
-                <PiCaretRight size={20} />
-              </ActionIcon>
-            </Group>
-          </Paper>
-
           <Divider my="md" />
 
           {/* Logout */}
-          <Paper p="md" shadow="xs">
+          <Paper className="c-pointer" p="md" shadow="xs">
             <Group gap={20} onClick={openLogoutModal}>
               <ThemeIcon size="lg" radius="xl" variant="light" color="red">
                 <PiSignOut size={24} />

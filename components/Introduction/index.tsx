@@ -17,6 +17,7 @@ export default function Index() {
   const { login, authenticated } = useLogin({
     onComplete: (user, isNewUser, wasAlreadyAuthenticated) => {
       // If the user was already authenticated, do nothing
+
       if (wasAlreadyAuthenticated) return
 
       // If the user is new and has a promo code, redirect to the referral code page
