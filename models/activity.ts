@@ -13,6 +13,7 @@ const airdropSchema = new Schema({
   symbol: { type: String, required: true },
   decimal: { type: Number, required: true },
   amount: { type: String, required: true }, // Base unit, not wei, ex: 10 USDC
+  finalized: { type: Boolean, default: false, index: true }, // airdrop share finalized
 })
 
 export const schema = new Schema({

@@ -2,14 +2,22 @@
 
 import { useRef } from 'react'
 import { Stack, Paper, Table, Group, Divider } from '@mantine/core'
-import { Button, ActionIcon, Text, Box } from '@mantine/core'
+import { Button, ActionIcon, Text, Box, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { useActivity } from '@/store/contexts/admin/ActivityContext'
 import AddModel, { type AddModalRef } from './AddModal'
 import UpdateModal, { type UpdateModalRef } from './UpdateModal'
 import DeleteModal, { type DeleteModalRef } from './DeleteModal'
-import { PiPencil, PiTrash, PiPauseFill, PiPlayFill } from 'react-icons/pi'
+import {
+  PiPencil,
+  PiTrash,
+  PiPauseFill,
+  PiPlayFill,
+  PiCheckCircle,
+  PiXCircle,
+} from 'react-icons/pi'
 import { formateDate } from '@/utils/helper'
+import { formatNumber } from '@/utils/math'
 import classes from './index.module.css'
 
 export default function AdminEpoch() {
@@ -30,7 +38,7 @@ export default function AdminEpoch() {
         <Text style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{o.title}</Text>
       </Table.Td>
       <Table.Td>
-        <Text>{`${o.airdrop.amount} ${o.airdrop.symbol}`}</Text>
+        <Text>{`${formatNumber(o.airdrop.amount)} ${o.airdrop.symbol}`}</Text>
       </Table.Td>
       <Table.Td fz="sm">
         <Text fz={14}>{formateDate(o.startTime)}</Text>
@@ -43,6 +51,15 @@ export default function AdminEpoch() {
         <Text fz={12} c="dimmed">
           {formateDate(o.endTime, 'h:mm aa zzz')}
         </Text>
+      </Table.Td>
+      <Table.Td fz="sm">
+        <ThemeIcon size="sm" variant="transparent">
+          {o.airdrop.finalized ? (
+            <PiCheckCircle size={20} color="green" />
+          ) : (
+            <PiXCircle size={20} color="red" />
+          )}
+        </ThemeIcon>
       </Table.Td>
 
       <Table.Td>
@@ -92,6 +109,7 @@ export default function AdminEpoch() {
                     <Table.Th>Airdrop</Table.Th>
                     <Table.Th>Start</Table.Th>
                     <Table.Th>End</Table.Th>
+                    <Table.Th>Finalize</Table.Th>
                     <Table.Th>Actions</Table.Th>
                   </Table.Tr>
                 </Table.Thead>

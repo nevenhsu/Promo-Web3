@@ -1,10 +1,9 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 
 const airdropSchema = new Schema({
-  chainId: Number,
   symbol: String,
-  receivedAmount: { type: String, default: '0' },
-  pendingAmount: { type: String, default: '0' },
+  receivedAmount: { type: String, default: '0' }, // Base unit, not wei, ex: 10 USDC
+  pendingAmount: { type: String, default: '0' }, // Base unit, not wei, ex: 10 USDC
 })
 
 export const schema = new Schema({

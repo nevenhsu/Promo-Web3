@@ -14,8 +14,8 @@ export const schema = new Schema({
     index: true,
   },
   newSelfScore: { type: Number, required: true }, // The new score result for the activity
+  updated: { type: Boolean, default: false, index: true }, // Whether the user has updated the score
   createdAt: { type: Date, default: Date.now },
-  updated: { type: Boolean, default: false, index: true },
 })
 
 schema.index({ _activity: 1, _user: 1, updated: 1 })

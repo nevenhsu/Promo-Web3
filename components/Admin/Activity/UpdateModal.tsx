@@ -87,8 +87,8 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
   useEffect(() => {
     if (opened && selectedActivity) {
       form.setValues({
-        startTime: new Date(selectedActivity.startTime),
-        endTime: new Date(selectedActivity.endTime),
+        startTime: new Date(selectedActivity.startTime || Date.now()),
+        endTime: new Date(selectedActivity.endTime || Date.now()),
         title: selectedActivity.title,
         slug: selectedActivity.slug,
         description: selectedActivity.description,
@@ -99,7 +99,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
         link: selectedActivity.details.link || '',
         coverUrl: selectedActivity.details.coverUrl || '',
         thumbnailUrl: selectedActivity.details.thumbnailUrl || '',
-        published: selectedActivity.published || false,
+        published: selectedActivity.published,
       })
     }
   }, [selectedActivity, opened])
@@ -144,7 +144,11 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
                       activityType: Number(activityType),
                     },
                     { link, coverUrl, thumbnailUrl },
-                    { symbol: tokenData.symbol, decimal: tokenData.decimal, amount }
+                    {
+                      symbol: tokenData.symbol,
+                      decimal: tokenData.decimal,
+                      amount,
+                    }
                   )
                 }
               },
@@ -165,14 +169,12 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
               <DateTimePicker
                 valueFormat="DD MMM YYYY hh:mm A"
                 label="Start Time"
-                key={form.key('startTime')}
                 {...form.getInputProps('startTime')}
               />
 
               <DateTimePicker
                 valueFormat="DD MMM YYYY hh:mm A"
                 label="End Time"
-                key={form.key('endTime')}
                 {...form.getInputProps('endTime')}
                 excludeDate={date =>
                   Boolean(form.getValues().startTime && isBefore(date, form.getValues().startTime!))
@@ -249,7 +251,10 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
                 {...form.getInputProps('thumbnailUrl')}
               />
 
-              <Switch label="Published" {...form.getInputProps('published')} />
+              <Switch
+                label="Published"
+                {...form.getInputProps('published', { type: 'checkbox' })}
+              />
 
               <Box mb="md" />
 

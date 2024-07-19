@@ -12,7 +12,7 @@ const detailSchema = new Schema({
 const linkedAccountSchema = new Schema({
   userId: { type: String, required: true },
   platform: { type: String, enum: LinkAccountPlatform, required: true },
-  username: String,
+  username: { type: String, default: '' },
 })
 
 export const schema = new Schema({

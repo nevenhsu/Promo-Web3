@@ -62,7 +62,8 @@ export const deleteLinkAccount = createAsyncThunk<Partial<TUser>, string>(
 export interface IUserState {
   _id: string
   fetched: boolean
-  updating: boolean
+  updating: boolean // for update user
+  linking: boolean // for link account
   data: Partial<TUser>
 }
 
@@ -70,6 +71,7 @@ const initialState: IUserState = {
   _id: '',
   fetched: false,
   updating: false,
+  linking: false,
   data: {},
 }
 
@@ -103,8 +105,12 @@ export const slice = createSlice({
         _.merge(state.data, newData)
       }
     })
+    builder.addCase(updateLinkAccount.pending, (state, action) => {
+      state.linking = true
+    })
     builder.addCase(updateLinkAccount.fulfilled, (state, action) => {
       const newData = action.payload
+      state.linking = false
       if (newData) {
         state.data.linkedAccounts = [] // prevent duplicate
         _.merge(state.data, newData)

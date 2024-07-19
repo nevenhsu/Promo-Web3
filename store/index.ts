@@ -8,6 +8,7 @@ const userPersistConfig = {
   key: 'user',
   storage,
   version: 1,
+  blacklist: ['fetched'],
 }
 
 const rootReducer = combineReducers({

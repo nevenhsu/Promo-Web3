@@ -15,12 +15,13 @@ export const schema = new Schema({
     index: true,
   },
   status: { type: Number, enum: ActivityStatus, index: true, required: true },
-  errorCode: Number, // error code if status is error
+  error: String, // error message if status is error
   totalScore: { type: Number, index: true, default: 0 }, // total score ( self + 1st referral + 2nd referral)
   selfScore: { type: Number, default: 0 },
   referral1stScore: { type: Number, default: 0 }, // 1st level referral score
   referral2ndScore: { type: Number, default: 0 }, // 2nd level referral score
   updatedAt: { type: Date, default: Date.now }, // last updated date
+  finalized: { type: Boolean, default: false, index: true }, // airdrop share finalized
 })
 
 schema.index({ _activity: 1, _user: 1 }, { unique: true }) // unique index for activity and user
