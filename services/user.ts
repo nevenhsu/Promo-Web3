@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { TUser } from '@/models/user'
-import type { BucketType, PublicUser } from '@/types/db'
+import type { BucketType, PublicUser, LinkAccountPlatform } from '@/types/db'
 
 export const getUserInfo = async (): Promise<TUser | undefined> => {
   try {
@@ -47,4 +47,22 @@ export const getPublicUser = async (username: string): Promise<PublicUser | unde
     console.error(err)
     return undefined
   }
+}
+
+export const updateLinkAccount = async (userId: string, platform: string, username?: string) => {
+  const res = await axios.put<{ user: TUser }>(`/api/u/user/linkAccount`, {
+    userId,
+    platform,
+    username,
+  })
+  const { user } = res.data
+  return user
+}
+
+export const deleteLinkAccount = async (platform: string) => {
+  const res = await axios.delete<{ user: TUser }>(`/api/u/user/linkAccount`, {
+    data: { platform },
+  })
+  const { user } = res.data
+  return user
 }

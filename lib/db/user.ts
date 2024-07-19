@@ -1,6 +1,6 @@
 import * as _ from 'lodash-es'
 import UserModel from '@/models/user'
-import type { User, TUser } from '@/models/user'
+import type { User, TUser, LinkedAccount } from '@/models/user'
 
 export async function createUser(privyId: string, data?: Partial<TUser>) {
   try {
@@ -68,4 +68,63 @@ export async function updateUserById(_id: string, updateData: Partial<User>) {
 
 export function filterUserData(data: any) {
   return _.pick(data, ['username', 'name', 'details'])
+}
+
+export async function removeLinkAccount(_id: string, platform: string) {
+  try {
+    const result = await UserModel.findOneAndUpdate(
+      { _id },
+      {
+        $pull: { linkedAccounts: { platform } },
+      },
+      { new: true }
+    )
+    return result
+  } catch (error) {
+    console.error('Error removing linked account:', error)
+    throw error
+  }
+}
+
+export async function updateLinkAccount(_id: string, data: LinkedAccount) {
+  try {
+    const { userId, platform, username = '' } = data
+
+    if (!_id || !userId || !platform) {
+      throw new Error('Missing required fields')
+    }
+
+    // Update the linked account if it already exists
+    const result = await UserModel.findOneAndUpdate(
+      { _id, 'linkedAccounts.platform': platform },
+      {
+        $set: {
+          'linkedAccounts.$.userId': userId,
+          'linkedAccounts.$.username': username,
+          'linkedAccounts.$.platform': platform,
+        },
+      },
+      { new: true }
+    )
+
+    // If the linked account does not exist, insert a new one
+    if (!result) {
+      const upsertResult = await UserModel.findOneAndUpdate(
+        { _id },
+        {
+          $push: { linkedAccounts: data },
+        },
+        { new: true, upsert: true }
+      )
+
+      console.log('Upserted document:', upsertResult)
+      return upsertResult
+    }
+
+    console.log('Updated document:', result)
+    return result
+  } catch (error) {
+    console.error('Error updating linked account:', error)
+    throw error
+  }
 }

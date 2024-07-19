@@ -154,7 +154,10 @@ export default function ProfileAccount() {
                 </Text>
               </Title>
 
-              {renderLink(AccountType.X, twitter?.name || twitter?.username || twitter?.subject)}
+              {renderLink(
+                AccountType.X,
+                twitter?.username ? `@${twitter.username}` : twitter?.name || twitter?.subject
+              )}
             </Group>
           </Paper>
         </Stack>

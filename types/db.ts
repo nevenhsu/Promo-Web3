@@ -14,6 +14,11 @@ export enum AdminRole {
   DevAdmin = 1,
 }
 
+export enum LinkAccountPlatform {
+  Google = 'google',
+  X = 'x',
+}
+
 export enum ActivityType {
   // Default for all
   None = 0,

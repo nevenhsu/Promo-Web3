@@ -1,8 +1,13 @@
 import * as _ from 'lodash-es'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getUserInfo, updateUser as updateUserAPI } from '@/services/user'
+import {
+  getUserInfo,
+  updateUser as _updateUser,
+  updateLinkAccount as _updateLinkAccount,
+  deleteLinkAccount as _deleteLinkAccount,
+} from '@/services/user'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import type { TUser } from '@/models/user'
+import type { TUser, LinkedAccount } from '@/models/user'
 
 export const fetchUser = createAsyncThunk<Partial<TUser>>('user/fetch', async () => {
   try {
@@ -18,8 +23,35 @@ export const updateUser = createAsyncThunk<Partial<TUser>, Partial<TUser>>(
   'user/update',
   async data => {
     try {
-      const updateData = await updateUserAPI(data)
+      const updateData = await _updateUser(data)
       return updateData || {}
+    } catch (err) {
+      console.error(err)
+      return {}
+    }
+  }
+)
+
+export const updateLinkAccount = createAsyncThunk<Partial<TUser>, LinkedAccount>(
+  '/user/linkAccount',
+  async data => {
+    const { userId, platform, username } = data
+    try {
+      const user = await _updateLinkAccount(userId, platform, username || '')
+      return user
+    } catch (err) {
+      console.error(err)
+      return {}
+    }
+  }
+)
+
+export const deleteLinkAccount = createAsyncThunk<Partial<TUser>, string>(
+  'user/deleteLinkAccount',
+  async platform => {
+    try {
+      const user = await _deleteLinkAccount(platform)
+      return user
     } catch (err) {
       console.error(err)
       return {}
@@ -67,6 +99,21 @@ export const slice = createSlice({
       const newData = action.payload
       state.updating = false
       if (newData) {
+        state.data.linkedAccounts = [] // prevent duplicate
+        _.merge(state.data, newData)
+      }
+    })
+    builder.addCase(updateLinkAccount.fulfilled, (state, action) => {
+      const newData = action.payload
+      if (newData) {
+        state.data.linkedAccounts = [] // prevent duplicate
+        _.merge(state.data, newData)
+      }
+    })
+    builder.addCase(deleteLinkAccount.fulfilled, (state, action) => {
+      const newData = action.payload
+      if (newData) {
+        state.data.linkedAccounts = [] // prevent duplicate
         _.merge(state.data, newData)
       }
     })

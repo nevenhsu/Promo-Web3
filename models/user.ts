@@ -1,5 +1,5 @@
 import { models, model, Model, Schema } from 'mongoose'
-import { SocialMedia } from '@/types/db'
+import { LinkAccountPlatform } from '@/types/db'
 import { customAlphabet } from 'nanoid'
 import { cleanup } from '@/utils/helper'
 import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
@@ -9,10 +9,10 @@ const detailSchema = new Schema({
   avatar: String,
 })
 
-const linkedAccountsSchema = new Schema({
+const linkedAccountSchema = new Schema({
   userId: { type: String, required: true },
-  username: { type: String, required: true },
-  platform: { type: String, enum: SocialMedia, required: true },
+  platform: { type: String, enum: LinkAccountPlatform, required: true },
+  username: String,
 })
 
 export const schema = new Schema({
@@ -31,18 +31,18 @@ export const schema = new Schema({
   },
   name: String,
   email: String,
-  details: { type: detailSchema, required: true, default: {} },
-  linkedAccounts: { type: [linkedAccountsSchema], default: [], required: true },
+  details: { type: detailSchema, default: {} },
+  linkedAccounts: { type: [linkedAccountSchema], default: [] },
   createdTime: { type: Date, default: Date.now },
 })
 
 // Types for redux store
-type LinkedAccounts = InferSchemaType<typeof linkedAccountsSchema>
-type TLinkedAccounts = LinkedAccounts & { _id: string }
+export type LinkedAccount = InferSchemaType<typeof linkedAccountSchema>
+type TLinkedAccount = LinkedAccount & { _id: string }
 export type User = InferSchemaType<typeof schema>
 export type TUser = Omit<User, 'linkedAccounts'> & {
   _id: string
-  linkedAccounts: TLinkedAccounts[]
+  linkedAccounts: TLinkedAccount[]
 }
 
 // Function to generate a random string

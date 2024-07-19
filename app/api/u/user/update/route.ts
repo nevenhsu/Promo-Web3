@@ -36,6 +36,6 @@ export async function PUT(req: NextRequest) {
 }
 
 function getUpdateData(data: any) {
-  const updateData = _.pick(data, ['username', 'name', 'details'])
+  const updateData = _.pick(data, ['username', 'name', 'details', 'email'])
   return updateData
 }

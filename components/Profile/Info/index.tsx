@@ -65,14 +65,17 @@ export default function ProfileInfo() {
 
   const updateInfo = async (name: string, username: string) => {
     try {
-      const isUnique = await isUniqueUsername(username)
-      if (isUnique) {
-        dispatch(updateUser({ name, username }))
-        return
+      // Check if username is unique
+      if (username !== data.username) {
+        const isUnique = await isUniqueUsername(username)
+        if (!isUnique) {
+          form.setFieldError('username', 'This username is taken, please try another')
+          return
+        }
       }
 
-      // Show error message
-      form.setFieldError('username', 'This username is taken, please try another')
+      // Update user info
+      dispatch(updateUser({ name, username }))
     } catch (err) {
       console.error(err)
     }

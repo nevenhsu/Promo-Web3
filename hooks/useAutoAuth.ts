@@ -11,10 +11,10 @@ import { useAppDispatch } from '@/hooks/redux'
 export default function useAutoAuth() {
   const dispatch = useAppDispatch()
 
-  const { status } = useSession()
   const { getAccessToken, user } = usePrivy()
-  const privyId = user?.id
+  const { id: privyId } = user || {}
 
+  const { status } = useSession()
   const authOnServer = status === 'authenticated'
   const notAuthOnServer = status === 'unauthenticated'
 
@@ -29,13 +29,14 @@ export default function useAutoAuth() {
     signIn('credentials', { authToken, privyId, redirect: false }).catch(err => console.error(err))
   }
 
+  // go auth on server
   useEffect(() => {
     if (privyId && notAuthOnServer) {
-      startAuth(privyId) // go auth on server
+      startAuth(privyId)
     }
   }, [privyId, notAuthOnServer])
 
-  // on init
+  // auto fetch user data
   useEffect(() => {
     if (authOnServer) {
       dispatch(fetchUser())
