@@ -1,5 +1,5 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
-import { ActivityStatus } from '@/types/db'
+import { ActivityStatus, ActivityErrorCode } from '@/types/db'
 
 export const schema = new Schema({
   _activity: {
@@ -15,7 +15,7 @@ export const schema = new Schema({
     index: true,
   },
   status: { type: Number, enum: ActivityStatus, index: true, required: true },
-  error: String, // error message if status is error
+  error: { type: Number, enum: ActivityErrorCode }, // error code if status is error
   totalScore: { type: Number, index: true, default: 0 }, // total score ( self + 1st referral + 2nd referral)
   selfScore: { type: Number, default: 0 },
   referral1stScore: { type: Number, default: 0 }, // 1st level referral score

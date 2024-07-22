@@ -25,6 +25,7 @@ export const schema = new Schema({
   description: String,
   activityType: { type: Number, enum: ActivityType, required: true },
   socialMedia: { type: String, enum: SocialMedia, required: true },
+  required: { type: Object, default: {} }, // requires for join
   details: { type: detailSchema, required: true },
   airdrop: { type: airdropSchema, required: true },
   published: { type: Boolean, default: false, index: true },
