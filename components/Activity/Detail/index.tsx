@@ -16,10 +16,10 @@ import { Group, Stack, Box, Space, Divider, Paper } from '@mantine/core'
 import { Title, Text, Button, ThemeIcon, Progress } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiLightning, PiPersonSimpleRun, PiTrophy, PiCheckBold } from 'react-icons/pi'
-import { PiTriangleBold, PiTriangleDashedBold, PiCircleDashedBold } from 'react-icons/pi'
+import { PiWarningBold, PiTriangleDashedBold, PiCircleDashedBold } from 'react-icons/pi'
 import { formatDate } from '@/utils/date'
 import { formatNumber } from '@/utils/math'
-import { getActionLabel } from '../variables'
+import { getActionLabel, getErrorText } from '../variables'
 import { LinkAccountPlatform, ActivityStatus } from '@/types/db'
 import type { TPublicActivity } from '@/models/activity'
 import type { TUserActivityStatus } from '@/models/userActivityStatus'
@@ -63,7 +63,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
     return status
   }, [])
 
-  const { value: details } = fetchDetailsState
+  const details = fetchDetailsState.value || data.details
 
   const airdropShare = useMemo(() => {
     if (!details || !status) return 0
@@ -134,13 +134,12 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   }, [resetUserStatusState.value])
 
   const renderStatus = (userStatus: TUserActivityStatus) => {
-    const { status, error } = userStatus
-    const { title, message, icon, color } = getStatusContent(status, error || '')
+    const { title, message, icon, color } = getStatusContent(userStatus)
 
     return (
       <>
         <Paper radius="sm" p="md" shadow="xs">
-          <Group>
+          <Group wrap="nowrap">
             <ThemeIcon color={color} radius="xl" size="lg">
               {icon}
             </ThemeIcon>
@@ -334,20 +333,15 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   )
 }
 
-function getStatusContent(status: ActivityStatus, error?: string) {
+function getStatusContent(userStatus: TUserActivityStatus) {
+  const { status, error } = userStatus
+
   switch (status) {
     case ActivityStatus.Unjoined: {
       const title = 'Join now'
       const message = 'You have not joined this activity yet'
       const icon = <PiTriangleDashedBold size={20} />
       const color = 'dark'
-      return { title, message, icon, color }
-    }
-    case ActivityStatus.Initial: {
-      const title = 'Waiting for confirmation'
-      const message = 'We will confirm your activity soon'
-      const icon = <PiCircleDashedBold size={20} />
-      const color = 'blue'
       return { title, message, icon, color }
     }
     case ActivityStatus.Completed: {
@@ -358,10 +352,17 @@ function getStatusContent(status: ActivityStatus, error?: string) {
       return { title, message, icon, color }
     }
     case ActivityStatus.Error: {
-      const title = 'Not completed'
-      const message = error
-      const icon = <PiTriangleBold size={20} />
+      const { title, message } = getErrorText(error || 0)
+      const icon = <PiWarningBold size={20} />
       const color = 'red'
+      return { title, message, icon, color }
+    }
+    case ActivityStatus.Initial:
+    default: {
+      const title = 'Waiting for confirmation'
+      const message = 'We will confirm your activity soon'
+      const icon = <PiCircleDashedBold size={20} />
+      const color = 'blue'
       return { title, message, icon, color }
     }
   }
