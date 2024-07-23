@@ -66,9 +66,10 @@ export async function getReferral(_referrer: string, _referee: string) {
 
 export async function getReferrer(_referee: string) {
   try {
-    const referral = await ReferralModel.findOne({ _referee }).populate<{ _referrer: TUser }>(
-      '_referrer'
-    )
+    const referral = await ReferralModel.findOne({
+      _referee,
+      level: ReferralLevel.First,
+    }).populate<{ _referrer: TUser }>('_referrer')
     return referral
   } catch (error) {
     console.error('Error getting referrer:', error)

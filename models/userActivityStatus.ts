@@ -22,6 +22,7 @@ export const schema = new Schema({
   referral2ndScore: { type: Number, default: 0 }, // 2nd level referral score
   updatedAt: { type: Date, default: Date.now }, // last updated date
   finalized: { type: Boolean, default: false, index: true }, // airdrop share finalized
+  details: { type: Object, default: {} }, // additional details
 })
 
 schema.index({ _activity: 1, _user: 1 }, { unique: true }) // unique index for activity and user
