@@ -4,7 +4,7 @@ import { ActivityType, SocialMedia } from '@/types/db'
 const detailSchema = new Schema({
   link: { type: String, required: true }, // post id
   participants: { type: Number, default: 0 },
-  totalScore: { type: Number, default: 0 },
+  totalScore: { type: Number, default: 0.0 },
   coverUrl: String,
   thumbnailUrl: String,
 })

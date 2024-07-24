@@ -18,11 +18,11 @@ export const schema = new Schema({
   referral1stNumber: { type: Number, default: 0 }, // 1st level referral number
   referral2ndNumber: { type: Number, default: 0 }, // 2nd level referral number
   // score
-  TotalScore: { type: Number, default: 0, index: true }, // total score ( self + 1st referral + 2nd referral)
-  selfScore: { type: Number, default: 0 },
+  totalScore: { type: Number, default: 0.0, index: true }, // total score ( self + 1st referral + 2nd referral)
+  selfScore: { type: Number, default: 0.0 },
   // referral score
-  referral1stScore: { type: Number, default: 0 }, // 1st level referral score
-  referral2ndScore: { type: Number, default: 0 }, // 2nd level referral score
+  referral1stScore: { type: Number, default: 0.0 }, // 1st level referral score
+  referral2ndScore: { type: Number, default: 0.0 }, // 2nd level referral score
   // air drop
   airdrops: { type: [airdropSchema], default: [] },
 })

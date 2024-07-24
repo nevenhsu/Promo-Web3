@@ -20,7 +20,7 @@ export const schema = new Schema({
     required: true,
     index: true,
   },
-  score: { type: Number, default: 0 }, // The score the referrer gets for this referral
+  score: { type: Number, default: 0.0 }, // The score the referrer gets for this referral
   createdAt: { type: Date, default: Date.now, index: true },
 })
 

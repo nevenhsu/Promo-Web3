@@ -73,8 +73,6 @@ export async function updateReferralScore(
     return null
   }
 
-  console.log('Updated referral:', referral)
-
   return referral
 }
 
