@@ -2,17 +2,12 @@ import UserActivityStatusModel from '@/models/userActivityStatus'
 import { ActivityStatus } from '@/types/db'
 
 export async function getUserActivityStatus(userId: string, activityId: string) {
-  try {
-    const doc = await UserActivityStatusModel.findOne({
-      _user: userId,
-      _activity: activityId,
-    })
+  const doc = await UserActivityStatusModel.findOne({
+    _user: userId,
+    _activity: activityId,
+  })
 
-    return doc
-  } catch (error) {
-    console.error('Error finding user activity status:', error)
-    throw error
-  }
+  return doc
 }
 
 export async function updateUserActivityStatus(
@@ -20,16 +15,11 @@ export async function updateUserActivityStatus(
   activityId: string,
   status: ActivityStatus
 ) {
-  try {
-    const doc = await UserActivityStatusModel.findOneAndUpdate(
-      { _user: userId, _activity: activityId },
-      { status, updatedAt: new Date() },
-      { upsert: true, new: true }
-    )
+  const doc = await UserActivityStatusModel.findOneAndUpdate(
+    { _user: userId, _activity: activityId },
+    { status, updatedAt: new Date() },
+    { upsert: true, new: true }
+  )
 
-    return doc
-  } catch (error) {
-    console.error('Error adding user activity status:', error)
-    throw error
-  }
+  return doc
 }
