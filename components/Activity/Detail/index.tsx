@@ -12,7 +12,7 @@ import { useAppSelector } from '@/hooks/redux'
 import { getPublicActivityDetails } from '@/services/activity'
 import { notifications } from '@mantine/notifications'
 import { getUserActivityStatus, resetUserActivityStatus } from '@/services/userActivityStatus'
-import { Group, Stack, Box, Space, Divider, Paper } from '@mantine/core'
+import { Group, Stack, Box, Space, Divider, Paper, Skeleton } from '@mantine/core'
 import { Title, Text, Button, ThemeIcon, Progress } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiLightning, PiPersonSimpleRun, PiTrophy, PiCheckBold } from 'react-icons/pi'
@@ -32,7 +32,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
   const router = useRouter()
   const promo = usePromo() // for referral code
-  const { loading, bothAuth } = useLoginStatus()
+  const { bothAuth, loading } = useLoginStatus()
 
   // Platform linked account from Privy
   const { user, linkTwitter } = usePrivy()
@@ -47,6 +47,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   }, [linkedAccounts])
 
   // for use activity status
+  const [statusReady, setStatusReady] = useState(false) // for loading status
   const [status, setStatus] = useState<TUserActivityStatus | undefined>()
   const bonusScore = _.sum([status?.referral1stScore, status?.referral2ndScore])
 
@@ -121,7 +122,12 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   // Fetch user activity status
   useEffect(() => {
     if (bothAuth && slug) {
-      getUserActivityStatus(slug).then(setStatus).catch(console.error)
+      getUserActivityStatus(slug)
+        .then(res => {
+          setStatus(res)
+          setStatusReady(true)
+        })
+        .catch(console.error)
     }
   }, [bothAuth, slug])
 
@@ -132,26 +138,28 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
     }
   }, [resetUserStatusState.value])
 
-  const renderStatus = (userStatus: TUserActivityStatus) => {
+  const renderStatus = (userStatus?: TUserActivityStatus) => {
     const { title, message, icon, color } = getStatusContent(userStatus)
 
     return (
       <>
-        <Paper radius="sm" p="md" shadow="xs">
-          <Group wrap="nowrap">
-            <ThemeIcon color={color} radius="xl" size="lg">
-              {icon}
-            </ThemeIcon>
-            <Box>
-              <Title order={5} fw={500}>
-                {title}
-              </Title>
-              <Text c="dimmed" fz="xs">
-                {message}
-              </Text>
-            </Box>
-          </Group>
-        </Paper>
+        <Skeleton visible={!statusReady}>
+          <Paper radius="sm" p="md" shadow="xs">
+            <Group wrap="nowrap">
+              <ThemeIcon color={color} radius="xl" size="lg">
+                {icon}
+              </ThemeIcon>
+              <Box>
+                <Title order={5} fw={500}>
+                  {title}
+                </Title>
+                <Text c="dimmed" fz="xs">
+                  {message}
+                </Text>
+              </Box>
+            </Group>
+          </Paper>
+        </Skeleton>
       </>
     )
   }
@@ -175,101 +183,110 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
             {formatNumber(data.airdrop.amount)} {data.airdrop.symbol}
           </Title>
 
-          {details && status ? (
+          {bothAuth ? (
             <>
               <Stack gap="sm">
                 {renderStatus(status)}
 
-                <Paper radius="sm" p="md" shadow="xs">
-                  <Group justify="space-between">
-                    <Title order={4} fw={500}>
-                      Activity Score
-                    </Title>
-                    <Title order={4} c="orange">
-                      {formatNumber(status.totalScore)}
-                    </Title>
-                  </Group>
+                {status ? (
+                  <>
+                    <Paper radius="sm" p="md" shadow="xs">
+                      <Group justify="space-between">
+                        <Title order={4} fw={500}>
+                          Activity Score
+                        </Title>
+                        <Title order={4} c="orange">
+                          {formatNumber(status?.totalScore || 0)}
+                        </Title>
+                      </Group>
 
-                  <Stack mt={8} gap="lg">
-                    <Divider />
+                      <Stack mt={8} gap="lg">
+                        <Divider />
 
-                    <Stack gap="lg">
-                      <Box>
-                        <Text c="dark" fz="sm" mb="xs">
-                          Your post score
-                        </Text>
-
-                        <Progress.Root size="sm">
-                          <Progress.Section
-                            value={(status.selfScore / details.totalScore) * 100}
-                            color="orange"
-                          />
-                          <Progress.Section
-                            value={(bonusScore / details.totalScore) * 100}
-                            color="orange.2"
-                          />
-                        </Progress.Root>
-
-                        <Group mt="xs" justify="space-between">
-                          <Group gap="sm">
-                            <Text fz="sm" c="orange">
-                              Score: {formatNumber(status.selfScore)}
+                        <Stack gap="lg">
+                          <Box>
+                            <Text c="dark" fz="sm" mb="xs">
+                              Your post score
                             </Text>
-                            <Text fz="sm" c="orange.4">
-                              Bonus: {formatNumber(bonusScore)}
-                            </Text>
-                          </Group>
-                          <Text fz="sm" c="dimmed">
-                            Total: {formatNumber(details.totalScore)}
-                          </Text>
-                        </Group>
-                      </Box>
-                    </Stack>
 
-                    <Text fz="xs" c="dimmed">
-                      Last Updated at {formatDate(new Date(status.updatedAt), 'dd MMM yyyy HH:mm')}
-                    </Text>
-                  </Stack>
-                </Paper>
+                            <Progress.Root size="sm">
+                              <Progress.Section
+                                value={((status?.selfScore || 0) / details.totalScore) * 100}
+                                color="orange"
+                              />
+                              <Progress.Section
+                                value={(bonusScore / details.totalScore) * 100}
+                                color="orange.2"
+                              />
+                            </Progress.Root>
 
-                <Paper radius="sm" p="md" shadow="xs">
-                  <Group justify="space-between">
-                    <Title order={4} fw={500}>
-                      Airdrop share
-                    </Title>
-                    <Title order={4} c="orange">
-                      {formatNumber(airdropShare)} {airdrop.symbol}
-                    </Title>
-                  </Group>
+                            <Group mt="xs" justify="space-between">
+                              <Group gap="sm">
+                                <Text fz="sm" c="orange">
+                                  Score: {formatNumber(status?.selfScore || 0)}
+                                </Text>
+                                <Text fz="sm" c="orange.4">
+                                  Bonus: {formatNumber(bonusScore)}
+                                </Text>
+                              </Group>
+                              <Text fz="sm" c="dimmed">
+                                Total: {formatNumber(details.totalScore)}
+                              </Text>
+                            </Group>
+                          </Box>
+                        </Stack>
 
-                  <Stack mt={8} gap="lg">
-                    <Divider />
-
-                    <Stack gap="lg">
-                      <Box>
-                        <Text c="dark" fz="sm" mb="xs">
-                          Your share
+                        <Text fz="xs" c="dimmed">
+                          {status?.updatedAt
+                            ? `Last Updated at ${formatDate(new Date(status?.updatedAt), 'dd MMM yyyy HH:mm')}`
+                            : ' '}
                         </Text>
+                      </Stack>
+                    </Paper>
 
-                        <Progress size="sm" value={(airdropShare / Number(airdrop.amount)) * 100} />
+                    <Paper radius="sm" p="md" shadow="xs">
+                      <Group justify="space-between">
+                        <Title order={4} fw={500}>
+                          Airdrop share
+                        </Title>
+                        <Title order={4} c="orange">
+                          {formatNumber(airdropShare)} {airdrop.symbol}
+                        </Title>
+                      </Group>
 
-                        <Group mt="xs" gap={4}>
-                          <Text fz="sm" c="orange">
-                            {formatNumber(airdropShare)}
-                          </Text>
-                          <Text fz="sm" c="dimmed">
-                            / {formatNumber(airdrop.amount)}
-                          </Text>
-                        </Group>
-                      </Box>
-                    </Stack>
+                      <Stack mt={8} gap="lg">
+                        <Divider />
 
-                    <Text fz="xs" c="dimmed">
-                      Airdrop will finalized after{' '}
-                      {formatDate(new Date(data.endTime), 'dd MMM yyyy HH:mm')}
-                    </Text>
-                  </Stack>
-                </Paper>
+                        <Stack gap="lg">
+                          <Box>
+                            <Text c="dark" fz="sm" mb="xs">
+                              Your share
+                            </Text>
+
+                            <Progress
+                              size="sm"
+                              value={(airdropShare / Number(airdrop.amount)) * 100}
+                            />
+
+                            <Group mt="xs" gap={4}>
+                              <Text fz="sm" c="orange">
+                                {formatNumber(airdropShare)}
+                              </Text>
+                              <Text fz="sm" c="dimmed">
+                                / {formatNumber(airdrop.amount)}
+                              </Text>
+                            </Group>
+                          </Box>
+                        </Stack>
+
+                        <Text fz="xs" c="dimmed">
+                          Airdrop will finalized after{' '}
+                          {formatDate(new Date(data.endTime), 'dd MMM yyyy HH:mm')}
+                        </Text>
+                      </Stack>
+                    </Paper>
+                  </>
+                ) : null}
               </Stack>
             </>
           ) : null}
@@ -302,25 +319,27 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
             <Divider />
           </>
 
-          <Stack>
-            {bothAuth ? (
-              <>
-                <Button variant="outline" onClick={handleLinkAccount} loading={linking}>
-                  {linkedX ? `Linked as ${linkedX.username}` : `Link your ${socialMedia}`}
-                </Button>
+          <Skeleton visible={loading}>
+            <Stack>
+              {bothAuth ? (
+                <>
+                  <Button variant="outline" onClick={handleLinkAccount} loading={linking}>
+                    {linkedX ? `Linked as ${linkedX.username}` : `Link your ${socialMedia}`}
+                  </Button>
 
-                <Button
-                  onClick={handleConfirm}
-                  disabled={!linkedX}
-                  loading={resetUserStatusState.loading}
-                >
-                  Confirm {getActionLabel(data.activityType)}
-                </Button>
-              </>
-            ) : (
-              <Button onClick={login}>Join now</Button>
-            )}
-          </Stack>
+                  <Button
+                    onClick={handleConfirm}
+                    disabled={!linkedX}
+                    loading={resetUserStatusState.loading}
+                  >
+                    Confirm {getActionLabel(data.activityType)}
+                  </Button>
+                </>
+              ) : (
+                <Button onClick={login}>Join now</Button>
+              )}
+            </Stack>
+          </Skeleton>
 
           {/* Embedded Post */}
           {children}
@@ -332,17 +351,10 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   )
 }
 
-function getStatusContent(userStatus: TUserActivityStatus) {
-  const { status, error } = userStatus
+function getStatusContent(userStatus?: TUserActivityStatus) {
+  const { status, error } = userStatus || {}
 
   switch (status) {
-    case ActivityStatus.Unjoined: {
-      const title = 'Join now'
-      const message = 'Join this activity to earn rewards'
-      const icon = <PiRocketLaunch size={20} />
-      const color = 'dark'
-      return { title, message, icon, color }
-    }
     case ActivityStatus.Completed: {
       const title = 'Successfully joined!'
       const message = 'Keep your activity until the event end'
@@ -356,11 +368,18 @@ function getStatusContent(userStatus: TUserActivityStatus) {
       const color = 'red'
       return { title, message, icon, color }
     }
-    case ActivityStatus.Initial:
-    default: {
+    case ActivityStatus.Initial: {
       const title = 'Waiting for confirmation'
       const message = 'We will confirm your activity soon'
       const icon = <PiCircleDashedBold size={20} />
+      const color = 'dark'
+      return { title, message, icon, color }
+    }
+    case ActivityStatus.Unjoined:
+    default: {
+      const title = 'Join now'
+      const message = 'Join this activity to earn rewards'
+      const icon = <PiRocketLaunch size={20} />
       const color = 'dark'
       return { title, message, icon, color }
     }
