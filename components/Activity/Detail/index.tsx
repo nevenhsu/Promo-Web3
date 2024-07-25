@@ -52,7 +52,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   const statusData = userActivityStatus.data[slug]
   const statusDataLoading = userActivityStatus.loading[slug]
   const statusDataFetched = userActivityStatus.fetched[slug]
-  const statusLoading = statusDataLoading || (Boolean(statusData) && !statusDataFetched) // not fetched yet
+  const statusLoading = statusDataLoading || !statusDataFetched // not fetched yet
   const bonusScore = _.sum([statusData?.referral1stScore, statusData?.referral2ndScore])
 
   // Activity details
@@ -124,7 +124,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
     }
   }, [bothAuth, slug])
 
-  const renderStatus = (userStatus?: Partial<TUserActivityStatus>) => {
+  const renderStatus = (userStatus?: TUserActivityStatus) => {
     const { title, message, icon, color } = getStatusContent(userStatus)
     return (
       <>
@@ -336,7 +336,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   )
 }
 
-function getStatusContent(userStatus?: Partial<TUserActivityStatus>) {
+function getStatusContent(userStatus?: TUserActivityStatus) {
   const { status, error } = userStatus || {}
 
   switch (status) {

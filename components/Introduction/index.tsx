@@ -4,45 +4,39 @@ import { useRouter } from '@/navigation'
 import { useSearchParams } from 'next/navigation'
 import { usePromo } from '@/hooks/usePromo'
 import useLogin from '@/hooks/useLogin'
-import { useAppSelector } from '@/hooks/redux'
+import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 
 export default function Index() {
   const router = useRouter()
-  const { _id } = useAppSelector(state => state.user)
   const searchParams = useSearchParams()
+  const { bothAuth } = useLoginStatus()
   const promo = usePromo()
 
-  const { login, authenticated } = useLogin({
+  // Get the callback URL from the url query params
+  const callbackUrl = searchParams.get('callbackUrl')
+  const callbackPath = getPathBeforeQuery(callbackUrl)
+
+  const { login } = useLogin({
     onComplete: (user, isNewUser, wasAlreadyAuthenticated) => {
-      // If the user was already authenticated, do nothing
-
-      if (wasAlreadyAuthenticated) return
-
       // If the user is new and has a promo code, redirect to the referral code page
       if (isNewUser && promo) {
-        router.push('/refer/code')
-        return
-      } else if (isNewUser) {
-        router.push('/activity')
-        return
+        return promo ? router.push('/refer/code') : router.push('/activity')
       }
 
-      // handle auth callbackUrl
-      const callbackUrl = searchParams.get('callbackUrl')
-      const callbackPath = getPathBeforeQuery(callbackUrl)
+      if (!wasAlreadyAuthenticated) {
+        return router.push('/home')
+      }
+
       if (callbackPath) {
-        router.push(callbackPath)
-        return
+        return router.push(callbackPath)
       }
-
-      router.push('/home')
     },
   })
 
   const handleClick = () => {
-    if (authenticated && _id) {
+    if (bothAuth) {
       router.push('/home')
       return
     }
