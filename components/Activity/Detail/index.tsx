@@ -1,17 +1,17 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { useRouter } from '@/navigation'
 import { useAsyncFn } from 'react-use'
 import { usePrivy } from '@privy-io/react-auth'
 import useLogin from '@/hooks/useLogin'
 import { usePromo } from '@/hooks/usePromo'
-import { useAppSelector } from '@/hooks/redux'
+import { useAppSelector, useAppDispatch } from '@/hooks/redux'
+import { fetchUserActivityStatus, resetUserActivityStatus } from '@/store/slices/userActivityStatus'
 import { getPublicActivityDetails } from '@/services/activity'
 import { notifications } from '@mantine/notifications'
-import { getUserActivityStatus, resetUserActivityStatus } from '@/services/userActivityStatus'
 import { Group, Stack, Box, Space, Divider, Paper, Skeleton } from '@mantine/core'
 import { Title, Text, Button, ThemeIcon, Progress } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
@@ -30,6 +30,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   const { slug, airdrop } = data
   const socialMedia = data.socialMedia.toUpperCase()
 
+  const dispatch = useAppDispatch()
   const router = useRouter()
   const promo = usePromo() // for referral code
   const { bothAuth, loading } = useLoginStatus()
@@ -47,9 +48,12 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   }, [linkedAccounts])
 
   // for use activity status
-  const [statusReady, setStatusReady] = useState(false) // for loading status
-  const [status, setStatus] = useState<TUserActivityStatus | undefined>()
-  const bonusScore = _.sum([status?.referral1stScore, status?.referral2ndScore])
+  const { userActivityStatus } = useAppSelector(state => state)
+  const statusData = userActivityStatus.data[slug]
+  const statusDataLoading = userActivityStatus.loading[slug]
+  const statusDataFetched = userActivityStatus.fetched[slug]
+  const statusLoading = statusDataLoading || (Boolean(statusData) && !statusDataFetched) // not fetched yet
+  const bonusScore = _.sum([statusData?.referral1stScore, statusData?.referral2ndScore])
 
   // Activity details
   const [fetchDetailsState, fetchDetails] = useAsyncFn(async (slug: string) => {
@@ -57,20 +61,13 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
     return details
   }, [])
 
-  // Reset user activity status
-  const [resetUserStatusState, resetUserStatus] = useAsyncFn(async (slug: string) => {
-    const status = await resetUserActivityStatus(slug)
-    return status
-  }, [])
-
   const details = fetchDetailsState.value || data.details
 
   const airdropShare = useMemo(() => {
-    if (!details || !status) return 0
+    if (!details || !statusData?.totalScore) return 0
     if (!details.totalScore) return 0
-
-    return (status.totalScore / details.totalScore) * Number(airdrop.amount) || 0
-  }, [status, details, airdrop])
+    return (statusData.totalScore / details.totalScore) * Number(airdrop.amount) || 0
+  }, [statusData, details, airdrop])
 
   // Login to join activity
   const { login } = useLogin({
@@ -89,7 +86,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
   const handleConfirm = () => {
     // If the activity is completed or initial, do nothing
-    if (status?.status === ActivityStatus.Completed) {
+    if (statusData?.status === ActivityStatus.Completed) {
       notifications.show({
         title: 'Activity completed',
         message: 'You have already completed this activity',
@@ -98,8 +95,8 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
       return
     }
 
-    if (bothAuth && slug && status?.status !== ActivityStatus.Initial) {
-      resetUserStatus(slug)
+    if (bothAuth && slug && statusData?.status !== ActivityStatus.Initial) {
+      dispatch(resetUserActivityStatus(slug))
     }
 
     notifications.show({
@@ -122,28 +119,16 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   // Fetch user activity status
   useEffect(() => {
     if (bothAuth && slug) {
-      getUserActivityStatus(slug)
-        .then(res => {
-          setStatus(res)
-          setStatusReady(true)
-        })
-        .catch(console.error)
+      // Fetch new status on page load
+      dispatch(fetchUserActivityStatus(slug))
     }
   }, [bothAuth, slug])
 
-  // Update user activity status
-  useEffect(() => {
-    if (resetUserStatusState.value) {
-      setStatus(resetUserStatusState.value)
-    }
-  }, [resetUserStatusState.value])
-
-  const renderStatus = (userStatus?: TUserActivityStatus) => {
+  const renderStatus = (userStatus?: Partial<TUserActivityStatus>) => {
     const { title, message, icon, color } = getStatusContent(userStatus)
-
     return (
       <>
-        <Skeleton visible={!statusReady}>
+        <Skeleton visible={statusLoading}>
           <Paper radius="sm" p="md" shadow="xs">
             <Group wrap="nowrap">
               <ThemeIcon color={color} radius="xl" size="lg">
@@ -186,105 +171,109 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
           {bothAuth ? (
             <>
               <Stack gap="sm">
-                {renderStatus(status)}
+                {renderStatus(statusData)}
 
-                {status ? (
+                {statusData ? (
                   <>
-                    <Paper radius="sm" p="md" shadow="xs">
-                      <Group justify="space-between">
-                        <Title order={4} fw={500}>
-                          Activity Score
-                        </Title>
-                        <Title order={4} c="orange">
-                          {formatNumber(status?.totalScore || 0)}
-                        </Title>
-                      </Group>
+                    <Skeleton visible={statusLoading}>
+                      <Paper radius="sm" p="md" shadow="xs">
+                        <Group justify="space-between">
+                          <Title order={4} fw={500}>
+                            Activity Score
+                          </Title>
+                          <Title order={4} c="orange">
+                            {formatNumber(statusData.totalScore)}
+                          </Title>
+                        </Group>
 
-                      <Stack mt={8} gap="lg">
-                        <Divider />
+                        <Stack mt={8} gap="lg">
+                          <Divider />
 
-                        <Stack gap="lg">
-                          <Box>
-                            <Text c="dark" fz="sm" mb="xs">
-                              Your post score
-                            </Text>
+                          <Stack gap="lg">
+                            <Box>
+                              <Text c="dark" fz="sm" mb="xs">
+                                Your post score
+                              </Text>
 
-                            <Progress.Root size="sm">
-                              <Progress.Section
-                                value={((status?.selfScore || 0) / details.totalScore) * 100}
-                                color="orange"
-                              />
-                              <Progress.Section
-                                value={(bonusScore / details.totalScore) * 100}
-                                color="orange.2"
-                              />
-                            </Progress.Root>
+                              <Progress.Root size="sm">
+                                <Progress.Section
+                                  value={(statusData.selfScore / details.totalScore) * 100}
+                                  color="orange"
+                                />
+                                <Progress.Section
+                                  value={(bonusScore / details.totalScore) * 100}
+                                  color="orange.2"
+                                />
+                              </Progress.Root>
 
-                            <Group mt="xs" justify="space-between">
-                              <Group gap="sm">
-                                <Text fz="sm" c="orange">
-                                  Score: {formatNumber(status?.selfScore || 0)}
-                                </Text>
-                                <Text fz="sm" c="orange.4">
-                                  Bonus: {formatNumber(bonusScore)}
+                              <Group mt="xs" justify="space-between">
+                                <Group gap="sm">
+                                  <Text fz="sm" c="orange">
+                                    Score: {formatNumber(statusData.selfScore)}
+                                  </Text>
+                                  <Text fz="sm" c="orange.4">
+                                    Bonus: {formatNumber(bonusScore)}
+                                  </Text>
+                                </Group>
+                                <Text fz="sm" c="dimmed">
+                                  Total: {formatNumber(details.totalScore)}
                                 </Text>
                               </Group>
-                              <Text fz="sm" c="dimmed">
-                                Total: {formatNumber(details.totalScore)}
-                              </Text>
-                            </Group>
-                          </Box>
+                            </Box>
+                          </Stack>
+
+                          <Text fz="xs" c="dimmed">
+                            {statusData.updatedAt
+                              ? `Last Updated at ${formatDate(new Date(statusData.updatedAt), 'dd MMM yyyy HH:mm')}`
+                              : ' '}
+                          </Text>
                         </Stack>
+                      </Paper>
+                    </Skeleton>
 
-                        <Text fz="xs" c="dimmed">
-                          {status?.updatedAt
-                            ? `Last Updated at ${formatDate(new Date(status?.updatedAt), 'dd MMM yyyy HH:mm')}`
-                            : ' '}
-                        </Text>
-                      </Stack>
-                    </Paper>
+                    <Skeleton visible={statusLoading}>
+                      <Paper radius="sm" p="md" shadow="xs">
+                        <Group justify="space-between">
+                          <Title order={4} fw={500}>
+                            Airdrop share
+                          </Title>
+                          <Title order={4} c="orange">
+                            {formatNumber(airdropShare)} {airdrop.symbol}
+                          </Title>
+                        </Group>
 
-                    <Paper radius="sm" p="md" shadow="xs">
-                      <Group justify="space-between">
-                        <Title order={4} fw={500}>
-                          Airdrop share
-                        </Title>
-                        <Title order={4} c="orange">
-                          {formatNumber(airdropShare)} {airdrop.symbol}
-                        </Title>
-                      </Group>
+                        <Stack mt={8} gap="lg">
+                          <Divider />
 
-                      <Stack mt={8} gap="lg">
-                        <Divider />
-
-                        <Stack gap="lg">
-                          <Box>
-                            <Text c="dark" fz="sm" mb="xs">
-                              Your share
-                            </Text>
-
-                            <Progress
-                              size="sm"
-                              value={(airdropShare / Number(airdrop.amount)) * 100}
-                            />
-
-                            <Group mt="xs" gap={4}>
-                              <Text fz="sm" c="orange">
-                                {formatNumber(airdropShare)}
+                          <Stack gap="lg">
+                            <Box>
+                              <Text c="dark" fz="sm" mb="xs">
+                                Your share
                               </Text>
-                              <Text fz="sm" c="dimmed">
-                                / {formatNumber(airdrop.amount)}
-                              </Text>
-                            </Group>
-                          </Box>
+
+                              <Progress
+                                size="sm"
+                                value={(airdropShare / Number(airdrop.amount)) * 100}
+                              />
+
+                              <Group mt="xs" gap={4}>
+                                <Text fz="sm" c="orange">
+                                  {formatNumber(airdropShare)}
+                                </Text>
+                                <Text fz="sm" c="dimmed">
+                                  / {formatNumber(airdrop.amount)}
+                                </Text>
+                              </Group>
+                            </Box>
+                          </Stack>
+
+                          <Text fz="xs" c="dimmed">
+                            Airdrop will finalized after{' '}
+                            {formatDate(new Date(data.endTime), 'dd MMM yyyy HH:mm')}
+                          </Text>
                         </Stack>
-
-                        <Text fz="xs" c="dimmed">
-                          Airdrop will finalized after{' '}
-                          {formatDate(new Date(data.endTime), 'dd MMM yyyy HH:mm')}
-                        </Text>
-                      </Stack>
-                    </Paper>
+                      </Paper>
+                    </Skeleton>
                   </>
                 ) : null}
               </Stack>
@@ -319,27 +308,23 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
             <Divider />
           </>
 
-          <Skeleton visible={loading}>
-            <Stack>
-              {bothAuth ? (
-                <>
-                  <Button variant="outline" onClick={handleLinkAccount} loading={linking}>
-                    {linkedX ? `Linked as ${linkedX.username}` : `Link your ${socialMedia}`}
-                  </Button>
+          <Stack>
+            {bothAuth ? (
+              <>
+                <Button variant="outline" onClick={handleLinkAccount} loading={linking}>
+                  {linkedX ? `Linked as ${linkedX.username}` : `Link your ${socialMedia}`}
+                </Button>
 
-                  <Button
-                    onClick={handleConfirm}
-                    disabled={!linkedX}
-                    loading={resetUserStatusState.loading}
-                  >
-                    Confirm {getActionLabel(data.activityType)}
-                  </Button>
-                </>
-              ) : (
-                <Button onClick={login}>Join now</Button>
-              )}
-            </Stack>
-          </Skeleton>
+                <Button onClick={handleConfirm} disabled={!linkedX} loading={statusDataLoading}>
+                  Confirm {getActionLabel(data.activityType)}
+                </Button>
+              </>
+            ) : (
+              <Button onClick={login} loading={loading}>
+                Join now
+              </Button>
+            )}
+          </Stack>
 
           {/* Embedded Post */}
           {children}
@@ -351,7 +336,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   )
 }
 
-function getStatusContent(userStatus?: TUserActivityStatus) {
+function getStatusContent(userStatus?: Partial<TUserActivityStatus>) {
   const { status, error } = userStatus || {}
 
   switch (status) {

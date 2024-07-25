@@ -1,7 +1,8 @@
 'use client'
 
 import { useAppDispatch } from '@/hooks/redux'
-import { clearData } from '@/store/slices/user'
+import { clearData as clearUser } from '@/store/slices/user'
+import { clearData as clearUserActivityStatus } from '@/store/slices/userActivityStatus'
 import { signOut } from 'next-auth/react'
 import { useLogout as _useLogout } from '@privy-io/react-auth'
 import { modals } from '@mantine/modals'
@@ -13,7 +14,8 @@ export default function useLogout() {
   // Privy logout
   const { logout } = _useLogout({
     onSuccess: () => {
-      dispatch(clearData())
+      dispatch(clearUser())
+      dispatch(clearUserActivityStatus())
       signOut({ callbackUrl: '/home' }) // NextAuth logout
     },
   })

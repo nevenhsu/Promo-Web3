@@ -84,7 +84,10 @@ export const slice = createSlice({
     },
     clearData: state => {
       // for logout
-      _.merge(state, initialState)
+      _.forEach(initialState, (value, key) => {
+        // @ts-ignore
+        state[key] = value
+      })
     },
   },
   extraReducers: builder => {
