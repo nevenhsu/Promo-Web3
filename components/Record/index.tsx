@@ -4,9 +4,6 @@ import { Link } from '@/navigation'
 import { Group, Stack, Paper, Space, Box, Tabs, Divider } from '@mantine/core'
 import { Title, Text, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import LevelCard from '@/components/share/LevelCard'
-import { PiMedalFill, PiLightning } from 'react-icons/pi'
-import classes from './index.module.css'
 
 enum TabValue {
   Score = 'Score',

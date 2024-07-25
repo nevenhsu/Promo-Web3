@@ -18,6 +18,6 @@ export async function GET(req: NextRequest, { params }: { params: { username: st
     return NextResponse.json({ user: filterUserData(user) })
   } catch (error) {
     console.error(error)
-    NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

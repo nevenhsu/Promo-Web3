@@ -111,7 +111,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
   }))
 
   const handleSubmit = async (
-    data: Omit<Activity, 'index' | 'details' | 'airdrop'>,
+    data: Omit<Activity, 'index' | 'details' | 'airdrop' | 'requirements'>,
     details: Partial<ActivityDetail>,
     airdrop: Partial<ActivityAirDrop>
   ) => {

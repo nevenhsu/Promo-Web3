@@ -21,6 +21,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ data: activities, hasMore, nextSkip })
   } catch (error) {
     console.error(error)
-    NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -22,6 +22,6 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
     return NextResponse.json({ details })
   } catch (error) {
     console.error(error)
-    NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

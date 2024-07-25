@@ -95,7 +95,7 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
     close()
   }
 
-  const handleSubmit = async (data: Omit<Activity, 'index'>) => {
+  const handleSubmit = async (data: Omit<Activity, 'index' | 'requirements'>) => {
     const newActivity = await createActivity(data)
     if (newActivity) {
       handleClose()

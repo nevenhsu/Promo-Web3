@@ -1,13 +1,8 @@
 import { getMetadata } from '@/utils/sanity/queries'
 import type { Metadata, ResolvingMetadata } from 'next'
 
-type Props = {
-  params: {}
-  searchParams: { [key: string]: string | string[] | undefined }
-}
-
 export async function generateMetadata(
-  { params, searchParams }: Props,
+  { params, searchParams }: any,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const data = await getMetadata()

@@ -16,10 +16,12 @@ interface ActivityContextType {
   loading: boolean
   setSelectedIndex: (index: number) => void
   fetchActivities: () => void
-  createActivity: (newData: Omit<Activity, 'index'>) => Promise<TActivity | undefined>
+  createActivity: (
+    newData: Omit<Activity, 'index' | 'requirements'>
+  ) => Promise<TActivity | undefined>
   updateActivity: (
     index: number,
-    updateData: Partial<Omit<Activity, 'details' | 'index'>>,
+    updateData: Partial<Omit<Activity, 'index' | 'details' | 'requirements'>>,
     updateDetails: Partial<ActivityDetail>,
     updateAirdrop: Partial<ActivityAirDrop>
   ) => Promise<TActivity | undefined>
@@ -51,7 +53,7 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }
 
-  const createActivity = async (newData: Omit<Activity, 'index'>) => {
+  const createActivity = async (newData: Omit<Activity, 'index' | 'requirements'>) => {
     try {
       setLoading(true)
       const activity = await _createActivity(newData)

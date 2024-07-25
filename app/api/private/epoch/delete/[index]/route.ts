@@ -28,6 +28,6 @@ export async function DELETE(req: NextRequest, { params }: { params: { index: st
     return NextResponse.json({ epoch })
   } catch (error) {
     console.error(error)
-    NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

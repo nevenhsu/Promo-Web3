@@ -26,6 +26,6 @@ export async function PUT(req: NextRequest, { params }: { params: { index: strin
     return NextResponse.json({ epoch: updated })
   } catch (error) {
     console.error(error)
-    NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

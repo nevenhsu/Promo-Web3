@@ -4,7 +4,7 @@ import type { Activity, TActivity, ActivityDetail, ActivityAirDrop } from '@/mod
 const api = '/api/private/activity'
 
 export const createActivity = async (
-  newData: Omit<Activity, 'index'>
+  newData: Omit<Activity, 'index' | 'requirements'>
 ): Promise<TActivity | undefined> => {
   try {
     const { data } = await axios.post<{ activity: TActivity }>(`${api}/create`, {

@@ -18,6 +18,6 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
     return NextResponse.json({ user })
   } catch (error) {
     console.error(error)
-    NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
