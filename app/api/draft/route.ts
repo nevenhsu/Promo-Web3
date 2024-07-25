@@ -13,8 +13,8 @@ export async function GET(request: Request) {
   let path = `/${lang}`
 
   switch (type) {
-    case 'activity': {
-      path += `/activity/${slug}`
+    case 'page': {
+      path += `/page/${slug}`
       break
     }
     case 'home':

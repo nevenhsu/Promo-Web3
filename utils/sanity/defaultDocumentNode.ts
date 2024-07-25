@@ -17,7 +17,7 @@ export const defaultDocumentNode: DefaultDocumentNodeResolver = (S, { schemaType
   // Only show preview pane on 'post' schema type documents
   switch (schemaType) {
     case 'home':
-    case 'activity':
+    case 'page':
       return S.document().views([
         S.view.form(),
         S.view

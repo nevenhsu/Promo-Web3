@@ -100,7 +100,7 @@ export default defineType({
                 name: 'reference',
                 type: 'reference',
                 title: 'Reference',
-                to: [{ type: 'activity' }],
+                to: [{ type: 'page' }],
               },
             ],
           },

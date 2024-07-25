@@ -4,6 +4,7 @@ import type { ImageData } from '@/types/sanity/image'
 import type { HomeData } from '@/types/sanity/home'
 import type { FooterData } from '@/types/sanity/footer'
 import type { SanitySlug } from '@/types/sanity/common'
+import type { MetadataData } from '@/types/sanity/metadataData'
 
 const assetQuery = groq`
 asset {
@@ -66,7 +67,7 @@ export const homeQuery = groq`
 *[_type=='home' && lang==$lang][0]
 {
   ...,
-  activities[]-> {
+  pages[]-> {
     ${pageDataQuery}
     "content": null,
   },
@@ -271,3 +272,13 @@ export const metadataQuery = groq`
   },
 }
 `
+
+export async function getMetadata() {
+  try {
+    const data = await client.fetch<Partial<MetadataData>>(metadataQuery)
+    return data
+  } catch (err) {
+    console.error(err)
+    return {}
+  }
+}

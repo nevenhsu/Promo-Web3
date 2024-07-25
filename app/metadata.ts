@@ -1,6 +1,4 @@
-import { client } from '@/utils/sanity/client'
-import { metadataQuery } from '@/utils/sanity/queries'
-import type { MetadataData } from '@/types/sanity/metadataData'
+import { getMetadata } from '@/utils/sanity/queries'
 import type { Metadata, ResolvingMetadata } from 'next'
 
 type Props = {
@@ -12,7 +10,7 @@ export async function generateMetadata(
   { params, searchParams }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const data = await client.fetch<Partial<MetadataData>>(metadataQuery)
+  const data = await getMetadata()
 
   // if (!data) throw new Error('no metadata document')
   const { title, description, author, keywords, cover, svg, png } = data || {}
