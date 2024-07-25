@@ -5,6 +5,7 @@ import dbConnect from '@/lib/dbConnect'
 import UserModel from '@/models/user'
 import { createUser } from '@/lib/db/user'
 import { getAdmin } from '@/lib/db/admin'
+import { env } from '@/utils/env'
 
 const privy = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID, process.env.PRIVY_APP_SECRET)
 
@@ -39,8 +40,10 @@ const handler = NextAuth({
             }
 
             const admin = await getAdmin(user._id.toString())
-            const isAdmin = Boolean(admin)
-            const adminRole = admin?.role
+            const isAdmin = Boolean(admin) || env.dev.isAdmin
+            const adminRole = admin?.role || env.dev.adminRole
+
+            console.log({ id: user._id.toString(), privyId, isAdmin, adminRole })
 
             return { id: user._id.toString(), privyId, isAdmin, adminRole }
           }

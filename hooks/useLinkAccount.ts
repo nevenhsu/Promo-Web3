@@ -1,24 +1,20 @@
 'use client'
 
 import { useEffect, useMemo } from 'react'
-import { useSession } from 'next-auth/react'
 import { usePrivy } from '@privy-io/react-auth'
 import { updateLinkAccount, deleteLinkAccount } from '@/store/slices/user'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
 import { LinkAccountPlatform } from '@/types/db'
+import { useLoginStatus } from '@/hooks/useLoginStatus'
 
 // auto update link accounts
 
 export default function useLinkAccount() {
   const dispatch = useAppDispatch()
   const { data } = useAppSelector(state => state.user)
-
-  const { user, authenticated } = usePrivy()
+  const { bothAuth } = useLoginStatus()
+  const { user } = usePrivy()
   const { google, twitter } = user || {}
-
-  const { status } = useSession()
-  const authOnServer = status === 'authenticated'
-  const authOnBoth = authOnServer && authenticated
 
   const { linkedAccounts = [] } = data
   const linkedGoogle = useMemo(
@@ -32,7 +28,7 @@ export default function useLinkAccount() {
 
   // auto update google account
   useEffect(() => {
-    if (!authOnBoth) return
+    if (!bothAuth) return
 
     const notLinked = google && !linkedGoogle
     const outDated = google && linkedGoogle && google.subject !== linkedGoogle.userId
@@ -48,11 +44,11 @@ export default function useLinkAccount() {
     } else if (!google && linkedGoogle) {
       dispatch(deleteLinkAccount(LinkAccountPlatform.Google))
     }
-  }, [authOnBoth, linkedGoogle, google])
+  }, [bothAuth, linkedGoogle, google])
 
   // auto update x account
   useEffect(() => {
-    if (!authOnBoth) return
+    if (!bothAuth) return
 
     const notLinked = twitter && !linkedX
     const outDated = twitter && linkedX && twitter.subject !== linkedX.userId
@@ -71,7 +67,7 @@ export default function useLinkAccount() {
     } else if (!twitter && linkedX) {
       dispatch(deleteLinkAccount(LinkAccountPlatform.X))
     }
-  }, [authOnBoth, linkedX, twitter])
+  }, [bothAuth, linkedX, twitter])
 
   return null
 }

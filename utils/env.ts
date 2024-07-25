@@ -13,6 +13,7 @@ export const env = {
   dev: isProd
     ? {}
     : {
+        isAdmin: true,
         adminRole: process.env.DEV_ADMIN_ROLE ? Number(process.env.DEV_ADMIN_ROLE) : undefined,
       },
 }

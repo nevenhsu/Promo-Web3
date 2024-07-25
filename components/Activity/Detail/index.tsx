@@ -2,7 +2,7 @@
 
 import * as _ from 'lodash-es'
 import { useEffect, useState, useMemo } from 'react'
-import { useSession } from 'next-auth/react'
+import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { useRouter } from '@/navigation'
 import { useAsyncFn } from 'react-use'
 import { usePrivy } from '@privy-io/react-auth'
@@ -16,7 +16,7 @@ import { Group, Stack, Box, Space, Divider, Paper } from '@mantine/core'
 import { Title, Text, Button, ThemeIcon, Progress } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiLightning, PiPersonSimpleRun, PiTrophy, PiCheckBold } from 'react-icons/pi'
-import { PiWarningBold, PiTriangleDashedBold, PiCircleDashedBold } from 'react-icons/pi'
+import { PiWarningBold, PiCircleDashedBold, PiRocketLaunch } from 'react-icons/pi'
 import { formatDate } from '@/utils/date'
 import { formatNumber } from '@/utils/math'
 import { getActionLabel, getErrorText } from '../variables'
@@ -32,8 +32,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
   const router = useRouter()
   const promo = usePromo() // for referral code
-  const session = useSession()
-  const loggedIn = session.status === 'authenticated'
+  const { loading, bothAuth } = useLoginStatus()
 
   // Platform linked account from Privy
   const { user, linkTwitter } = usePrivy()
@@ -98,7 +97,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
       return
     }
 
-    if (loggedIn && slug && status?.status !== ActivityStatus.Initial) {
+    if (bothAuth && slug && status?.status !== ActivityStatus.Initial) {
       resetUserStatus(slug)
     }
 
@@ -121,10 +120,10 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
   // Fetch user activity status
   useEffect(() => {
-    if (loggedIn && slug) {
+    if (bothAuth && slug) {
       getUserActivityStatus(slug).then(setStatus).catch(console.error)
     }
-  }, [loggedIn, slug])
+  }, [bothAuth, slug])
 
   // Update user activity status
   useEffect(() => {
@@ -202,11 +201,11 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
                         <Progress.Root size="sm">
                           <Progress.Section
-                            value={status.selfScore / details.totalScore}
+                            value={(status.selfScore / details.totalScore) * 100}
                             color="orange"
                           />
                           <Progress.Section
-                            value={bonusScore / details.totalScore}
+                            value={(bonusScore / details.totalScore) * 100}
                             color="orange.2"
                           />
                         </Progress.Root>
@@ -252,7 +251,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                           Your share
                         </Text>
 
-                        <Progress size="sm" value={airdropShare / Number(airdrop.amount)} />
+                        <Progress size="sm" value={(airdropShare / Number(airdrop.amount)) * 100} />
 
                         <Group mt="xs" gap={4}>
                           <Text fz="sm" c="orange">
@@ -304,7 +303,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
           </>
 
           <Stack>
-            {loggedIn ? (
+            {bothAuth ? (
               <>
                 <Button variant="outline" onClick={handleLinkAccount} loading={linking}>
                   {linkedX ? `Linked as ${linkedX.username}` : `Link your ${socialMedia}`}
@@ -339,8 +338,8 @@ function getStatusContent(userStatus: TUserActivityStatus) {
   switch (status) {
     case ActivityStatus.Unjoined: {
       const title = 'Join now'
-      const message = 'You have not joined this activity yet'
-      const icon = <PiTriangleDashedBold size={20} />
+      const message = 'Join this activity to earn rewards'
+      const icon = <PiRocketLaunch size={20} />
       const color = 'dark'
       return { title, message, icon, color }
     }
@@ -362,7 +361,7 @@ function getStatusContent(userStatus: TUserActivityStatus) {
       const title = 'Waiting for confirmation'
       const message = 'We will confirm your activity soon'
       const icon = <PiCircleDashedBold size={20} />
-      const color = 'blue'
+      const color = 'dark'
       return { title, message, icon, color }
     }
   }
