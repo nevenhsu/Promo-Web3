@@ -32,8 +32,7 @@ import type { TUserActivityStatus } from '@/models/userActivityStatus'
 type ActivityDetailProps = { data: TPublicActivity; children?: React.ReactNode }
 
 export default function ActivityDetail({ data, children }: ActivityDetailProps) {
-  const { slug, airdrop } = data
-  const socialMedia = toUpper(data.socialMedia)
+  const { slug, airdrop, socialMedia } = data
 
   const dispatch = useAppDispatch()
   const router = useRouter()
@@ -297,7 +296,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
               <Group gap="xs">
                 <PiLightning size={20} />
                 <Text fz="sm">
-                  {getActionLabel(data.activityType)} on {socialMedia}
+                  {getActionLabel(data.activityType)} on {toUpper(socialMedia)}
                 </Text>
               </Group>
 

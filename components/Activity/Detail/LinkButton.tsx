@@ -20,7 +20,7 @@ export default function LinkButton({ platform, onLink }: LinkButtonProps) {
   }, [linkedAccounts, platform])
 
   return (
-    <Button onClick={onLink} loading={linking}>
+    <Button variant="outline" onClick={onLink} loading={linking}>
       {account ? `Linked as ${account.username}` : `Link your ${toUpper(platform)}`}
     </Button>
   )
