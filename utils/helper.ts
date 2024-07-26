@@ -26,3 +26,11 @@ export function getStartOfDate(date: string | number | Date) {
   const d = format(date, 'yyyy-MM-dd')
   return fromZonedTime(d, timezone)
 }
+
+export function toUpper(str: string) {
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map(word => word[0].toUpperCase() + word.substring(1))
+    .join(' ')
+}

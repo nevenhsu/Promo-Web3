@@ -11,7 +11,7 @@ import RwdLayout from '@/components/share/RwdLayout'
 export default function Index() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { bothAuth } = useLoginStatus()
+  const { bothAuth, loading } = useLoginStatus()
   const promo = usePromo()
 
   // Get the callback URL from the url query params
@@ -46,7 +46,9 @@ export default function Index() {
 
   return (
     <RwdLayout>
-      <Button onClick={handleClick}>Get Started</Button>
+      <Button onClick={handleClick} loading={loading}>
+        Get Started
+      </Button>
     </RwdLayout>
   )
 }

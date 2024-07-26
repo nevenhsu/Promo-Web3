@@ -5,6 +5,7 @@ import type { BreakPoint } from '@/types/common'
 
 type AppState = {
   isPreview: boolean
+  isMobileDevice: boolean
   breakPoints: BreakPoint[]
   viewportSize: { width: number; height: number }
 }
@@ -17,6 +18,7 @@ type AppValue = {
 
 const initialState: AppState = {
   isPreview: false,
+  isMobileDevice: false,
   breakPoints: ['base'], // ['base', 'xs', 'sm', 'md', 'lg', 'xl']
   viewportSize: { width: 0, height: 0 },
 }
@@ -31,10 +33,14 @@ const initValue: AppValue = {
 const AppContext = createContext(initValue)
 
 // Create a provider component
-type AppProviderProps = { isPreview: boolean; children: React.ReactNode }
+type AppProviderProps = {
+  isPreview: boolean
+  isMobileDevice: boolean
+  children: React.ReactNode
+}
 
-export const AppProvider = ({ isPreview, children }: AppProviderProps) => {
-  const [state, setState] = useState({ ...initialState, isPreview })
+export const AppProvider = ({ isPreview, isMobileDevice, children }: AppProviderProps) => {
+  const [state, setState] = useState({ ...initialState, isPreview, isMobileDevice })
 
   const updateState = (next: Partial<AppState>) =>
     setState(prev => {
@@ -52,6 +58,10 @@ export const AppProvider = ({ isPreview, children }: AppProviderProps) => {
   useEffect(() => {
     updateState({ isPreview })
   }, [isPreview])
+
+  useEffect(() => {
+    updateState({ isMobileDevice })
+  }, [isMobileDevice])
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
 }

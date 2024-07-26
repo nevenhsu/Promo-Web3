@@ -9,6 +9,7 @@ import RwdLayout from '@/components/share/RwdLayout'
 import { getActionLabel } from './variables'
 import { formatDate } from '@/utils/date'
 import { formatNumber } from '@/utils/math'
+import { toUpper } from '@/utils/helper'
 import type { TPublicActivity } from '@/models/activity'
 
 enum TabValue {
@@ -108,7 +109,7 @@ function ActivityItem({ data }: { data: TPublicActivity }) {
                   <Text fz="xs" c="dimmed">
                     Platform
                   </Text>
-                  <Text fz="sm">{data.socialMedia.toUpperCase()}</Text>
+                  <Text fz="sm">{toUpper(data.socialMedia)}</Text>
                 </Box>
                 <Box ta="center">
                   <Text fz="xs" c="dimmed">

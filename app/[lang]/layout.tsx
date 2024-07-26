@@ -4,6 +4,7 @@ import Script from 'next/script'
 import dynamic from 'next/dynamic'
 import { draftMode } from 'next/headers'
 import { ColorSchemeScript } from '@mantine/core'
+import { detectDevice } from '@/lib/userAgent'
 import { AppProvider } from '@/store/AppContext'
 import Providers from '@/components/providers/Providers'
 import MyAppShell from '@/components/MyAppShell'
@@ -31,6 +32,7 @@ export default function LocaleLayout({
   unstable_setRequestLocale(lang)
 
   const { isEnabled } = draftMode()
+  const { isMobileDevice } = detectDevice()
   const messages = useMessages()
 
   const renderContent = () => {
@@ -57,7 +59,7 @@ export default function LocaleLayout({
       <body style={{ width: '100vw', overflowX: 'hidden' }}>
         <NextIntlClientProvider locale={lang} messages={messages}>
           <Providers>
-            <AppProvider isPreview={isEnabled}>
+            <AppProvider isPreview={isEnabled} isMobileDevice={isMobileDevice}>
               {isEnabled ? (
                 <PreviewProvider token={env.sanityToken}>{renderContent()}</PreviewProvider>
               ) : (

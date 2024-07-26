@@ -8,19 +8,24 @@ import { useAsyncFn } from 'react-use'
 import { usePrivy } from '@privy-io/react-auth'
 import useLogin from '@/hooks/useLogin'
 import { usePromo } from '@/hooks/usePromo'
+import { useAppContext } from '@/store/AppContext'
 import { useAppSelector, useAppDispatch } from '@/hooks/redux'
 import { fetchUserActivityStatus, resetUserActivityStatus } from '@/store/slices/userActivityStatus'
 import { getPublicActivityDetails } from '@/services/activity'
 import { notifications } from '@mantine/notifications'
+import { useDisclosure } from '@mantine/hooks'
 import { Group, Stack, Box, Space, Divider, Paper, Skeleton } from '@mantine/core'
 import { Title, Text, Button, ThemeIcon, Progress } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
+import LinkModal from './LinkModal'
+import LinkButton from './LinkButton'
 import { PiLightning, PiPersonSimpleRun, PiTrophy, PiCheckBold } from 'react-icons/pi'
 import { PiWarningBold, PiCircleDashedBold, PiRocketLaunch } from 'react-icons/pi'
 import { formatDate } from '@/utils/date'
 import { formatNumber } from '@/utils/math'
 import { getActionLabel, getErrorText } from '../variables'
 import { LinkAccountPlatform, ActivityStatus } from '@/types/db'
+import { toUpper } from '@/utils/helper'
 import type { TPublicActivity } from '@/models/activity'
 import type { TUserActivityStatus } from '@/models/userActivityStatus'
 
@@ -28,12 +33,16 @@ type ActivityDetailProps = { data: TPublicActivity; children?: React.ReactNode }
 
 export default function ActivityDetail({ data, children }: ActivityDetailProps) {
   const { slug, airdrop } = data
-  const socialMedia = data.socialMedia.toUpperCase()
+  const socialMedia = toUpper(data.socialMedia)
 
   const dispatch = useAppDispatch()
   const router = useRouter()
   const promo = usePromo() // for referral code
   const { bothAuth, loading } = useLoginStatus()
+
+  // for link modal
+  const { isMobileDevice } = useAppContext().state
+  const [opened, { open, close }] = useDisclosure(false)
 
   // Platform linked account from Privy
   const { user, linkTwitter } = usePrivy()
@@ -108,7 +117,8 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
   const handleLinkAccount = () => {
     if (twitter) return
-    linkTwitter()
+
+    isMobileDevice ? open() : linkTwitter()
   }
 
   // Fetch realtime activity details
@@ -311,9 +321,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
           <Stack>
             {bothAuth ? (
               <>
-                <Button variant="outline" onClick={handleLinkAccount} loading={linking}>
-                  {linkedX ? `Linked as ${linkedX.username}` : `Link your ${socialMedia}`}
-                </Button>
+                <LinkButton platform={socialMedia} onLink={handleLinkAccount} />
 
                 <Button onClick={handleConfirm} disabled={!linkedX} loading={statusDataLoading}>
                   Confirm {getActionLabel(data.activityType)}
@@ -330,6 +338,8 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
           {children}
         </Stack>
       </RwdLayout>
+
+      <LinkModal platform={socialMedia} opened={opened} onClose={close} />
 
       <Space h={100} />
     </>
