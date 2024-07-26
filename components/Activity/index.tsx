@@ -78,14 +78,14 @@ function ActivityItem({ data }: { data: TPublicActivity }) {
           {/* Left */}
           <Stack py="md" justify="space-between" w={56} flex="1 0 auto">
             <Box ta="center">
-              <Text fz="sm" lh={1}>
+              <Text className="nowrap" fz="sm" lh={1}>
                 {data.airdrop.symbol}
               </Text>
-              <Title order={3} c="orange">
+              <Title className="nowrap" order={3} c="orange">
                 {formatNumber(data.airdrop.amount)}
               </Title>
             </Box>
-            <Text ta="center" fz="xs" c="dimmed">
+            <Text className="nowrap" ta="center" fz="xs" c="dimmed">
               {formatDate(new Date(data.endTime))}
             </Text>
           </Stack>
@@ -95,7 +95,7 @@ function ActivityItem({ data }: { data: TPublicActivity }) {
           {/* Right */}
           <Stack gap={32} py="md" w="100%">
             <Box>
-              <Title order={4} fw={500} lh={1} mb={8}>
+              <Title order={4} fw={500} mb={8} mt={-4} lh={1.25}>
                 {data.title}
               </Title>
               <Text fz="xs" c="dark" lineClamp={2}>
@@ -106,16 +106,16 @@ function ActivityItem({ data }: { data: TPublicActivity }) {
             <Group justify="space-between">
               <Group gap={24}>
                 <Box ta="center">
+                  <Text fz="xs">{toUpper(data.socialMedia)}</Text>
                   <Text fz="xs" c="dimmed">
                     Platform
                   </Text>
-                  <Text fz="sm">{toUpper(data.socialMedia)}</Text>
                 </Box>
                 <Box ta="center">
+                  <Text fz="xs">{getActionLabel(data.activityType)}</Text>
                   <Text fz="xs" c="dimmed">
                     Action
                   </Text>
-                  <Text fz="sm">{getActionLabel(data.activityType)}</Text>
                 </Box>
               </Group>
               <Link

@@ -1,3 +1,4 @@
+import type mongoose from 'mongoose'
 import { TUser } from '@/models/user'
 
 export type PublicUser = Pick<TUser, 'name' | 'username' | 'details'>
@@ -57,4 +58,18 @@ export enum ActivityErrorCode {
   NotFound = 2, // Post not found, user not found, etc
   NotFulfilled = 3, // Not enough followers, friends, etc
   Error = 4, // Error in processing
+}
+
+export type LeanDocumentArray<MySchema extends Record<string, any>> = {
+  [K in keyof MySchema]: MySchema[K] extends mongoose.Types.DocumentArray<infer ArrayType>
+    ? LeanDocumentArray<Omit<ArrayType, keyof mongoose.Types.Subdocument>>[]
+    : MySchema[K] extends
+          | number
+          | string
+          | boolean
+          | Date
+          | mongoose.Schema.Types.ObjectId
+          | mongoose.Types.ObjectId
+      ? MySchema[K]
+      : LeanDocumentArray<MySchema[K]>
 }

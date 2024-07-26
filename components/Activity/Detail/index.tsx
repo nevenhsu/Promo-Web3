@@ -17,8 +17,8 @@ import { useDisclosure } from '@mantine/hooks'
 import { Group, Stack, Box, Space, Divider, Paper, Skeleton } from '@mantine/core'
 import { Title, Text, Button, ThemeIcon, Progress } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import LinkModal from './LinkModal'
-import LinkButton from './LinkButton'
+import LinkModal from '@/components/share/LinkModal'
+import LinkButton from '@/components/share/LinkButton'
 import { PiLightning, PiPersonSimpleRun, PiTrophy, PiCheckBold } from 'react-icons/pi'
 import { PiWarningBold, PiCircleDashedBold, PiRocketLaunch } from 'react-icons/pi'
 import { formatDate } from '@/utils/date'
@@ -182,7 +182,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
               <Stack gap="sm">
                 {renderStatus(statusData)}
 
-                {statusData ? (
+                {statusData && statusData.totalScore > 0 ? (
                   <>
                     <Skeleton visible={statusLoading}>
                       <Paper radius="sm" p="md" shadow="xs">
@@ -201,7 +201,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                           <Stack gap="lg">
                             <Box>
                               <Text c="dark" fz="sm" mb="xs">
-                                Your post score
+                                Your activity score
                               </Text>
 
                               <Progress.Root size="sm">
@@ -211,18 +211,14 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                                 />
                                 <Progress.Section
                                   value={(bonusScore / details.totalScore) * 100}
-                                  color="orange.2"
+                                  color="orange.3"
                                 />
                               </Progress.Root>
 
                               <Group mt="xs" justify="space-between">
-                                <Group gap="sm">
-                                  <Text fz="sm" c="orange">
-                                    Score: {formatNumber(statusData.selfScore)}
-                                  </Text>
-                                  <Text fz="sm" c="orange.4">
-                                    Bonus: {formatNumber(bonusScore)}
-                                  </Text>
+                                <Group gap="sm" c="orange">
+                                  <Text fz="sm">Score: {formatNumber(statusData.selfScore)}</Text>
+                                  <Text fz="sm">Bonus: {formatNumber(bonusScore)}</Text>
                                 </Group>
                                 <Text fz="sm" c="dimmed">
                                   Total: {formatNumber(details.totalScore)}
@@ -244,7 +240,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                       <Paper radius="sm" p="md" shadow="xs">
                         <Group justify="space-between">
                           <Title order={4} fw={500}>
-                            Airdrop share
+                            Airdrop reward
                           </Title>
                           <Title order={4} c="orange">
                             {formatNumber(airdropShare)} {airdrop.symbol}
@@ -257,7 +253,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                           <Stack gap="lg">
                             <Box>
                               <Text c="dark" fz="sm" mb="xs">
-                                Your share
+                                Current estimated reward
                               </Text>
 
                               <Progress

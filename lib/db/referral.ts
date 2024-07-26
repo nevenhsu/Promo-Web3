@@ -14,7 +14,7 @@ export async function createReferral(_referrer: string, _referee: string) {
   // If the referrer has a referrer, create a second-level referral
   const upperReferral = await getReferrer(_referrer)
   if (upperReferral) {
-    await _createReferral(upperReferral._referrer._id, _referee, ReferralLevel.Second)
+    await _createReferral(upperReferral._referrer._id.toString(), _referee, ReferralLevel.Second)
   }
 
   return referral
@@ -45,7 +45,7 @@ export async function _createReferral(_referrer: string, _referee: string, level
 }
 
 export async function getReferral(_referrer: string, _referee: string) {
-  const referral = await ReferralModel.findOne({ _referrer, _referee })
+  const referral = await ReferralModel.findOne({ _referrer, _referee }).lean()
   return referral
 }
 
@@ -53,7 +53,10 @@ export async function getReferrer(_referee: string) {
   const referral = await ReferralModel.findOne({
     _referee,
     level: ReferralLevel.First,
-  }).populate<{ _referrer: TUser }>('_referrer')
+  })
+    .lean()
+    .populate<{ _referrer: TUser }>('_referrer')
+
   return referral
 }
 
@@ -90,8 +93,8 @@ export async function getReferralByLevel(
     .sort({ createdAt })
     .skip(skip)
     .limit(n)
+    .lean()
     .populate<{ _referee: TUser }>('_referee')
-    .exec()
 
   return referral
 }

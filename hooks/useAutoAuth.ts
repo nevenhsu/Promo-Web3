@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { signIn } from 'next-auth/react'
 import { usePrivy } from '@privy-io/react-auth'
-import { fetchUser } from '@/store/slices/user'
+import { fetchUser, fetchUserStatus } from '@/store/slices/user'
 import { useAppDispatch } from '@/hooks/redux'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
 
@@ -42,6 +42,7 @@ export default function useAutoAuth() {
   useEffect(() => {
     if (nextAuth) {
       dispatch(fetchUser())
+      dispatch(fetchUserStatus())
     }
   }, [nextAuth])
 

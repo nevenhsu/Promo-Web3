@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { TUser } from '@/models/user'
-import type { BucketType, PublicUser, LinkAccountPlatform } from '@/types/db'
+import type { BucketType, PublicUser } from '@/types/db'
 
 export const getUserInfo = async (): Promise<TUser | undefined> => {
   try {

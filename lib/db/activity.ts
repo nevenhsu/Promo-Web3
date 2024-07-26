@@ -36,6 +36,7 @@ export async function getPublicActivities(
     .sort({ index })
     .skip(skip)
     .limit(n)
+    .lean()
     .exec()
 
   const joinedIds: { [id: string]: boolean } = {}
@@ -53,9 +54,8 @@ export async function getPublicActivities(
   }
 
   // add join status to activities
-  return activities.map(activity => {
-    const joined = joinedIds[activity._id.toString()] || false
-    const doc = activity.toJSON()
+  return activities.map(doc => {
+    const joined = joinedIds[doc._id.toString()] || false
     return { ...doc, joined }
   })
 }
@@ -64,7 +64,7 @@ export async function getPublicActivity(slug: string) {
   const activity = await ActivityModel.findOne({
     slug,
     published: true,
-  }).exec()
+  }).lean()
 
   return activity
 }
@@ -75,7 +75,7 @@ export async function getPublicActivityDetails(slug: string) {
     published: true,
   })
     .select('details')
-    .exec()
+    .lean()
 
   return data?.details
 }
@@ -89,7 +89,7 @@ export async function getActivityId(slug: string) {
     slug,
   })
     .select('index')
-    .exec()
+    .lean()
 
   return data?._id.toString()
 }
@@ -172,13 +172,13 @@ export async function deleteActivity(index: number) {
 }
 
 export async function getAllActivity() {
-  const activities = await ActivityModel.find().sort({ index: -1 })
+  const activities = await ActivityModel.find().sort({ index: -1 }).lean()
   console.log('All activities:', activities.length)
   return activities
 }
 
 export async function getActivity(slug: string) {
-  const activity = await ActivityModel.findOne({ slug }).orFail()
+  const activity = await ActivityModel.findOne({ slug }).lean().orFail()
   return activity
 }
 

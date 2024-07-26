@@ -1,19 +1,38 @@
 'use client'
 
+import * as _ from 'lodash-es'
+import Decimal from 'decimal.js'
 import { useAppSelector } from '@/hooks/redux'
 import { useReferral } from '@/store/contexts/user/referralContext'
 import { Link } from '@/navigation'
 import { Stack, Group, Box, Paper, SimpleGrid, Divider, Space } from '@mantine/core'
 import { Title, Text, ThemeIcon, ActionIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
+import { formatNumber } from '@/utils/math'
 import { PiRocket, PiRocketLaunch, PiCurrencyCircleDollar } from 'react-icons/pi'
 import { PiCaretRight, PiBarcode } from 'react-icons/pi'
+import type { Airdrop } from '@/models/userStatus'
+
+// TODO: get activity counts from API
 
 export default function Home() {
-  const { data, _id } = useAppSelector(state => state.user)
+  const { data, status } = useAppSelector(state => state.user)
   const { name } = data
 
   const { isReferred } = useReferral()
+
+  const {
+    referral1stScore,
+    referral2ndScore,
+    totalScore = 0,
+    selfScore = 0,
+    airdrops = [],
+  } = status || {}
+
+  const referralScore = _.sum([referral1stScore, referral2ndScore])
+  const airdropValues = airdrops.map(getAirdropValue)
+  const receivedValue = _.sumBy(airdropValues, 'receivedValue')
+  const pendingValue = _.sumBy(airdropValues, 'pendingValue')
 
   return (
     <>
@@ -25,7 +44,7 @@ export default function Home() {
           <Paper p={16} c="white" bg="orange">
             <Group justify="space-between">
               <Title order={4}>Total Score</Title>
-              <Title order={4}>32,542</Title>
+              <Title order={4}>{totalScore}</Title>
             </Group>
             <Space h={12} />
             <Divider color="white" />
@@ -35,14 +54,14 @@ export default function Home() {
                 <PiRocket size={24} />
                 <Box>
                   <Text size="xs">Activity</Text>
-                  <Text fw={500}>32,542</Text>
+                  <Text fw={500}>{selfScore}</Text>
                 </Box>
               </Group>
               <Group gap={12}>
                 <PiRocketLaunch size={24} />
                 <Box>
                   <Text size="xs">Referral</Text>
-                  <Text fw={500}>2,820</Text>
+                  <Text fw={500}>{referralScore}</Text>
                 </Box>
               </Group>
             </SimpleGrid>
@@ -105,13 +124,13 @@ export default function Home() {
                 <Text size="xs" c="dimmed">
                   Received
                 </Text>
-                <Title order={4}>$12.22</Title>
+                <Title order={4}>${formatNumber(receivedValue)}</Title>
               </Box>
               <Box>
                 <Text size="xs" c="dimmed">
                   Pending
                 </Text>
-                <Title order={4}>$2.38</Title>
+                <Title order={4}>${formatNumber(pendingValue)}</Title>
               </Box>
             </SimpleGrid>
           </Paper>
@@ -171,4 +190,12 @@ export default function Home() {
       <Space h={100} />
     </>
   )
+}
+
+function getAirdropValue(data: Airdrop) {
+  const { symbol, receivedAmount, pendingAmount } = data
+  const price = 1 // get price from API
+  const receivedValue = new Decimal(receivedAmount).mul(price).toNumber()
+  const pendingValue = new Decimal(pendingAmount).mul(price).toNumber()
+  return { receivedValue, pendingValue }
 }

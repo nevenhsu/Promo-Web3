@@ -2,6 +2,7 @@ import { models, model, Model, Schema } from 'mongoose'
 import { LinkAccountPlatform } from '@/types/db'
 import { customAlphabet } from 'nanoid'
 import { cleanup } from '@/utils/helper'
+import type { LeanDocumentArray } from '@/types/db'
 import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
 
 // no sensitive data here
@@ -38,12 +39,8 @@ export const schema = new Schema({
 
 // Types for redux store
 export type LinkedAccount = InferSchemaType<typeof linkedAccountSchema>
-type TLinkedAccount = LinkedAccount & { _id: string }
 export type User = InferSchemaType<typeof schema>
-export type TUser = Omit<User, 'linkedAccounts'> & {
-  _id: string
-  linkedAccounts: TLinkedAccount[]
-}
+export type TUser = LeanDocumentArray<User> & { _id: string }
 
 // Function to generate a random string
 function randomUsername() {

@@ -30,7 +30,7 @@ export default function Record() {
                       <Text fz="sm" lh={1}>
                         Score
                       </Text>
-                      <Title order={3} c="orange">
+                      <Title className="nowrap" order={3} c="orange">
                         12.8k
                       </Title>
                     </Box>
@@ -43,23 +43,23 @@ export default function Record() {
 
                   {/* Right */}
                   <Stack gap={32} py="md" w="100%">
-                    <Title order={4} fw={500} lh={1} mb={8}>
+                    <Title order={4} fw={500} mb={8} mt={-4} lh={1.25}>
                       Headline
                     </Title>
 
                     <Group justify="space-between">
                       <Group gap={24}>
                         <Box ta="center">
+                          <Text fz="xs">12.6k</Text>
                           <Text fz="xs" c="dimmed">
-                            Earn
+                            Gain
                           </Text>
-                          <Text fz="sm">12.6k</Text>
                         </Box>
                         <Box ta="center">
+                          <Text fz="xs">1.2k</Text>
                           <Text fz="xs" c="dimmed">
                             Bonus
                           </Text>
-                          <Text fz="sm">1.2k</Text>
                         </Box>
                       </Group>
                       <Link
