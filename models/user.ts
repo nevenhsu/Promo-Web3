@@ -64,7 +64,13 @@ const handleUpdate = async function (next: CallbackWithoutResultAndOptionalError
   /* @ts-expect-error */
   const update = this.getUpdate()
   if (update && update.username) {
-    update.username = cleanup(update.username)
+    const cleaned = cleanup(update.username)
+
+    if (cleaned.length < 2) {
+      throw new Error('Invalid username')
+    }
+
+    update.username = cleaned
     /* @ts-expect-error */
     this.setUpdate(update)
   }

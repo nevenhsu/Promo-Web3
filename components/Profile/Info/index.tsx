@@ -32,34 +32,28 @@ export default function ProfileInfo() {
   }, [updating, prevUpdating])
 
   const form = useForm({
-    mode: 'uncontrolled',
+    mode: 'controlled',
     initialValues: {
       name,
       username,
     },
     validate: {
       name: hasLength({ min: 1, max: 20 }, 'Should be between 1 and 20 characters'),
-      username: hasLength({ min: 1, max: 20 }, 'Should be between 1 and 20 characters'),
+      username: o => {
+        const cleaned = cleanup(o)
+        form.setFieldValue('username', cleaned)
+        return hasLength({ min: 2, max: 20 }, 'Should be between 2 and 20 characters')(cleaned)
+      },
     },
   })
 
+  const values = form.getValues()
+  const alreadyUpdated = values.username === username && values.name === name
+
   const handleSubmit = (values: typeof form.values) => {
-    if (values.username === username && values.name === name) {
-      notifications.show({
-        title: 'Already updated',
-        message: 'No changes detected',
-        color: 'dark',
-      })
-      return
-    }
-
     if (values.name && values.username) {
-      // Clean up username
-      const cleanUsername = cleanup(values.username)
-      form.setFieldValue('username', cleanUsername)
-
       // Update user info
-      updateInfo(values.name, cleanUsername)
+      updateInfo(values.name, cleanup(values.username))
     }
   }
 
@@ -78,6 +72,7 @@ export default function ProfileInfo() {
       dispatch(updateUser({ name, username }))
     } catch (err) {
       console.error(err)
+      // TODO: Show error notification
     }
   }
 
@@ -110,7 +105,6 @@ export default function ProfileInfo() {
           <form
             onSubmit={form.onSubmit(
               values => handleSubmit(values),
-
               (validationErrors, values, event) => {
                 console.log(
                   validationErrors, // <- form.errors at the moment of submit
@@ -144,7 +138,7 @@ export default function ProfileInfo() {
                   </Button>
                 </Link>
 
-                <Button type="submit" loading={updating}>
+                <Button type="submit" loading={updating} disabled={alreadyUpdated}>
                   Update Profile
                 </Button>
               </Group>

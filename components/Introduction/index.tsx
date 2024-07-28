@@ -25,17 +25,21 @@ export default function Index() {
         return promo ? router.push('/refer/code') : router.push('/activity')
       }
 
-      if (!wasAlreadyAuthenticated) {
-        return router.push('/home')
-      }
-
       if (callbackPath) {
         return router.push(callbackPath)
+      }
+
+      if (!wasAlreadyAuthenticated) {
+        return router.push('/home')
       }
     },
   })
 
   const handleClick = () => {
+    if (callbackPath) {
+      return router.push(callbackPath)
+    }
+
     if (bothAuth) {
       router.push('/home')
       return

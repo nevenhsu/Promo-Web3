@@ -231,7 +231,7 @@ export default function Send() {
             <Stack>
               <TextInput
                 label="Transfer Address"
-                placeholder="Public Address (0x...)"
+                placeholder="Wallet Address (0x...)"
                 rightSectionWidth={56}
                 rightSection={
                   <Button size="compact-sm" variant="transparent" onClick={handlePaste}>

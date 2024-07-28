@@ -101,6 +101,5 @@ function isAdminPage(pathname: string) {
 }
 
 function isAdmin(token: JWT | null) {
-  const adminRole = token?.user?.adminRole ?? env.dev.adminRole
-  return adminRole !== undefined
+  return token?.user?.isAdmin ?? env.dev.isAdmin ?? false
 }

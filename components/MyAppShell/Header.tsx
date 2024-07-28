@@ -2,7 +2,7 @@
 
 import { Link, usePathname, useRouter } from '@/navigation'
 import { useAppSelector } from '@/hooks/redux'
-import { usePrivy } from '@privy-io/react-auth'
+import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { usePromo } from '@/hooks/usePromo'
 import { Group, Box, ActionIcon, Avatar } from '@mantine/core'
 import Logo from '@/public/icons/logo.svg'
@@ -13,8 +13,8 @@ export default function Header() {
   const pathname = usePathname()
   usePromo() // Save promo code
 
-  const { authenticated } = usePrivy()
-  const { data, _id } = useAppSelector(state => state.user)
+  const { bothAuth } = useLoginStatus()
+  const { data } = useAppSelector(state => state.user)
 
   const { name, details } = data
   const avatar = details?.avatar || ''
@@ -42,7 +42,7 @@ export default function Header() {
         </Group>
 
         <Group>
-          {authenticated && Boolean(_id) ? (
+          {bothAuth ? (
             <Link href="/profile">
               <Avatar src={avatar}>{name ? name.substring(0, 1).toUpperCase() : ''}</Avatar>
             </Link>
