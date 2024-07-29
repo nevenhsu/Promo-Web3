@@ -62,6 +62,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   const statusDataFetched = userActivityStatus.fetched[slug]
   const statusLoading = statusDataLoading || !statusDataFetched // not fetched yet
   const bonusScore = _.sum([statusData?.referral1stScore, statusData?.referral2ndScore])
+  const confirmed = statusData?.status === ActivityStatus.Completed
 
   // Activity details
   const [fetchDetailsState, fetchDetails] = useAsyncFn(async (slug: string) => {
@@ -94,7 +95,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
   const handleConfirm = () => {
     // If the activity is completed or initial, do nothing
-    if (statusData?.status === ActivityStatus.Completed) {
+    if (confirmed) {
       notifications.show({
         title: 'Activity completed',
         message: 'You have already completed this activity',
@@ -318,8 +319,12 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
               <>
                 <LinkButton platform={socialMedia} onLink={handleLinkAccount} />
 
-                <Button onClick={handleConfirm} disabled={!linkedX} loading={statusDataLoading}>
-                  Confirm {getActionLabel(data.activityType)}
+                <Button
+                  onClick={handleConfirm}
+                  disabled={!linkedX || confirmed}
+                  loading={statusDataLoading}
+                >
+                  {confirmed ? 'Completed' : `Confirm ${getActionLabel(data.activityType)}`}
                 </Button>
               </>
             ) : (

@@ -1,12 +1,6 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import type { LeanDocumentArray } from '@/types/db'
 
-const airdropSchema = new Schema({
-  symbol: { type: String, required: true },
-  receivedAmount: { type: String, default: '0' }, // Base unit, not wei, ex: 10 USDC
-  pendingAmount: { type: String, default: '0' }, // Base unit, not wei, ex: 10 USDC
-})
-
 export const schema = new Schema({
   _user: {
     type: Schema.Types.ObjectId,
@@ -24,11 +18,8 @@ export const schema = new Schema({
   // referral score
   referral1stScore: { type: Number, default: 0.0 }, // 1st level referral score
   referral2ndScore: { type: Number, default: 0.0 }, // 2nd level referral score
-  // air drop
-  airdrops: { type: [airdropSchema], default: [] },
 })
 
-export type Airdrop = InferSchemaType<typeof airdropSchema>
 export type UserStatus = InferSchemaType<typeof schema>
 export type TUserStatus = LeanDocumentArray<UserStatus>
 

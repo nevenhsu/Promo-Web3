@@ -23,3 +23,11 @@ export async function updateUserActivityStatus(
 
   return doc
 }
+
+export async function countUserActivityStatus(userId: string, finalized: boolean) {
+  const count = await UserActivityStatusModel.countDocuments({
+    _user: userId,
+    finalized: finalized ? true : { $in: [null, false] },
+  })
+  return count
+}

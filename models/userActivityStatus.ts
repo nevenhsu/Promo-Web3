@@ -25,9 +25,10 @@ export const schema = new Schema({
   selfScore: { type: Number, default: 0.0 },
   referral1stScore: { type: Number, default: 0.0 }, // 1st level referral score
   referral2ndScore: { type: Number, default: 0.0 }, // 2nd level referral score
-  updatedAt: { type: Date, default: Date.now }, // last updated date
-  finalized: { type: Boolean, default: false, index: true }, // airdrop share finalized
   details: { type: Object, default: {} }, // additional details
+  updatedAt: { type: Date, default: Date.now, index: true }, // last updated date
+  finalized: { type: Boolean, default: false, index: true }, // airdrop amount finalized
+  airdropped: { type: Boolean, default: false, index: true }, // airdrop sent
 })
 
 schema.index({ _activity: 1, _user: 1 }, { unique: true }) // unique index for activity and user

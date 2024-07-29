@@ -26,10 +26,10 @@ export default function LinkModal({ platform, opened, onClose }: LinkModalProps)
         <Stack gap="xl">
           <Box>
             <Text fz="sm" mb="xs">
-              Please use a computer to ensure a smooth connection of your {platformUpper} account.
+              Please stay on browser to ensure a smooth connection of your {platformUpper} account.
             </Text>
             <Text fz="sm" c="red">
-              Connecting via a mobile device may result in issues.
+              Connecting via app may result in issues.
             </Text>
           </Box>
           <LinkButton platform={platform} onLink={handleLink} />

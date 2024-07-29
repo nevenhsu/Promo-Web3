@@ -6,10 +6,9 @@ import {
   updateLinkAccount as _updateLinkAccount,
   deleteLinkAccount as _deleteLinkAccount,
 } from '@/services/user'
-import { getUserStatus } from '@/services/userStatus'
+import { getUserStatus, type TUserStatus } from '@/services/userStatus'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { TUser, LinkedAccount } from '@/models/user'
-import type { TUserStatus } from '@/models/userStatus'
 
 export const fetchUser = createAsyncThunk<Partial<TUser>>('user/fetch', async () => {
   try {
@@ -72,7 +71,7 @@ export interface IUserState {
   updating: boolean // for update user
   linking: boolean // for link account
   data: Partial<TUser>
-  status?: TUserStatus
+  statusData?: TUserStatus
 }
 
 const initialState: IUserState = {
@@ -81,7 +80,7 @@ const initialState: IUserState = {
   updating: false,
   linking: false,
   data: {},
-  status: undefined,
+  statusData: undefined,
 }
 
 export const slice = createSlice({
@@ -136,7 +135,7 @@ export const slice = createSlice({
       }
     })
     builder.addCase(fetchUserStatus.fulfilled, (state, action) => {
-      state.status = action.payload
+      state.statusData = action.payload
     })
   },
 })

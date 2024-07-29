@@ -11,25 +11,20 @@ import RwdLayout from '@/components/share/RwdLayout'
 import { formatNumber } from '@/utils/math'
 import { PiRocket, PiRocketLaunch, PiCurrencyCircleDollar } from 'react-icons/pi'
 import { PiCaretRight, PiBarcode } from 'react-icons/pi'
-import type { Airdrop } from '@/models/userStatus'
+import type { Airdrop } from '@/models/airdrop'
 
 // TODO: get activity counts from API
 
 export default function Home() {
-  const { data, status } = useAppSelector(state => state.user)
+  const { data, statusData } = useAppSelector(state => state.user)
   const { name } = data
 
   const { isReferred } = useReferral()
 
-  const {
-    referral1stScore,
-    referral2ndScore,
-    totalScore = 0,
-    selfScore = 0,
-    airdrops = [],
-  } = status || {}
+  const { airdrops = [], progress, status } = statusData || {}
+  const { referral1stScore, referral2ndScore, totalScore = 0, selfScore = 0 } = status || {}
 
-  const referralScore = _.sum([referral1stScore, referral2ndScore])
+  const referralScore = _.sum([referral1stScore, referral2ndScore]) || 0
   const airdropValues = airdrops.map(getAirdropValue)
   const receivedValue = _.sumBy(airdropValues, 'receivedValue')
   const pendingValue = _.sumBy(airdropValues, 'pendingValue')
@@ -70,7 +65,7 @@ export default function Home() {
           {/* Activity */}
           <Paper p={16} shadow="xs">
             <Group>
-              <ThemeIcon size="xl" radius="md">
+              <ThemeIcon size="xl" radius="md" variant="light">
                 <PiRocket size={24} />
               </ThemeIcon>
               <Box>
@@ -88,15 +83,15 @@ export default function Home() {
             <SimpleGrid cols={2}>
               <Box>
                 <Text size="xs" c="dimmed">
-                  Completed
+                  Participated
                 </Text>
-                <Title order={4}>12</Title>
+                <Title order={4}>{progress?.total || 0}</Title>
               </Box>
               <Box>
                 <Text size="xs" c="dimmed">
                   Ongoing
                 </Text>
-                <Title order={4}>1</Title>
+                <Title order={4}>{progress?.ongoing || 0}</Title>
               </Box>
             </SimpleGrid>
           </Paper>
@@ -104,7 +99,7 @@ export default function Home() {
           {/* Airdrop */}
           <Paper p={16} shadow="xs">
             <Group>
-              <ThemeIcon size="xl" radius="md">
+              <ThemeIcon size="xl" radius="md" variant="light">
                 <PiCurrencyCircleDollar size={24} />
               </ThemeIcon>
               <Box>

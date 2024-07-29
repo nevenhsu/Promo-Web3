@@ -2,11 +2,11 @@ import UserStatusModel from '@/models/userStatus'
 import { ReferralLevel } from '@/types/db'
 
 export async function getUserStatus(userId: string) {
-  const userStatus = await UserStatusModel.findOne({ _user: userId })
+  let userStatus = await UserStatusModel.findOne({ _user: userId })
 
   if (!userStatus) {
-    const newStatus = new UserStatusModel({ _user: userId })
-    const doc = await newStatus.save()
+    userStatus = new UserStatusModel({ _user: userId })
+    const doc = await userStatus.save()
     return doc
   }
 
