@@ -122,7 +122,7 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
                     endTime,
                     activityType: Number(activityType),
                     details: { link, coverUrl, thumbnailUrl, participants: 0, totalScore: 0 },
-                    airdrop: { symbol, decimal, amount, finalized: false },
+                    airdrop: { symbol, amount, finalized: false },
                   })
                 }
               },

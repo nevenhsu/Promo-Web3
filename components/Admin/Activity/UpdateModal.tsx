@@ -146,7 +146,6 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
                     { link, coverUrl, thumbnailUrl },
                     {
                       symbol: tokenData.symbol,
-                      decimal: tokenData.decimal,
                       amount,
                     }
                   )

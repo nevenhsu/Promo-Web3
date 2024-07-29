@@ -124,7 +124,7 @@ function ActivityItem({ data }: { data: TPublicActivity }) {
                   params: { slug: data.slug },
                 }}
               >
-                <Button variant={data.joined ? 'light' : 'filled'}>
+                <Button variant={data.joined ? 'outline' : 'filled'}>
                   {data.joined ? 'Joined' : 'Join'}
                 </Button>
               </Link>

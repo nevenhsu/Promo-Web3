@@ -123,7 +123,6 @@ export default function ProfileInfo() {
               />
 
               <TextInput
-                data-autofocus
                 label="Username"
                 key={form.key('username')}
                 {...form.getInputProps('username')}
@@ -139,7 +138,7 @@ export default function ProfileInfo() {
                 </Link>
 
                 <Button type="submit" loading={updating} disabled={alreadyUpdated}>
-                  Update Profile
+                  {alreadyUpdated ? 'Updated' : 'Update'}
                 </Button>
               </Group>
             </Stack>

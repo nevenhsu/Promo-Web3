@@ -5,8 +5,9 @@ import type { Viewport } from 'next'
 
 export const viewport: Viewport = {
   width: 'device-width',
+  minimumScale: 1,
   initialScale: 1,
-  maximumScale: 2,
+  userScalable: false,
 }
 
 // generateMetadata
