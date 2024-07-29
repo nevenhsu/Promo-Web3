@@ -1,27 +1,22 @@
 import axios from 'axios'
 import type { TUser } from '@/models/user'
+import type { ReferralCode } from '@/models/referralCode'
 import type { BucketType, PublicUser } from '@/types/db'
 
-export const getUserInfo = async (): Promise<TUser | undefined> => {
-  try {
-    const { data } = await axios.get<{ user: TUser }>('/api/u/user')
-    const { user } = data
-    return user
-  } catch (err) {
-    console.error(err)
-    return undefined
-  }
+export type UserData = {
+  user: TUser
+  referralData: ReferralCode
+}
+
+export const getUserInfo = async () => {
+  const { data } = await axios.get<UserData>('/api/u/user')
+  return data
 }
 
 export const updateUser = async (body: Partial<TUser>) => {
-  try {
-    const res = await axios.put<{ user: TUser }>(`/api/u/user/update`, body)
-    const { user } = res.data
-    return user
-  } catch (err) {
-    console.error(err)
-    return undefined
-  }
+  const res = await axios.put<{ user: TUser }>(`/api/u/user/update`, body)
+  const { user } = res.data
+  return user
 }
 
 export const uploadImage = async (dataURI: string, type: BucketType) => {

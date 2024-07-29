@@ -9,59 +9,38 @@ import {
 import { getUserStatus, type TUserStatus } from '@/services/userStatus'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { TUser, LinkedAccount } from '@/models/user'
+import type { ReferralCode } from '@/models/referralCode'
 
-export const fetchUser = createAsyncThunk<Partial<TUser>>('user/fetch', async () => {
-  try {
-    const data = await getUserInfo()
-    return data || {}
-  } catch (err) {
-    console.error(err)
-    return {}
-  }
+export const fetchUser = createAsyncThunk('user/fetch', async () => {
+  const data = await getUserInfo()
+  return data
 })
 
-export const fetchUserStatus = createAsyncThunk<TUserStatus>('user/fetchStatus', async () => {
+export const fetchUserStatus = createAsyncThunk('user/fetchStatus', async () => {
   const data = await getUserStatus()
   return data
 })
 
-export const updateUser = createAsyncThunk<Partial<TUser>, Partial<TUser>>(
-  'user/update',
-  async data => {
-    try {
-      const updateData = await _updateUser(data)
-      return updateData || {}
-    } catch (err) {
-      console.error(err)
-      return {}
-    }
-  }
-)
+export const updateUser = createAsyncThunk<TUser, Partial<TUser>>('user/update', async data => {
+  const updateData = await _updateUser(data)
+  return updateData || {}
+})
 
-export const updateLinkAccount = createAsyncThunk<Partial<TUser>, LinkedAccount>(
+export const updateLinkAccount = createAsyncThunk<TUser, LinkedAccount>(
   '/user/linkAccount',
   async data => {
     const { userId, platform, username } = data
-    try {
-      const user = await _updateLinkAccount(userId, platform, username || '')
-      return user
-    } catch (err) {
-      console.error(err)
-      return {}
-    }
+
+    const user = await _updateLinkAccount(userId, platform, username || '')
+    return user
   }
 )
 
-export const deleteLinkAccount = createAsyncThunk<Partial<TUser>, string>(
+export const deleteLinkAccount = createAsyncThunk<TUser, string>(
   'user/deleteLinkAccount',
   async platform => {
-    try {
-      const user = await _deleteLinkAccount(platform)
-      return user
-    } catch (err) {
-      console.error(err)
-      return {}
-    }
+    const user = await _deleteLinkAccount(platform)
+    return user
   }
 )
 
@@ -72,6 +51,7 @@ export interface IUserState {
   linking: boolean // for link account
   data: Partial<TUser>
   statusData?: TUserStatus
+  referralData?: ReferralCode
 }
 
 const initialState: IUserState = {
@@ -81,6 +61,7 @@ const initialState: IUserState = {
   linking: false,
   data: {},
   statusData: undefined,
+  referralData: undefined,
 }
 
 export const slice = createSlice({
@@ -100,9 +81,10 @@ export const slice = createSlice({
   },
   extraReducers: builder => {
     builder.addCase(fetchUser.fulfilled, (state, action) => {
-      const data = action.payload
-      state.data = data
-      state._id = data._id || ''
+      const { user, referralData } = action.payload
+      state.data = user
+      state._id = user._id || ''
+      state.referralData = referralData
       state.fetched = true
     })
     builder.addCase(updateUser.pending, (state, action) => {

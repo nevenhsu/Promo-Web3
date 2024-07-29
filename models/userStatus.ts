@@ -21,7 +21,6 @@ export const schema = new Schema({
 })
 
 export type UserStatus = InferSchemaType<typeof schema>
-export type TUserStatus = LeanDocumentArray<UserStatus>
 
 const name = 'UserStatus'
 export default (models[name] as Model<UserStatus>) || model(name, schema)

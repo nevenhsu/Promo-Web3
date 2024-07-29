@@ -10,6 +10,10 @@ export function cleanup(val: string, toLowerCase = true) {
   return str.replace(/[^a-zA-Z0-9._-]/g, '')
 }
 
+export function cleanCode(val: string) {
+  return val.replace(/[^a-zA-Z0-9]/g, '')
+}
+
 export function getGMT(date: string | number | Date) {
   const time = toZonedTime(date, timezone)
   const formattedDate = format(time, 'h:mm aa zzz', { timeZone: timezone })

@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useAsyncFn } from 'react-use'
 import { usePrivy } from '@privy-io/react-auth'
+import { useAppSelector } from '@/hooks/redux'
 import { useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
-import { Stack, Paper, Space, Group, Modal, Box } from '@mantine/core'
+import { Stack, Paper, Space, Group, Modal } from '@mantine/core'
 import { Title, Text, Button, ActionIcon, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiLinkBreak, PiLink } from 'react-icons/pi'
@@ -17,32 +18,40 @@ enum AccountType {
 }
 
 export default function ProfileAccount() {
-  const [opened, { open, close }] = useDisclosure(false)
-  const [type, setType] = useState<AccountType>() // for modal
-
   const { user, linkEmail, linkGoogle, linkTwitter } = usePrivy()
   const { unlinkEmail, unlinkGoogle, unlinkTwitter } = usePrivy()
   const { email, google, twitter } = user || {}
 
-  const [unlinkState, unlink] = useAsyncFn(async (type: AccountType) => {
-    switch (type) {
-      case AccountType.Email: {
-        if (!email) return
-        const result = await unlinkEmail(email.address)
-        return result
+  const { statusData } = useAppSelector(state => state.user)
+  const locked = !statusData || statusData.progress.ongoing > 0 // prevent unlinking while ongoing
+
+  // for modal
+  const [opened, { open, close }] = useDisclosure(false)
+  const [type, setType] = useState<AccountType>()
+  const showLocked = locked && type === AccountType.X
+
+  const [unlinkState, unlink] = useAsyncFn(
+    async (type: AccountType) => {
+      switch (type) {
+        case AccountType.Email: {
+          if (!email) return
+          const result = await unlinkEmail(email.address)
+          return result
+        }
+        case AccountType.Google: {
+          if (!google) return
+          const result = await unlinkGoogle(google.subject)
+          return result
+        }
+        case AccountType.X: {
+          if (!twitter || showLocked) return
+          const result = await unlinkTwitter(twitter.subject)
+          return result
+        }
       }
-      case AccountType.Google: {
-        if (!google) return
-        const result = await unlinkGoogle(google.subject)
-        return result
-      }
-      case AccountType.X: {
-        if (!twitter) return
-        const result = await unlinkTwitter(twitter.subject)
-        return result
-      }
-    }
-  }, [])
+    },
+    [showLocked]
+  )
 
   useEffect(() => {
     // reset type when modal closed
@@ -88,10 +97,10 @@ export default function ProfileAccount() {
 
   const renderLink = (type: AccountType, account?: string) => {
     return (
-      <Group gap={4}>
+      <Group gap={4} wrap="nowrap">
         {account ? (
           <>
-            <Text fz="sm" c="dimmed">
+            <Text fz="sm" c="dimmed" ta="right">
               {account}
             </Text>
             <ActionIcon variant="transparent" color="red" onClick={() => handleOpenModal(type)}>
@@ -126,7 +135,7 @@ export default function ProfileAccount() {
           </Title>
 
           <Paper p="md" radius="sm" shadow="xs">
-            <Group justify="space-between">
+            <Group justify="space-between" wrap="nowrap">
               <Title order={5} fw={500}>
                 Email
               </Title>
@@ -136,7 +145,7 @@ export default function ProfileAccount() {
           </Paper>
 
           <Paper p="md" radius="sm" shadow="xs">
-            <Group justify="space-between">
+            <Group justify="space-between" wrap="nowrap">
               <Title order={5} fw={500}>
                 Google
               </Title>
@@ -146,7 +155,7 @@ export default function ProfileAccount() {
           </Paper>
 
           <Paper p="md" radius="sm" shadow="xs">
-            <Group justify="space-between">
+            <Group justify="space-between" wrap="nowrap">
               <Title order={5} fw={500}>
                 X
                 <Text mx="xs" fz="xs" component="span" c="dimmed">
@@ -165,15 +174,29 @@ export default function ProfileAccount() {
 
       <Modal opened={opened} onClose={close} title={`Unlink ${type}`} centered>
         <Stack gap="xs" c="dimmed">
-          <Text fz="xs">Are you sure you want to unlink your {type} account?</Text>
-          <Text fz="xs">You will not be able to sign in with this account anymore.</Text>
+          {showLocked ? (
+            <>
+              <Text fz="xs">
+                You cannot unlink your account while there is an ongoing activity.
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text fz="xs">Are you sure you want to unlink your {type} account?</Text>
+              <Text fz="xs">You will not be able to sign in with this account anymore.</Text>
+            </>
+          )}
         </Stack>
         <Space h="xl" />
         <Group justify="right">
           <Button onClick={close} variant="outline" color="black">
             Cancel
           </Button>
-          <Button onClick={handleUnlink} loading={unlinkState.loading} disabled={!type}>
+          <Button
+            onClick={handleUnlink}
+            loading={unlinkState.loading}
+            disabled={showLocked || !type}
+          >
             Unlink
           </Button>
         </Group>

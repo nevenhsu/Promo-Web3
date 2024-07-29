@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
-import { updateLinkAccount, deleteLinkAccount } from '@/store/slices/user'
+import { updateLinkAccount, deleteLinkAccount, updateUser } from '@/store/slices/user'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
 import { LinkAccountPlatform } from '@/types/db'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
@@ -14,9 +14,9 @@ export default function useLinkAccount() {
   const { data } = useAppSelector(state => state.user)
   const { bothAuth } = useLoginStatus()
   const { user } = usePrivy()
-  const { google, twitter } = user || {}
+  const { google, twitter, email } = user || {}
 
-  const { linkedAccounts = [] } = data
+  const { linkedAccounts = [], email: linkedEmail } = data
   const linkedGoogle = useMemo(
     () => linkedAccounts.find(account => account.platform === LinkAccountPlatform.Google),
     [linkedAccounts]
@@ -68,6 +68,22 @@ export default function useLinkAccount() {
       dispatch(deleteLinkAccount(LinkAccountPlatform.X))
     }
   }, [bothAuth, linkedX, twitter])
+
+  // auto update email
+  useEffect(() => {
+    if (!bothAuth) return
+
+    const notLinked = email && !linkedEmail
+    const outDated = email && linkedEmail && email.address !== linkedEmail
+
+    if (notLinked || outDated) {
+      dispatch(
+        updateUser({
+          email: email.address,
+        })
+      )
+    }
+  }, [bothAuth, linkedEmail, email])
 
   return null
 }

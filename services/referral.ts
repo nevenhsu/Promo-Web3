@@ -1,6 +1,11 @@
 import axios from 'axios'
-import type { TReferral, TReferee } from '@/models/referral'
+import type { TReferee } from '@/models/referral'
 import type { PublicUser, ReferralLevel } from '@/types/db'
+
+export const getRefererByCode = async (code: string) => {
+  const { data } = await axios.get<{ user: PublicUser }>(`/api/public/referral/${code}`)
+  return data.user
+}
 
 export const getReferrer = async (): Promise<PublicUser | undefined> => {
   try {

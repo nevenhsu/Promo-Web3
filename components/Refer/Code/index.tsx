@@ -11,13 +11,14 @@ import { useReferral } from '@/store/contexts/user/referralContext'
 import { Space, Stack, Modal, Avatar, Group, Box } from '@mantine/core'
 import { Text, Title, Button, TextInput } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { getPublicUser } from '@/services/user'
+import { getRefererByCode } from '@/services/referral'
+import { cleanCode } from '@/utils/helper'
 import { PiBarcode } from 'react-icons/pi'
 
 export default function ReferCode() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { data, _id } = useAppSelector(state => state.user)
+  const { data } = useAppSelector(state => state.user)
   const { referer, isReferred, createState, createReferral } = useReferral()
 
   // Get promo code
@@ -26,12 +27,12 @@ export default function ReferCode() {
   const [opened, { open, close }] = useDisclosure(false)
 
   const [userState, fetchUser] = useAsyncFn(
-    async (username: string) => {
-      if (username === data.username) {
+    async (code: string) => {
+      const user = await getRefererByCode(code)
+
+      if (user.username === data.username) {
         throw new Error('You cannot refer yourself.')
       }
-
-      const user = await getPublicUser(username)
 
       if (user) {
         open()
@@ -106,9 +107,13 @@ export default function ReferCode() {
                 leftSection={<PiBarcode size={24} />}
                 placeholder="Enter referral code"
                 value={value}
-                error={userState.error?.message || createState.error?.response?.data.error}
+                error={
+                  userState.error?.response?.data.error ||
+                  userState.error?.message ||
+                  createState.error?.response?.data.error
+                }
                 onChange={event => {
-                  setValue(event.currentTarget.value)
+                  setValue(cleanCode(event.currentTarget.value.toUpperCase()))
                 }}
               />
               <Button disabled={opened} loading={userState.loading} onClick={handleSubmit}>

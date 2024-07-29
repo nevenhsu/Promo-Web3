@@ -8,8 +8,12 @@ import RwdLayout from '@/components/share/RwdLayout'
 import { PiRocketLaunch } from 'react-icons/pi'
 
 export default function Refer() {
-  const { data } = useAppSelector(state => state.user)
-  const link = `${window.location.origin}/?promo=${data.username}`
+  const { referralData } = useAppSelector(state => state.user)
+  const { code } = referralData || {}
+
+  const getPromoLink = (code: string) => {
+    return `${window.location.origin}/?promo=${code}`
+  }
 
   return (
     <>
@@ -26,7 +30,6 @@ export default function Refer() {
           <Divider />
 
           {/* Contents */}
-
           <Stack gap={24}>
             <Group wrap="nowrap" align="start">
               <ThemeIcon size="xl" radius="md" variant="light">
@@ -58,26 +61,24 @@ export default function Refer() {
           </Stack>
 
           {/* Link */}
-
           <Paper p="xs" ta="center" c="orange" bd="1px dashed red">
             <Text fz="sm" fw={500}>
-              {link}
+              {code ? getPromoLink(code) : 'Loading...'}
             </Text>
           </Paper>
 
           {/* Actions */}
-
           <Stack gap={24}>
-            <CopyButton value={link}>
+            <CopyButton value={code ? getPromoLink(code) : ''}>
               {({ copied, copy }) => (
-                <Button size="md" onClick={copy}>
+                <Button size="md" onClick={copy} loading={!code}>
                   {copied ? 'Copied' : 'Copy my invite link'}
                 </Button>
               )}
             </CopyButton>
 
             <Link href="/refer/list">
-              <Button size="md" variant="light" w="100%">
+              <Button size="md" variant="outline" w="100%">
                 View my friends
               </Button>
             </Link>
