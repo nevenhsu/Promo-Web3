@@ -15,6 +15,11 @@ const airdropSchema = new Schema({
   finalized: { type: Boolean, default: false, index: true }, // airdrop share finalized
 })
 
+const bonusSchema = new Schema({
+  data: { type: Object, default: {} }, // custom bonus data
+  finalized: { type: Boolean, default: false, index: true }, // bonus share finalized
+})
+
 export const schema = new Schema({
   index: { type: Number, required: true, unique: true, index: true },
   startTime: { type: Date, required: true, index: true },
@@ -27,6 +32,7 @@ export const schema = new Schema({
   requirements: { type: Object, default: {} }, // requirements for join
   details: { type: detailSchema, required: true },
   airdrop: { type: airdropSchema, required: true },
+  bonus: { type: bonusSchema, default: {} },
   published: { type: Boolean, default: false, index: true },
 })
 

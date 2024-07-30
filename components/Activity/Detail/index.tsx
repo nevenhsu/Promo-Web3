@@ -14,13 +14,13 @@ import { fetchUserActivityStatus, resetUserActivityStatus } from '@/store/slices
 import { getPublicActivityDetails } from '@/services/activity'
 import { notifications } from '@mantine/notifications'
 import { useDisclosure } from '@mantine/hooks'
-import { Group, Stack, Box, Space, Divider, Paper, Skeleton } from '@mantine/core'
-import { Title, Text, Button, ThemeIcon, Progress } from '@mantine/core'
+import { Group, Stack, Box, Space, Divider, Paper, Skeleton, Modal } from '@mantine/core'
+import { Title, Text, Button, ThemeIcon, ActionIcon, CopyButton, Progress } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import LinkModal from '@/components/share/LinkModal'
 import LinkButton from '@/components/share/LinkButton'
 import { PiLightning, PiPersonSimpleRun, PiTrophy, PiCheckBold } from 'react-icons/pi'
-import { PiWarningBold, PiCircleDashedBold, PiRocketLaunch } from 'react-icons/pi'
+import { PiWarningBold, PiCircleDashedBold, PiRocketLaunch, PiShareFatFill } from 'react-icons/pi'
 import { formatDate } from '@/utils/date'
 import { formatNumber } from '@/utils/math'
 import { getActionLabel, getErrorText } from '../variables'
@@ -43,12 +43,18 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   const { isMobileDevice } = useAppContext().state
   const [opened, { open, close }] = useDisclosure(false)
 
+  // for share modal
+  const [shareOpened, shareActions] = useDisclosure(false)
+
   // Platform linked account from Privy
   const { user, linkTwitter } = usePrivy()
   const { twitter } = user || {}
 
+  // User data
+  const { data: userData, referralData } = useAppSelector(state => state.user)
+  const { code } = referralData || {}
+
   // Platform linked account from database
-  const { data: userData, linking } = useAppSelector(state => state.user)
   const { linkedAccounts } = userData
   const linkedX = useMemo(() => {
     if (!linkedAccounts) return
@@ -92,6 +98,10 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
       }
     },
   })
+
+  const getPromoLink = (code: string) => {
+    return `${window.location.origin}/activity/${slug}?promo=${code}`
+  }
 
   const handleConfirm = () => {
     // If the activity is completed or initial, do nothing
@@ -163,12 +173,23 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
     <>
       <RwdLayout>
         <Stack gap="lg">
-          <Box>
-            <Text c="dimmed" fz="xs">
-              {formatDate(new Date(data.startTime))} ~ {formatDate(new Date(data.endTime))}
-            </Text>
-            <Title order={3}>{data.title}</Title>
-          </Box>
+          <Group wrap="nowrap" justify="space-between">
+            <Box>
+              <Text c="dimmed" fz="xs">
+                {formatDate(new Date(data.startTime))} ~ {formatDate(new Date(data.endTime))}
+              </Text>
+              <Title order={3}>{data.title}</Title>
+            </Box>
+            <ActionIcon
+              variant="outline"
+              size="md"
+              radius="md"
+              loading={!code}
+              onClick={shareActions.open}
+            >
+              <PiShareFatFill />
+            </ActionIcon>
+          </Group>
 
           <Text fz="sm" c="dark">
             {data.description}
@@ -340,6 +361,34 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
       </RwdLayout>
 
       <LinkModal platform={socialMedia} opened={opened} onClose={close} />
+
+      <Modal
+        opened={shareOpened}
+        onClose={shareActions.close}
+        title="Activity referral link"
+        centered
+      >
+        <Stack gap="lg">
+          <Text fz="sm" c="dimmed">
+            Share this activity to your friends and earn more rewards
+          </Text>
+
+          {/* Link */}
+          <Paper p="xs" ta="center" c="orange" bd="1px dashed red">
+            <Text fz="sm" fw={500}>
+              {code ? getPromoLink(code) : 'Loading...'}
+            </Text>
+          </Paper>
+
+          <CopyButton value={code ? getPromoLink(code) : ''}>
+            {({ copied, copy }) => (
+              <Button size="md" onClick={copy} loading={!code}>
+                {copied ? 'Copied' : 'Copy my invite link'}
+              </Button>
+            )}
+          </CopyButton>
+        </Stack>
+      </Modal>
 
       <Space h={100} />
     </>

@@ -11,10 +11,12 @@ import { useLoginStatus } from '@/hooks/useLoginStatus'
 
 export default function useLinkAccount() {
   const dispatch = useAppDispatch()
-  const { data } = useAppSelector(state => state.user)
+  const { data, fetched } = useAppSelector(state => state.user)
   const { bothAuth } = useLoginStatus()
   const { user } = usePrivy()
   const { google, twitter, email } = user || {}
+
+  const ready = fetched && bothAuth && user
 
   const { linkedAccounts = [], email: linkedEmail } = data
   const linkedGoogle = useMemo(
@@ -28,7 +30,7 @@ export default function useLinkAccount() {
 
   // auto update google account
   useEffect(() => {
-    if (!bothAuth) return
+    if (!ready) return
 
     const notLinked = google && !linkedGoogle
     const outDated = google && linkedGoogle && google.subject !== linkedGoogle.userId
@@ -44,11 +46,11 @@ export default function useLinkAccount() {
     } else if (!google && linkedGoogle) {
       dispatch(deleteLinkAccount(LinkAccountPlatform.Google))
     }
-  }, [bothAuth, linkedGoogle, google])
+  }, [ready, linkedGoogle, google])
 
   // auto update x account
   useEffect(() => {
-    if (!bothAuth) return
+    if (!ready) return
 
     const notLinked = twitter && !linkedX
     const outDated = twitter && linkedX && twitter.subject !== linkedX.userId
@@ -67,11 +69,11 @@ export default function useLinkAccount() {
     } else if (!twitter && linkedX) {
       dispatch(deleteLinkAccount(LinkAccountPlatform.X))
     }
-  }, [bothAuth, linkedX, twitter])
+  }, [ready, linkedX, twitter])
 
   // auto update email
   useEffect(() => {
-    if (!bothAuth) return
+    if (!ready) return
 
     const notLinked = email && !linkedEmail
     const outDated = email && linkedEmail && email.address !== linkedEmail
@@ -83,7 +85,7 @@ export default function useLinkAccount() {
         })
       )
     }
-  }, [bothAuth, linkedEmail, email])
+  }, [ready, linkedEmail, email])
 
   return null
 }
