@@ -36,7 +36,7 @@ export default function Header() {
             </ActionIcon>
           ) : null}
 
-          <Box w={64} h={64} ml={-16}>
+          <Box w={60} h={60} ml={-8}>
             <Logo width="100%" height="100%" />
           </Box>
         </Group>

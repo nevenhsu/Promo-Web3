@@ -7,7 +7,7 @@ import { colorInput } from '@sanity/color-input'
 import { publicEnv } from '@/utils/env'
 import { schemaTypes } from '@/utils/sanity/schemas'
 import { defaultDocumentNode } from '@/utils/sanity/defaultDocumentNode'
-import LogoIcon from '@/public/images/logo.svg'
+import LogoIcon from '@/public/icons/logo.svg'
 
 const { projectId, dataset } = publicEnv.sanity
 
