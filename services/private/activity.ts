@@ -1,17 +1,17 @@
 import axios from 'axios'
-import type { Activity, TActivity, ActivityDetail, ActivityAirDrop } from '@/models/activity'
+import type {
+  TActivity,
+  ActivityDetail,
+  ActivityAirDrop,
+  ActivityData,
+  NewActivityData,
+} from '@/models/activity'
 
 const api = '/api/private/activity'
 
-export const createActivity = async (
-  newData: Omit<Activity, 'index' | 'requirements'>
-): Promise<TActivity | undefined> => {
+export const createActivity = async (newData: NewActivityData): Promise<TActivity | undefined> => {
   try {
-    const { data } = await axios.post<{ activity: TActivity }>(`${api}/create`, {
-      ...newData,
-      startTime: newData.startTime.toISOString(),
-      endTime: newData.endTime.toISOString(),
-    })
+    const { data } = await axios.post<{ activity: TActivity }>(`${api}/create`, newData)
     return data.activity
   } catch (err) {
     console.error(err)
@@ -21,7 +21,7 @@ export const createActivity = async (
 
 export const updateActivity = async (
   index: number,
-  updateData: Partial<Omit<Activity, 'index' | 'details' | 'airdrop'>>,
+  updateData: Partial<ActivityData>,
   updateDetail: Partial<ActivityDetail>,
   updateAirdrop: Partial<ActivityAirDrop>
 ): Promise<TActivity | undefined> => {

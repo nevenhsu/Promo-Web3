@@ -39,6 +39,9 @@ export const schema = new Schema({
 export type Activity = InferSchemaType<typeof schema>
 export type ActivityDetail = InferSchemaType<typeof detailSchema>
 export type ActivityAirDrop = InferSchemaType<typeof airdropSchema>
+export type ActivityBonus = InferSchemaType<typeof bonusSchema>
+export type ActivityData = Omit<Activity, 'index' | 'details' | 'requirements' | 'bonus'>
+export type NewActivityData = ActivityData & { details: ActivityDetail }
 export type TActivity = {
   index: number // auto increase
   startTime: string // ISO 8601 date string
@@ -48,8 +51,10 @@ export type TActivity = {
   description: string
   activityType: number // ActivityType
   socialMedia: string // SocialMedia
+  requirements: Record<string, any>
   details: ActivityDetail
   airdrop: ActivityAirDrop
+  bonus: ActivityBonus
   published: boolean // for public view
 }
 export type TPublicActivity = TActivity & { joined: boolean }

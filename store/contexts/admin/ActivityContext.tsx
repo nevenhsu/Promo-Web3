@@ -7,7 +7,13 @@ import {
   updateActivity as _updateActivity,
   deleteActivity as _deleteActivity,
 } from '@/services/private/activity'
-import type { TActivity, Activity, ActivityDetail, ActivityAirDrop } from '@/models/activity'
+import type {
+  TActivity,
+  ActivityDetail,
+  ActivityAirDrop,
+  ActivityData,
+  NewActivityData,
+} from '@/models/activity'
 
 interface ActivityContextType {
   activities: TActivity[]
@@ -16,12 +22,10 @@ interface ActivityContextType {
   loading: boolean
   setSelectedIndex: (index: number) => void
   fetchActivities: () => void
-  createActivity: (
-    newData: Omit<Activity, 'index' | 'requirements'>
-  ) => Promise<TActivity | undefined>
+  createActivity: (newData: NewActivityData) => Promise<TActivity | undefined>
   updateActivity: (
     index: number,
-    updateData: Partial<Omit<Activity, 'index' | 'details' | 'requirements'>>,
+    updateData: Partial<ActivityData>,
     updateDetails: Partial<ActivityDetail>,
     updateAirdrop: Partial<ActivityAirDrop>
   ) => Promise<TActivity | undefined>
@@ -53,7 +57,7 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }
 
-  const createActivity = async (newData: Omit<Activity, 'index' | 'requirements'>) => {
+  const createActivity = async (newData: NewActivityData) => {
     try {
       setLoading(true)
       const activity = await _createActivity(newData)
@@ -70,7 +74,7 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const updateActivity = async (
     index: number,
-    updateData: Partial<Omit<Activity, 'index' | 'details' | 'airdrop'>>,
+    updateData: Partial<ActivityData>,
     updateDetails: Partial<ActivityDetail>,
     updateAirdrop: Partial<ActivityAirDrop>
   ) => {

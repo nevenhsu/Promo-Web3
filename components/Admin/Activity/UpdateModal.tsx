@@ -14,7 +14,7 @@ import { formateDate } from '@/utils/helper'
 import { publicEnv } from '@/utils/env'
 import { ActivityType, SocialMedia } from '@/types/db'
 import { activityTypes, createSlug } from './variables'
-import type { Activity, ActivityDetail, ActivityAirDrop } from '@/models/activity'
+import type { ActivityDetail, ActivityAirDrop, ActivityData } from '@/models/activity'
 
 export type UpdateModalRef = {
   open: () => void
@@ -111,7 +111,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
   }))
 
   const handleSubmit = async (
-    data: Omit<Activity, 'index' | 'details' | 'airdrop' | 'requirements'>,
+    data: Partial<ActivityData>,
     details: Partial<ActivityDetail>,
     airdrop: Partial<ActivityAirDrop>
   ) => {

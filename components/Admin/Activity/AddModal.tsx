@@ -14,7 +14,7 @@ import { formateDate } from '@/utils/helper'
 import { publicEnv } from '@/utils/env'
 import { ActivityType, SocialMedia } from '@/types/db'
 import { activityTypes, createSlug } from './variables'
-import type { Activity } from '@/models/activity'
+import type { NewActivityData } from '@/models/activity'
 
 export type AddModalRef = {
   open: () => void
@@ -95,7 +95,7 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
     close()
   }
 
-  const handleSubmit = async (data: Omit<Activity, 'index' | 'requirements'>) => {
+  const handleSubmit = async (data: NewActivityData) => {
     const newActivity = await createActivity(data)
     if (newActivity) {
       handleClose()
