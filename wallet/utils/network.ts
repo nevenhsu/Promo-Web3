@@ -1,3 +1,5 @@
+import { base, baseSepolia, arbitrum, arbitrumSepolia } from 'viem/chains'
+
 type NetworkInfo = {
   chainId: number
   name: string
@@ -7,15 +9,31 @@ type NetworkInfo = {
 
 export const networks: NetworkInfo[] = [
   { chainId: 1, name: 'Ethereum Mainnet', icon: '/icons/base.svg', subtitle: 'Ethereum Mainnet' },
-  { chainId: 8453, name: 'Base', icon: '/icons/base.svg', subtitle: 'Ethereum L2 Network' },
   {
-    chainId: 84532,
-    name: 'Base Sepolia',
+    chainId: base.id,
+    name: base.name,
+    icon: '/icons/base.svg',
+    subtitle: 'Ethereum L2 Network',
+  },
+  {
+    chainId: baseSepolia.id,
+    name: baseSepolia.name,
     icon: '/icons/base-testnet.svg',
     subtitle: 'Ethereum L2 Testnet',
   },
-  { chainId: 31337, name: 'Hardhat', icon: '/icons/hardhat.svg', subtitle: 'Hardhat Network' },
-]
+  {
+    chainId: arbitrum.id,
+    name: arbitrum.name,
+    icon: '/icons/arbitrum.svg',
+    subtitle: 'Ethereum L2 Network',
+  },
+  {
+    chainId: arbitrumSepolia.id,
+    name: arbitrumSepolia.name,
+    icon: '/icons/arbitrum-testnet.svg',
+    subtitle: 'Ethereum L2 Testnet',
+  },
+] as const
 
 export function getNetwork(chainId?: string | number) {
   const chainIdNum = toChainId(chainId || '0')

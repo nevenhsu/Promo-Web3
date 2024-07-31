@@ -5,7 +5,6 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 import useContracts from '@/wallet/hooks/useContracts'
 import { useWallet } from '@/wallet/hooks/useWallet'
 import { supportedChains } from './variables'
-import { unifyAddress } from '@/wallet/utils/helper'
 import { getTokens, type Erc20 } from '@/contracts/tokens'
 import type, { Contracts, Contract } from '@/wallet/hooks/useContracts'
 
@@ -35,14 +34,9 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(false)
 
   const wallet = useWallet()
-  const { chainId, contracts, walletAddress, isSmartAccount } = useContracts()
+  const { chainId, contracts, walletAddress, isSmartAccount, ready, getContract } = useContracts()
 
   const tokens = useMemo(() => getTokens(chainId), [chainId])
-
-  const getContract = (address?: string) => {
-    if (!address) return
-    return contracts[unifyAddress(address)]
-  }
 
   // methods
   const updateBalances = async () => {
@@ -83,10 +77,10 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   useEffect(() => {
-    if (wallet && !_.isEmpty(contracts)) {
+    if (ready) {
       updateBalances()
     }
-  }, [wallet, chainId, walletAddress, contracts])
+  }, [contracts, ready])
 
   return (
     <Web3Context.Provider

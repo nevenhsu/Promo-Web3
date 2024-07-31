@@ -4,20 +4,6 @@
   text-align: center;
 }
 
-.actions div {
-  background: var(--mantine-color-white);
-  color: var(--mantine-primary-color-6);
-  border-radius: var(--mantine-radius-sm);
-  padding: 8px;
-  margin: 0 auto 4px;
-}
-
-.actions svg {
-  display: block;
-  margin: auto;
-  margin-bottom: 4px;
-}
-
 .tabs {
   display: flex;
   background-color: var(--mantine-color-gray-2);
