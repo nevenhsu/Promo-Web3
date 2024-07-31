@@ -2,27 +2,26 @@
 
 import { useState, useEffect } from 'react'
 import { useWallet } from '@/wallet/hooks/useWallet'
-import { useSmartAccount } from '@/wallet/hooks/useSmartAccount'
-import { toChainId } from '@/wallet/utils/network'
+import type { useSmartAccount } from '@/wallet/hooks/useSmartAccount'
 import type { EIP1193Provider } from '@privy-io/react-auth'
 import type { KernelProvider } from '@/wallet/hooks/useSmartAccount'
 
 export type WalletProvider = EIP1193Provider | KernelProvider
 
-export function useWalletProvider() {
+type SmartAccountValues = ReturnType<typeof useSmartAccount>
+
+export function useWalletProvider({ kernelProvider, smartAccountAddress }: SmartAccountValues) {
   const wallet = useWallet()
-  const chainId = toChainId(wallet?.chainId)
-  const { kernelProvider, accountAddress } = useSmartAccount(chainId)
 
   const [provider, setProvider] = useState<WalletProvider>()
-  const [walletAddress, setWalletAddress] = useState('')
-  const [isSmartAccount, setIsSmartAccount] = useState(Boolean(accountAddress))
+  const [walletAddress, setWalletAddress] = useState<string>()
+  const [isSmartAccount, setIsSmartAccount] = useState(Boolean(smartAccountAddress))
 
   const getProvider = async () => {
     try {
       if (kernelProvider) {
         setProvider(kernelProvider)
-        setWalletAddress(accountAddress)
+        setWalletAddress(smartAccountAddress)
         setIsSmartAccount(true)
       } else if (wallet) {
         const provider = await wallet.getEthereumProvider()
@@ -33,19 +32,18 @@ export function useWalletProvider() {
       } else if (provider) {
         // clear
         setProvider(undefined)
-        setWalletAddress('')
+        setWalletAddress(undefined)
         setIsSmartAccount(false)
       }
     } catch (err) {
+      // TODO: handle error
       console.error(err)
     }
   }
 
   useEffect(() => {
-    if (wallet) {
-      getProvider()
-    }
+    getProvider()
   }, [wallet, kernelProvider])
 
-  return { chainId, provider, walletAddress, isSmartAccount }
+  return { provider, walletAddress, isSmartAccount }
 }

@@ -25,7 +25,7 @@ export function useSmartAccount(chainId?: number) {
   // Find the embedded wallet and get its EIP1193 provider
   const wallet = useWallet()
 
-  const [accountAddress, setAccountAddress] = useState('')
+  const [smartAccountAddress, setSmartAccountAddress] = useState<string>()
   const [kernelProvider, setKernelProvider] = useState<KernelProvider>()
 
   useEffect(() => {
@@ -37,17 +37,18 @@ export function useSmartAccount(chainId?: number) {
             const { kernelProvider, accountAddress } = res
             if (kernelProvider && accountAddress) {
               setKernelProvider(kernelProvider)
-              setAccountAddress(accountAddress)
+              setSmartAccountAddress(accountAddress)
             }
           }
         })
         .catch(console.error)
     } else {
       setKernelProvider(undefined)
+      setSmartAccountAddress(undefined)
     }
   }, [wallet, chainId])
 
-  return { kernelProvider, accountAddress }
+  return { kernelProvider, smartAccountAddress }
 }
 
 async function getAccountClient(wallet: ConnectedWallet, chainId: number | undefined) {

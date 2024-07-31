@@ -30,7 +30,8 @@ export default function Send() {
   const mounted = useRef(false)
   const [opened, { open, close }] = useDisclosure(false)
   const [txTimestamp, setTxTimestamp] = useState(0)
-  const { chainId, walletAddress, balances, prices, updateBalances } = useWeb3()
+  const { chainId, prices, walletAddress, balancesValues } = useWeb3()
+  const { balances, updateBalances } = balancesValues
   const { txs, addTx } = useTx()
 
   const tx = useMemo(() => {

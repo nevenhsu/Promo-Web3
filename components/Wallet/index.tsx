@@ -27,18 +27,10 @@ export default function Wallet() {
   const { data } = useAppSelector(state => state.user)
   const { name } = data
 
-  const {
-    chainId,
-    walletAddress,
-    balances,
-    prices,
-    loading,
-    tokens,
-    isSmartAccount,
-    updateBalances,
-  } = useWeb3()
+  const { chainId, prices, tokens, walletAddress, balancesValues } = useWeb3()
 
   const { user } = usePrivy()
+  const { balances, updateBalances, loading } = balancesValues
 
   if (!user?.wallet?.address) {
     return <CreateWallet />

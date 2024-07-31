@@ -11,7 +11,8 @@ import { getNetwork } from '@/wallet/utils/network'
 import classes from './index.module.css'
 
 export default function Receive() {
-  const { walletAddress, chainId, isSmartAccount } = useWeb3()
+  const { chainId, walletProviderValues } = useWeb3()
+  const { isSmartAccount, walletAddress = '' } = walletProviderValues
 
   const network = getNetwork(chainId)
 
@@ -54,7 +55,7 @@ export default function Receive() {
           </Stack>
 
           <Paper p="md" shadow="xs" radius="sm">
-            <Stack>
+            <Stack gap="lg">
               <Box>
                 <Text fz="lg" fw={500} mb="xs">
                   My wallet address
@@ -72,7 +73,7 @@ export default function Receive() {
 
               <Group grow>
                 <Button
-                  variant="light"
+                  variant="outline"
                   onClick={() =>
                     modals.open({
                       title: 'My wallet',

@@ -44,7 +44,8 @@ const TxContext = createContext<TxContextType | undefined>(undefined)
 
 export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const wallet = useWallet()
-  const { chainId, contracts } = useWeb3()
+  const { chainId, contractsValues } = useWeb3()
+  const { getContract } = contractsValues
 
   const [txs, setTxs] = useState<Tx[]>([])
   const txsRef = useRef<{ [hash: string]: boolean }>({}) // hash: isHandled
@@ -53,7 +54,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     if (!chainId) return
 
     const contractAddress = unifyAddress(contractAddr)
-    const contract = contracts[contractAddress]
+    const contract = getContract(contractAddr)
     const fn = _.get(contract, [fnName])
     const status = contract && fn ? TxStatus.Init : TxStatus.Error
     const timestamp = Date.now() // unique id

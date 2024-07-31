@@ -6,3 +6,10 @@ console.error = (...args: any) => {
   if (/defaultProps|lowercase|MetaMask/.test(args[0])) return
   error(...args)
 }
+
+const warn = console.warn
+console.warn = (...args: any) => {
+  // hide warning
+  if (/Coinbase/.test(args[0])) return
+  warn(...args)
+}
