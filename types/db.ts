@@ -73,3 +73,9 @@ export type LeanDocumentArray<MySchema extends Record<string, any>> = {
       ? MySchema[K]
       : LeanDocumentArray<MySchema[K]>
 }
+
+export enum TxStatus {
+  Pending = 0,
+  Completed = 1,
+  Error = 4,
+}
