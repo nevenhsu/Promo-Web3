@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { useAsyncFn } from 'react-use'
-import { useAppSelector } from '@/hooks/redux'
+import { useLoginStatus } from '@/hooks/useLoginStatus'
 import {
   getReferrer,
   getReferralByLevel,
@@ -17,7 +17,6 @@ interface ReferralContextType {
   isReferred: boolean
   referees1st: TReferee[]
   referees2nd: TReferee[]
-  fetchReferer: () => Promise<void>
   createReferral: (username: string) => Promise<void>
   createState: AsyncState<void>
 }
@@ -25,7 +24,7 @@ interface ReferralContextType {
 const ReferralContext = createContext<ReferralContextType | undefined>(undefined)
 
 export const ReferralProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { _id } = useAppSelector(state => state.user)
+  const { bothAuth } = useLoginStatus()
 
   const [referer, setReferer] = useState<PublicUser>()
   const isReferred = Boolean(referer)
@@ -34,15 +33,13 @@ export const ReferralProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [referees2nd, setReferees2nd] = useState<TReferee[]>([])
 
   const fetchReferer = async () => {
-    if (_id) {
-      try {
-        const data = await getReferrer()
-        if (data) {
-          setReferer(data)
-        }
-      } catch (err) {
-        console.error(err)
+    try {
+      const data = await getReferrer()
+      if (data) {
+        setReferer(data)
       }
+    } catch (err) {
+      console.error(err)
     }
   }
 
@@ -60,10 +57,10 @@ export const ReferralProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   )
 
   useEffect(() => {
-    if (_id) {
+    if (bothAuth) {
       fetchReferer()
     }
-  }, [_id])
+  }, [bothAuth])
 
   return (
     <ReferralContext.Provider
@@ -72,7 +69,6 @@ export const ReferralProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         isReferred,
         referees1st,
         referees2nd,
-        fetchReferer,
         createReferral,
         createState,
       }}

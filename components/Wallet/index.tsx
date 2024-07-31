@@ -19,7 +19,8 @@ export default function Wallet() {
   const { _id, fetched, data } = useAppSelector(state => state.user)
   const { username, name, details } = data
 
-  const { chainId, walletAddress, balances, prices, loading, updateBalances } = useWeb3()
+  const { chainId, walletAddress, balances, prices, loading, updateBalances, isSmartAccount } =
+    useWeb3()
 
   const { user } = usePrivy()
 

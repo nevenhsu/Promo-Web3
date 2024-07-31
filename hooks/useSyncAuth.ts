@@ -1,18 +1,19 @@
 'use client'
 
 import { useEffect } from 'react'
-import { signIn } from 'next-auth/react'
+import { signIn, signOut } from 'next-auth/react'
 import { usePrivy } from '@privy-io/react-auth'
-import { fetchUser, fetchUserStatus } from '@/store/slices/user'
 import { useAppDispatch } from '@/hooks/redux'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
+import { fetchUser, fetchUserStatus, clearData as clearUser } from '@/store/slices/user'
+import { clearData as clearUserActivityStatus } from '@/store/slices/userActivityStatus'
 
-// auto connect privy to mongodb
+// sync auth status between privy and next-auth
 
-export default function useAutoAuth() {
+export default function useSyncAuth() {
   const dispatch = useAppDispatch()
 
-  const { nextAuthFail, nextAuth } = useLoginStatus()
+  const { nextAuthFail, nextAuth, privyAuthFail, bothAuth } = useLoginStatus()
 
   const { getAccessToken, user } = usePrivy()
   const { id: privyId } = user || {}
@@ -31,20 +32,29 @@ export default function useAutoAuth() {
     })
   }
 
-  // go auth on server
+  // auto fetch user data
+  useEffect(() => {
+    if (bothAuth) {
+      dispatch(fetchUser())
+      dispatch(fetchUserStatus())
+    }
+  }, [bothAuth])
+
+  // go login
   useEffect(() => {
     if (privyId && nextAuthFail) {
       startAuth(privyId)
     }
   }, [privyId, nextAuthFail])
 
-  // auto fetch user data
+  // auto logout
   useEffect(() => {
-    if (nextAuth) {
-      dispatch(fetchUser())
-      dispatch(fetchUserStatus())
+    if (privyAuthFail && nextAuth) {
+      dispatch(clearUser())
+      dispatch(clearUserActivityStatus())
+      signOut({ callbackUrl: '/home' }) // NextAuth logout
     }
-  }, [nextAuth])
+  }, [privyAuthFail, nextAuth])
 
   return null
 }

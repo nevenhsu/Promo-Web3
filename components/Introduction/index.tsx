@@ -22,26 +22,27 @@ export default function Index() {
     onComplete: (user, isNewUser, wasAlreadyAuthenticated) => {
       // If the user is new and has a promo code, redirect to the referral code page
       if (isNewUser && promo) {
-        return promo ? router.push('/refer/code') : router.push('/activity')
+        promo ? router.push('/refer/code') : router.push('/activity')
+        return
       }
 
       if (callbackPath) {
-        return router.push(callbackPath)
+        router.push(callbackPath)
+        return
       }
 
       if (!wasAlreadyAuthenticated) {
-        return router.push('/home')
+        router.push('/home')
+        return
       }
     },
   })
 
   const handleClick = () => {
-    if (callbackPath) {
-      return router.push(callbackPath)
-    }
-
     if (bothAuth) {
-      router.push('/home')
+      const nextUrl = callbackPath || '/home'
+      router.push(nextUrl)
+      router.refresh()
       return
     }
 

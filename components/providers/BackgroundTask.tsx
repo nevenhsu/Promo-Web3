@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import useAutoAuth from '@/hooks/useAutoAuth'
+import useSyncAuth from '@/hooks/useSyncAuth'
 import useLinkAccount from '@/hooks/useLinkAccount'
 import { useViewportSize } from '@mantine/hooks'
 import { useScreenQuery } from '@/hooks/useScreenQuery'
@@ -10,7 +10,7 @@ import { useAppContext } from '@/store/AppContext'
 export default function BackgroundTask() {
   const { updateState } = useAppContext()
 
-  useAutoAuth() // connect privy to mongodb
+  useSyncAuth() // connect privy to next-auth
   useLinkAccount() // auto update link accounts
 
   useScreenQuery() // update app context state

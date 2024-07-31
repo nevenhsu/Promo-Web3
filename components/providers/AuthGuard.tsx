@@ -9,7 +9,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
-  const { bothAuth, privyAuthFail } = useLoginStatus()
+  const { bothAuth, nextAuthFail } = useLoginStatus()
 
   const isPublic = isPublicPage(pathname)
 
@@ -18,11 +18,11 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       return
     }
 
-    if (privyAuthFail) {
+    if (nextAuthFail) {
       // Redirect to index if not authenticated
       router.push('/')
     }
-  }, [isPublic, privyAuthFail])
+  }, [isPublic, nextAuthFail])
 
   // TODO: show loading screen
   return <>{isPublic || bothAuth ? <>{children}</> : <></>}</>

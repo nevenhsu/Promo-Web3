@@ -17,8 +17,8 @@ export const schema = new Schema({
     ref: 'Wallet', // This should match the name of your wallet model
     index: true,
   },
-  _fromContract: { type: String, index: true }, // Contract address
-  _toContract: { type: String, index: true }, // Contract address
+  from: { type: String, index: true }, // non user wallet address
+  to: { type: String, index: true }, // non user wallet address
   hash: { type: String, index: true, required: true },
   status: {
     type: Number,

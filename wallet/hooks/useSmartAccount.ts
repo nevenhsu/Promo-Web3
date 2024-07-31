@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useWallet } from '@/wallet/hooks/useWallet'
 import { createPublicClient, http } from 'viem'
 import { providerToSmartAccountSigner, ENTRYPOINT_ADDRESS_V07 } from 'permissionless'
-
 import {
   createZeroDevPaymasterClient,
   createKernelAccount,
@@ -66,7 +65,6 @@ async function getAccountClient(wallet: ConnectedWallet, chainId: number | undef
       transport: http(chain.rpcUrls.default.http[0]),
     })
 
-    // @ts-ignore
     // Create a ZeroDev ECDSA validator from the `smartAccountSigner` from above and your `publicClient`
     const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
       signer: smartAccountSigner,
@@ -74,7 +72,6 @@ async function getAccountClient(wallet: ConnectedWallet, chainId: number | undef
       kernelVersion,
     })
 
-    // @ts-ignore
     // Create a Kernel account from the ECDSA validator
     const account = await createKernelAccount(publicClient, {
       plugins: {
