@@ -23,18 +23,20 @@ export function useBalances({ chainId, walletAddress, contractsValues }: UseBala
 
     const tokens = getTokens(chainId)
 
-    for (const token of tokens) {
-      try {
-        const contract = getContract(token.address)
-        if (!contract) throw new Error(`Contract not found: ${token.symbol}`)
+    await Promise.all(
+      tokens.map(async token => {
+        try {
+          const contract = getContract(token.address)
+          if (!contract) throw new Error(`Contract not found: ${token.symbol}`)
 
-        const balance = await contract.balanceOf(walletAddress)
-        setBalances(prev => ({ ...prev, [token.symbol]: balance }))
-        console.log(`Balance of ${token.symbol}: ${balance}`)
-      } catch (err) {
-        console.error(err)
-      }
-    }
+          const balance = await contract.balanceOf(walletAddress)
+          setBalances(prev => ({ ...prev, [token.symbol]: balance }))
+          console.log(`Balance of ${token.symbol}: ${balance}`)
+        } catch (err) {
+          console.error(err)
+        }
+      })
+    )
   }, [chainId, walletAddress, getContract])
 
   // Update balances when contracts are ready

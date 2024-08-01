@@ -144,38 +144,25 @@ export const useTx = (): TxContextType => {
 }
 
 async function checkTxStatus(wallet: ConnectedWallet, hash: string) {
-  try {
-    const provider = await wallet.getEthersProvider()
-    return checkTx(provider, hash)
-  } catch (err) {
-    console.error(err)
-    return false
-  }
+  const provider = await wallet.getEthersProvider()
+  return checkTx(provider, hash)
 }
 
 async function checkTx(provider: Web3Provider, hash: string) {
-  try {
-    const receipt = await provider.getTransactionReceipt(hash)
+  const receipt = await provider.getTransactionReceipt(hash)
 
-    if (receipt === null) {
-      console.log('Transaction not found or not yet mined.')
-      await wait()
-      return checkTx(provider, hash)
-    }
-
-    // Check if the transaction was successful
-    if (receipt.status === 1) {
-      console.log(`Transaction was successful! ${hash}`)
-      return true
-    } else if (receipt.status === 0) {
-      console.log(`Transaction failed! ${hash}`)
-    } else {
-      console.log(`Unknown transaction status. ${hash}`)
-    }
-
-    return false
-  } catch (err) {
-    console.error(err)
-    return false
+  if (receipt === null) {
+    console.log('Transaction not found or not yet mined.')
+    await wait(2000)
+    return checkTx(provider, hash)
   }
+
+  // Check if the transaction was successful
+  if (receipt.status === 1) {
+    console.log(`Transaction was successful! ${hash}`)
+    return true
+  }
+
+  console.log(`Transaction failed! ${hash}`)
+  return false
 }

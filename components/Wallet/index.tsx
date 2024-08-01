@@ -24,14 +24,14 @@ const ThemeAction = ThemeIcon.withProps({
 })
 
 export default function Wallet() {
+  const { user } = usePrivy()
   const { data } = useAppSelector(state => state.user)
   const { name } = data
 
   const { chainId, prices, tokens, walletAddress, balancesValues } = useWeb3()
-
-  const { user } = usePrivy()
   const { balances, updateBalances, loading } = balancesValues
 
+  // TODO: only for smart account
   if (!user?.wallet?.address) {
     return <CreateWallet />
   }

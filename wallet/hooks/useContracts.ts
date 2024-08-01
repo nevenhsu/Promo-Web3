@@ -22,6 +22,14 @@ export function useContracts({ chainId, walletProviderValues }: ContractParams) 
   const [contracts, setContracts] = useState<Contracts>({})
   const { provider } = walletProviderValues
 
+  const getContract = useCallback(
+    (address?: string) => {
+      if (!address) return
+      return contracts[unifyAddress(address)]
+    },
+    [contracts]
+  )
+
   const getContracts = async (provider: WalletProvider) => {
     try {
       // The "any" network will allow spontaneous network changes
@@ -56,14 +64,6 @@ export function useContracts({ chainId, walletProviderValues }: ContractParams) 
       setReady(false)
     }
   }, [provider]) // assuming signer is a dependency
-
-  const getContract = useCallback(
-    (address?: string) => {
-      if (!address) return
-      return contracts[unifyAddress(address)]
-    },
-    [contracts]
-  )
 
   return { contracts, ready, getContract }
 }
