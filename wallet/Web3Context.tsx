@@ -7,9 +7,11 @@ import { useSmartAccount } from '@/wallet/hooks/useSmartAccount'
 import { useWalletProvider } from '@/wallet/hooks/useWalletProvider'
 import { useContracts } from '@/wallet/hooks/useContracts'
 import { useBalances } from '@/wallet/hooks/useBalances'
+import { useWalletClient } from '@/wallet/hooks/useWalletClient'
 import { supportedChains } from './variables'
 import { toChainId } from '@/wallet/utils/network'
 import { getTokens, type Erc20 } from '@/contracts/tokens'
+import type { WalletClient } from 'viem'
 
 type SmartAccountValues = ReturnType<typeof useSmartAccount>
 type WalletProviderValues = ReturnType<typeof useWalletProvider>
@@ -22,6 +24,7 @@ interface Web3ContextType {
   chainId?: number
   tokens: Erc20[]
   walletAddress?: string
+  walletClient?: WalletClient
   smartAccountValues: SmartAccountValues
   walletProviderValues: WalletProviderValues
   contractsValues: ContractsValues
@@ -40,8 +43,9 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   // hooks
   const smartAccountValues = useSmartAccount(chainId)
   const walletProviderValues = useWalletProvider(smartAccountValues)
-  const { walletAddress } = walletProviderValues
-  const contractsValues = useContracts({ walletProviderValues, chainId })
+  const { walletAddress, provider } = walletProviderValues
+  const { walletClient } = useWalletClient({ chainId, provider })
+  const contractsValues = useContracts({ chainId, walletClient })
   const balancesValues = useBalances({ chainId, walletAddress, contractsValues })
 
   // TODO: usePrices
@@ -67,6 +71,7 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
         chainId,
         tokens,
         walletAddress,
+        walletClient,
         smartAccountValues,
         walletProviderValues,
         contractsValues,

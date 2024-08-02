@@ -1,69 +1,56 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
-import { getTokenContracts } from '@/contracts'
-import { Web3Provider } from '@ethersproject/providers'
+import * as _ from 'lodash-es'
+import { useState, useEffect, useCallback } from 'react'
+import { getTokens } from '@/contracts/tokens'
+import { getContract as createContract } from 'viem'
 import { unifyAddress } from '@/wallet/utils/helper'
-import type { useWalletProvider, WalletProvider } from '@/wallet/hooks/useWalletProvider'
-import type { Erc20Permit } from '@/contracts/typechain-types'
+import type { WalletClient, GetContractReturnType } from 'viem'
 
-type WalletProviderValues = ReturnType<typeof useWalletProvider>
-
-type Contract = Erc20Permit // | OtherContractType
-type Contracts = { [address: string]: Contract | undefined }
-
-type ContractParams = {
+type UseBalanceParams = {
   chainId?: number
-  walletProviderValues: WalletProviderValues
+  walletClient?: WalletClient
 }
 
-export function useContracts({ chainId, walletProviderValues }: ContractParams) {
-  const [ready, setReady] = useState(false) // ready to use contracts
+type Contracts = {
+  [address: string]: GetContractReturnType<unknown[], WalletClient> | undefined
+}
+
+export function useContracts({ chainId, walletClient }: UseBalanceParams) {
   const [contracts, setContracts] = useState<Contracts>({})
-  const { provider } = walletProviderValues
+  const [ready, setReady] = useState(false)
 
   const getContract = useCallback(
-    (address?: string) => {
-      if (!address) return
+    (address: string) => {
       return contracts[unifyAddress(address)]
     },
     [contracts]
   )
 
-  const getContracts = async (provider: WalletProvider) => {
-    try {
-      // The "any" network will allow spontaneous network changes
-      const ethersProvider = new Web3Provider(provider, 'any')
-      const signer = await ethersProvider.getSigner()
-
-      // @ts-expect-error JsonRpcSigner does not exist on type Signer
-      const tokenContracts = getTokenContracts(chainId, signer)
-
-      const results: Contracts = {}
-      tokenContracts.forEach(({ contract, token }) => {
-        results[unifyAddress(token.address)] = contract
-      })
-
-      setContracts(results)
-      setReady(true)
-    } catch (err) {
-      // TODO: handle error
-      console.error(err)
-      setContracts({})
-      setReady(false)
-    }
-  }
-
   useEffect(() => {
-    setReady(false)
+    setReady(false) // Reset ready state
 
-    if (provider) {
-      getContracts(provider)
+    if (walletClient && chainId) {
+      // Token contracts
+      const tokens = getTokens(chainId)
+      const contracts: Contracts = {}
+      _.forEach(tokens, token => {
+        const { abi, address } = token
+        const contract = createContract({
+          abi,
+          address,
+          client: walletClient,
+        })
+
+        // @ts-ignore
+        contracts[unifyAddress(address)] = contract
+      })
+      setContracts(contracts)
+      setReady(true)
     } else {
-      setContracts({})
-      setReady(false)
+      setContracts({}) // Clear contracts
     }
-  }, [provider]) // assuming signer is a dependency
+  }, [walletClient, chainId])
 
   return { contracts, ready, getContract }
 }

@@ -29,7 +29,7 @@ export function useWalletProvider({ kernelProvider, smartAccountAddress }: Smart
         setProvider(provider)
         setWalletAddress(wallet.address)
         setIsSmartAccount(false)
-      } else if (provider) {
+      } else {
         // clear
         setProvider(undefined)
         setWalletAddress(undefined)

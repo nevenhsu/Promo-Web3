@@ -1,14 +1,17 @@
 import { baseSepolia, arbitrum, arbitrumSepolia } from 'viem/chains'
+import ERC20 from '@/contracts/abi/ERC20.json'
+import Erc20Permit from '@/contracts/abi/Erc20Permit.json'
 
 export type Erc20 = {
   chainId: number
   name: string
   symbol: string
   decimal: number
-  address: string
+  address: `0x${string}`
   version: string
   isPermit: boolean
   icon: string
+  abi: Array<any>
 }
 
 export const tokens: { [id: string]: Erc20[] } = {
@@ -22,6 +25,7 @@ export const tokens: { [id: string]: Erc20[] } = {
       version: '2',
       isPermit: true,
       icon: '/icons/usdc-token.svg',
+      abi: Erc20Permit.abi,
     },
   ],
   [arbitrum.id]: [
@@ -34,6 +38,7 @@ export const tokens: { [id: string]: Erc20[] } = {
       version: '2',
       isPermit: true,
       icon: '/icons/usdc-token.svg',
+      abi: Erc20Permit.abi,
     },
   ],
   [arbitrumSepolia.id]: [
@@ -46,6 +51,7 @@ export const tokens: { [id: string]: Erc20[] } = {
       version: '2',
       isPermit: true,
       icon: '/icons/usdc-token.svg',
+      abi: Erc20Permit.abi,
     },
   ],
 } as const

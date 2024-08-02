@@ -9,6 +9,8 @@ import type { ContractTransactionResponse } from 'ethers'
 import type { ConnectedWallet } from '@privy-io/react-auth'
 import type { Web3Provider } from '@ethersproject/providers'
 
+// TODO: use viem
+
 type TxFunction = (...arg: any[]) => Promise<ContractTransactionResponse>
 
 export enum TxStatus {
@@ -32,20 +34,20 @@ export type Tx = {
 
 interface TxContextType {
   txs: Tx[]
-  addTx: (
-    contractAddress: string,
-    fnName: string,
-    args: any[],
-    description?: string
-  ) => { timestamp: number } | undefined
+  // addTx: (
+  //   contractAddress: string,
+  //   fnName: string,
+  //   args: any[],
+  //   description?: string
+  // ) => { timestamp: number } | undefined
 }
 
 const TxContext = createContext<TxContextType | undefined>(undefined)
 
 export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const wallet = useWallet()
-  const { chainId, contractsValues } = useWeb3()
-  const { getContract } = contractsValues
+  const { chainId } = useWeb3()
+  // const { getContract } = contractsValues
 
   const [txs, setTxs] = useState<Tx[]>([])
   const txsRef = useRef<{ [hash: string]: boolean }>({}) // hash: isHandled
@@ -54,28 +56,28 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     if (!chainId) return
 
     const contractAddress = unifyAddress(contractAddr)
-    const contract = getContract(contractAddr)
-    const fn = _.get(contract, [fnName])
-    const status = contract && fn ? TxStatus.Init : TxStatus.Error
-    const timestamp = Date.now() // unique id
+    // const contract = getContract(contractAddr)
+    // const fn = _.get(contract, [fnName])
+    // const status = contract && fn ? TxStatus.Init : TxStatus.Error
+    // const timestamp = Date.now() // unique id
 
-    const tx: Tx = {
-      timestamp,
-      chainId,
-      contractAddress,
-      fnName,
-      status,
-      description,
-    }
+    // const tx: Tx = {
+    //   timestamp,
+    //   chainId,
+    //   contractAddress,
+    //   fnName,
+    //   status,
+    //   description,
+    // }
 
     // add tx to list
-    setTxs(prev => [...prev, tx])
+    // setTxs(prev => [...prev, tx])
 
-    // call tx function
-    const txFn = fn as TxFunction
-    callTx(timestamp, txFn, args)
+    // // call tx function
+    // const txFn = fn as TxFunction
+    // callTx(timestamp, txFn, args)
 
-    return { timestamp }
+    // return { timestamp }
   }
 
   const callTx = async (timestamp: number, txFn: TxFunction, args: any[]) => {
@@ -127,7 +129,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     <TxContext.Provider
       value={{
         txs,
-        addTx,
+        // addTx,
       }}
     >
       {children}

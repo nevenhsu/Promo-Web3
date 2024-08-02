@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useWallet } from '@/wallet/hooks/useWallet'
-import { createPublicClient, http } from 'viem'
+import { http } from 'viem'
 import { providerToSmartAccountSigner, ENTRYPOINT_ADDRESS_V07 } from 'permissionless'
 import {
   createZeroDevPaymasterClient,
@@ -11,8 +11,8 @@ import {
 } from '@zerodev/sdk'
 import { signerToEcdsaValidator } from '@zerodev/ecdsa-validator'
 import { KernelEIP1193Provider } from '@zerodev/sdk/providers'
-import { supportedChains } from '@/wallet/variables'
 import { getZeroDev } from '@/wallet/zeroDev'
+import { getPublicClient } from '@/wallet/publicClients'
 import { KERNEL_V3_1 } from '@zerodev/sdk/constants'
 import type { ConnectedWallet } from '@privy-io/react-auth'
 import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types'
@@ -53,18 +53,16 @@ export function useSmartAccount(chainId?: number) {
 
 async function getAccountClient(wallet: ConnectedWallet, chainId: number | undefined) {
   const zeroDev = getZeroDev(chainId)
+  const publicClient = getPublicClient(chainId)
 
-  if (wallet && zeroDev) {
+  if (wallet && zeroDev && publicClient) {
     const provider = await wallet.getEthereumProvider()
 
     // Use the EIP1193 `provider` from Privy to create a `SmartAccountSigner`
     const smartAccountSigner = await providerToSmartAccountSigner(provider as any)
 
     // Initialize a viem public client on your app's desired network
-    const chain = supportedChains.find(({ id }) => id === chainId)!
-    const publicClient = createPublicClient({
-      transport: http(chain.rpcUrls.default.http[0]),
-    })
+    const { chain } = publicClient
 
     // Create a ZeroDev ECDSA validator from the `smartAccountSigner` from above and your `publicClient`
     const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
