@@ -29,13 +29,15 @@ export function useBalances({ chainId, walletAddress, contractsValues }: UseBala
         try {
           const contract = getContract(token.address)
           if (contract) {
-            const data = (await contract.read.balanceOf([walletAddress])) as bigint
-            setBalances(prev => ({ ...prev, [token.symbol]: data }))
+            const data = await contract.read.balanceOf([walletAddress])
+            if (typeof data === 'bigint') {
+              setBalances(prev => ({ ...prev, [token.symbol]: data }))
 
-            console.log(
-              `${token.symbol} balance:`,
-              formatBalance(data, token.decimal).toDP(2).toString()
-            )
+              console.log(
+                `${token.symbol} balance:`,
+                formatBalance(data, token.decimal).toDP(2).toString()
+              )
+            }
           }
         } catch (err) {
           console.error(err)

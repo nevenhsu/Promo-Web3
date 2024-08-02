@@ -1,17 +1,18 @@
 import { baseSepolia, arbitrum, arbitrumSepolia } from 'viem/chains'
 import ERC20 from '@/contracts/abi/ERC20.json'
 import Erc20Permit from '@/contracts/abi/Erc20Permit.json'
+import type { Hash } from 'viem'
 
 export type Erc20 = {
   chainId: number
   name: string
   symbol: string
   decimal: number
-  address: `0x${string}`
+  address: Hash
   version: string
   isPermit: boolean
   icon: string
-  abi: Array<any>
+  abi: unknown[]
 }
 
 export const tokens: { [id: string]: Erc20[] } = {

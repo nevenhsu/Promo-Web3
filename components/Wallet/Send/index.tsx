@@ -32,7 +32,7 @@ export default function Send() {
   const [txTimestamp, setTxTimestamp] = useState(0)
   const { chainId, prices, walletAddress, balancesValues } = useWeb3()
   const { balances, updateBalances } = balancesValues
-  const { txs } = useTx()
+  const { txs, addTx } = useTx()
 
   const tx = useMemo(() => {
     return txTimestamp ? _.find(txs, { timestamp: txTimestamp }) : undefined
@@ -164,12 +164,16 @@ export default function Send() {
     if (!token) return
 
     const val = formatBalance(amount, token.decimal).toString()
-    // const result = addTx(token.address, 'transfer', [to, amount], `Transfer ${val} USDC`)
+    const result = addTx(token.address, 'transfer', [to, amount], `Transfer ${val} USDC`)
 
-    // if (result) {
-    //   setTxTimestamp(result.timestamp)
-    //   open()
-    // }
+    if (result) {
+      const { timestamp, waitTx } = result
+      setTxTimestamp(timestamp)
+      open()
+
+      const hash = await waitTx()
+      console.log('Send Index: ', { hash })
+    }
   }
 
   const handleOnOk = () => {
