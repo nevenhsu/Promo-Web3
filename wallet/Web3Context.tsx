@@ -43,8 +43,8 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   // hooks
   const smartAccountValues = useSmartAccount(chainId)
   const walletProviderValues = useWalletProvider(smartAccountValues)
-  const { walletAddress, provider } = walletProviderValues
-  const { walletClient } = useWalletClient({ chainId, provider })
+  const { walletAddress } = walletProviderValues
+  const { walletClient } = useWalletClient({ chainId, walletProviderValues })
   const contractsValues = useContracts({ chainId, walletClient })
   const balancesValues = useBalances({ chainId, walletAddress, contractsValues })
 

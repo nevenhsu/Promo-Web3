@@ -5,7 +5,6 @@ import RwdLayout from '@/components/share/RwdLayout'
 import { PiCopy, PiLink } from 'react-icons/pi'
 
 export default function HistoryTx({ tx }: { tx: string }) {
-  console.log({ tx })
   return (
     <>
       <RwdLayout>

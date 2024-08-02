@@ -16,6 +16,7 @@ import { getPublicClient } from '@/wallet/publicClients'
 import { KERNEL_V3_1 } from '@zerodev/sdk/constants'
 import type { ConnectedWallet } from '@privy-io/react-auth'
 import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types'
+import type { Account, Hash } from 'viem'
 
 export type KernelProvider = KernelEIP1193Provider<ENTRYPOINT_ADDRESS_V07_TYPE>
 
@@ -25,8 +26,9 @@ export function useSmartAccount(chainId?: number) {
   // Find the embedded wallet and get its EIP1193 provider
   const wallet = useWallet()
 
-  const [smartAccountAddress, setSmartAccountAddress] = useState<string>()
+  const [smartAccountAddress, setSmartAccountAddress] = useState<Hash>()
   const [kernelProvider, setKernelProvider] = useState<KernelProvider>()
+  const [account, setAccount] = useState<Account>()
 
   useEffect(() => {
     const zeroDev = getZeroDev(chainId)
@@ -34,7 +36,7 @@ export function useSmartAccount(chainId?: number) {
       getAccountClient(wallet, chainId)
         .then(res => {
           if (res) {
-            const { kernelProvider, accountAddress } = res
+            const { kernelProvider, accountAddress, account } = res
             if (kernelProvider && accountAddress) {
               setKernelProvider(kernelProvider)
               setSmartAccountAddress(accountAddress)
@@ -105,6 +107,6 @@ async function getAccountClient(wallet: ConnectedWallet, chainId: number | undef
     const kernelProvider = new KernelEIP1193Provider(kernelClient)
     console.log('Smart account created:', accountAddress)
 
-    return { kernelProvider, accountAddress }
+    return { kernelProvider, accountAddress, account }
   }
 }

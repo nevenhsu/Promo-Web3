@@ -5,6 +5,7 @@ import { useWallet } from '@/wallet/hooks/useWallet'
 import type { useSmartAccount } from '@/wallet/hooks/useSmartAccount'
 import type { EIP1193Provider } from '@privy-io/react-auth'
 import type { KernelProvider } from '@/wallet/hooks/useSmartAccount'
+import type { Hash } from 'viem'
 
 export type WalletProvider = EIP1193Provider | KernelProvider
 
@@ -14,7 +15,7 @@ export function useWalletProvider({ kernelProvider, smartAccountAddress }: Smart
   const wallet = useWallet()
 
   const [provider, setProvider] = useState<WalletProvider>()
-  const [walletAddress, setWalletAddress] = useState<string>()
+  const [walletAddress, setWalletAddress] = useState<Hash>()
   const [isSmartAccount, setIsSmartAccount] = useState(Boolean(smartAccountAddress))
 
   const getProvider = async () => {
@@ -27,7 +28,7 @@ export function useWalletProvider({ kernelProvider, smartAccountAddress }: Smart
         const provider = await wallet.getEthereumProvider()
 
         setProvider(provider)
-        setWalletAddress(wallet.address)
+        setWalletAddress(wallet.address as any)
         setIsSmartAccount(false)
       } else {
         // clear

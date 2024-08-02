@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { useWeb3 } from '@/wallet/Web3Context'
 import { getPublicClient } from '@/wallet/publicClients'
 import { wait } from '@/wallet/utils/helper'
-import type { SimulateContractReturnType, WriteContractReturnType, PublicClient, Hash } from 'viem'
+import type { Hash, SimulateContractReturnType, WriteContractReturnType } from 'viem'
 
 type SimulateFn = (...args: any[]) => Promise<SimulateContractReturnType>
 type WriteFn = (...args: any[]) => Promise<WriteContractReturnType>
@@ -27,6 +27,7 @@ export type Tx = {
   status: TxStatus
   hash?: Hash
   description?: string
+  error?: string
 }
 
 interface TxContextType {
@@ -92,8 +93,8 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   ) => {
     const { simulateFn, writeFn, args } = values
     try {
-      await simulateFn(...args)
-      const hash = await writeFn(...args)
+      await simulateFn(args)
+      const hash = await writeFn(args)
 
       // update tx hash
       updateTx(timestamp, { hash, status: TxStatus.Pending })
@@ -101,9 +102,11 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
       return hash
     } catch (err) {
-      // update tx status
       console.error(err)
-      updateTx(timestamp, { status: TxStatus.Failed })
+
+      const msg = _.get(err, 'details') || _.get(err, 'message', 'Unknown error')
+      const error = msg.includes('gas') ? 'Insufficient gas. Please try again later.' : msg
+      updateTx(timestamp, { status: TxStatus.Failed, error })
     }
   }
 
@@ -113,7 +116,10 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   const handleTxStatus = async (tx: Tx, hash: Hash) => {
     const success = await checkTxStatus(tx.chainId, hash)
-    updateTx(tx.timestamp, { status: success ? TxStatus.Success : TxStatus.Failed })
+    updateTx(tx.timestamp, {
+      status: success ? TxStatus.Success : TxStatus.Failed,
+      error: success ? '' : 'Transaction failed',
+    })
   }
 
   useEffect(() => {

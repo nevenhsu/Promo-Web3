@@ -4,7 +4,7 @@ import * as _ from 'lodash-es'
 import Image from 'next/image'
 import Decimal from 'decimal.js'
 import { useRouter } from '@/navigation'
-import { useRef, useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useForm } from '@mantine/form'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { useTx, TxStatus, type Tx } from '@/wallet/TxContext'
@@ -27,11 +27,11 @@ type FormData = {
 export default function Send() {
   const router = useRouter()
 
-  const mounted = useRef(false)
   const [opened, { open, close }] = useDisclosure(false)
   const [txTimestamp, setTxTimestamp] = useState(0)
-  const { chainId, prices, walletAddress, balancesValues } = useWeb3()
+  const { chainId, prices, walletAddress, balancesValues, contractsValues } = useWeb3()
   const { balances, updateBalances } = balancesValues
+  const { ready } = contractsValues
   const { txs, addTx } = useTx()
 
   const tx = useMemo(() => {
@@ -62,11 +62,10 @@ export default function Send() {
   })
 
   useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true
+    if (ready) {
       updateBalances()
     }
-  }, [])
+  }, [ready])
 
   useEffect(() => {
     if (tokens.length) {
@@ -172,7 +171,6 @@ export default function Send() {
       open()
 
       const hash = await waitTx()
-      console.log('Send Index: ', { hash })
     }
   }
 
@@ -353,16 +351,14 @@ function Transaction({
               </Title>
               <Box ta="center">
                 <Text fz="sm" c="dimmed" mb="xs">
-                  {`${amount} ${symbol} ${
-                    tx.status === TxStatus.Success
-                      ? 'has been sent'
-                      : tx.status === TxStatus.Failed
-                        ? 'failed to send'
-                        : 'is being sent'
-                  } to the address:`}
+                  {tx.status === TxStatus.Failed
+                    ? tx.error
+                    : `${amount} ${symbol} ${
+                        tx.status === TxStatus.Success ? 'has been sent' : 'is being sent'
+                      } to the address:`}
                 </Text>
                 <Text fz="xs" c="dimmed">
-                  {to || 'address'}
+                  {tx.status === TxStatus.Failed ? '' : to}
                 </Text>
               </Box>
             </Stack>
@@ -374,7 +370,7 @@ function Transaction({
             Okay, done
           </Button>
           {isFinished && (
-            <Button variant="light" onClick={onBack}>
+            <Button variant="outline" onClick={onBack}>
               Back to send
             </Button>
           )}

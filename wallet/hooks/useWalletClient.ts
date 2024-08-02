@@ -3,17 +3,24 @@
 import { useEffect, useState } from 'react'
 import { createWalletClient, custom, type WalletClient } from 'viem'
 import { supportedChains } from '@/wallet/variables'
-import type { WalletProvider } from '@/wallet/hooks/useWalletProvider'
+import type { useWalletProvider } from '@/wallet/hooks/useWalletProvider'
 
-type WalletClientParams = { chainId?: number; provider?: WalletProvider }
+type WalletProviderValues = ReturnType<typeof useWalletProvider>
+type WalletClientParams = {
+  chainId?: number
+  walletProviderValues: WalletProviderValues
+}
 
-export function useWalletClient({ provider, chainId }: WalletClientParams) {
+export function useWalletClient({ walletProviderValues, chainId }: WalletClientParams) {
+  const { provider, walletAddress } = walletProviderValues
   const [walletClient, setWalletClient] = useState<WalletClient>()
 
   useEffect(() => {
     const chain = supportedChains.find(c => c.id === chainId)
-    if (provider && chain) {
+    if (chain && provider && walletAddress) {
+      // https://viem.sh/docs/clients/wallet#optional-hoist-the-account
       const client = createWalletClient({
+        account: walletAddress,
         chain,
         transport: custom(provider),
       })
