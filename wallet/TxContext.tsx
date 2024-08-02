@@ -3,8 +3,9 @@
 import * as _ from 'lodash-es'
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { getPublicClient } from '@/wallet/publicClients'
+import { getPublicClient } from '@/wallet/lib/publicClients'
 import { wait } from '@/wallet/utils/helper'
+import { getContract } from '@/wallet/lib/getContracts'
 import type { Hash, SimulateContractReturnType, WriteContractReturnType } from 'viem'
 
 type SimulateFn = (...args: any[]) => Promise<SimulateContractReturnType>
@@ -43,21 +44,22 @@ interface TxContextType {
 const TxContext = createContext<TxContextType | undefined>(undefined)
 
 export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { chainId, contractsValues } = useWeb3()
-  const { getContract } = contractsValues
+  const { chainId, contracts } = useWeb3()
 
   const [txs, setTxs] = useState<Tx[]>([])
   const txsRef = useRef<{ [hash: string]: boolean }>({}) // hash: isHandled
 
   const addTx = (contractAddress: string, fnName: string, args: any[], description?: string) => {
-    const contract = getContract(contractAddress)
+    const contract = getContract(contractAddress, contracts)
 
-    if (!chainId || !contract) return
+    if (!chainId) return
 
-    const simulateFn = contract.simulate[fnName]
-    const writeFn = contract.write[fnName]
+    const simulateFn = contract?.simulate[fnName]
+    const writeFn = contract?.write[fnName]
 
-    const status = contract && Boolean(simulateFn) ? TxStatus.Init : TxStatus.Error
+    const valid = contract && simulateFn && writeFn
+
+    const status = valid ? TxStatus.Init : TxStatus.Error
     const timestamp = Date.now() // unique id
 
     const tx: Tx = {
@@ -72,19 +74,21 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     // add tx to list
     setTxs(prev => [...prev, tx])
 
-    // send tx
-    const txResult = sendTx(timestamp, {
-      simulateFn,
-      writeFn,
-      args,
-    })
+    if (valid) {
+      // send tx
+      const txResult = sendTx(timestamp, {
+        simulateFn,
+        writeFn,
+        args,
+      })
 
-    const waitTx = async () => {
-      const hash = await txResult
-      return hash
+      const waitTx = async () => {
+        const hash = await txResult
+        return hash
+      }
+
+      return { timestamp, waitTx }
     }
-
-    return { timestamp, waitTx }
   }
 
   const sendTx = async (
@@ -105,7 +109,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       console.error(err)
 
       const msg = _.get(err, 'details') || _.get(err, 'message', 'Unknown error')
-      const error = msg.includes('gas') ? 'Insufficient gas. Please try again later.' : msg
+      const error = msg.includes('gas') ? 'Exceed gas limit. Please try again later.' : msg
       updateTx(timestamp, { status: TxStatus.Failed, error })
     }
   }

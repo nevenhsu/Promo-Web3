@@ -1,42 +1,44 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useAsyncFn } from 'react-use'
 import { getTokens } from '@/contracts/tokens'
 import { formatBalance } from '@/utils/math'
-import type { useContracts } from '@/wallet/hooks/useContracts'
+import { getContract, type Contracts } from '@/wallet/lib/getContracts'
+import type { WalletProviderValues } from '@/wallet/lib/getWalletProvider'
 
-type ContractsValues = ReturnType<typeof useContracts>
 type UseBalanceParams = {
   chainId?: number
-  walletAddress?: string
-  contractsValues: ContractsValues
+  contracts?: Contracts
+  walletProviderValues?: WalletProviderValues
+  loading: boolean
 }
 type Balances = { [symbol: string]: bigint | undefined }
 
-export function useBalances({ chainId, walletAddress, contractsValues }: UseBalanceParams) {
-  const { ready, getContract } = contractsValues
+export function useBalances({
+  chainId,
+  contracts,
+  walletProviderValues,
+  loading,
+}: UseBalanceParams) {
+  const { walletAddress } = walletProviderValues || {}
+  const notReady = !chainId || !walletAddress || _.isEmpty(contracts) || loading
 
-  const tokens = useMemo(() => getTokens(chainId), [chainId])
   const [balances, setBalances] = useState<Balances>({})
 
-  const [{ loading }, updateBalances] = useAsyncFn(async () => {
-    if (!ready || !walletAddress) return
+  const [updateState, updateBalances] = useAsyncFn(async () => {
+    const tokens = getTokens(chainId)
+    if (notReady) return
 
-    await Promise.all(
-      _.map(tokens, async token => {
+    const results = await Promise.all(
+      tokens.map(async ({ address, symbol, decimal }) => {
         try {
-          const contract = getContract(token.address)
+          const contract = getContract(address, contracts)
           if (contract) {
-            const data = await contract.read.balanceOf([walletAddress])
-            if (typeof data === 'bigint') {
-              setBalances(prev => ({ ...prev, [token.symbol]: data }))
-
-              console.log(
-                `${token.symbol} balance:`,
-                formatBalance(data, token.decimal).toDP(2).toString()
-              )
+            const balance = await contract.read.balanceOf([walletAddress])
+            if (typeof balance === 'bigint') {
+              return { symbol, decimal, balance }
             }
           }
         } catch (err) {
@@ -44,15 +46,32 @@ export function useBalances({ chainId, walletAddress, contractsValues }: UseBala
         }
       })
     )
-  }, [ready, walletAddress, tokens])
 
-  // Update balances when contracts are ready
+    const newBalances = results.reduce((acc, result) => {
+      if (result) {
+        const { symbol, decimal, balance } = result
+        acc[symbol] = balance
+        console.log(`${symbol} balance:`, formatBalance(balance, decimal).toDP(2).toString())
+      }
+      return acc
+    }, {} as Balances)
+
+    setBalances(newBalances)
+  }, [notReady, chainId, walletAddress, contracts])
+
   useEffect(() => {
-    if (!ready || !walletAddress) {
-      // Clear balances when wallet is disconnected
+    // reset balances when loading contracts
+    if (loading) {
       setBalances({})
     }
-  }, [ready, walletAddress])
+  }, [loading])
 
-  return { balances, loading, updateBalances }
+  useEffect(() => {
+    if (notReady) return
+
+    // auto update balances
+    updateBalances()
+  }, [notReady, chainId, walletAddress, contracts])
+
+  return { notReady, balances, loading: loading || updateState.loading, updateBalances }
 }

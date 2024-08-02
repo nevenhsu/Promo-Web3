@@ -29,9 +29,9 @@ export default function Send() {
 
   const [opened, { open, close }] = useDisclosure(false)
   const [txTimestamp, setTxTimestamp] = useState(0)
-  const { chainId, prices, walletAddress, balancesValues, contractsValues } = useWeb3()
+  const { chainId, walletAddress, balancesValues, pricesValues } = useWeb3()
   const { balances, updateBalances } = balancesValues
-  const { ready } = contractsValues
+  const { prices } = pricesValues
   const { txs, addTx } = useTx()
 
   const tx = useMemo(() => {
@@ -60,12 +60,6 @@ export default function Send() {
       amount: value => (value ? null : 'Should not be empty'),
     },
   })
-
-  useEffect(() => {
-    if (ready) {
-      updateBalances()
-    }
-  }, [ready])
 
   useEffect(() => {
     if (tokens.length) {
@@ -269,9 +263,7 @@ export default function Send() {
                   </Text>
 
                   <Text fz="xs" c="dimmed">
-                    {price
-                      ? `USD ${new Decimal(price).mul(form.values.amount || '0').toDP(2)}`
-                      : 'No price yet'}
+                    {price ? `USD ${price.mul(form.values.amount || '0').toDP(2)}` : 'No price yet'}
                   </Text>
                 </Group>
               </Stack>

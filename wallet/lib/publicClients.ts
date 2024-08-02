@@ -1,6 +1,6 @@
 import * as _ from 'lodash-es'
 import { createPublicClient, http } from 'viem'
-import { supportedChains } from './variables'
+import { supportedChains } from '@/wallet/variables'
 
 const clients = supportedChains.map(chain =>
   createPublicClient({

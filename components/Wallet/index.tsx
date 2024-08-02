@@ -3,6 +3,7 @@
 import * as _ from 'lodash-es'
 import Decimal from 'decimal.js'
 import Image from 'next/image'
+import { useMemo } from 'react'
 import { Link } from '@/navigation'
 import { usePrivy } from '@privy-io/react-auth'
 import { useAppSelector } from '@/hooks/redux'
@@ -28,8 +29,23 @@ export default function Wallet() {
   const { data } = useAppSelector(state => state.user)
   const { name } = data
 
-  const { chainId, prices, tokens, walletAddress, balancesValues } = useWeb3()
+  const { chainId, tokens, walletAddress, balancesValues, pricesValues } = useWeb3()
   const { balances, updateBalances, loading } = balancesValues
+  const { prices } = pricesValues
+
+  const totalBalance = useMemo(() => {
+    return _.reduce(
+      tokens,
+      (acc, o) => {
+        const price = prices[o.symbol]
+        const balance = balances[o.symbol]
+        const bal = Decimal.div(balance?.toString() || 0, 10 ** o.decimal)
+        const val = price ? price.mul(bal) : new Decimal(0)
+        return acc.add(val)
+      },
+      new Decimal(0)
+    )
+  }, [balances, prices, tokens])
 
   // TODO: only for smart account
   if (!user?.wallet?.address) {
@@ -48,7 +64,7 @@ export default function Wallet() {
             <Title order={4} fw={500}>
               Balance
             </Title>
-            <Title order={4}>USD 13220.42</Title>
+            <Title order={4}>USD {totalBalance.toDP(2).toString()}</Title>
           </Group>
 
           <Space h={40} />
@@ -105,7 +121,7 @@ export default function Wallet() {
               const balance = balances[o.symbol]
               const price = prices[o.symbol]
               const bal = Decimal.div(balance?.toString() || 0, 10 ** o.decimal)
-              const p = price ? Decimal.mul(bal, price) : undefined
+              const p = price ? price.mul(bal) : undefined
 
               return (
                 <Paper key={o.symbol} radius="md" p="md" shadow="xs">

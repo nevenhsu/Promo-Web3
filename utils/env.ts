@@ -5,7 +5,7 @@ const isProd = process.env.NODE_ENV === 'production'
 export const env = {
   isProd,
 
-  locales: ['en', 'zh'], // next-intl
+  locales: ['en', 'zh-TW'], // next-intl
 
   sanityToken: process.env.SANITY_API_READ_TOKEN, // sanity
 

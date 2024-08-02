@@ -1,35 +1,34 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import React, { createContext, useContext, useState, useMemo } from 'react'
+import React, { createContext, useContext, useMemo, useEffect } from 'react'
+import { useAsyncFn } from 'react-use'
 import { useWallet } from '@/wallet/hooks/useWallet'
-import { useSmartAccount } from '@/wallet/hooks/useSmartAccount'
-import { useWalletProvider } from '@/wallet/hooks/useWalletProvider'
-import { useContracts } from '@/wallet/hooks/useContracts'
+import { getSmartAccount, type SmartAccountValues } from '@/wallet/lib/getSmartAccount'
+import { getWalletProvider, type WalletProviderValues } from '@/wallet/lib/getWalletProvider'
+import { getWalletClient } from '@/wallet/lib/getWalletClient'
+import { getContracts, type Contracts } from '@/wallet/lib/getContracts'
 import { useBalances } from '@/wallet/hooks/useBalances'
-import { useWalletClient } from '@/wallet/hooks/useWalletClient'
+import { usePrices } from '@/wallet/hooks/usePrices'
 import { supportedChains } from './variables'
 import { toChainId } from '@/wallet/utils/network'
 import { getTokens, type Erc20 } from '@/contracts/tokens'
 import type { WalletClient } from 'viem'
 
-type SmartAccountValues = ReturnType<typeof useSmartAccount>
-type WalletProviderValues = ReturnType<typeof useWalletProvider>
-type ContractsValues = ReturnType<typeof useContracts>
 type BalancesValues = ReturnType<typeof useBalances>
+type PricesValues = ReturnType<typeof usePrices>
 
-type Prices = { [symbol: string]: number | undefined }
-
-interface Web3ContextType {
+type Web3ContextType = {
+  loading: boolean
   chainId?: number
   tokens: Erc20[]
   walletAddress?: string
+  smartAccountValues?: SmartAccountValues
+  walletProviderValues?: WalletProviderValues
   walletClient?: WalletClient
-  smartAccountValues: SmartAccountValues
-  walletProviderValues: WalletProviderValues
-  contractsValues: ContractsValues
+  contracts?: Contracts
   balancesValues: BalancesValues
-  prices: Prices
+  pricesValues: PricesValues
   switchChain: (chainId: number) => Promise<void>
 }
 
@@ -40,16 +39,29 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   const chainId = toChainId(wallet?.chainId)
   const tokens = useMemo(() => getTokens(chainId), [chainId])
 
-  // hooks
-  const smartAccountValues = useSmartAccount(chainId)
-  const walletProviderValues = useWalletProvider(smartAccountValues)
-  const { walletAddress } = walletProviderValues
-  const { walletClient } = useWalletClient({ chainId, walletProviderValues })
-  const contractsValues = useContracts({ chainId, walletClient })
-  const balancesValues = useBalances({ chainId, walletAddress, contractsValues })
+  // setup
+  const [valuesState, setupValues] = useAsyncFn(async () => {
+    if (!chainId || !wallet) return
+    // get values
+    const smartAccountValues = await getSmartAccount(chainId, wallet)
+    const walletProviderValues = await getWalletProvider(wallet, smartAccountValues)
+    const walletClient = getWalletClient(chainId, walletProviderValues)
+    const contracts = walletClient ? getContracts(chainId, walletClient) : {}
+    console.log('Current wallet: ', {
+      walletAddress: walletProviderValues.walletAddress,
+      isSmartAccount: walletProviderValues.isSmartAccount,
+    })
+    return { contracts, smartAccountValues, walletProviderValues, walletClient }
+  }, [chainId, wallet])
 
-  // TODO: usePrices
-  const [prices, setPrices] = useState<Prices>({ USDC: 1 })
+  // state
+  const { value, loading } = valuesState
+  const { contracts, smartAccountValues, walletProviderValues, walletClient } = value || {}
+  const { walletAddress } = walletProviderValues || {}
+
+  // hooks
+  const balancesValues = useBalances({ chainId, contracts, walletProviderValues, loading })
+  const pricesValues = usePrices()
 
   const switchChain = async (chainId: number) => {
     if (!wallet) return
@@ -65,18 +77,25 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
+  useEffect(() => {
+    if (chainId && wallet) {
+      setupValues()
+    }
+  }, [chainId, wallet])
+
   return (
     <Web3Context.Provider
       value={{
+        loading,
         chainId,
         tokens,
         walletAddress,
         walletClient,
         smartAccountValues,
         walletProviderValues,
-        contractsValues,
+        contracts,
         balancesValues,
-        prices,
+        pricesValues,
         switchChain,
       }}
     >
