@@ -12,7 +12,7 @@ import {
   PiNumberCircleEightFill,
   PiNumberCircleNineFill,
 } from 'react-icons/pi'
-import type { NumberListData } from '@/types/sanity/numberList'
+import type { NumberListData } from '@/sanity/types/numberList'
 
 const icons = [
   PiNumberCircleOneFill,

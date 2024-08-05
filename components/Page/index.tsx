@@ -16,7 +16,7 @@ import RwdLayout from '@/components/share/RwdLayout'
 import SanityImage from '@/components/sanity/Image'
 import MyAvatar from '@/components/sanity/MyAvatar'
 import { variables } from '@/theme/cssVariables'
-import type { PageData } from '@/types/sanity/page'
+import type { PageData } from '@/sanity/types/page'
 import classes from './index.module.css'
 
 const headerHeight = variables.header.height

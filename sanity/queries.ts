@@ -1,11 +1,11 @@
 import groq from 'groq'
 import { client } from '@/sanity/client'
-import type { ImageData } from '@/types/sanity/image'
-import type { HomeData } from '@/types/sanity/home'
-import type { PageData } from '@/types/sanity/page'
-import type { FooterData } from '@/types/sanity/footer'
-import type { SanitySlug } from '@/types/sanity/common'
-import type { MetadataData } from '@/types/sanity/metadataData'
+import type { ImageData } from '@/sanity/types/image'
+import type { HomeData } from '@/sanity/types/home'
+import type { PageData } from '@/sanity/types/page'
+import type { FooterData } from '@/sanity/types/footer'
+import type { SanitySlug } from '@/sanity/types/common'
+import type { MetadataData } from '@/sanity/types/metadataData'
 
 const assetQuery = groq`
 asset {

@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { useState } from 'react'
 import { useDeepCompareEffect } from 'react-use'
 import type { SimpleGridProps } from '@mantine/core'
-import type { Rwd } from '@/types/sanity/rwd'
+import type { Rwd } from '@/sanity/types/rwd'
 
 type ToKey<T, V = any> = { [K in keyof T]: V }
 

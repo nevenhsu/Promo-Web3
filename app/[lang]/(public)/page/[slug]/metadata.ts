@@ -1,6 +1,6 @@
 import { client } from '@/sanity/client'
 import { pageMetaQuery } from '@/sanity/queries'
-import type { PageMetadataQuery } from '@/types/sanity/page'
+import type { PageMetadataQuery } from '@/sanity/types/page'
 import type { Metadata, ResolvingMetadata } from 'next'
 
 type Props = {

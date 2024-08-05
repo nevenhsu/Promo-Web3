@@ -1,5 +1,5 @@
 import { MyPortableText } from '@/components/common'
-import { ContentData } from '@/types/sanity/content'
+import { ContentData } from '@/sanity/types/content'
 import classes from './index.module.css'
 
 export function Content({ data }: { data: Partial<ContentData> }) {

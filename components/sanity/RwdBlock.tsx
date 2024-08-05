@@ -2,12 +2,12 @@
 
 import * as _ from 'lodash-es'
 import clsx from 'clsx'
-import useRwd from '@/hooks/sanity/useRwd'
+import useRwd from '@/sanity/hooks/useRwd'
 import { useScreenQueryValue } from '@/hooks/useScreenQuery'
 import { Box, Divider } from '@mantine/core'
 import RwdSimpleGrid from '@/components/sanity/Rwd/SimpleGrid'
 import { MyPortableText } from '@/components/common'
-import type { RwdData } from '@/types/sanity/rwd'
+import type { RwdData } from '@/sanity/types/rwd'
 import type { BreakPointData } from '@/types/common'
 import classes from './index.module.css'
 

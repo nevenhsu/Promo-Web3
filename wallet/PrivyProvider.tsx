@@ -22,7 +22,7 @@ export default function MyPrivyProvider({ children }: React.PropsWithChildren) {
         },
         legal: {
           termsAndConditionsUrl: `${publicEnv.baseUrl}/page/terms`,
-          privacyPolicyUrl: `${publicEnv.baseUrl}/page/privacy`,
+          privacyPolicyUrl: `${publicEnv.baseUrl}/page/privacy-policy`,
         },
       }}
     >

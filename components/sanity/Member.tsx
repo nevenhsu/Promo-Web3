@@ -1,7 +1,7 @@
 import { Box } from '@mantine/core'
 import { Body } from '@/components/Fonts'
 import MyAvatar from '@/components/sanity/MyAvatar'
-import type { MemberData } from '@/types/sanity/member'
+import type { MemberData } from '@/sanity/types/member'
 
 export function Member({ data }: { data: Partial<MemberData> }) {
   const { avatar, content } = data

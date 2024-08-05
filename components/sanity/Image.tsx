@@ -5,7 +5,7 @@ import { useNextSanityImage } from 'next-sanity-image'
 import { client } from '@/sanity/client'
 import { getImageData } from '@/sanity/queries'
 import Img, { ImageProps } from 'next/image'
-import type { ImageData, ImageAssetData } from '@/types/sanity/image'
+import type { ImageData, ImageAssetData } from '@/sanity/types/image'
 
 export type SanityImageProps = { image: ImageAssetData } & Omit<
   ImageProps,
