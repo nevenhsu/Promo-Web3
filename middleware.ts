@@ -5,7 +5,7 @@ import createIntlMiddleware from 'next-intl/middleware'
 import { i18nConfig } from './i18n'
 import { env } from '@/utils/env'
 
-export const publicPages = ['/', '/activity(/.*)?']
+export const publicPages = ['/', '/page(/.*)?', '/activity(/.*)?']
 
 const intlMiddleware = createIntlMiddleware(i18nConfig)
 

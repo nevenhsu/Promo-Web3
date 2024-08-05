@@ -5,7 +5,7 @@ import { useAppSelector } from '@/hooks/redux'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { usePromo } from '@/hooks/usePromo'
 import { Group, Box, ActionIcon, Avatar } from '@mantine/core'
-import Logo from '@/public/icons/logo.svg'
+import Logo from '@/public/logo.svg'
 import { PiCaretLeft } from 'react-icons/pi'
 
 export default function Header() {

@@ -7,8 +7,7 @@ import type { DefaultDocumentNodeResolver } from 'sanity/structure'
 function getPreviewUrl(doc: SanityDocument) {
   const url = new URL('/api/draft', publicEnv.baseUrl)
   const slug = doc?.slug?.current || ''
-  const lang = doc?.lang || ''
-  url.search = `type=${doc._type}&slug=${slug}&lang=${lang}`
+  url.search = `type=${doc._type}&slug=${slug}`
   return url.href
 }
 

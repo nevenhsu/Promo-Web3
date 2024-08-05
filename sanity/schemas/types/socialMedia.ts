@@ -1,6 +1,6 @@
 import * as _ from 'lodash-es'
 import { defineType } from 'sanity'
-import { getIcon, getName, SocialIcon } from '@/utils/sanity/socialIcon'
+import { getIcon, getName, SocialIcon } from '@/sanity/lib/socialIcon'
 
 export default defineType({
   title: 'Social Media',

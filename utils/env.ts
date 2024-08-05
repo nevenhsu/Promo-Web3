@@ -1,14 +1,13 @@
 // private
-
 const isProd = process.env.NODE_ENV === 'production'
+
+// public
+export const locales = ['en', 'zhTW'] as const // next-intl
 
 export const env = {
   isProd,
-
-  locales: ['en', 'zh-TW'], // next-intl
-
+  locales,
   sanityToken: process.env.SANITY_API_READ_TOKEN, // sanity
-
   // only for dev
   dev: isProd
     ? {}
@@ -20,6 +19,7 @@ export const env = {
 
 // for browser by prefixing with NEXT_PUBLIC_
 export const publicEnv = {
+  locales,
   isProd: process.env.NEXT_PUBLIC_NODE_ENV === 'production',
   timezone: process.env.NEXT_PUBLIC_TIME_ZONE,
   baseUrl: getBaseUrl(),

@@ -1,4 +1,4 @@
-import { getMetadata } from '@/utils/sanity/queries'
+import { getMetadata } from '@/sanity/queries'
 import type { Metadata, ResolvingMetadata } from 'next'
 
 export async function generateMetadata(

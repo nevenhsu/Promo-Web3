@@ -17,9 +17,8 @@ export const isPostUnique: SlugIsUniqueValidator = async (slug, context) => {
     draft: `drafts.${id}`,
     published: id,
     slug,
-    lang: document.lang,
   }
-  const query = `!defined(*[!(_id in [$draft, $published]) && slug.current == $slug && lang == $lang][0]._id)`
+  const query = `!defined(*[!(_id in [$draft, $published]) && slug.current == $slug][0]._id)`
   const result = await client.fetch(query, params)
 
   return result

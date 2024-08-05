@@ -10,6 +10,7 @@ import href from './types/href'
 import socialMedia from './types/socialMedia'
 import blockContent from './types/blockContent'
 import content from './types/content'
+import pageData from './types/pageData'
 import home from './home'
 import page from './page'
 import category from './category'
@@ -37,6 +38,7 @@ export const schemaTypes = [
   space,
   blockContent,
   content,
+  pageData,
   home,
   page,
   footer,

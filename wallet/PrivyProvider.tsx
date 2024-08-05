@@ -2,6 +2,8 @@ import { PrivyProvider } from '@privy-io/react-auth'
 import { Web3Provider } from './Web3Context'
 import { TxProvider } from './TxContext'
 import { defaultChain, supportedChains } from './variables'
+import { publicEnv } from '@/utils/env'
+import { colors } from '@/theme/colors'
 
 export default function MyPrivyProvider({ children }: React.PropsWithChildren) {
   return (
@@ -14,7 +16,13 @@ export default function MyPrivyProvider({ children }: React.PropsWithChildren) {
           createOnLogin: 'all-users',
         },
         appearance: {
-          // theme: publicEnv.defaultColorScheme,
+          theme: publicEnv.defaultColorScheme,
+          accentColor: colors.orange[5] as `#${string}`,
+          logo: `${publicEnv.baseUrl}/logo.svg`,
+        },
+        legal: {
+          termsAndConditionsUrl: `${publicEnv.baseUrl}/page/terms`,
+          privacyPolicyUrl: `${publicEnv.baseUrl}/page/privacy`,
         },
       }}
     >

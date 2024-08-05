@@ -6,6 +6,7 @@ import { useMediaQuery } from '@mantine/hooks'
 import { AppShell } from '@mantine/core'
 import Header from './Header'
 import MobileFooter from './MobileFooter'
+import { variables } from '@/theme/cssVariables'
 
 export default function MyAppShell({ children }: React.PropsWithChildren) {
   const matches = useMediaQuery('(min-width: 36em)')
@@ -15,7 +16,7 @@ export default function MyAppShell({ children }: React.PropsWithChildren) {
 
   return (
     <AppShell
-      header={{ height: 64 }}
+      header={{ ...variables.header }}
       navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !opened, desktop: true } }}
       withBorder={false}
     >

@@ -26,16 +26,18 @@ export type ItemType =
   | 'textCard'
   | 'titleCard'
 
+export type Rwd<T> = {
+  base?: T
+  xs?: T
+  sm?: T
+  md?: T
+  lg?: T
+  xl?: T
+}
+
 export type RwdData = {
   title?: string
   divider?: { noDivider: boolean; noDividerTop: boolean; noDividerBottom: boolean }
-  rwd?: {
-    base: LayoutData | undefined
-    xs: LayoutData | undefined
-    sm: LayoutData | undefined
-    md: LayoutData | undefined
-    lg: LayoutData | undefined
-    xl: LayoutData | undefined
-  }
+  rwd?: Rwd<LayoutData>
   items?: SanityArray<Item & { _type: ItemType }>
 }

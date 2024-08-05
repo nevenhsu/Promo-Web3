@@ -2,8 +2,7 @@ import _ from 'lodash'
 import { useState } from 'react'
 import { useDeepCompareEffect } from 'react-use'
 import type { SimpleGridProps } from '@mantine/core'
-
-type RwdObject<T> = { base?: T; xs?: T; sm?: T; md?: T; lg?: T; xl?: T }
+import type { Rwd } from '@/types/sanity/rwd'
 
 type ToKey<T, V = any> = { [K in keyof T]: V }
 
@@ -12,7 +11,7 @@ type ValuesAsKeys<T extends Partial<Record<any, any>>> = Record<T[keyof T], any>
 export default function useRwd<
   V extends Partial<Record<keyof T, keyof SimpleGridProps>>,
   T = Record<string, any>,
->(toKey: V, value: RwdObject<T> | undefined, fallback: Partial<ToKey<T>>) {
+>(toKey: V, value: Rwd<T> | undefined, fallback: Partial<ToKey<T>>) {
   const { base, xs, sm, md, lg, xl } = value || {}
 
   const [results, setResults] = useState<ValuesAsKeys<V>>()

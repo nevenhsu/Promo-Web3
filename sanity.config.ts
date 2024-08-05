@@ -4,10 +4,10 @@ import { visionTool } from '@sanity/vision'
 import { media } from 'sanity-plugin-media'
 import { table } from '@sanity/table'
 import { colorInput } from '@sanity/color-input'
+import { schemaTypes } from '@/sanity/schemas'
+import { defaultDocumentNode } from '@/sanity/defaultDocumentNode'
 import { publicEnv } from '@/utils/env'
-import { schemaTypes } from '@/utils/sanity/schemas'
-import { defaultDocumentNode } from '@/utils/sanity/defaultDocumentNode'
-import LogoIcon from '@/public/icons/logo.svg'
+import LogoIcon from '@/public/logo.svg'
 
 const { projectId, dataset } = publicEnv.sanity
 

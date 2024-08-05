@@ -1,7 +1,8 @@
 import groq from 'groq'
-import { client } from '@/utils/sanity/client'
+import { client } from '@/sanity/client'
 import type { ImageData } from '@/types/sanity/image'
 import type { HomeData } from '@/types/sanity/home'
+import type { PageData } from '@/types/sanity/page'
 import type { FooterData } from '@/types/sanity/footer'
 import type { SanitySlug } from '@/types/sanity/common'
 import type { MetadataData } from '@/types/sanity/metadataData'
@@ -34,6 +35,55 @@ const memberQuery = groq`
   }
 `
 
+const contentRef = groq`
+_type == 'space' => @->,
+_type == 'image' => {
+  ...,
+  ${assetQuery}
+},
+_type == 'member' => {
+  ${memberQuery}
+},
+_type == 'block' => {
+  ...,
+  markDefs[] {
+    ...,
+    _type == 'internalLink' => {
+      ...,
+      "slug": @.reference->slug.current,
+    }
+  }
+}
+`
+
+const getBlockRef = (type: string) => groq`
+_type == '${type}' => {
+  ...,
+  blockContent[] {
+    ...,
+    ${contentRef}
+  }
+}
+`
+
+const blockContent = groq`
+{
+  ...,
+  ${contentRef},
+  
+  _type == 'rwd' => {
+    ...,
+    items[] {
+      ...,
+      ${contentRef},
+      ${getBlockRef('content')},
+      ${getBlockRef('titleCard')},
+      ${getBlockRef('contentCard')}
+    }
+  }
+}
+`
+
 const pageDataQuery = groq`
   ...,
   categories[]->,
@@ -52,6 +102,11 @@ const pageDataQuery = groq`
       ${assetQuery}
     }
   },
+  ...lang[$lang] {
+    ...,
+    content[] ${blockContent},
+  },
+  "lang": null,
 `
 
 export async function getImageData(id: string) {
@@ -142,74 +197,25 @@ export async function getSlugData() {
   }
 }
 
-const contentRef = groq`
-_type == 'space' => @->,
-_type == 'image' => {
-  ...,
-  ${assetQuery}
-},
-_type == 'member' => {
-  ${memberQuery}
-},
-_type == 'block' => {
-  ...,
-  markDefs[] {
-    ...,
-    _type == 'internalLink' => {
-      ...,
-      "slug": @.reference->slug.current,
-    }
-  }
-}
-`
-
-const getBlockRef = (type: string) => groq`
-_type == '${type}' => {
-  ...,
-  blockContent[] {
-    ...,
-    ${contentRef}
-  }
-}
-`
-
-const blockContent = groq`
-{
-  ...,
-  ${contentRef},
-  
-  _type == 'rwd' => {
-    ...,
-    items[] {
-      ...,
-      ${contentRef},
-      ${getBlockRef('content')},
-      ${getBlockRef('titleCard')},
-      ${getBlockRef('contentCard')}
-    }
-  }
-}
-`
-
 export const pageQuery = groq`
-*[_type=='page' && slug.current==$slug && lang==$lang][0]
+*[_type=='page' && slug.current==$slug][0]
 { 
   ${pageDataQuery}
-  content[] ${blockContent},
 }
 `
 
 export const pageMetaQuery = groq`
-*[_type=='page' && slug.current==$slug && lang==$lang][0]
-{ 
-  ${pageDataQuery}
-  "content": null
+*[_type=='page' && slug.current==$slug] {
+  ...,
+  ...lang[$lang],
+  "content": null,
+  "lang": null,
 }
 `
 
 export async function getPageData(slug: string, lang: string) {
   try {
-    const data = await client.fetch(pageQuery, { slug, lang })
+    const data = await client.fetch<PageData>(pageQuery, { slug, lang })
     return data
   } catch (err) {
     console.error(err)

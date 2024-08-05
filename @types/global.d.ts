@@ -33,7 +33,7 @@ declare global {
       NEXT_PUBLIC_NODE_ENV: 'development' | 'production' | 'test'
       NEXT_PUBLIC_TIME_ZONE: string
       NEXT_PUBLIC_BASE_URL: string
-      NEXT_PUBLIC_COLOR_SCHEME: 'dark' | 'light' | 'auto'
+      NEXT_PUBLIC_COLOR_SCHEME: 'dark' | 'light'
       NEXT_PUBLIC_PRIVY_APP_ID: string
       NEXT_PUBLIC_GOOGLE_ANALYTICS: string
 

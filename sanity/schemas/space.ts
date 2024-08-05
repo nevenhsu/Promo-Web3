@@ -1,6 +1,6 @@
 import * as _ from 'lodash-es'
 import { defineType } from 'sanity'
-import { getRwdField } from '@/utils/sanity/getRwdField'
+import { getRwdField } from '@/sanity/schemas/lib/getRwdField'
 
 const name = 'height'
 

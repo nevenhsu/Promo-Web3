@@ -1,4 +1,4 @@
-export * from '@/components/PortableText'
+export * from '@/components/sanity/PortableText'
 export * from '@/components/sanity/RwdBlock'
 export * from '@/components/sanity/Content'
 export * from '@/components/sanity/table/Mtable'

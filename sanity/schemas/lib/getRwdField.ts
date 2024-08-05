@@ -25,6 +25,7 @@ export function getRwdField(
       { title: 'LG (1200)', name: 'lg', group: 'lg' },
       { title: 'XL (1408)', name: 'xl', group: 'xl' },
     ].map(o => ({ ...fields, ...o })),
+    options: { collapsed: false },
     preview: {
       select: { base: 'base', xs: 'xs', sm: 'sm', md: 'md', lg: 'lg', xl: 'xl' },
       prepare: ({ base, xs, sm, md, lg, xl }: { [k: string]: any }) => {

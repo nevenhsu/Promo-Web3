@@ -1,5 +1,5 @@
 import { InputProps } from 'sanity'
-import { extractIframeAttributes } from '@/utils/sanity/extractIframeAttributes'
+import { extractIframeAttributes } from '@/sanity/lib/extractIframeAttributes'
 import { Stack, Badge } from '@mantine/core'
 
 export default function IframeInput(props: InputProps) {

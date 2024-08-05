@@ -1,8 +1,8 @@
 import * as _ from 'lodash-es'
 import { defineField, defineType } from 'sanity'
 import IframeInput from '@/components/sanity/IframeInput'
-import { extractIframeAttributes } from '@/utils/sanity/extractIframeAttributes'
-import { getRwdField } from '@/utils/sanity/getRwdField'
+import { extractIframeAttributes } from '@/sanity/lib/extractIframeAttributes'
+import { getRwdField } from '@/sanity/schemas/lib/getRwdField'
 
 export default defineType({
   name: 'iframe',

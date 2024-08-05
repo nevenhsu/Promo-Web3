@@ -3,24 +3,21 @@ import type { ImageAssetData } from './image'
 import type { CategoryData } from './category'
 import type { AvatarData } from './avatar'
 import type { SanityArray, SanitySlug } from './common'
+import type { Rwd } from './rwd'
 
 export type PageData = SanitySlug & {
+  hidden: boolean
   title: string
   description: string
-  locked: boolean
-  password: string
-  passwordHint: string
-  mainImage: {
-    base?: { asset: ImageAssetData }
-    xs?: { asset: ImageAssetData }
-    sm?: { asset: ImageAssetData }
-    md?: { asset: ImageAssetData }
-    lg?: { asset: ImageAssetData }
-    xl?: { asset: ImageAssetData }
-  }
+  content: SanityArray<PortableTextBlock>
+  mainImage: Rwd<{ asset: ImageAssetData }>
   categories: CategoryData[]
   author: AvatarData
   publishedAt: string
   readTime: number
-  content: SanityArray<PortableTextBlock>
+}
+
+export type PageMetadataQuery = Omit<PageData, 'lang'> & {
+  title: string
+  description: string
 }

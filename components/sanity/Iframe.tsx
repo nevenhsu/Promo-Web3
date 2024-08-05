@@ -1,6 +1,6 @@
 import * as _ from 'lodash-es'
 import { Box } from '@mantine/core'
-import { extractIframeAttributes } from '@/utils/sanity/extractIframeAttributes'
+import { extractIframeAttributes } from '@/sanity/lib/extractIframeAttributes'
 
 type IframeProps = {
   title?: string
