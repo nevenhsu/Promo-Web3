@@ -12,7 +12,7 @@ import classes from './index.module.css'
 
 export default function Receive() {
   const { chainId, walletProviderValues } = useWeb3()
-  const { isSmartAccount, walletAddress = '' } = walletProviderValues
+  const { isSmartAccount, walletAddress = '' } = walletProviderValues || {}
 
   const network = getNetwork(chainId)
 
