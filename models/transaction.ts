@@ -8,22 +8,22 @@ const tokenSchema = new Schema({
 
 export const schema = new Schema({
   chainId: { type: Number, required: true, index: true },
-  hash: { type: String, index: true, required: true },
+  hash: { type: String, required: true, index: true },
   contract: { type: String, index: true }, // contract address
+  from: { type: String, required: true, index: true }, // non user wallet address
+  to: { type: String, index: true }, // non user wallet address
   _fromWallet: {
     type: Schema.Types.ObjectId,
-    ref: 'Wallet', // This should match the name of your wallet model
+    ref: 'UserWallet', // This should match the name of your wallet model
     index: true,
   },
   _toWallet: {
     type: Schema.Types.ObjectId,
-    ref: 'Wallet', // This should match the name of your wallet model
+    ref: 'UserWallet', // This should match the name of your wallet model
     index: true,
   },
-  from: { type: String, index: true }, // non user wallet address
-  to: { type: String, index: true }, // non user wallet address
   status: { type: Number, enum: TxStatus, index: true, default: TxStatus.Pending },
-  isAirdrop: { type: Boolean, index: true, default: false },
+  isAirdrop: { type: Boolean, default: false, index: true },
   createdAt: { type: Date, default: Date.now, index: true },
   token: { type: tokenSchema },
   details: { type: Object }, // Additional details

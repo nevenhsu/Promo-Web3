@@ -71,7 +71,7 @@ export default function Wallet() {
             </Stack>
             <Stack gap={4} ta="right">
               <Text fz="xs">{isSmartAccount ? 'Smart Wallet' : 'Embedded Wallet'}</Text>
-              <Text fz="xs" className="word-break-all">
+              <Text fz="xs" className="word-break-all" lh={1.2}>
                 {formatAddress(walletAddress)}
               </Text>
             </Stack>

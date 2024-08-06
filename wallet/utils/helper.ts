@@ -15,7 +15,7 @@ export function formatAddress(address?: string): string {
     return ''
   }
 
-  const start = address.slice(0, 8) // Extract the first 8 characters
+  const start = address.slice(0, 10) // Extract the first 8 characters
   const end = address.slice(-8) // Extract the last 8 characters
   return `${start}...${end}` // Combine them with an ellipsis
 }

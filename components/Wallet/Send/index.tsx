@@ -157,14 +157,22 @@ export default function Send() {
     if (!token) return
 
     const val = formatBalance(amount, token.decimal).toString()
-    const result = addTx(token.address, 'transfer', [to, amount], `Transfer ${val} USDC`)
+    const result = addTx(
+      {
+        contractAddr: token.address,
+        fnName: 'transfer',
+        fnArgs: [to, amount],
+        description: `Transfer ${val} ${token.symbol} to ${to}`,
+      },
+      hash => {
+        // save to db
+      }
+    )
 
     if (result) {
-      const { timestamp, waitTx } = result
+      const { timestamp } = result
       setTxTimestamp(timestamp)
       open()
-
-      const hash = await waitTx()
     }
   }
 

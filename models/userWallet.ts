@@ -10,12 +10,12 @@ export const schema = new Schema({
   address: { type: String, required: true, index: true },
   walletClientType: { type: String, required: true, index: true }, // privy, zerodev, metamask, rainbow, coinbase_wallet, etc...
   connectorType: { type: String, required: true }, // injected, wallet_connect, coinbase_wallet, embedded, etc...
-  tracked: Boolean, // If this wallet is used by our service
+  supported: { type: Boolean, index: true }, // If this wallet is used by our service
 })
 
-export type Wallet = InferSchemaType<typeof schema>
+export type UserWallet = InferSchemaType<typeof schema>
 
-const name = 'Wallet'
-const WalletModel = (models[name] as Model<Wallet>) || model(name, schema)
+const name = 'UserWallet'
+const UserWalletModel = (models[name] as Model<UserWallet>) || model(name, schema)
 
-export default WalletModel
+export default UserWalletModel

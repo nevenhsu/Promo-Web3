@@ -12,6 +12,7 @@ import { useBalances } from '@/wallet/hooks/useBalances'
 import { usePrices } from '@/wallet/hooks/usePrices'
 import { supportedChains } from './variables'
 import { toChainId } from '@/wallet/utils/network'
+import { updateWallet } from '@/services/userWallet'
 import { getTokens, type Erc20 } from '@/contracts/tokens'
 import type { WalletClient } from 'viem'
 
@@ -82,6 +83,26 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
       setupValues()
     }
   }, [chainId, wallet])
+
+  useEffect(() => {
+    // save wallet to db
+    if (wallet) {
+      updateWallet({
+        address: wallet.address,
+        walletClientType: wallet.walletClientType,
+        connectorType: wallet.connectorType,
+        supported: true,
+      }).catch(console.error)
+    }
+    if (walletProviderValues && walletProviderValues.isSmartAccount) {
+      updateWallet({
+        address: walletProviderValues.walletAddress,
+        walletClientType: 'zerodev',
+        connectorType: 'embedded',
+        supported: true,
+      }).catch(console.error)
+    }
+  }, [wallet, walletProviderValues])
 
   return (
     <Web3Context.Provider

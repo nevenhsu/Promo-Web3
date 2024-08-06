@@ -1,8 +1,8 @@
-import { arbitrum, arbitrumSepolia } from 'viem/chains'
+import { arbitrum, arbitrumSepolia, baseSepolia } from 'viem/chains'
 import { publicEnv } from '@/utils/env'
 
 const defaultChain = publicEnv.isProd ? arbitrum : arbitrumSepolia
-const supportedChains = [arbitrum, arbitrumSepolia]
+const supportedChains = [arbitrum, arbitrumSepolia, baseSepolia]
 
 export { defaultChain, supportedChains }
 

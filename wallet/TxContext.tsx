@@ -23,7 +23,7 @@ export enum TxStatus {
 export type Tx = {
   timestamp: number // unique id
   chainId: number
-  contractAddress: string
+  contractAddr: string
   fnName: string
   status: TxStatus
   hash?: Hash
@@ -31,13 +31,20 @@ export type Tx = {
   error?: string
 }
 
+type AddTxValues = {
+  contractAddr: string
+  fnName: string
+  fnArgs: any[]
+  description?: string
+}
+
+type TxCallback = (hash: Hash) => void
+
 interface TxContextType {
   txs: Tx[]
   addTx: (
-    contractAddress: string,
-    fnName: string,
-    args: any[],
-    description?: string
+    values: AddTxValues,
+    callback?: TxCallback
   ) => { waitTx: () => Promise<Hash | undefined>; timestamp: number } | undefined
 }
 
@@ -49,8 +56,9 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [txs, setTxs] = useState<Tx[]>([])
   const txsRef = useRef<{ [hash: string]: boolean }>({}) // hash: isHandled
 
-  const addTx = (contractAddress: string, fnName: string, args: any[], description?: string) => {
-    const contract = getContract(contractAddress, contracts)
+  const addTx = (values: AddTxValues, callback?: TxCallback) => {
+    const { contractAddr, fnName, fnArgs, description } = values
+    const contract = getContract(contractAddr, contracts)
 
     if (!chainId) return
 
@@ -65,7 +73,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     const tx: Tx = {
       timestamp,
       chainId,
-      contractAddress,
+      contractAddr,
       fnName,
       status,
       description,
@@ -76,11 +84,15 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
     if (valid) {
       // send tx
-      const txResult = sendTx(timestamp, {
-        simulateFn,
-        writeFn,
-        args,
-      })
+      const txResult = sendTx(
+        timestamp,
+        {
+          simulateFn,
+          writeFn,
+          fnArgs,
+        },
+        callback
+      )
 
       const waitTx = async () => {
         const hash = await txResult
@@ -93,16 +105,21 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   const sendTx = async (
     timestamp: number,
-    values: { simulateFn: SimulateFn; writeFn: WriteFn; args: any[] }
+    values: { simulateFn: SimulateFn; writeFn: WriteFn; fnArgs: any[] },
+    callback?: TxCallback
   ) => {
-    const { simulateFn, writeFn, args } = values
+    const { simulateFn, writeFn, fnArgs } = values
     try {
-      await simulateFn(args)
-      const hash = await writeFn(args)
+      await simulateFn(fnArgs)
+      const hash = await writeFn(fnArgs)
 
       // update tx hash
       updateTx(timestamp, { hash, status: TxStatus.Pending })
       console.log(`Transaction hash: ${hash}`)
+
+      if (callback) {
+        callback(hash)
+      }
 
       return hash
     } catch (err) {
