@@ -21,6 +21,10 @@ a:active {
   white-space: nowrap;
 }
 
+.word-break-all {
+  word-break: break-all;
+}
+
 .absolute-vertical {
   position: absolute;
   top: 50%;

@@ -12,6 +12,7 @@ import { Space, Group, Stack, Paper, Button, Text, Title, ThemeIcon } from '@man
 import NetworkButton from '@/components/Wallet/NetworkButton'
 import RwdLayout from '@/components/share/RwdLayout'
 import CreateWallet from './CreateWallet'
+import { formatAddress } from '@/wallet/utils/helper'
 import { PiArrowUpBold, PiArrowDownBold, PiClockBold, PiCreditCardBold } from 'react-icons/pi'
 import classes from './index.module.css'
 
@@ -29,7 +30,8 @@ export default function Wallet() {
   const { data } = useAppSelector(state => state.user)
   const { name } = data
 
-  const { chainId, tokens, walletAddress, balancesValues, pricesValues } = useWeb3()
+  const { chainId, tokens, walletProviderValues, balancesValues, pricesValues } = useWeb3()
+  const { isSmartAccount, walletAddress } = walletProviderValues || {}
   const { balances, updateBalances, loading } = balancesValues
   const { prices } = pricesValues
 
@@ -60,11 +62,19 @@ export default function Wallet() {
         <Space h={40} />
 
         <Paper p="sm" c="white" shadow="xs" bg="var(--mantine-primary-color-5)">
-          <Group justify="space-between">
-            <Title order={4} fw={500}>
-              Balance
-            </Title>
-            <Title order={4}>USD {totalBalance.toDP(2).toString()}</Title>
+          <Group justify="space-between" wrap="nowrap">
+            <Stack gap={4}>
+              <Text fz="xs">Balance</Text>
+              <Title order={4} lh={1} className="nowrap">
+                USD {totalBalance.toDP(2).toString()}
+              </Title>
+            </Stack>
+            <Stack gap={4} ta="right">
+              <Text fz="xs">{isSmartAccount ? 'Smart Wallet' : 'Embedded Wallet'}</Text>
+              <Text fz="xs" className="word-break-all">
+                {formatAddress(walletAddress)}
+              </Text>
+            </Stack>
           </Group>
 
           <Space h={40} />

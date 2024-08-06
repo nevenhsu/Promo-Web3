@@ -108,6 +108,8 @@ export default function Blog({ slug, lang, initialData }: PageProps) {
           </motion.div>
         </RwdLayout>
       </Box>
+
+      <Space h={100} />
     </>
   )
 }
