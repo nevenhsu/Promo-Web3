@@ -56,6 +56,17 @@ export const tokens: { [id: string]: Erc20[] } = {
       icon: '/icons/usdc-token.svg',
       abi: Erc20Permit.abi,
     },
+    {
+      chainId: arbitrumSepolia.id,
+      name: 'Sharx',
+      symbol: 'SHX',
+      decimal: 18,
+      address: unifyAddress('0x52b1010586Bc3861d4B578774Be87AD5919Ef804'),
+      version: '1',
+      isPermit: true,
+      icon: '/icons/sharx-token.svg',
+      abi: Erc20Permit.abi,
+    }
   ],
 } as const
 
