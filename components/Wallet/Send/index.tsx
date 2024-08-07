@@ -19,8 +19,7 @@ import { getNetwork } from '@/wallet/utils/network'
 import { createTransaction } from '@/services/transaction'
 import { TxStatus, TxType } from '@/types/db'
 import { PiArrowDown } from 'react-icons/pi'
-import { isAddress } from 'viem'
-import { isAddressEqual } from '@/wallet/utils/helper'
+import { isAddressEqual, isAddress } from '@/wallet/utils/helper'
 import { type Erc20 } from '@/contracts/tokens'
 
 type FormData = {

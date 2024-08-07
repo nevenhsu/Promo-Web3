@@ -1,4 +1,4 @@
-import { isAddressEqual as _isAddressEqual, type Hash } from 'viem'
+import { isAddressEqual as _isAddressEqual, isAddress as _isAddress, type Hash } from 'viem'
 
 export function unifyAddress(address: string) {
   return address.toLowerCase() as Hash
@@ -24,4 +24,8 @@ export function formatAddress(address?: string): string {
 
 export function isAddressEqual(addr1: string, addr2: string) {
   return _isAddressEqual(addr1 as any, addr2 as any)
+}
+
+export function isAddress(address: string) {
+  return _isAddress(address, { strict: false })
 }
