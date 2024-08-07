@@ -18,7 +18,7 @@ import { getTokens, getToken } from '@/contracts/tokens'
 import { formatBalance, formatAmount } from '@/utils/math'
 import { getNetwork } from '@/wallet/utils/network'
 import { createTransaction } from '@/services/transaction'
-import { TxStatus } from '@/types/db'
+import { TxStatus, TxType } from '@/types/db'
 import { PiArrowDown } from 'react-icons/pi'
 import { isAddress } from 'viem'
 import { isAddressEqual } from '@/wallet/utils/helper'
@@ -182,6 +182,7 @@ export default function Send() {
               chainId,
               hash,
               from: walletAddress,
+              type: TxType.ERC20,
               to,
               contract: token.address,
               token: {
@@ -250,7 +251,7 @@ export default function Send() {
 
                 {/* Address */}
                 <Stack pos="relative" gap={4}>
-                  <Paper p="md" radius="sm">
+                  <Paper p="md" radius="sm" h={96}>
                     <Text fz="sm" fw={500} mb="xs">
                       {isSmartAccount ? 'My smart wallet' : 'My embedded wallet'}
                     </Text>
@@ -269,7 +270,7 @@ export default function Send() {
                     <PiArrowDown size={20} />
                   </ThemeIcon>
 
-                  <Paper p="md" radius="sm">
+                  <Paper p="md" radius="sm" h={96}>
                     <Group justify="space-between">
                       <Text fz="sm" fw={500}>
                         Transfer Address
@@ -283,6 +284,14 @@ export default function Send() {
                       placeholder="Wallet Address (0x...)"
                       variant="unstyled"
                       key={form.key('to')}
+                      styles={{
+                        root: { position: 'relative' },
+                        input: { border: 'none' },
+                        error: {
+                          position: 'absolute',
+                          bottom: -12,
+                        },
+                      }}
                       data-autofocus
                       {...form.getInputProps('to')}
                     />

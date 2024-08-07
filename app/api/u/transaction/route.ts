@@ -2,12 +2,12 @@ import * as _ from 'lodash-es'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
-import { saveTransaction, getTransaction } from '@/lib/db/transaction'
+import { saveTransaction, getTransaction, getTransactions } from '@/lib/db/transaction'
 import { getUserWallets } from '@/lib/db/userWallet'
 import { TxStatus } from '@/types/db'
 import { isAddressEqual } from '@/wallet/utils/helper'
 
-// Create a transaction for the current user
+// Save a transaction for the current user
 export async function PUT(req: NextRequest) {
   try {
     const jwt = await getToken({ req })
@@ -75,11 +75,38 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// Get the transactions of the current user
+export async function GET(req: NextRequest) {
+  try {
+    // Parse query string parameters
+    const { searchParams } = new URL(req.url)
+    const page = Number(searchParams.get('page')) || 1
+    const limit = Number(searchParams.get('limit')) || 10
+    const count = page === 1
+
+    const jwt = await getToken({ req })
+    const userId = jwt?.user?.id!
+
+    await dbConnect()
+
+    const { total, txs } = await getTransactions(userId, page, limit, count)
+
+    return NextResponse.json({
+      total,
+      txs,
+    })
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
 function pickData(data: any) {
   const val = _.pick(data, [
     'chainId',
     'hash',
     'contract',
+    'type',
     'from',
     'to',
     'status',

@@ -60,6 +60,11 @@ export enum ActivityErrorCode {
   Error = 4, // Error in processing
 }
 
+export enum TxType {
+  Native = 'Native', // ETH
+  ERC20 = 'ERC20',
+}
+
 export enum TxStatus {
   Init = -3, // not yet called
   Pending = -2, // called but not yet confirmed

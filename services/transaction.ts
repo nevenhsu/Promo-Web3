@@ -17,3 +17,11 @@ export async function updateTransactionStatus(values: {
   const { data } = await axios.post<{ tx: Transaction }>('/api/u/transaction', values)
   return data.tx
 }
+
+// Get the transactions of the current user
+export async function getTransactions(page: number, limit: number) {
+  const { data } = await axios.get<{ txs: Transaction[]; total?: number }>('/api/u/transaction', {
+    params: { page, limit },
+  })
+  return data
+}

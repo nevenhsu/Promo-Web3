@@ -1,5 +1,5 @@
 import { models, model, Model, Schema } from 'mongoose'
-import { TxStatus } from '@/types/db'
+import { TxStatus, TxType } from '@/types/db'
 import { unifyAddress } from '@/wallet/utils/helper'
 import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
 
@@ -13,6 +13,7 @@ export const schema = new Schema({
   chainId: { type: Number, required: true, index: true },
   hash: { type: String, required: true, index: true },
   from: { type: String, required: true, index: true }, // non user wallet address
+  type: { type: String, enum: TxType, required: true, index: true }, // TxType
   // optional
   to: { type: String, index: true }, // non user wallet address
   contract: { type: String, index: true }, // contract address
