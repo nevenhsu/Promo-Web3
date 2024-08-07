@@ -2,6 +2,7 @@ import * as _ from 'lodash-es'
 import { baseSepolia, arbitrum, arbitrumSepolia } from 'viem/chains'
 import ERC20 from '@/contracts/abi/ERC20.json'
 import Erc20Permit from '@/contracts/abi/Erc20Permit.json'
+import { unifyAddress } from '@/wallet/utils/helper'
 import type { Hash } from 'viem'
 
 export type Erc20 = {
@@ -23,7 +24,7 @@ export const tokens: { [id: string]: Erc20[] } = {
       name: 'USDC',
       symbol: 'USDC',
       decimal: 6,
-      address: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+      address: unifyAddress('0x036CbD53842c5426634e7929541eC2318f3dCF7e'),
       version: '2',
       isPermit: true,
       icon: '/icons/usdc-token.svg',
@@ -36,7 +37,7 @@ export const tokens: { [id: string]: Erc20[] } = {
       name: 'USD Coin',
       symbol: 'USDC',
       decimal: 6,
-      address: '0xaf88d065e77c8cc2239327c5edb3a432268e5831',
+      address: unifyAddress('0xaf88d065e77c8cc2239327c5edb3a432268e5831'),
       version: '2',
       isPermit: true,
       icon: '/icons/usdc-token.svg',
@@ -49,7 +50,7 @@ export const tokens: { [id: string]: Erc20[] } = {
       name: 'USD Coin',
       symbol: 'USDC',
       decimal: 6,
-      address: '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d',
+      address: unifyAddress('0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d'),
       version: '2',
       isPermit: true,
       icon: '/icons/usdc-token.svg',

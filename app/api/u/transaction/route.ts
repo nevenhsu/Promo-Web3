@@ -5,6 +5,7 @@ import dbConnect from '@/lib/dbConnect'
 import { saveTransaction, getTransaction } from '@/lib/db/transaction'
 import { getUserWallets } from '@/lib/db/userWallet'
 import { TxStatus } from '@/types/db'
+import { isAddressEqual } from '@/wallet/utils/helper'
 
 // Create a transaction for the current user
 export async function PUT(req: NextRequest) {
@@ -14,40 +15,17 @@ export async function PUT(req: NextRequest) {
 
     await dbConnect()
 
-    const wallets = await getUserWallets(userId)
-
     const data = await req.json()
-    const {
-      chainId,
-      hash,
-      contract,
-      from,
-      to,
-      status,
-      createdAt,
-      token,
-      details,
-      isAirdrop = false,
-    } = data
+    const value = pickData(data)
 
     // Check if the user has the wallet
-    const fromWallet = wallets.find(w => w.address === from)
+    const wallets = await getUserWallets(userId)
+    const fromWallet = wallets.find(w => isAddressEqual(w.address, value.from))
     if (!fromWallet) {
       return NextResponse.json({ error: 'Invalid user wallet' }, { status: 400 })
     }
 
-    const tx = await saveTransaction({
-      chainId,
-      hash,
-      contract,
-      from,
-      to,
-      status,
-      isAirdrop,
-      createdAt,
-      token,
-      details,
-    })
+    const tx = await saveTransaction(value)
 
     return NextResponse.json({
       tx,
@@ -66,8 +44,6 @@ export async function POST(req: NextRequest) {
 
     await dbConnect()
 
-    const wallets = await getUserWallets(userId)
-
     const data = await req.json()
     const { chainId, hash, status } = data
 
@@ -78,7 +54,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if the user has the wallet
-    const fromWallet = wallets.find(w => w.address === tx.from)
+    const wallets = await getUserWallets(userId)
+    const fromWallet = wallets.find(w => isAddressEqual(w.address, tx.from))
     if (!fromWallet) {
       return NextResponse.json({ error: 'Invalid user wallet' }, { status: 400 })
     }
@@ -96,4 +73,21 @@ export async function POST(req: NextRequest) {
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
+}
+
+function pickData(data: any) {
+  const val = _.pick(data, [
+    'chainId',
+    'hash',
+    'contract',
+    'from',
+    'to',
+    'status',
+    'createdAt',
+    'token',
+    'details',
+    'isAirdrop',
+  ])
+
+  return val
 }

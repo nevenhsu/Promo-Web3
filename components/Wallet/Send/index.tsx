@@ -7,7 +7,7 @@ import { useRouter } from '@/navigation'
 import { useState, useMemo, useEffect } from 'react'
 import { useForm } from '@mantine/form'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { useTx, TxStatus, type Tx } from '@/wallet/TxContext'
+import { useTx, type Tx } from '@/wallet/TxContext'
 import { modals } from '@mantine/modals'
 import { useDisclosure } from '@mantine/hooks'
 import { Paper, Stack, Group, Title, Text, Space, Divider, Box } from '@mantine/core'
@@ -16,6 +16,8 @@ import RwdLayout from '@/components/share/RwdLayout'
 import { getTokens, getToken } from '@/contracts/tokens'
 import { formatBalance, formatAmount } from '@/utils/math'
 import { getNetwork } from '@/wallet/utils/network'
+import { createTransaction } from '@/services/transaction'
+import { TxStatus } from '@/types/db'
 import { type Erc20 } from '@/contracts/tokens'
 
 type FormData = {
@@ -112,7 +114,7 @@ export default function Send() {
       return
     }
 
-    const amount = formatAmount(values.amount, token.decimal)
+    const amount = formatAmount(values.amount, token.decimal) // raw value
     if (new Decimal(amount).gt(balance.toString())) {
       form.setFieldError('amount', 'Insufficient balance')
       return
@@ -156,7 +158,7 @@ export default function Send() {
   const handleSubmit = async (to: string, amount: string) => {
     if (!token) return
 
-    const val = formatBalance(amount, token.decimal).toString()
+    const val = formatBalance(amount, token.decimal).toString() // display value
     const result = addTx(
       {
         contractAddr: token.address,
@@ -164,8 +166,29 @@ export default function Send() {
         fnArgs: [to, amount],
         description: `Transfer ${val} ${token.symbol} to ${to}`,
       },
-      hash => {
-        // save to db
+      async ({ hash, waitSuccess, timestamp }) => {
+        if (chainId && walletAddress) {
+          try {
+            const success = await waitSuccess
+            // save to db
+            const tx = await createTransaction({
+              chainId,
+              hash,
+              from: walletAddress,
+              to,
+              contract: token.address,
+              token: {
+                symbol: token.symbol,
+                amount: val,
+              },
+              status: success ? TxStatus.Success : TxStatus.Failed,
+              createdAt: new Date(timestamp),
+            })
+            console.log('Transaction saved: ', tx.hash)
+          } catch (err) {
+            console.error(err)
+          }
+        }
       }
     )
 
@@ -202,16 +225,16 @@ export default function Send() {
             <Title order={3}>Send</Title>
 
             <Stack>
-              {/* Token */}
+              {/* TODO: Token menu */}
               <Paper p="md" shadow="xs" radius="sm">
                 <Group>
                   <Image src={token?.icon || ''} width={32} height={32} alt={token?.symbol || ''} />
                   <Stack gap={4}>
                     <Title order={4} fw={500} lh={1}>
-                      USDC
+                      {token?.symbol || ''}
                     </Title>
                     <Text fz="xs" c="dimmed" lh={1}>
-                      USD Coin
+                      {token?.name || ''}
                     </Text>
                   </Stack>
                 </Group>

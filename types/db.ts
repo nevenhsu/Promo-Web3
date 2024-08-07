@@ -60,6 +60,15 @@ export enum ActivityErrorCode {
   Error = 4, // Error in processing
 }
 
+export enum TxStatus {
+  Init = -3, // not yet called
+  Pending = -2, // called but not yet confirmed
+  Confirming = -1, // waiting for confirmations
+  Failed = 0,
+  Success = 1,
+  Error = 4, // ex: no contract, no function
+}
+
 export type LeanDocumentArray<MySchema extends Record<string, any>> = {
   [K in keyof MySchema]: MySchema[K] extends mongoose.Types.DocumentArray<infer ArrayType>
     ? LeanDocumentArray<Omit<ArrayType, keyof mongoose.Types.Subdocument>>[]
@@ -72,10 +81,4 @@ export type LeanDocumentArray<MySchema extends Record<string, any>> = {
           | mongoose.Types.ObjectId
       ? MySchema[K]
       : LeanDocumentArray<MySchema[K]>
-}
-
-export enum TxStatus {
-  Pending = 0,
-  Completed = 1,
-  Error = 4,
 }

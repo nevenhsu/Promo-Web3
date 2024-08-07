@@ -1,24 +1,16 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { getPublicClient } from '@/wallet/lib/publicClients'
 import { wait } from '@/wallet/utils/helper'
 import { getContract } from '@/wallet/lib/getContracts'
+import { TxStatus } from '@/types/db'
 import type { Hash, SimulateContractReturnType, WriteContractReturnType } from 'viem'
 
 type SimulateFn = (...args: any[]) => Promise<SimulateContractReturnType>
 type WriteFn = (...args: any[]) => Promise<WriteContractReturnType>
-
-export enum TxStatus {
-  Init = 'init', // not yet called
-  Pending = 'pending', // called but not yet confirmed
-  Confirming = 'confirming', // waiting for confirmations
-  Success = 'success',
-  Failed = 'failed',
-  Error = 'error', // ex: no contract, no function
-}
 
 export type Tx = {
   timestamp: number // unique id
@@ -38,7 +30,11 @@ type AddTxValues = {
   description?: string
 }
 
-type TxCallback = (hash: Hash) => void
+type TxCallback = (values: {
+  hash: Hash
+  waitSuccess: Promise<boolean>
+  timestamp: number // Date.now()
+}) => Promise<void>
 
 interface TxContextType {
   txs: Tx[]
@@ -54,7 +50,10 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const { chainId, contracts } = useWeb3()
 
   const [txs, setTxs] = useState<Tx[]>([])
-  const txsRef = useRef<{ [hash: string]: boolean }>({}) // hash: isHandled
+
+  const updateTx = (timestamp: number, newValue: Partial<Tx>) => {
+    setTxs(prev => prev.map(o => (o.timestamp === timestamp ? { ...o, ...newValue } : o)))
+  }
 
   const addTx = (values: AddTxValues, callback?: TxCallback) => {
     const { contractAddr, fnName, fnArgs, description } = values
@@ -84,15 +83,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
     if (valid) {
       // send tx
-      const txResult = sendTx(
-        timestamp,
-        {
-          simulateFn,
-          writeFn,
-          fnArgs,
-        },
-        callback
-      )
+      const txResult = sendTx({ timestamp, chainId }, { simulateFn, writeFn, fnArgs }, callback)
 
       const waitTx = async () => {
         const hash = await txResult
@@ -104,11 +95,12 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   }
 
   const sendTx = async (
-    timestamp: number,
-    values: { simulateFn: SimulateFn; writeFn: WriteFn; fnArgs: any[] },
+    data: { timestamp: number; chainId: number },
+    fn: { simulateFn: SimulateFn; writeFn: WriteFn; fnArgs: any[] },
     callback?: TxCallback
   ) => {
-    const { simulateFn, writeFn, fnArgs } = values
+    const { timestamp, chainId } = data
+    const { simulateFn, writeFn, fnArgs } = fn
     try {
       await simulateFn(fnArgs)
       const hash = await writeFn(fnArgs)
@@ -117,8 +109,11 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       updateTx(timestamp, { hash, status: TxStatus.Pending })
       console.log(`Transaction hash: ${hash}`)
 
+      // check tx status
+      const waitSuccess = handleTxStatus(timestamp, chainId, hash)
+
       if (callback) {
-        callback(hash)
+        callback({ hash, waitSuccess, timestamp })
       }
 
       return hash
@@ -131,36 +126,14 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }
   }
 
-  const updateTx = (timestamp: number, newValue: Partial<Tx>) => {
-    setTxs(prev => prev.map(o => (o.timestamp === timestamp ? { ...o, ...newValue } : o)))
-  }
-
-  const handleTxStatus = async (tx: Tx, hash: Hash) => {
-    const success = await checkTxStatus(tx.chainId, hash)
-    updateTx(tx.timestamp, {
+  const handleTxStatus = async (timestamp: number, chainId: number, hash: Hash) => {
+    const success = await checkTxStatus(chainId, hash)
+    updateTx(timestamp, {
       status: success ? TxStatus.Success : TxStatus.Failed,
       error: success ? '' : 'Transaction failed',
     })
+    return success
   }
-
-  useEffect(() => {
-    if (_.some(txs, o => o.status === TxStatus.Pending)) {
-      setTxs(prev =>
-        prev.map(o => {
-          if (o.status === TxStatus.Pending && o.hash) {
-            // handle tx status only once
-            if (!txsRef.current[o.hash]) {
-              txsRef.current[o.hash] = true
-              handleTxStatus(o, o.hash)
-            }
-
-            return { ...o, status: TxStatus.Confirming }
-          }
-          return o
-        })
-      )
-    }
-  }, [txs])
 
   return (
     <TxContext.Provider
@@ -187,8 +160,11 @@ async function checkTxStatus(chainId: number, hash: Hash) {
     const client = getPublicClient(chainId)
     if (!client) return false
 
-    const receipt = await client.getTransactionReceipt({ hash })
-    return receipt.status === 'success'
+    const { status, blockNumber } = await client.getTransactionReceipt({ hash })
+
+    console.log('TransactionReceipt', { status, blockNumber, hash })
+
+    return status === 'success'
   } catch (err) {
     console.log('Transaction not found or not yet mined.', err)
 

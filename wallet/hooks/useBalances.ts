@@ -14,7 +14,8 @@ type UseBalanceParams = {
   walletProviderValues?: WalletProviderValues
   loading: boolean
 }
-type Balances = { [symbol: string]: bigint | undefined }
+
+type Balances = { [symbol: string]: bigint | undefined } // smallest unit
 
 export function useBalances({
   chainId,

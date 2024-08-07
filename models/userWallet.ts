@@ -1,4 +1,6 @@
-import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
+import { models, model, Model, Schema } from 'mongoose'
+import { unifyAddress } from '@/wallet/utils/helper'
+import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
 
 export const schema = new Schema({
   _user: {
@@ -14,6 +16,34 @@ export const schema = new Schema({
 })
 
 export type UserWallet = InferSchemaType<typeof schema>
+
+// Middleware before saving
+schema.pre<UserWallet>('save', async function (next) {
+  this.address = unifyAddress(this.address)
+
+  /* @ts-expect-error */
+  await this.validate()
+  next()
+})
+
+// Middleware before updating
+const handleUpdate = async function (next: CallbackWithoutResultAndOptionalError) {
+  /* @ts-expect-error */
+  const update = this.getUpdate()
+  if (update && update.address) {
+    update.address = unifyAddress(update.address)
+    /* @ts-expect-error */
+    this.setUpdate(update)
+  }
+
+  /* @ts-expect-error */
+  await this.validate()
+  next()
+}
+
+schema.pre<UserWallet>('findOneAndUpdate', handleUpdate)
+schema.pre<UserWallet>('updateOne', handleUpdate)
+schema.pre<UserWallet>('updateMany', handleUpdate)
 
 const name = 'UserWallet'
 const UserWalletModel = (models[name] as Model<UserWallet>) || model(name, schema)
