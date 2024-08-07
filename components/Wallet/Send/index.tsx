@@ -20,6 +20,8 @@ import { getNetwork } from '@/wallet/utils/network'
 import { createTransaction } from '@/services/transaction'
 import { TxStatus } from '@/types/db'
 import { PiArrowDown } from 'react-icons/pi'
+import { isAddress } from 'viem'
+import { isAddressEqual } from '@/wallet/utils/helper'
 import { type Erc20 } from '@/contracts/tokens'
 
 type FormData = {
@@ -58,11 +60,13 @@ export default function Send() {
       symbol: value => (value ? null : 'Should not be empty'),
       to: value =>
         value
-          ? value !== walletAddress
-            ? null
-            : 'Should not be the same wallet'
+          ? !isAddress(value)
+            ? 'Invalid address'
+            : isAddressEqual(value, walletAddress || '')
+              ? 'Should not be the same wallet'
+              : null
           : 'Should not be empty',
-      amount: value => (value ? null : 'Should not be empty'),
+      amount: value => (Number(value) > 0 ? null : 'Should be greater than 0'),
     },
   })
 
@@ -79,7 +83,7 @@ export default function Send() {
     }
   }, [tx])
 
-  const { symbol } = form.values
+  const { symbol, amount } = form.values
 
   // Get token info
   const { token, balance, price } = useMemo(() => {
@@ -90,7 +94,7 @@ export default function Send() {
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText()
-      if (text.startsWith('0x')) {
+      if (isAddress(text)) {
         form.setFieldValue('to', text)
       }
     } catch (err) {
@@ -113,7 +117,7 @@ export default function Send() {
     }
 
     if (!balance) {
-      form.setFieldError('amount', 'Insufficient balance')
+      form.setFieldError('amount', 'Invalid balance')
       return
     }
 
@@ -227,29 +231,31 @@ export default function Send() {
           <Stack gap="xl">
             <Title order={3}>Send</Title>
 
-            <Stack>
-              {/* Network */}
-              <Paper p="md" shadow="xs" radius="sm">
-                <Group>
-                  <Image src={network.icon} width={32} height={32} alt={network.name} />
-                  <Stack gap={4}>
-                    <Title order={4} fw={500} lh={1}>
-                      {network.name}
-                    </Title>
-                    <Text fz="xs" c="dimmed" lh={1}>
-                      {network.subtitle}
-                    </Text>
-                  </Stack>
-                </Group>
-              </Paper>
-              <FocusTrap active>
+            <FocusTrap active>
+              <Stack>
+                {/* Network */}
+                <Paper p="md" shadow="xs" radius="sm">
+                  <Group>
+                    <Image src={network.icon} width={32} height={32} alt={network.name} />
+                    <Stack gap={4}>
+                      <Title order={4} fw={500} lh={1}>
+                        {network.name}
+                      </Title>
+                      <Text fz="xs" c="dimmed" lh={1}>
+                        {network.subtitle}
+                      </Text>
+                    </Stack>
+                  </Group>
+                </Paper>
+
+                {/* Address */}
                 <Stack pos="relative" gap={4}>
                   <Paper p="md" radius="sm">
                     <Text fz="sm" fw={500} mb="xs">
                       {isSmartAccount ? 'My smart wallet' : 'My embedded wallet'}
                     </Text>
                     <Text className="nowrap" fz="sm">
-                      {walletAddress}
+                      {walletAddress || 'No wallet address'}
                     </Text>
                   </Paper>
 
@@ -283,6 +289,7 @@ export default function Send() {
                   </Paper>
                 </Stack>
 
+                {/* Token */}
                 <Select
                   label="Token"
                   placeholder="Pick a token"
@@ -305,6 +312,7 @@ export default function Send() {
                   {...form.getInputProps('symbol')}
                 />
 
+                {/* Amount */}
                 <Stack gap={4}>
                   <NumberInput
                     label="Amount"
@@ -327,14 +335,12 @@ export default function Send() {
                     </Text>
 
                     <Text fz="xs" c="dimmed">
-                      {price
-                        ? `USD ${price.mul(form.values.amount || '0').toDP(2)}`
-                        : 'No price yet'}
+                      {price ? `USD ${price.mul(Number(amount) || '0').toDP(2)}` : 'No price yet'}
                     </Text>
                   </Group>
                 </Stack>
-              </FocusTrap>
-            </Stack>
+              </Stack>
+            </FocusTrap>
 
             <Group grow>
               <Button type="submit" disabled={Boolean(txTimestamp)}>
