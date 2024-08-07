@@ -150,7 +150,7 @@ export default function Wallet() {
                     </Group>
                     <Stack gap={4} ta="right">
                       <Text fw={500} lh={1}>
-                        {bal.toDP(4).toString()}
+                        {bal.toDP(6).toString()}
                       </Text>
                       <Text fz="xs" c="dimmed" lh={1}>
                         {p ? `USD ${p.toDP(2).toString()}` : 'No price yet'}

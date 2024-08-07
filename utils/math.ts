@@ -1,14 +1,16 @@
 import Decimal from 'decimal.js'
 import numeral from 'numeral'
 
-export function formatBalance(balance: Decimal.Value | bigint, decimal: number) {
-  const bal = new Decimal(balance.toString())
-  return bal.div(new Decimal(10).pow(decimal))
+export function formatBalance(rawAmount: Decimal.Value | bigint, decimal: number) {
+  // ex: 1000000000000000000 => 1
+  const amount = new Decimal(rawAmount.toString()).floor()
+  return amount.div(new Decimal(10).pow(decimal))
 }
 
-export function formatAmount(balance: Decimal.Value | bigint, decimal: number) {
-  const bal = new Decimal(balance.toString())
-  return bal.mul(new Decimal(10).pow(decimal))
+export function formatAmount(displayAmount: Decimal.Value | bigint, decimal: number) {
+  // ex: 1 => 1000000000000000000
+  const amount = new Decimal(displayAmount.toString())
+  return amount.mul(new Decimal(10).pow(decimal)).floor()
 }
 
 export function formatNumber(num: number | string) {

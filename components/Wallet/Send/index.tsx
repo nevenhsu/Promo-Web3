@@ -2,7 +2,6 @@
 
 import * as _ from 'lodash-es'
 import Image from 'next/image'
-import Decimal from 'decimal.js'
 import { useRouter } from '@/navigation'
 import { useState, useMemo, useEffect } from 'react'
 import { useForm } from '@mantine/form'
@@ -27,7 +26,7 @@ import { type Erc20 } from '@/contracts/tokens'
 type FormData = {
   symbol: string // token
   to: string
-  amount: string
+  amount: string // display value
 }
 
 export default function Send() {
@@ -121,11 +120,15 @@ export default function Send() {
       return
     }
 
-    const amount = formatAmount(values.amount, token.decimal) // raw value
-    if (new Decimal(amount).gt(balance.toString())) {
+    const rawAmount = formatAmount(values.amount, token.decimal) // raw value
+    if (rawAmount.gt(balance.toString())) {
       form.setFieldError('amount', 'Insufficient balance')
       return
     }
+
+    // Set final display value
+    const correctedAmount = formatBalance(rawAmount, token.decimal).toString()
+    form.setFieldValue('amount', correctedAmount)
 
     modals.openConfirmModal({
       title: 'Confirm Transfer',
@@ -136,7 +139,7 @@ export default function Send() {
               Transfer
             </Text>
             <Text fz="sm" fw={500}>
-              {values.amount} {token.symbol}
+              {correctedAmount} {token.symbol}
             </Text>
           </Group>
           <Group justify="space-between" align="start">
@@ -158,20 +161,20 @@ export default function Send() {
         </Stack>
       ),
       labels: { confirm: 'Confirm', cancel: 'Cancel' },
-      onConfirm: () => handleSubmit(values.to, amount.toString()),
+      onConfirm: () => handleSubmit(values.to, rawAmount.toString()),
     })
   }
 
-  const handleSubmit = async (to: string, amount: string) => {
+  const handleSubmit = async (to: string, rawAmount: string) => {
     if (!token) return
 
-    const val = formatBalance(amount, token.decimal).toString() // display value
+    const displayAmount = formatBalance(rawAmount, token.decimal).toString() // display value
     const result = addTx(
       {
         contractAddr: token.address,
         fnName: 'transfer',
-        fnArgs: [to, amount],
-        description: `Transfer ${val} ${token.symbol} to ${to}`,
+        fnArgs: [to, rawAmount],
+        description: `Transfer ${displayAmount} ${token.symbol} to ${to}`,
       },
       async ({ hash, waitSuccess, timestamp }) => {
         if (chainId && walletAddress) {
@@ -187,7 +190,7 @@ export default function Send() {
               contract: token.address,
               token: {
                 symbol: token.symbol,
-                amount: val,
+                amount: displayAmount,
               },
               status: success ? TxStatus.Success : TxStatus.Failed,
               createdAt: new Date(timestamp),
@@ -424,7 +427,7 @@ function Transaction({
                       : 'Sending'}
               </Title>
               <Box ta="center">
-                <Text fz="sm" c="dimmed" mb="xs">
+                <Text className="nowrap" fz="sm" c="dimmed" mb="xs">
                   {tx.status === TxStatus.Failed
                     ? tx.error
                     : `${amount} ${symbol} ${
