@@ -1,5 +1,5 @@
 body {
-  background: hsl(210, 1%, 95%);
+  background: var(--my-color-bg);
 }
 
 a,

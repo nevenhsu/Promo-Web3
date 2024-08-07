@@ -11,13 +11,15 @@ import { useTx, type Tx } from '@/wallet/TxContext'
 import { modals } from '@mantine/modals'
 import { useDisclosure } from '@mantine/hooks'
 import { Paper, Stack, Group, Title, Text, Space, Divider, Box } from '@mantine/core'
-import { Button, TextInput, NumberInput, Modal } from '@mantine/core'
+import { Button, TextInput, NumberInput, Select } from '@mantine/core'
+import { ThemeIcon, Modal, FocusTrap } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { getTokens, getToken } from '@/contracts/tokens'
 import { formatBalance, formatAmount } from '@/utils/math'
 import { getNetwork } from '@/wallet/utils/network'
 import { createTransaction } from '@/services/transaction'
 import { TxStatus } from '@/types/db'
+import { PiArrowDown } from 'react-icons/pi'
 import { type Erc20 } from '@/contracts/tokens'
 
 type FormData = {
@@ -31,7 +33,8 @@ export default function Send() {
 
   const [opened, { open, close }] = useDisclosure(false)
   const [txTimestamp, setTxTimestamp] = useState(0)
-  const { chainId, walletAddress, balancesValues, pricesValues } = useWeb3()
+  const { chainId, walletProviderValues, balancesValues, pricesValues } = useWeb3()
+  const { walletAddress, isSmartAccount } = walletProviderValues || {}
   const { balances, updateBalances } = balancesValues
   const { prices } = pricesValues
   const { txs, addTx } = useTx()
@@ -47,7 +50,7 @@ export default function Send() {
   const form = useForm<FormData>({
     mode: 'controlled',
     initialValues: {
-      symbol: 'USDC',
+      symbol: tokens[0]?.symbol || '',
       to: '',
       amount: '',
     },
@@ -225,21 +228,6 @@ export default function Send() {
             <Title order={3}>Send</Title>
 
             <Stack>
-              {/* TODO: Token menu */}
-              <Paper p="md" shadow="xs" radius="sm">
-                <Group>
-                  <Image src={token?.icon || ''} width={32} height={32} alt={token?.symbol || ''} />
-                  <Stack gap={4}>
-                    <Title order={4} fw={500} lh={1}>
-                      {token?.symbol || ''}
-                    </Title>
-                    <Text fz="xs" c="dimmed" lh={1}>
-                      {token?.name || ''}
-                    </Text>
-                  </Stack>
-                </Group>
-              </Paper>
-
               {/* Network */}
               <Paper p="md" shadow="xs" radius="sm">
                 <Group>
@@ -254,50 +242,98 @@ export default function Send() {
                   </Stack>
                 </Group>
               </Paper>
-            </Stack>
+              <FocusTrap active>
+                <Stack pos="relative" gap={4}>
+                  <Paper p="md" radius="sm">
+                    <Text fz="sm" fw={500} mb="xs">
+                      {isSmartAccount ? 'My smart wallet' : 'My embedded wallet'}
+                    </Text>
+                    <Text className="nowrap" fz="sm">
+                      {walletAddress}
+                    </Text>
+                  </Paper>
 
-            <Stack>
-              <TextInput
-                label="Transfer Address"
-                placeholder="Wallet Address (0x...)"
-                rightSectionWidth={56}
-                rightSection={
-                  <Button size="compact-sm" variant="transparent" onClick={handlePaste}>
-                    Paste
-                  </Button>
-                }
-                size="md"
-                key={form.key('to')}
-                {...form.getInputProps('to')}
-              />
+                  <ThemeIcon
+                    className="absolute-center"
+                    variant="white"
+                    mx="auto"
+                    size="lg"
+                    bd="4px solid var(--my-color-bg)"
+                  >
+                    <PiArrowDown size={20} />
+                  </ThemeIcon>
 
-              <Stack gap={4}>
-                <NumberInput
-                  label="Amount"
-                  placeholder=""
-                  rightSectionWidth={48}
-                  rightSection={
-                    <Button onClick={handleMax} size="compact-sm" variant="transparent">
-                      Max
-                    </Button>
+                  <Paper p="md" radius="sm">
+                    <Group justify="space-between">
+                      <Text fz="sm" fw={500}>
+                        Transfer Address
+                      </Text>
+                      <Button size="compact-xs" variant="outline" onClick={handlePaste}>
+                        Paste
+                      </Button>
+                    </Group>
+
+                    <TextInput
+                      placeholder="Wallet Address (0x...)"
+                      variant="unstyled"
+                      key={form.key('to')}
+                      data-autofocus
+                      {...form.getInputProps('to')}
+                    />
+                  </Paper>
+                </Stack>
+
+                <Select
+                  label="Token"
+                  placeholder="Pick a token"
+                  data={tokens.map(o => ({
+                    value: o.symbol,
+                    label: `${o.symbol} - ${o.name}`,
+                  }))}
+                  allowDeselect={false}
+                  checkIconPosition="right"
+                  leftSection={
+                    token ? (
+                      <Image
+                        src={token.icon || ''}
+                        width={20}
+                        height={20}
+                        alt={token.symbol || ''}
+                      />
+                    ) : null
                   }
-                  size="md"
-                  key={form.key('amount')}
-                  {...form.getInputProps('amount')}
+                  {...form.getInputProps('symbol')}
                 />
 
-                <Group justify="space-between">
-                  <Text fz="xs" c="dimmed">
-                    {token
-                      ? `Available Balance: ${formatBalance(balance || 0, token.decimal).toDP(6)}`
-                      : ''}
-                  </Text>
+                <Stack gap={4}>
+                  <NumberInput
+                    label="Amount"
+                    placeholder=""
+                    rightSectionWidth={48}
+                    rightSection={
+                      <Button onClick={handleMax} size="compact-sm" variant="transparent">
+                        Max
+                      </Button>
+                    }
+                    key={form.key('amount')}
+                    {...form.getInputProps('amount')}
+                  />
 
-                  <Text fz="xs" c="dimmed">
-                    {price ? `USD ${price.mul(form.values.amount || '0').toDP(2)}` : 'No price yet'}
-                  </Text>
-                </Group>
-              </Stack>
+                  <Group justify="space-between">
+                    <Text fz="xs" c="dimmed">
+                      {token
+                        ? `Available Balance: ${formatBalance(balance || 0, token.decimal).toDP(6)}`
+                        : ''}
+                    </Text>
+
+                    <Text fz="xs" c="dimmed">
+                      {price
+                        ? `USD ${price.mul(form.values.amount || '0').toDP(2)}`
+                        : 'No price yet'}
+                    </Text>
+                  </Group>
+                </Stack>
+              </FocusTrap>
             </Stack>
 
             <Group grow>

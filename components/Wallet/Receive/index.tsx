@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { AspectRatio, Paper, Stack, Group, Box, Title, Text, Space } from '@mantine/core'
-import { CopyButton, Button } from '@mantine/core'
+import { CopyButton, Button, Pill } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import QRCode from 'react-qr-code'
 import RwdLayout from '@/components/share/RwdLayout'
@@ -23,21 +23,6 @@ export default function Receive() {
           <Title order={3}>Receive</Title>
 
           <Stack>
-            {/* Token */}
-            <Paper p="md" shadow="xs" radius="sm">
-              <Group>
-                <Image src="/icons/usdc-token.svg" width={40} height={40} alt="usdc" />
-                <Stack gap={4}>
-                  <Text fz="lg" fw={500} lh={1}>
-                    USDC
-                  </Text>
-                  <Text fz="xs" c="dimmed" lh={1}>
-                    USD Coin
-                  </Text>
-                </Stack>
-              </Group>
-            </Paper>
-
             {/* Network */}
             <Paper p="md" shadow="xs" radius="sm">
               <Group>
@@ -55,28 +40,31 @@ export default function Receive() {
           </Stack>
 
           <Paper p="md" shadow="xs" radius="sm">
-            <Stack gap="lg">
-              <Box>
-                <Text fz="lg" fw={500} mb="xs">
-                  My wallet address
+            <Stack>
+              <Group justify="space-between">
+                <Text fz="lg" fw={500} lh={1}>
+                  My wallet
                 </Text>
-                <Text
-                  fz="sm"
-                  w={200}
-                  style={{
-                    wordWrap: 'break-word',
-                  }}
-                >
-                  {walletAddress}
-                </Text>
-              </Box>
+                <Pill>{isSmartAccount ? 'Smart wallet' : 'Embedded wallet'}</Pill>
+              </Group>
+
+              <Text
+                fz="sm"
+                w={200}
+                style={{
+                  wordWrap: 'break-word',
+                }}
+                mb="lg"
+              >
+                {walletAddress}
+              </Text>
 
               <Group grow>
                 <Button
                   variant="outline"
                   onClick={() =>
                     modals.open({
-                      title: 'My wallet',
+                      title: isSmartAccount ? 'Smart wallet' : 'Embedded wallet',
                       children: (
                         <>
                           <AspectRatio className={classes.qrcode} ratio={1}>
