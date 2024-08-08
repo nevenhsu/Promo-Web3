@@ -9,7 +9,7 @@ import AddModel, { type AddModalRef } from './AddModal'
 import UpdateModal, { type UpdateModalRef } from './UpdateModal'
 import DeleteModal, { type DeleteModalRef } from './DeleteModal'
 import { PiPencil, PiTrash } from 'react-icons/pi'
-import { formateDate } from '@/utils/helper'
+import { formateZonedDate } from '@/utils/helper'
 import { publicEnv } from '@/utils/env'
 import classes from './index.module.css'
 
@@ -27,15 +27,15 @@ export default function AdminEpoch() {
         {o.index}
       </Table.Td>
       <Table.Td fz="sm">
-        <Text fz={14}>{formateDate(o.startTime)}</Text>
+        <Text fz={14}>{formateZonedDate(o.startTime)}</Text>
         <Text fz={12} c="dimmed">
-          {formateDate(o.startTime, 'h:mm aa zzz')}
+          {formateZonedDate(o.startTime, 'h:mm aa zzz')}
         </Text>
       </Table.Td>
       <Table.Td fz="sm">
-        <Text fz={14}> {formateDate(o.endTime)}</Text>
+        <Text fz={14}> {formateZonedDate(o.endTime)}</Text>
         <Text fz={12} c="dimmed">
-          {formateDate(o.endTime, 'h:mm aa zzz')}
+          {formateZonedDate(o.endTime, 'h:mm aa zzz')}
         </Text>
       </Table.Td>
 

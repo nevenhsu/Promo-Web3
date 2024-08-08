@@ -10,7 +10,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Text, Button } from '@mantine/core'
 import { TextInput, Textarea, Select, Switch } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
-import { formateDate } from '@/utils/helper'
+import { formateZonedDate } from '@/utils/helper'
 import { publicEnv } from '@/utils/env'
 import { ActivityType, SocialMedia } from '@/types/db'
 import { activityTypes, createSlug } from './variables'
@@ -62,7 +62,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
           return 'Should not be empty'
         }
         if (values.endTime && !isBefore(value, values.endTime)) {
-          return `Should before ${formateDate(values.endTime, 'MMM dd yyyy h:mm aa')}`
+          return `Should before ${formateZonedDate(values.endTime, 'MMM dd yyyy h:mm aa')}`
         }
         return null
       },
@@ -71,7 +71,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
           return 'Should not be empty'
         }
         if (values.startTime && isBefore(value, values.startTime)) {
-          return `Should after ${formateDate(values.startTime, 'MMM dd yyyy h:mm aa')}`
+          return `Should after ${formateZonedDate(values.startTime, 'MMM dd yyyy h:mm aa')}`
         }
         return null
       },

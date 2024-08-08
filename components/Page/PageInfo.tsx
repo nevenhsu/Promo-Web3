@@ -1,6 +1,6 @@
 import { Group } from '@mantine/core'
 import { Caption } from '@/components/Fonts'
-import { formateDate } from '@/utils/helper'
+import { formateZonedDate } from '@/utils/helper'
 import type { PageData } from '@/sanity/types/page'
 
 export default function BlogInfo({ data }: { data: Partial<PageData> }) {
@@ -12,7 +12,7 @@ export default function BlogInfo({ data }: { data: Partial<PageData> }) {
       <Group c="dimmed" gap={8}>
         {publishedAt ? (
           <>
-            <Caption>{formateDate(publishedAt)}</Caption>
+            <Caption>{formateZonedDate(publishedAt)}</Caption>
             <Caption>·</Caption>
           </>
         ) : null}

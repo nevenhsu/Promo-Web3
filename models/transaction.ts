@@ -36,6 +36,12 @@ export const schema = new Schema({
 })
 
 export type Transaction = InferSchemaType<typeof schema>
+export type TTransaction = Transaction & {
+  _id: string
+  isSender: boolean
+  isReceiver: boolean
+  createdAt: string
+}
 export type TransactionData = Omit<Transaction, '_fromWallet' | '_toWallet' | 'isAirdrop'>
 
 // Middleware before saving

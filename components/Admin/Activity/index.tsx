@@ -16,7 +16,7 @@ import {
   PiCheckCircle,
   PiXCircle,
 } from 'react-icons/pi'
-import { formateDate } from '@/utils/helper'
+import { formateZonedDate } from '@/utils/helper'
 import { formatNumber } from '@/utils/math'
 import classes from './index.module.css'
 
@@ -41,15 +41,15 @@ export default function AdminEpoch() {
         <Text>{`${formatNumber(o.airdrop.amount)} ${o.airdrop.symbol}`}</Text>
       </Table.Td>
       <Table.Td fz="sm">
-        <Text fz={14}>{formateDate(o.startTime)}</Text>
+        <Text fz={14}>{formateZonedDate(o.startTime)}</Text>
         <Text fz={12} c="dimmed">
-          {formateDate(o.startTime, 'h:mm aa zzz')}
+          {formateZonedDate(o.startTime, 'h:mm aa zzz')}
         </Text>
       </Table.Td>
       <Table.Td fz="sm">
-        <Text fz={14}> {formateDate(o.endTime)}</Text>
+        <Text fz={14}> {formateZonedDate(o.endTime)}</Text>
         <Text fz={12} c="dimmed">
-          {formateDate(o.endTime, 'h:mm aa zzz')}
+          {formateZonedDate(o.endTime, 'h:mm aa zzz')}
         </Text>
       </Table.Td>
       <Table.Td fz="sm">

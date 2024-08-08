@@ -5,7 +5,7 @@ import { forwardRef, useImperativeHandle } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Button, Checkbox, Text } from '@mantine/core'
 import { useActivity } from '@/store/contexts/admin/ActivityContext'
-import { formateDate } from '@/utils/helper'
+import { formateZonedDate } from '@/utils/helper'
 
 export type DeleteModalRef = {
   open: () => void
@@ -44,9 +44,9 @@ export default forwardRef<DeleteModalRef, {}>(function AddModal(props, ref) {
                 Index: {selectedActivity?.index}
               </Text>
               <Text fz="xs" c="dimmed">
-                {selectedActivity?.startTime ? formateDate(selectedActivity.startTime) : ''}
+                {selectedActivity?.startTime ? formateZonedDate(selectedActivity.startTime) : ''}
                 {` ~ `}
-                {selectedActivity?.endTime ? formateDate(selectedActivity.endTime) : ''}
+                {selectedActivity?.endTime ? formateZonedDate(selectedActivity.endTime) : ''}
               </Text>
             </Box>
 

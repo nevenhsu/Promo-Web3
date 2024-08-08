@@ -5,7 +5,7 @@ import { forwardRef, useImperativeHandle } from 'react'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Button, Checkbox, Text } from '@mantine/core'
 import { useEpoch } from '@/store/contexts/admin/EpochContext'
-import { formateDate } from '@/utils/helper'
+import { formateZonedDate } from '@/utils/helper'
 
 export type DeleteModalRef = {
   open: () => void
@@ -41,9 +41,9 @@ export default forwardRef<DeleteModalRef, {}>(function AddModal(props, ref) {
             <Box>
               <Text fw={500}>Index: {selectedEpoch?.index}</Text>
               <Text fz="xs" c="dimmed">
-                {selectedEpoch?.startTime ? formateDate(selectedEpoch.startTime) : ''}
+                {selectedEpoch?.startTime ? formateZonedDate(selectedEpoch.startTime) : ''}
                 {` ~ `}
-                {selectedEpoch?.endTime ? formateDate(selectedEpoch.endTime) : ''}
+                {selectedEpoch?.endTime ? formateZonedDate(selectedEpoch.endTime) : ''}
               </Text>
             </Box>
 

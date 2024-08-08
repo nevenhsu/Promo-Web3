@@ -6,6 +6,7 @@ import { saveTransaction, getTransaction, getTransactions } from '@/lib/db/trans
 import { getUserWallets } from '@/lib/db/userWallet'
 import { TxStatus } from '@/types/db'
 import { isAddressEqual } from '@/wallet/utils/helper'
+import { isEnumMember } from '@/utils/helper'
 
 // Save a transaction for the current user
 export async function PUT(req: NextRequest) {
@@ -61,8 +62,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if the status is valid
-    if (status in TxStatus) {
-      tx.status = status
+    if (isEnumMember(status, TxStatus)) {
+      tx.status = status as any
       await tx.save()
     } else {
       return NextResponse.json({ error: 'Invalid transaction status' }, { status: 400 })
@@ -82,14 +83,14 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const page = Number(searchParams.get('page')) || 1
     const limit = Number(searchParams.get('limit')) || 10
-    const count = page === 1
+    const isAirdrop = searchParams.get('isAirdrop') === 'true'
 
     const jwt = await getToken({ req })
     const userId = jwt?.user?.id!
 
     await dbConnect()
 
-    const { total, txs } = await getTransactions(userId, page, limit, count)
+    const { total, txs } = await getTransactions(userId, { page, limit }, { isAirdrop })
 
     return NextResponse.json({
       total,

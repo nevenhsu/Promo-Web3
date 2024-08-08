@@ -7,7 +7,7 @@ import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Button, Text } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
-import { formateDate, getStartOfDate } from '@/utils/helper'
+import { formateZonedDate, getStartOfDate } from '@/utils/helper'
 import { publicEnv } from '@/utils/env'
 
 export type AddModalRef = {
@@ -35,10 +35,10 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
           return 'Should not be empty'
         }
         if (lastDate && isBefore(value, lastDate)) {
-          return `Should after ${formateDate(lastDate, 'MMM dd yyyy h:mm aa')}`
+          return `Should after ${formateZonedDate(lastDate, 'MMM dd yyyy h:mm aa')}`
         }
         if (values.endTime && !isBefore(value, values.endTime)) {
-          return `Should before ${formateDate(values.endTime, 'MMM dd yyyy h:mm aa')}`
+          return `Should before ${formateZonedDate(values.endTime, 'MMM dd yyyy h:mm aa')}`
         }
         return null
       },
@@ -47,7 +47,7 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
           return 'Should not be empty'
         }
         if (values.startTime && isBefore(value, values.startTime)) {
-          return `Should after ${formateDate(values.startTime, 'MMM dd yyyy h:mm aa')}`
+          return `Should after ${formateZonedDate(values.startTime, 'MMM dd yyyy h:mm aa')}`
         }
         return null
       },

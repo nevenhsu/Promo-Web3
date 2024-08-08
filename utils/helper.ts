@@ -20,9 +20,16 @@ export function getGMT(date: string | number | Date) {
   return formattedDate
 }
 
-export function formateDate(date: string | number | Date, formatStr = 'dd MMM yyyy') {
+// MMM dd yyyy h:mm aa
+export function formateZonedDate(date: string | number | Date, formatStr = 'dd MMM yyyy') {
   const time = toZonedTime(date, timezone)
   const formattedDate = format(time, formatStr, { timeZone: timezone })
+  return formattedDate
+}
+
+// MMM dd yyyy h:mm aa
+export function formateLocalDate(date: string | number | Date, formatStr = 'dd MMM yyyy') {
+  const formattedDate = format(date, formatStr)
   return formattedDate
 }
 
@@ -37,4 +44,12 @@ export function toUpper(str: string) {
     .split(' ')
     .map(word => word[0].toUpperCase() + word.substring(1))
     .join(' ')
+}
+
+// Function to check if the input is part of the enum
+export function isEnumMember<T extends Record<string, unknown>>(
+  value: unknown,
+  enumType: T
+): value is T {
+  return Object.values(enumType).includes(value)
 }
