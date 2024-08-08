@@ -1,6 +1,7 @@
 import { models, model, Model, Schema } from 'mongoose'
 import { unifyAddress } from '@/wallet/utils/helper'
 import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
+import type { User } from '@/models/user'
 
 export const schema = new Schema({
   _user: {
@@ -16,6 +17,7 @@ export const schema = new Schema({
 })
 
 export type UserWallet = InferSchemaType<typeof schema>
+export type TUserWallet = UserWallet & { _user: User }
 
 // Middleware before saving
 schema.pre<UserWallet>('save', async function (next) {

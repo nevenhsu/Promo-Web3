@@ -1,37 +1,48 @@
-import { base, baseSepolia, arbitrum, arbitrumSepolia } from 'viem/chains'
+import { mainnet, base, baseSepolia, arbitrum, arbitrumSepolia } from 'viem/chains'
 
 type NetworkInfo = {
   chainId: number
   name: string
   icon: string
   subtitle: string
+  blockExplorerUrl: string
 }
 
 export const networks: NetworkInfo[] = [
-  { chainId: 1, name: 'Ethereum Mainnet', icon: '/icons/base.svg', subtitle: 'Ethereum Mainnet' },
+  {
+    chainId: mainnet.id,
+    name: mainnet.name,
+    icon: '/icons/base.svg',
+    subtitle: 'Ethereum Mainnet',
+    blockExplorerUrl: mainnet.blockExplorers.default.url,
+  },
   {
     chainId: base.id,
     name: base.name,
     icon: '/icons/base.svg',
     subtitle: 'Ethereum L2 Network',
+    blockExplorerUrl: base.blockExplorers.default.url,
   },
   {
     chainId: baseSepolia.id,
     name: baseSepolia.name,
     icon: '/icons/base-testnet.svg',
     subtitle: 'Ethereum L2 Testnet',
+    blockExplorerUrl: baseSepolia.blockExplorers.default.url,
   },
   {
     chainId: arbitrum.id,
     name: arbitrum.name,
     icon: '/icons/arbitrum.svg',
     subtitle: 'Ethereum L2 Network',
+    blockExplorerUrl: arbitrum.blockExplorers.default.url,
   },
   {
     chainId: arbitrumSepolia.id,
     name: arbitrumSepolia.name,
     icon: '/icons/arbitrum-testnet.svg',
     subtitle: 'Ethereum L2 Testnet',
+    blockExplorerUrl: arbitrumSepolia.blockExplorers.default.url,
   },
 ] as const
 
@@ -43,6 +54,7 @@ export function getNetwork(chainId?: string | number) {
     name: 'Unknown',
     icon: '/icons/base.svg',
     subtitle: 'Network Error',
+    blockExplorerUrl: '',
   }
   return network || fallback
 }

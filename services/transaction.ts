@@ -1,5 +1,6 @@
 import axios from 'axios'
-import type { TransactionData, Transaction, TTransaction } from '@/models/transaction'
+import type { TransactionData, Transaction } from '@/models/transaction'
+import type { TTransaction, UserTransaction } from '@/models/transaction'
 import type { TxStatus } from '@/types/db'
 
 // Create a transaction for the current user
@@ -31,4 +32,9 @@ export async function getTransactions(values: { page: number; limit: number; isA
 
   const { data } = await axios.get<{ txs: TTransaction[]; total?: number }>(url.toString())
   return data
+}
+
+export async function getUserTransaction(txId: string) {
+  const { data } = await axios.get<{ tx: UserTransaction }>(`/api/u/transaction/${txId}`)
+  return data.tx
 }

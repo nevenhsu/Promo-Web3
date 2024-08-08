@@ -1,10 +1,38 @@
 'use client'
-import { Paper, Stack, Group, Space, Box, Divider } from '@mantine/core'
-import { Title, Text, CopyButton, ActionIcon } from '@mantine/core'
+
+import { useEffect } from 'react'
+import { useAsyncFn } from 'react-use'
+import Image from 'next/image'
+import { Paper, Stack, Group, Space, Box, Divider, Skeleton } from '@mantine/core'
+import { Title, Text, CopyButton, ActionIcon, Pill } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
+import { getUserTransaction } from '@/services/transaction'
+import { getToken } from '@/contracts/tokens'
+import { formateLocalDate } from '@/utils/helper'
+import { getNetwork } from '@/wallet/utils/network'
+import { formatAddress } from '@/wallet/utils/helper'
 import { PiCopy, PiLink } from 'react-icons/pi'
+import { TxStatus } from '@/types/db'
 
 export default function HistoryTx({ tx }: { tx: string }) {
+  const [TxState, fetchTx] = useAsyncFn(() => getUserTransaction(tx), [tx])
+
+  const { value, loading, error } = TxState
+
+  const network = getNetwork(value?.chainId)
+  const token = getToken(value?.chainId, value?.token?.symbol)
+  const label = getStatusLabel(value?.status)
+
+  const handleLink = () => {
+    if (value?.hash && network.blockExplorerUrl) {
+      window.open(`${network.blockExplorerUrl}/tx/${value.hash}`, '_blank')
+    }
+  }
+
+  useEffect(() => {
+    fetchTx()
+  }, [])
+
   return (
     <>
       <RwdLayout>
@@ -12,90 +40,106 @@ export default function HistoryTx({ tx }: { tx: string }) {
 
         <Space h={40} />
 
-        <Paper radius="md" p="md" shadow="xs">
-          <Stack>
-            <Group justify="space-between">
-              <Text fz="sm" c="dark.4">
-                Status
-              </Text>
-              <Text fz="sm" fw={500} c="green">
-                Completed
-              </Text>
-            </Group>
+        <Skeleton visible={loading}>
+          <Paper radius="md" p="md" shadow="xs">
+            <Stack>
+              <Group justify="space-between">
+                <Text fz="sm" c="dark.4">
+                  Status
+                </Text>
+                <Text fz="sm" fw={500} c={label.color}>
+                  {label.text}
+                </Text>
+              </Group>
 
-            <Group justify="space-between" align="start">
-              <Text fz="sm" c="dark.4">
-                Network
-              </Text>
-              <Text fz="sm">Base</Text>
-            </Group>
+              <Group justify="space-between" align="start">
+                <Text fz="sm" c="dark.4">
+                  Network
+                </Text>
+                <Text fz="sm">{network.name}</Text>
+              </Group>
 
-            <Group justify="space-between" align="start">
-              <Text fz="sm" c="dark.4">
-                Tx Hash
-              </Text>
-              <Box w={200}>
-                <TxLink val="0xebb806f1836755ff44b6e22ca02df26b16eb743d0fccc9fd4467e76997bf7476" />
-              </Box>
-            </Group>
+              <Group justify="space-between" align="start">
+                <Text fz="sm" c="dark.4">
+                  Tx Hash
+                </Text>
+                <Box w={200}>
+                  <TxLink val={value?.hash || ''} onClick={handleLink} />
+                </Box>
+              </Group>
 
-            <Group justify="space-between" align="start">
-              <Text fz="sm" c="dark.4">
-                From
-              </Text>
-              <Box w={200}>
-                <CopyText val="0xFFF52Ae25609dDb9c3E0Ea75B8f57D25DeDA2FEd" />
-              </Box>
-            </Group>
+              <Group justify="space-between" align="start">
+                <Text fz="sm" c="dark.4">
+                  From
+                </Text>
+                <Box w={200}>
+                  <WalletText
+                    val={value?.from || ''}
+                    username={value?._fromWallet?._user.username}
+                  />
+                </Box>
+              </Group>
 
-            <Group justify="space-between" align="start">
-              <Text fz="sm" c="dark.4">
-                To
-              </Text>
-              <Box w={200}>
-                <CopyText val="0xeBd4436A257D2a2Fc5a2e5F1cd9E39054087588E" />
-              </Box>
-            </Group>
+              <Group justify="space-between" align="start">
+                <Text fz="sm" c="dark.4">
+                  To
+                </Text>
+                <Box w={200}>
+                  <WalletText val={value?.to || ''} username={value?._toWallet?._user.username} />
+                </Box>
+              </Group>
 
-            <Divider />
+              <Divider />
 
-            <Group justify="space-between" align="start">
-              <Text fz="sm" c="dark.4">
-                Token
-              </Text>
-              <Text fz="sm">USDC</Text>
-            </Group>
+              <Group justify="space-between" align="start">
+                <Text fz="sm" c="dark.4">
+                  Token
+                </Text>
+                <Group gap="xs">
+                  {token?.icon ? (
+                    <Image src={token.icon} width={18} height={18} alt={token.name} />
+                  ) : null}
+                  <Text fz="sm">{token?.symbol || 'Unknown'}</Text>
+                </Group>
+              </Group>
 
-            <Group justify="space-between" align="start">
-              <Text fz="sm" c="dark.4">
-                Amount
-              </Text>
-              <Text fz="sm">300.34</Text>
-            </Group>
+              <Group justify="space-between" align="start">
+                <Text fz="sm" c="dark.4">
+                  Amount
+                </Text>
+                <Text fz="sm">{value?.token?.amount || 'No data'}</Text>
+              </Group>
 
-            <Group justify="space-between" align="start">
-              <Text fz="sm" c="dark.4">
-                Date
-              </Text>
-              <Text fz="sm">5 Jun 2024 19:41</Text>
-            </Group>
-          </Stack>
-        </Paper>
+              <Group justify="space-between" align="start">
+                <Text fz="sm" c="dark.4">
+                  Date
+                </Text>
+                <Text fz="sm">
+                  {formateLocalDate(value?.createdAt || 0, 'MMM dd yyyy h:mm aa')}
+                </Text>
+              </Group>
+            </Stack>
+          </Paper>
+        </Skeleton>
       </RwdLayout>
+
       <Space h={100} />
     </>
   )
 }
 
-function CopyText({ val }: { val: string }) {
+function WalletText({ val, username }: { val: string; username?: string }) {
   return (
     <>
       <CopyButton value={val}>
         {({ copied, copy }) => (
-          <Group wrap="nowrap" align="start" gap="xs">
-            <Text fz="xs" c={copied ? 'green' : 'black'} style={{ wordBreak: 'break-word' }}>
-              {val}
-            </Text>
+          <Group wrap="nowrap" align="start" gap="xs" justify="space-between">
+            <Box>
+              {username ? <Pill fz="xs" mb={2}>{`@${username}`}</Pill> : null}
+              <Text fz="xs" c={copied ? 'green' : 'black'} style={{ wordBreak: 'break-word' }}>
+                {username ? formatAddress(val) : val}
+              </Text>
+            </Box>
             <ActionIcon onClick={copy} color={copied ? 'green' : 'black'}>
               <PiCopy size={16} />
             </ActionIcon>
@@ -106,17 +150,52 @@ function CopyText({ val }: { val: string }) {
   )
 }
 
-function TxLink({ val }: { val: string }) {
+function TxLink({ val, onClick }: { val: string; onClick?: () => void }) {
   return (
     <>
       <Group wrap="nowrap" align="start" gap="xs">
         <Text fz="xs" style={{ wordBreak: 'break-word' }}>
           {val}
         </Text>
-        <ActionIcon color="black">
+        <ActionIcon color="black" onClick={onClick}>
           <PiLink size={16} />
         </ActionIcon>
       </Group>
     </>
   )
+}
+
+function getStatusLabel(status?: number) {
+  switch (status) {
+    case TxStatus.Pending:
+      return {
+        color: 'blue',
+        text: 'Pending',
+      }
+    case TxStatus.Success:
+      return {
+        color: 'green',
+        text: 'Success',
+      }
+    case TxStatus.Confirming:
+      return {
+        color: 'blue',
+        text: 'Confirming',
+      }
+    case TxStatus.Error:
+      return {
+        color: 'red',
+        text: 'Error',
+      }
+    case TxStatus.Failed:
+      return {
+        color: 'red',
+        text: 'Failed',
+      }
+    default:
+      return {
+        color: 'gray',
+        text: 'Unknown',
+      }
+  }
 }

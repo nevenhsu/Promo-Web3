@@ -2,6 +2,7 @@ import { models, model, Model, Schema } from 'mongoose'
 import { TxStatus, TxType } from '@/types/db'
 import { unifyAddress } from '@/wallet/utils/helper'
 import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
+import type { TUserWallet } from '@/models/userWallet'
 
 const tokenSchema = new Schema({
   symbol: { type: String, required: true },
@@ -43,6 +44,7 @@ export type TTransaction = Transaction & {
   createdAt: string
 }
 export type TransactionData = Omit<Transaction, '_fromWallet' | '_toWallet' | 'isAirdrop'>
+export type UserTransaction = Transaction & { _fromWallet?: TUserWallet; _toWallet?: TUserWallet }
 
 // Middleware before saving
 schema.pre<Transaction>('save', async function (next) {

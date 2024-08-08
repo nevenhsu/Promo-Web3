@@ -2,6 +2,7 @@ import TransactionModel, { type Transaction } from '@/models/transaction'
 import { getUserWallet, getUserWallets } from '@/lib/db/userWallet'
 import { unifyAddress } from '@/wallet/utils/helper'
 import { TxStatus, TxType } from '@/types/db'
+import type { TUserWallet } from '@/models/userWallet'
 
 export async function saveTransaction(values: Omit<Transaction, '_fromWallet' | '_toWallet'>) {
   values.hash = unifyAddress(values.hash)
@@ -56,6 +57,10 @@ export async function getTransactions(userId: string, options?: GetOptions, filt
   const wallets = await getUserWallets(userId)
   const walletIds = wallets.map(wallet => wallet._id.toString())
 
+  if (!walletIds.length) {
+    return { txs: [], total: 0 }
+  }
+
   // Create the query
   const query: Record<string, any> = {
     $or: [{ _fromWallet: { $in: walletIds } }, { _toWallet: { $in: walletIds } }],
@@ -90,4 +95,29 @@ export async function getTransactions(userId: string, options?: GetOptions, filt
   }
 
   return { txs }
+}
+
+export async function getUserTransaction(userId: string, txId: string) {
+  const wallets = await getUserWallets(userId)
+  const walletIds = wallets.map(wallet => wallet._id.toString())
+
+  if (!walletIds.length) {
+    return null
+  }
+
+  const tx = await TransactionModel.findOne({
+    _id: txId,
+    $or: [{ _fromWallet: { $in: walletIds } }, { _toWallet: { $in: walletIds } }],
+  })
+    .populate<{ _fromWallet: TUserWallet }>({
+      path: '_fromWallet',
+      populate: { path: '_user' },
+    })
+    .populate<{ _toWallet: TUserWallet }>({
+      path: '_toWallet',
+      populate: { path: '_user' },
+    })
+    .lean()
+
+  return tx
 }
