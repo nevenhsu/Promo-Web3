@@ -20,15 +20,15 @@ export function getGMT(date: string | number | Date) {
   return formattedDate
 }
 
-// MMM dd yyyy h:mm aa
-export function formateZonedDate(date: string | number | Date, formatStr = 'dd MMM yyyy') {
+// MMM dd yyyy h:mm:ss aa
+export function formatZonedDate(date: string | number | Date, formatStr = 'dd MMM yyyy') {
   const time = toZonedTime(date, timezone)
   const formattedDate = format(time, formatStr, { timeZone: timezone })
   return formattedDate
 }
 
-// MMM dd yyyy h:mm aa
-export function formateLocalDate(date: string | number | Date, formatStr = 'dd MMM yyyy') {
+// MMM dd yyyy h:mm:ss aa
+export function formatLocalDate(date: string | number | Date, formatStr = 'dd MMM yyyy') {
   const formattedDate = format(date, formatStr)
   return formattedDate
 }

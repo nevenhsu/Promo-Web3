@@ -2,7 +2,7 @@ import { models, model, Model, Schema } from 'mongoose'
 import { TxStatus, TxType } from '@/types/db'
 import { unifyAddress } from '@/wallet/utils/helper'
 import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
-import type { TUserWallet } from '@/models/userWallet'
+import type { User } from '@/models/user'
 
 const tokenSchema = new Schema({
   symbol: { type: String, required: true },
@@ -28,6 +28,16 @@ export const schema = new Schema({
     ref: 'UserWallet', // This should match the name of your wallet model
     index: true,
   },
+  _fromUser: {
+    type: Schema.Types.ObjectId,
+    ref: 'User', // This should match the name of your user model
+    index: true,
+  },
+  _toUser: {
+    type: Schema.Types.ObjectId,
+    ref: 'User', // This should match the name of your user model
+    index: true,
+  },
   status: { type: Number, enum: TxStatus, index: true, default: TxStatus.Pending },
   isAirdrop: { type: Boolean, default: false, index: true },
   createdAt: { type: Date, default: Date.now, index: true },
@@ -43,8 +53,11 @@ export type TTransaction = Transaction & {
   isReceiver: boolean
   createdAt: string
 }
-export type TransactionData = Omit<Transaction, '_fromWallet' | '_toWallet' | 'isAirdrop'>
-export type UserTransaction = Transaction & { _fromWallet?: TUserWallet; _toWallet?: TUserWallet }
+export type TransactionData = Omit<
+  Transaction,
+  '_fromWallet' | '_toWallet' | '_fromUser' | '_toUser' | 'isAirdrop'
+>
+export type UserTransaction = Transaction & { _fromUser?: User; _toUser?: User }
 
 // Middleware before saving
 schema.pre<Transaction>('save', async function (next) {

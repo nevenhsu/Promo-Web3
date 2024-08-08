@@ -1,10 +1,12 @@
 import TransactionModel, { type Transaction } from '@/models/transaction'
-import { getUserWallet, getUserWallets } from '@/lib/db/userWallet'
+import { getUserWallet } from '@/lib/db/userWallet'
 import { unifyAddress } from '@/wallet/utils/helper'
 import { TxStatus, TxType } from '@/types/db'
-import type { TUserWallet } from '@/models/userWallet'
+import type { User } from '@/models/user'
 
-export async function saveTransaction(values: Omit<Transaction, '_fromWallet' | '_toWallet'>) {
+export async function saveTransaction(
+  values: Omit<Transaction, '_fromWallet' | '_toWallet' | '_fromUser' | '_toUser'>
+) {
   values.hash = unifyAddress(values.hash)
   values.from = unifyAddress(values.from)
   if (values.to) {
@@ -25,6 +27,8 @@ export async function saveTransaction(values: Omit<Transaction, '_fromWallet' | 
       ...values,
       _fromWallet: fromWallet?._id,
       _toWallet: toWallet?._id,
+      _fromUser: fromWallet?._user,
+      _toUser: toWallet?._user,
     },
     {
       upsert: true,
@@ -54,16 +58,9 @@ export async function getTransactions(userId: string, options?: GetOptions, filt
   const { page = 1, limit = 10 } = options || {}
   const { isAirdrop, status, type } = filter || {}
 
-  const wallets = await getUserWallets(userId)
-  const walletIds = wallets.map(wallet => wallet._id.toString())
-
-  if (!walletIds.length) {
-    return { txs: [], total: 0 }
-  }
-
   // Create the query
   const query: Record<string, any> = {
-    $or: [{ _fromWallet: { $in: walletIds } }, { _toWallet: { $in: walletIds } }],
+    $or: [{ _fromUser: userId }, { _toUser: userId }],
   }
   if (isAirdrop !== undefined) {
     query.isAirdrop = isAirdrop
@@ -83,8 +80,8 @@ export async function getTransactions(userId: string, options?: GetOptions, filt
 
   const txs = data.map(tx => {
     // Check if the transaction is made by the user
-    const isSender = walletIds.includes(tx._fromWallet?.toString() || '')
-    const isReceiver = walletIds.includes(tx._toWallet?.toString() || '')
+    const isSender = tx._fromUser?.toString() === userId
+    const isReceiver = tx._toUser?.toString() === userId
     return { ...tx, isSender, isReceiver }
   })
 
@@ -98,25 +95,11 @@ export async function getTransactions(userId: string, options?: GetOptions, filt
 }
 
 export async function getUserTransaction(userId: string, txId: string) {
-  const wallets = await getUserWallets(userId)
-  const walletIds = wallets.map(wallet => wallet._id.toString())
-
-  if (!walletIds.length) {
-    return null
-  }
-
   const tx = await TransactionModel.findOne({
     _id: txId,
-    $or: [{ _fromWallet: { $in: walletIds } }, { _toWallet: { $in: walletIds } }],
+    $or: [{ _fromUser: userId }, { _toUser: userId }],
   })
-    .populate<{ _fromWallet: TUserWallet }>({
-      path: '_fromWallet',
-      populate: { path: '_user' },
-    })
-    .populate<{ _toWallet: TUserWallet }>({
-      path: '_toWallet',
-      populate: { path: '_user' },
-    })
+    .populate<{ _fromUser: User; _toUser: User }>(['_fromUser', '_toUser'])
     .lean()
 
   return tx

@@ -8,7 +8,7 @@ import { Title, Text, CopyButton, ActionIcon, Pill, Center } from '@mantine/core
 import RwdLayout from '@/components/share/RwdLayout'
 import { getUserTransaction } from '@/services/transaction'
 import { getToken } from '@/contracts/tokens'
-import { formateLocalDate } from '@/utils/helper'
+import { formatLocalDate } from '@/utils/helper'
 import { getNetwork } from '@/wallet/utils/network'
 import { formatAddress } from '@/wallet/utils/helper'
 import { PiCopy, PiLink } from 'react-icons/pi'
@@ -80,10 +80,7 @@ export default function HistoryTx({ tx }: { tx: string }) {
                     From
                   </Text>
                   <Box w={200}>
-                    <WalletText
-                      val={value?.from || ''}
-                      username={value?._fromWallet?._user.username}
-                    />
+                    <WalletText val={value?.from || ''} username={value?._fromUser?.username} />
                   </Box>
                 </Group>
 
@@ -92,7 +89,7 @@ export default function HistoryTx({ tx }: { tx: string }) {
                     To
                   </Text>
                   <Box w={200}>
-                    <WalletText val={value?.to || ''} username={value?._toWallet?._user.username} />
+                    <WalletText val={value?.to || ''} username={value?._toUser?.username} />
                   </Box>
                 </Group>
 
@@ -122,7 +119,7 @@ export default function HistoryTx({ tx }: { tx: string }) {
                     Date
                   </Text>
                   <Text fz="sm">
-                    {formateLocalDate(value?.createdAt || 0, 'MMM dd yyyy h:mm aa')}
+                    {formatLocalDate(value?.createdAt || 0, 'MMM dd yyyy h:mm:ss aa')}
                   </Text>
                 </Group>
               </Stack>

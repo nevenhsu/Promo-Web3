@@ -8,7 +8,7 @@ import { useForm } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
 import { Modal, Stack, Box, Text, Button } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
-import { formateZonedDate, getStartOfDate } from '@/utils/helper'
+import { formatZonedDate, getStartOfDate } from '@/utils/helper'
 import { publicEnv } from '@/utils/env'
 
 export type UpdateModalRef = {
@@ -39,10 +39,10 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
           return 'Should not be empty'
         }
         if (prevEpoch && isBefore(value, prevEpoch.endTime)) {
-          return `Should not before ${formateZonedDate(prevEpoch.endTime, 'MMM dd yyyy h:mm aa')}`
+          return `Should not before ${formatZonedDate(prevEpoch.endTime, 'MMM dd yyyy h:mm aa')}`
         }
         if (values.endTime && !isBefore(value, values.endTime)) {
-          return `Should before ${formateZonedDate(values.endTime, 'MMM dd yyyy h:mm aa')}`
+          return `Should before ${formatZonedDate(values.endTime, 'MMM dd yyyy h:mm aa')}`
         }
         return null
       },
@@ -51,10 +51,10 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
           return 'Should not be empty'
         }
         if (nextEpoch && isAfter(value, nextEpoch.startTime)) {
-          return `Should not after ${formateZonedDate(nextEpoch.startTime, 'MMM dd yyyy h:mm aa')}`
+          return `Should not after ${formatZonedDate(nextEpoch.startTime, 'MMM dd yyyy h:mm aa')}`
         }
         if (values.startTime && isBefore(value, values.startTime)) {
-          return `Should after ${formateZonedDate(values.startTime, 'MMM dd yyyy h:mm aa')}`
+          return `Should after ${formatZonedDate(values.startTime, 'MMM dd yyyy h:mm aa')}`
         }
         return null
       },

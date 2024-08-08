@@ -10,7 +10,7 @@ import RwdLayout from '@/components/share/RwdLayout'
 import { PiArrowCircleUp, PiArrowCircleDown } from 'react-icons/pi'
 import { getTransactions } from '@/services/transaction'
 import { getToken } from '@/contracts/tokens'
-import { formateLocalDate, isEnumMember } from '@/utils/helper'
+import { formatLocalDate, isEnumMember } from '@/utils/helper'
 import type { TTransaction } from '@/models/transaction'
 
 enum TabValue {
@@ -127,7 +127,7 @@ export default function History() {
                   {tx.token?.amount || 'No data'}
                 </Text>
                 <Text fz="xs" c="dimmed" lh={1}>
-                  {formateLocalDate(tx.createdAt, 'MMM dd yyyy h:mm aa')}
+                  {formatLocalDate(tx.createdAt, 'MMM dd yyyy h:mm:ss aa')}
                 </Text>
               </Stack>
             </Group>
