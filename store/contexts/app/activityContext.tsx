@@ -1,7 +1,8 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react'
 import { useAsyncFn, usePrevious } from 'react-use'
+import { useAppSelector } from '@/hooks/redux'
 import { getPublicActivities } from '@/services/activity'
 import type { TPublicActivity } from '@/models/activity'
 
@@ -33,6 +34,10 @@ interface ActivityContextType {
 const ActivityContext = createContext<ActivityContextType | undefined>(undefined)
 
 export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Get activity status from redux
+  const { data: activityStatus } = useAppSelector(state => state.userActivityStatus)
+
+  // State for tabs and pagination
   const [activeTab, setActiveTab] = useState(TabValue.New)
   const prevTab = usePrevious(activeTab)
 
@@ -59,6 +64,21 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [current, limit, activeTab])
   // Get data from the hook
   const { value, loading, error } = activityState
+
+  // Transform data to include joined status
+  const data: TPublicActivity[] = useMemo(() => {
+    if (!value) return []
+
+    return value.activities.map(o => {
+      const status = activityStatus[o.slug]
+      const joined = status ? status.status >= 0 : false
+
+      return {
+        ...o,
+        joined: o.joined ? true : joined,
+      }
+    })
+  }, [value, activityStatus])
 
   // Update page data when transactions are fetched
   useEffect(() => {
@@ -93,7 +113,7 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setActiveTab,
         handlePageChange,
         loading,
-        data: value?.activities || [],
+        data,
         error,
       }}
     >

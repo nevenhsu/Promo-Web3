@@ -115,7 +115,7 @@ export default function Wallet() {
           <NetworkButton />
           <Button
             size="xs"
-            variant="light"
+            variant="outline"
             loading={balLoading}
             disabled={!walletAddress}
             onClick={() => updateBalances()}

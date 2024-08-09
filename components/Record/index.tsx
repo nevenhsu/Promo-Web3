@@ -52,13 +52,13 @@ export default function Record() {
                         <Box ta="center">
                           <Text fz="xs">12.6k</Text>
                           <Text fz="xs" c="dimmed">
-                            Gain
+                            Self
                           </Text>
                         </Box>
                         <Box ta="center">
                           <Text fz="xs">1.2k</Text>
                           <Text fz="xs" c="dimmed">
-                            Bonus
+                            Referral
                           </Text>
                         </Box>
                       </Group>
