@@ -1,18 +1,19 @@
 'use client'
 
-import { Link, usePathname, useRouter } from '@/navigation'
+import { Link, usePathname } from '@/navigation'
 import { useAppSelector } from '@/hooks/redux'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { usePromo } from '@/hooks/usePromo'
+import { useGoBack } from '@/hooks/useGoBack'
 import { Group, Box, ActionIcon, Avatar } from '@mantine/core'
 import Logo from '@/public/logo.svg'
 import { PiCaretLeft } from 'react-icons/pi'
 
 export default function Header() {
-  const router = useRouter()
-  const pathname = usePathname()
   usePromo() // Save promo code
+  const pathname = usePathname()
 
+  const { canGoBack, goBack } = useGoBack()
   const { bothAuth } = useLoginStatus()
   const { data } = useAppSelector(state => state.user)
 
@@ -20,14 +21,15 @@ export default function Header() {
   const avatar = details?.avatar || ''
 
   const hasPreviousPage = pathname.split('/').length > 2
+  const showBack = canGoBack && hasPreviousPage
 
   return (
     <>
       <Group h="100%" px={16} justify="space-between">
         <Group gap="md">
-          {hasPreviousPage ? (
+          {showBack ? (
             <ActionIcon
-              onClick={() => router.back()}
+              onClick={() => goBack()}
               variant="transparent"
               color="dark"
               aria-label="Back"

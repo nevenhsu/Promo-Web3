@@ -8,6 +8,7 @@ type AppState = {
   isMobileDevice: boolean
   breakPoints: BreakPoint[]
   viewportSize: { width: number; height: number }
+  pages: string[] // track the pages visited
 }
 
 type AppValue = {
@@ -21,6 +22,7 @@ const initialState: AppState = {
   isMobileDevice: false,
   breakPoints: ['base'], // ['base', 'xs', 'sm', 'md', 'lg', 'xl']
   viewportSize: { width: 0, height: 0 },
+  pages: [],
 }
 
 const initValue: AppValue = {
