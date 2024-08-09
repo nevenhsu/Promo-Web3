@@ -2,12 +2,12 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { useAsyncFn, usePrevious } from 'react-use'
-import { getPublicActivities } from '@/services/activity'
-import type { TPublicActivity } from '@/models/activity'
+import { getTransactions } from '@/services/transaction'
+import type { TTransaction } from '@/models/transaction'
 
 export enum TabValue {
-  New = 'new',
-  Ended = 'ended',
+  Transaction = 'transaction',
+  Airdrop = 'airdrop',
 }
 
 type DataPage = {
@@ -18,27 +18,27 @@ type DataPage = {
 
 type Pages = { [key in TabValue]: DataPage }
 
-interface ActivityContextType {
+interface TransactionContextType {
   current: number
   total: number
   limit: number
   activeTab: TabValue
   setActiveTab: (tab: TabValue) => void
   handlePageChange: (page: number) => void
-  data: TPublicActivity[]
+  data: TTransaction[]
   loading: boolean
   error?: Error
 }
 
-const ActivityContext = createContext<ActivityContextType | undefined>(undefined)
+const TxContext = createContext<TransactionContextType | undefined>(undefined)
 
-export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [activeTab, setActiveTab] = useState(TabValue.New)
+export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [activeTab, setActiveTab] = useState(TabValue.Transaction)
   const prevTab = usePrevious(activeTab)
 
   const [pages, setPages] = useState<Pages>({
-    new: { total: 1, current: 1, limit: 10 },
-    ended: { total: 1, current: 1, limit: 10 },
+    transaction: { total: 1, current: 1, limit: 10 },
+    airdrop: { total: 1, current: 1, limit: 10 },
   })
   const activePage = pages[activeTab]
   const { total, limit } = activePage
@@ -52,13 +52,13 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }))
   }
 
-  const [activityState, fetchActivities] = useAsyncFn(async () => {
-    const ongoing = activeTab === TabValue.New
-    const data = await getPublicActivities({ page: current, limit, ongoing })
+  const [transactionState, fetchTransactions] = useAsyncFn(async () => {
+    const isAirdrop = activeTab === TabValue.Airdrop
+    const data = await getTransactions({ page: current, limit, isAirdrop })
     return data
   }, [current, limit, activeTab])
   // Get data from the hook
-  const { value, loading, error } = activityState
+  const { value, loading, error } = transactionState
 
   // Update total page when transactions are fetched
   useEffect(() => {
@@ -73,11 +73,19 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Fetch transactions when page changes
   useEffect(() => {
-    fetchActivities()
+    fetchTransactions()
   }, [current, activeTab])
 
+  // Reset current page when tab changes
+  useEffect(() => {
+    setPages(prev => ({
+      ...prev,
+      [activeTab]: { ...prev[activeTab], current: 1 },
+    }))
+  }, [activeTab])
+
   return (
-    <ActivityContext.Provider
+    <TxContext.Provider
       value={{
         current,
         total,
@@ -85,20 +93,20 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         activeTab,
         setActiveTab,
         handlePageChange,
+        data: value?.txs || [],
         loading,
-        data: value?.activities || [],
         error,
       }}
     >
       {children}
-    </ActivityContext.Provider>
+    </TxContext.Provider>
   )
 }
 
-export const useActivity = (): ActivityContextType => {
-  const context = useContext(ActivityContext)
-  if (context === undefined) {
-    throw new Error('useReferral must be used within an ActivityProvider')
+export const useTransaction = () => {
+  const context = useContext(TxContext)
+  if (!context) {
+    throw new Error('useTx must be used within a TransactionProvider')
   }
   return context
 }

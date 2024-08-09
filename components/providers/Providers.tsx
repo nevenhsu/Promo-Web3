@@ -8,6 +8,7 @@ import PrivyProvider from '@/wallet/PrivyProvider'
 import AuthProvider from './AuthProvider'
 import { ReferralProvider } from '@/store/contexts/app/referralContext'
 import { ActivityProvider } from '@/store/contexts/app/activityContext'
+import { TransactionProvider } from '@/store/contexts/app/transactionContext'
 import BackgroundTask from './BackgroundTask'
 
 export default function Providers({ children }: React.PropsWithChildren) {
@@ -35,7 +36,9 @@ function DataProviders({ children }: React.PropsWithChildren) {
   return (
     <>
       <ReferralProvider>
-        <ActivityProvider>{children}</ActivityProvider>
+        <ActivityProvider>
+          <TransactionProvider>{children}</TransactionProvider>
+        </ActivityProvider>
       </ReferralProvider>
     </>
   )
