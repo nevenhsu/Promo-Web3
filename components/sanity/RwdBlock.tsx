@@ -3,7 +3,7 @@
 import * as _ from 'lodash-es'
 import clsx from 'clsx'
 import useRwd from '@/sanity/hooks/useRwd'
-import { useScreenQueryValue } from '@/hooks/useScreenQuery'
+import { useRwdValue } from '@/hooks/useRwdValue'
 import { Box, Divider } from '@mantine/core'
 import RwdSimpleGrid from '@/components/sanity/Rwd/SimpleGrid'
 import { MyPortableText } from '@/components/common'
@@ -21,11 +21,11 @@ export function RwdBlock({ data }: { data: Partial<RwdData> }) {
   const { items, divider, rwd } = data || {}
   const { noDivider, noDividerTop, noDividerBottom } = divider || {}
 
-  const boxWidth = useScreenQueryValue(fullWidthData, 'w')
-  const fullWidth = useScreenQueryValue(rwd, 'fullWidth')
-  const showItems = useScreenQueryValue(rwd, 'showItems')
-  const cols = useScreenQueryValue(rwd, 'cols') || 1
-  const verticalSpacing = useScreenQueryValue(rwd, 'verticalSpacing') ?? 40
+  const boxWidth = useRwdValue(fullWidthData, 'w')
+  const fullWidth = useRwdValue(rwd, 'fullWidth')
+  const showItems = useRwdValue(rwd, 'showItems')
+  const cols = useRwdValue(rwd, 'cols') || 1
+  const verticalSpacing = useRwdValue(rwd, 'verticalSpacing') ?? 40
   const elements = _.slice(items, 0, Number(showItems) || undefined)
 
   const gridProps = useRwd(

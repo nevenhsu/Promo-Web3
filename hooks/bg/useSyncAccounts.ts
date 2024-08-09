@@ -9,7 +9,7 @@ import { useLoginStatus } from '@/hooks/useLoginStatus'
 
 // auto update link accounts
 
-export default function useLinkAccount() {
+export function useSyncAccounts() {
   const dispatch = useAppDispatch()
   const { data, fetched } = useAppSelector(state => state.user)
   const { bothAuth } = useLoginStatus()

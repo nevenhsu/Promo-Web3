@@ -1,19 +1,21 @@
 'use client'
 
 import { useEffect } from 'react'
-import useSyncAuth from '@/hooks/useSyncAuth'
-import useLinkAccount from '@/hooks/useLinkAccount'
 import { useViewportSize } from '@mantine/hooks'
-import { useScreenQuery } from '@/hooks/useScreenQuery'
 import { useAppContext } from '@/store/AppContext'
+import { useSyncAuth } from '@/hooks/bg/useSyncAuth'
+import { useSyncAccounts } from '@/hooks/bg/useSyncAccounts'
+import { useSyncWallets } from '@/hooks/bg/useSyncWallets'
+import { useBreakPoints } from '@/hooks/bg/useBreakPoints'
 
 export default function BackgroundTask() {
   const { updateState } = useAppContext()
 
   useSyncAuth() // connect privy to next-auth
-  useLinkAccount() // auto update link accounts
+  useSyncAccounts() // auto update link accounts
+  useSyncWallets() // auto update wallets
 
-  useScreenQuery() // update app context state
+  useBreakPoints() // update break points in app context
 
   const viewportSize = useViewportSize()
 

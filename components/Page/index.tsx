@@ -3,9 +3,9 @@
 import _ from 'lodash'
 import clsx from 'clsx'
 import { useState, useEffect } from 'react'
-import useQuery from '@/hooks/useQuery'
+import useQuery from '@/sanity/hooks/useQuery'
 import { pageQuery } from '@/sanity/queries'
-import { useScreenQueryValue } from '@/hooks/useScreenQuery'
+import { useRwdValue } from '@/hooks/useRwdValue'
 import { motion } from 'framer-motion'
 import { MotionSlide, MotionBlur } from '@/components/motion'
 import { MyPortableText } from '@/components/common'
@@ -32,7 +32,7 @@ export default function Blog({ slug, lang, initialData }: PageProps) {
   const { title, content, mainImage, author } = data
   const show = !_.isEmpty(data)
   const [isInit, setInit] = useState(false)
-  const imageAsset = useScreenQueryValue(mainImage, 'asset')
+  const imageAsset = useRwdValue(mainImage, 'asset')
 
   useEffect(() => {
     if (show) {

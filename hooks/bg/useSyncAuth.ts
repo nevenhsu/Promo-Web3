@@ -10,7 +10,7 @@ import { clearData as clearUserActivityStatus } from '@/store/slices/userActivit
 
 // sync auth status between privy and next-auth
 
-export default function useSyncAuth() {
+export function useSyncAuth() {
   const dispatch = useAppDispatch()
 
   const { nextAuthFail, nextAuth, privyAuthFail, bothAuth } = useLoginStatus()
