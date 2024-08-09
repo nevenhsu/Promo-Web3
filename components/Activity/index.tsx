@@ -1,80 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useAsyncFn } from 'react-use'
 import { Link } from '@/navigation'
 import { Tabs, Group, Stack, Paper, Box, Space, Pagination } from '@mantine/core'
 import { Title, Text, Button, Divider, Center, Skeleton } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { getPublicActivities } from '@/services/activity'
+import { useActivity, TabValue } from '@/store/contexts/app/activityContext'
 import { getActionLabel } from './variables'
 import { formatDate } from '@/utils/date'
 import { formatNumber } from '@/utils/math'
 import { toUpper, isEnumMember } from '@/utils/helper'
 import type { TPublicActivity } from '@/models/activity'
 
-enum TabValue {
-  New = 'new',
-  Ended = 'ended',
-}
-
-type DataPage = {
-  total: number
-  current: number
-  limit: number
-}
-
-type Pages = { [key in TabValue]: DataPage }
-
 export default function Activity() {
-  const [activeTab, setActiveTab] = useState(TabValue.New)
-  const [pages, setPages] = useState<Pages>({
-    new: { total: 1, current: 1, limit: 10 },
-    ended: { total: 1, current: 1, limit: 10 },
-  })
-  const { total, current, limit } = pages[activeTab]
+  const { total, current, activeTab, setActiveTab, handlePageChange, data, loading, limit, error } =
+    useActivity()
 
-  const handlePageChange = (page: number) => {
-    setPages(prev => ({
-      ...prev,
-      [activeTab]: { ...prev[activeTab], current: page },
-    }))
-  }
-
-  const [activityState, fetchActivities] = useAsyncFn(async () => {
-    const ongoing = activeTab === TabValue.New
-    const data = await getPublicActivities({ page: current, limit, ongoing })
-    return data
-  }, [current, limit, activeTab])
-  // Get data from the hook
-  const { value, loading } = activityState
-  const activities = value?.activities || []
-
-  // Update total page when transactions are fetched
-  useEffect(() => {
-    if (value && value.total) {
-      const totalPage = Math.ceil(value.total / limit)
-      setPages(prev => ({
-        ...prev,
-        [activeTab]: { ...prev[activeTab], total: totalPage },
-      }))
-    }
-  }, [value, activeTab])
-
-  // Fetch transactions when page changes
-  useEffect(() => {
-    fetchActivities()
-  }, [current, activeTab])
-
-  // Reset current page when tab changes
-  useEffect(() => {
-    setPages(prev => ({
-      ...prev,
-      [activeTab]: { ...prev[activeTab], current: 1 },
-    }))
-  }, [activeTab])
-
-  const renderActivity = (data: TPublicActivity[]) => {
+  const renderActivity = () => {
     if (loading) {
       return <Skeleton radius="md" h={168} />
     }
@@ -113,11 +54,11 @@ export default function Activity() {
           </Tabs.List>
 
           <Tabs.Panel value={TabValue.New}>
-            <Stack py={40}>{renderActivity(activities)}</Stack>
+            <Stack py={40}>{renderActivity()}</Stack>
           </Tabs.Panel>
 
           <Tabs.Panel value={TabValue.Ended}>
-            <Stack py={40}>{renderActivity(activities)}</Stack>
+            <Stack py={40}>{renderActivity()}</Stack>
           </Tabs.Panel>
         </Tabs>
 
