@@ -30,9 +30,9 @@ export default function Wallet() {
   const { data } = useAppSelector(state => state.user)
   const { name } = data
 
-  const { chainId, tokens, walletProviderValues, balancesValues, pricesValues } = useWeb3()
+  const { chainId, tokens, walletProviderValues, balancesValues, pricesValues, loading } = useWeb3()
   const { isSmartAccount, walletAddress } = walletProviderValues || {}
-  const { balances, updateBalances, loading } = balancesValues
+  const { balances, updateBalances, loading: balLoading } = balancesValues
   const { prices } = pricesValues
 
   const totalBalance = useMemo(() => {
@@ -62,7 +62,7 @@ export default function Wallet() {
         <Space h={40} />
 
         <Paper p="sm" c="white" shadow="xs" bg="var(--mantine-primary-color-5)">
-          <Group justify="space-between" wrap="nowrap">
+          <Group justify="space-between" wrap="nowrap" align="start">
             <Stack gap={4}>
               <Text fz="xs">Balance</Text>
               <Title order={4} lh={1} className="nowrap">
@@ -70,9 +70,11 @@ export default function Wallet() {
               </Title>
             </Stack>
             <Stack gap={4} ta="right">
-              <Text fz="xs">{isSmartAccount ? 'Smart wallet' : 'Embedded wallet'}</Text>
+              <Text fz="xs">
+                {loading ? 'Connecting' : isSmartAccount ? 'Smart wallet' : 'Embedded wallet'}
+              </Text>
               <Text fz="xs" className="word-break-all" lh={1.2}>
-                {formatAddress(walletAddress)}
+                {loading ? ' ' : formatAddress(walletAddress)}
               </Text>
             </Stack>
           </Group>
@@ -114,7 +116,7 @@ export default function Wallet() {
           <Button
             size="xs"
             variant="light"
-            loading={loading}
+            loading={balLoading}
             disabled={!walletAddress}
             onClick={() => updateBalances()}
           >
