@@ -60,14 +60,21 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Get data from the hook
   const { value, loading, error } = activityState
 
-  // Update total page when transactions are fetched
+  // Update page data when transactions are fetched
   useEffect(() => {
-    if (value && value.total) {
-      const totalPage = Math.ceil(value.total / limit)
-      setPages(prev => ({
-        ...prev,
-        [activeTab]: { ...prev[activeTab], total: totalPage },
-      }))
+    if (value) {
+      if (value.total) {
+        const totalPage = Math.ceil(value.total / value.limit)
+        setPages(prev => ({
+          ...prev,
+          [activeTab]: { ...prev[activeTab], total: totalPage, limit: value.limit },
+        }))
+      } else {
+        setPages(prev => ({
+          ...prev,
+          [activeTab]: { ...prev[activeTab], limit: value.limit },
+        }))
+      }
     }
   }, [value, activeTab])
 
@@ -81,7 +88,7 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       value={{
         current,
         total,
-        limit: value?.limit || limit,
+        limit,
         activeTab,
         setActiveTab,
         handlePageChange,
