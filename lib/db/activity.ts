@@ -18,31 +18,45 @@ export async function getPublicActivitiesTotal(ongoing: boolean = true) {
   return total
 }
 
+export type GetOptions = {
+  page?: number
+  limit?: number
+}
+
+export type GetFilters = {
+  ongoing?: boolean
+}
+
 export async function getPublicActivities(
-  ongoing: boolean = true,
-  skip: number = 0,
-  limit: number = 10,
-  sort: 'desc' | 'asc' = 'desc',
+  options?: GetOptions,
+  filter?: GetFilters,
   userId?: string // for joined status
 ) {
-  const index = sort === 'asc' ? 1 : -1
-  const n = _.min([limit, 100]) || 1
+  const { page = 1 } = options || {}
+  const { ongoing } = filter || {}
 
-  const now = new Date()
-  const activities = await ActivityModel.find({
+  // Limit the number of transactions to 100
+  const limit = _.min([options?.limit || 10, 100]) || 1
+
+  // Create the query
+  const query: Record<string, any> = {
     published: true,
-    endTime: ongoing ? { $gt: now } : { $lte: now },
-  })
-    .sort({ index })
-    .skip(skip)
-    .limit(n)
+  }
+  if (ongoing !== undefined) {
+    const now = new Date()
+    query.endTime = ongoing ? { $gt: now } : { $lte: now }
+  }
+
+  const docs = await ActivityModel.find(query)
+    .sort({ startTime: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit)
     .lean()
-    .exec()
 
   const joinedIds: { [id: string]: boolean } = {}
 
-  if (userId && activities.length > 0) {
-    const activityIds = activities.map(activity => activity._id)
+  if (userId && docs.length > 0) {
+    const activityIds = docs.map(activity => activity._id)
     const activityStatus = await UserActivityStatusModel.find({
       _activity: { $in: activityIds },
       _user: userId,
@@ -54,10 +68,18 @@ export async function getPublicActivities(
   }
 
   // add join status to activities
-  return activities.map(doc => {
+  const activities = docs.map(doc => {
     const joined = joinedIds[doc._id.toString()] || false
     return { ...doc, joined }
   })
+
+  // return the total number of transactions
+  if (page === 1) {
+    const total = await ActivityModel.countDocuments(query)
+    return { total, activities, limit }
+  }
+
+  return { activities, limit }
 }
 
 export async function getPublicActivity(slug: string) {

@@ -90,12 +90,9 @@ export async function GET(req: NextRequest) {
 
     await dbConnect()
 
-    const { total, txs } = await getTransactions(userId, { page, limit }, { isAirdrop })
+    const data = await getTransactions(userId, { page, limit }, { isAirdrop })
 
-    return NextResponse.json({
-      total,
-      txs,
-    })
+    return NextResponse.json(data)
   } catch (error) {
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

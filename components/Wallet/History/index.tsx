@@ -18,17 +18,16 @@ enum TabValue {
   Airdrop = 'airdrop',
 }
 
-type TxPage = {
+type DataPage = {
   total: number
   current: number
   limit: number
 }
 
-type Pages = { [key in TabValue]: TxPage }
+type Pages = { [key in TabValue]: DataPage }
 
 export default function History() {
   const [activeTab, setActiveTab] = useState(TabValue.Transaction)
-
   const [pages, setPages] = useState<Pages>({
     transaction: { total: 1, current: 1, limit: 10 },
     airdrop: { total: 1, current: 1, limit: 10 },
@@ -42,13 +41,13 @@ export default function History() {
     }))
   }
 
-  const [transactions, fetchTransactions] = useAsyncFn(async () => {
+  const [transactionState, fetchTransactions] = useAsyncFn(async () => {
     const isAirdrop = activeTab === TabValue.Airdrop
     const data = await getTransactions({ page: current, limit, isAirdrop })
     return data
   }, [current, limit, activeTab])
   // Get data from the hook
-  const { value, loading } = transactions
+  const { value, loading } = transactionState
   const txs = value?.txs || []
 
   // Update total page when transactions are fetched

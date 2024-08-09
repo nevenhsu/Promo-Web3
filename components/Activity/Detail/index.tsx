@@ -1,6 +1,7 @@
 'use client'
 
 import * as _ from 'lodash-es'
+import Image from 'next/image'
 import { useEffect, useMemo } from 'react'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { useRouter } from '@/navigation'
@@ -19,13 +20,14 @@ import { Title, Text, Button, ThemeIcon, ActionIcon, CopyButton, Progress } from
 import RwdLayout from '@/components/share/RwdLayout'
 import LinkModal from '@/components/share/LinkModal'
 import LinkButton from '@/components/share/LinkButton'
-import { PiLightning, PiPersonSimpleRun, PiTrophy, PiCheckBold } from 'react-icons/pi'
-import { PiWarningBold, PiCircleDashedBold, PiRocketLaunch, PiShareFatFill } from 'react-icons/pi'
 import { formatDate } from '@/utils/date'
 import { formatNumber } from '@/utils/math'
 import { getActionLabel, getErrorText } from '../variables'
 import { LinkAccountPlatform, ActivityStatus } from '@/types/db'
 import { toUpper } from '@/utils/helper'
+import { allTokens } from '@/contracts/tokens'
+import { PiLightning, PiPersonSimpleRun, PiTrophy, PiCheckBold } from 'react-icons/pi'
+import { PiWarningBold, PiCircleDashedBold, PiRocketLaunch, PiShareFatFill } from 'react-icons/pi'
 import type { TPublicActivity } from '@/models/activity'
 import type { TUserActivityStatus } from '@/models/userActivityStatus'
 
@@ -33,6 +35,7 @@ type ActivityDetailProps = { data: TPublicActivity; children?: React.ReactNode }
 
 export default function ActivityDetail({ data, children }: ActivityDetailProps) {
   const { slug, airdrop, socialMedia } = data
+  const token = _.find(allTokens, { symbol: airdrop.symbol })
 
   const dispatch = useAppDispatch()
   const router = useRouter()
@@ -180,24 +183,29 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
               </Text>
               <Title order={3}>{data.title}</Title>
             </Box>
-            <ActionIcon
-              variant="outline"
-              size="md"
-              radius="md"
-              loading={!code}
-              onClick={shareActions.open}
-            >
-              <PiShareFatFill />
-            </ActionIcon>
+            {code ? (
+              <ActionIcon
+                variant="outline"
+                size="md"
+                radius="md"
+                loading={!code}
+                onClick={shareActions.open}
+              >
+                <PiShareFatFill />
+              </ActionIcon>
+            ) : null}
           </Group>
 
           <Text fz="sm" c="dark">
             {data.description}
           </Text>
 
-          <Title order={4} c="orange">
-            {formatNumber(data.airdrop.amount)} {data.airdrop.symbol}
-          </Title>
+          <Group gap="xs">
+            {token ? <Image src={token.icon} width={20} height={20} alt={token.symbol} /> : null}
+            <Title order={4} c="orange">
+              {formatNumber(data.airdrop.amount)} {data.airdrop.symbol}
+            </Title>
+          </Group>
 
           {bothAuth ? (
             <>
@@ -370,11 +378,11 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
       >
         <Stack gap="lg">
           <Text fz="sm" c="dimmed">
-            Share this activity to your friends and earn more rewards
+            Share this activity to your friends and earn more score
           </Text>
 
           {/* Link */}
-          <Paper p="xs" ta="center" c="orange" bd="1px dashed red">
+          <Paper p="xs" ta="center" c="orange" bd="1px dashed red" mb="sm">
             <Text fz="sm" fw={500}>
               {code ? getPromoLink(code) : 'Loading...'}
             </Text>

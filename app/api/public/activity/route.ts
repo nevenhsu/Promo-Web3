@@ -4,21 +4,22 @@ import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { getPublicActivities } from '@/lib/db/activity'
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const token = await getToken({ req })
     const userId = token?.user?.id
 
-    const { ongoing, skip = 0, limit = 10, sort = 'desc' } = await req.json()
+    // Parse query string parameters
+    const { searchParams } = new URL(req.url)
+    const page = Number(searchParams.get('page')) || 1
+    const limit = Number(searchParams.get('limit')) || 10
+    const ongoing = searchParams.get('ongoing') === 'true'
 
     await dbConnect()
 
-    const activities = await getPublicActivities(ongoing, skip, limit, sort, userId)
+    const data = await getPublicActivities({ page, limit }, { ongoing }, userId)
 
-    const hasMore = activities.length === limit
-    const nextSkip = hasMore ? skip + limit : undefined
-
-    return NextResponse.json({ data: activities, hasMore, nextSkip })
+    return NextResponse.json(data)
   } catch (error) {
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

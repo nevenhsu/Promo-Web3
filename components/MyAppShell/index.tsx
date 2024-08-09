@@ -3,6 +3,7 @@
 import { usePathname } from '@/navigation'
 import { useDisclosure } from '@mantine/hooks'
 import { useMediaQuery } from '@mantine/hooks'
+import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { AppShell } from '@mantine/core'
 import Header from './Header'
 import MobileFooter from './MobileFooter'
@@ -13,6 +14,7 @@ export default function MyAppShell({ children }: React.PropsWithChildren) {
   const atHome = usePathname() === '/'
 
   const [opened, { toggle }] = useDisclosure()
+  const { bothAuth } = useLoginStatus()
 
   return (
     <AppShell
@@ -26,7 +28,7 @@ export default function MyAppShell({ children }: React.PropsWithChildren) {
 
       <AppShell.Main>{children}</AppShell.Main>
 
-      {atHome ? null : (
+      {atHome || !bothAuth ? null : (
         <AppShell.Footer>
           <MobileFooter />
         </AppShell.Footer>

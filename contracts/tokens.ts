@@ -66,11 +66,12 @@ export const tokens: { [id: string]: Erc20[] } = {
       isPermit: true,
       icon: '/icons/sharx-token.svg',
       abi: Erc20Permit.abi,
-    }
+    },
   ],
 } as const
 
 export const symbols = _.uniq(_.flatMap(Object.values(tokens), o => o.map(o => o.symbol)))
+export const allTokens = _.flatMap(Object.values(tokens), o => o)
 
 export function getTokens(chainId?: number) {
   if (!chainId) return []

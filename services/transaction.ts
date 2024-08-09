@@ -30,7 +30,9 @@ export async function getTransactions(values: { page: number; limit: number; isA
   url.searchParams.append('isAirdrop', isAirdrop)
   // log url: http://localhost:3000/api/u/transaction?page=1&limit=10&isAirdrop=false
 
-  const { data } = await axios.get<{ txs: TTransaction[]; total?: number }>(url.toString())
+  const { data } = await axios.get<{ txs: TTransaction[]; limit: number; total?: number }>(
+    url.toString()
+  )
   return data
 }
 

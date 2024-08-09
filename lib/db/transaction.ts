@@ -1,3 +1,4 @@
+import * as _ from 'lodash-es'
 import TransactionModel, { type Transaction } from '@/models/transaction'
 import { getUserWallet } from '@/lib/db/userWallet'
 import { unifyAddress } from '@/wallet/utils/helper'
@@ -55,8 +56,11 @@ export type GetOptions = {
 }
 
 export async function getTransactions(userId: string, options?: GetOptions, filter?: GetFilters) {
-  const { page = 1, limit = 10 } = options || {}
+  const { page = 1 } = options || {}
   const { isAirdrop, status, type } = filter || {}
+
+  // Limit the number of transactions to 100
+  const limit = _.min([options?.limit || 10, 100]) || 1
 
   // Create the query
   const query: Record<string, any> = {
@@ -88,10 +92,10 @@ export async function getTransactions(userId: string, options?: GetOptions, filt
   // return the total number of transactions
   if (page === 1) {
     const total = await TransactionModel.countDocuments(query)
-    return { total, txs }
+    return { total, txs, limit }
   }
 
-  return { txs }
+  return { txs, limit }
 }
 
 export async function getUserTransaction(userId: string, txId: string) {
