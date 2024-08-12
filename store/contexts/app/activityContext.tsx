@@ -1,5 +1,6 @@
 'use client'
 
+import { usePathname } from '@/navigation'
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react'
 import { useAsyncFn, usePrevious } from 'react-use'
 import { useAppSelector } from '@/hooks/redux'
@@ -34,6 +35,10 @@ interface ActivityContextType {
 const ActivityContext = createContext<ActivityContextType | undefined>(undefined)
 
 export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Only fetch data when on the activity page
+  const pathname = usePathname()
+  const isOnPage = pathname.startsWith('/activity')
+
   // Get activity status from redux
   const { data: activityStatus } = useAppSelector(state => state.userActivityStatus)
 
@@ -80,7 +85,7 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     })
   }, [value, activityStatus])
 
-  // Update page data when transactions are fetched
+  // Update page data when data are fetched
   useEffect(() => {
     if (value) {
       if (value.total) {
@@ -100,8 +105,10 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Fetch transactions when page changes
   useEffect(() => {
-    fetchActivities()
-  }, [current, activeTab])
+    if (isOnPage) {
+      fetchActivities()
+    }
+  }, [current, activeTab, isOnPage])
 
   return (
     <ActivityContext.Provider

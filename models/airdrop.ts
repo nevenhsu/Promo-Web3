@@ -1,9 +1,10 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
+import UserModel from '@/models/user'
 
 const schema = new Schema({
   _user: {
     type: Schema.Types.ObjectId,
-    ref: 'User', // This should match the name of your user model
+    ref: UserModel,
     required: true,
     index: true,
   },

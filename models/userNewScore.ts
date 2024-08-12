@@ -1,15 +1,17 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
+import ActivityModel from '@/models/activity'
+import UserModel from '@/models/user'
 
 export const schema = new Schema({
   _activity: {
     type: Schema.Types.ObjectId,
-    ref: 'Activity', // This should match the name of your user model
+    ref: ActivityModel,
     required: true,
     index: true,
   },
   _user: {
     type: Schema.Types.ObjectId,
-    ref: 'User', // This should match the name of your user model
+    ref: UserModel,
     required: true,
     index: true,
   },

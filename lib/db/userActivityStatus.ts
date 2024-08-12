@@ -1,5 +1,7 @@
+import * as _ from 'lodash-es'
 import UserActivityStatusModel from '@/models/userActivityStatus'
 import { ActivityStatus } from '@/types/db'
+import type { Activity } from '@/models/activity'
 
 export async function getUserActivityStatus(userId: string, activityId: string) {
   const doc = await UserActivityStatusModel.findOne({
@@ -30,4 +32,30 @@ export async function countUserActivityStatus(userId: string, finalized: boolean
     finalized: finalized ? true : { $in: [null, false] },
   })
   return count
+}
+
+export type GetOptions = {
+  page?: number
+  limit?: number
+}
+
+export async function getUserActivityStatuses(userId: string, options?: GetOptions) {
+  const { page = 1 } = options || {}
+
+  // Limit the number of transactions to 100
+  const limit = _.min([options?.limit || 10, 100]) || 1
+
+  const data = await UserActivityStatusModel.find({ _user: userId })
+    .sort({ updatedAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .populate<{ _activity: Activity }>('_activity')
+    .lean()
+
+  if (page === 1) {
+    const total = await UserActivityStatusModel.countDocuments({ _user: userId })
+    return { data, limit, total }
+  }
+
+  return { data, limit }
 }

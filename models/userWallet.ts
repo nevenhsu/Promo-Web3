@@ -1,12 +1,12 @@
 import { models, model, Model, Schema } from 'mongoose'
 import { unifyAddress } from '@/wallet/utils/helper'
 import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
-import type { User } from '@/models/user'
+import UserModel, { type User } from '@/models/user'
 
 export const schema = new Schema({
   _user: {
     type: Schema.Types.ObjectId,
-    ref: 'User', // This should match the name of your user model
+    ref: UserModel,
     required: true,
     index: true,
   },

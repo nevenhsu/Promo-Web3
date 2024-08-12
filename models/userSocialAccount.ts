@@ -1,5 +1,6 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import { SocialMedia } from '@/types/db'
+import UserModel from '@/models/user'
 
 // Save social media account data
 
@@ -10,7 +11,7 @@ const detailSchema = new Schema({
 export const schema = new Schema({
   _user: {
     type: Schema.Types.ObjectId,
-    ref: 'User', // This should match the name of your user model
+    ref: UserModel,
     required: true,
     index: true,
   },

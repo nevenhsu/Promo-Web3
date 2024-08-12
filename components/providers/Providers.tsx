@@ -9,6 +9,7 @@ import AuthProvider from './AuthProvider'
 import { ReferralProvider } from '@/store/contexts/app/referralContext'
 import { ActivityProvider } from '@/store/contexts/app/activityContext'
 import { TransactionProvider } from '@/store/contexts/app/transactionContext'
+import { ActivityStatusProvider } from '@/store/contexts/app/activityStatusContext'
 import BackgroundTask from './BackgroundTask'
 
 export default function Providers({ children }: React.PropsWithChildren) {
@@ -37,7 +38,9 @@ function DataProviders({ children }: React.PropsWithChildren) {
     <>
       <ReferralProvider>
         <ActivityProvider>
-          <TransactionProvider>{children}</TransactionProvider>
+          <TransactionProvider>
+            <ActivityStatusProvider>{children}</ActivityStatusProvider>
+          </TransactionProvider>
         </ActivityProvider>
       </ReferralProvider>
     </>

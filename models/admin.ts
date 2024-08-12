@@ -1,11 +1,11 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import { AdminRole } from '@/types/db'
-import type { TUser } from '@/models/user'
+import UserModel, { type TUser } from '@/models/user'
 
 export const schema = new Schema({
   _user: {
     type: Schema.Types.ObjectId,
-    ref: 'User', // This should match the name of your user model
+    ref: UserModel,
     required: true,
     unique: true, // Ensures that each user can only be an admin once
     index: true,

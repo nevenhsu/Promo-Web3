@@ -1,5 +1,6 @@
 'use client'
 
+import { usePathname } from '@/navigation'
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { useAsyncFn, usePrevious } from 'react-use'
 import { getTransactions } from '@/services/transaction'
@@ -33,6 +34,10 @@ interface TransactionContextType {
 const TxContext = createContext<TransactionContextType | undefined>(undefined)
 
 export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Only fetch data when on the history page
+  const pathname = usePathname()
+  const isOnPage = pathname.startsWith('/wallet/history')
+
   const [activeTab, setActiveTab] = useState(TabValue.Transaction)
   const prevTab = usePrevious(activeTab)
 
@@ -60,7 +65,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
   // Get data from the hook
   const { value, loading, error } = transactionState
 
-  // Update page data when transactions are fetched
+  // Update page data when data are fetched
   useEffect(() => {
     if (value) {
       if (value.total) {
@@ -80,8 +85,10 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // Fetch transactions when page changes
   useEffect(() => {
-    fetchTransactions()
-  }, [current, activeTab])
+    if (isOnPage) {
+      fetchTransactions()
+    }
+  }, [current, activeTab, isOnPage])
 
   // Reset current page when tab changes
   useEffect(() => {

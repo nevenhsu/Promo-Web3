@@ -1,16 +1,18 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import { ActivityStatus, ActivityErrorCode } from '@/types/db'
+import ActivityModel, { type Activity } from '@/models/activity'
+import UserModel from '@/models/user'
 
 export const schema = new Schema({
   _activity: {
     type: Schema.Types.ObjectId,
-    ref: 'Activity', // This should match the name of your user model
+    ref: ActivityModel,
     required: true,
     index: true,
   },
   _user: {
     type: Schema.Types.ObjectId,
-    ref: 'User', // This should match the name of your user model
+    ref: UserModel,
     required: true,
     index: true,
   },
@@ -35,6 +37,7 @@ schema.index({ _activity: 1, _user: 1 }, { unique: true }) // unique index for a
 
 export type UserActivityStatus = InferSchemaType<typeof schema>
 export type TUserActivityStatus = Omit<UserActivityStatus, 'updatedAt'> & { updatedAt: string } // ISO 8601 date string
+export type TUserActivityStatusData = TUserActivityStatus & { _id: string; _activity: Activity }
 
 const name = 'UserActivityStatus'
 const UserActivityStatusModel = (models[name] as Model<UserActivityStatus>) || model(name, schema)

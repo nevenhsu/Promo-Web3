@@ -2,7 +2,8 @@ import { models, model, Model, Schema } from 'mongoose'
 import { TxStatus, TxType } from '@/types/db'
 import { unifyAddress } from '@/wallet/utils/helper'
 import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
-import type { User } from '@/models/user'
+import UserModel, { type User } from '@/models/user'
+import UserWalletModel from '@/models/userWallet'
 
 const tokenSchema = new Schema({
   symbol: { type: String, required: true },
@@ -20,22 +21,22 @@ export const schema = new Schema({
   contract: { type: String, index: true }, // contract address
   _fromWallet: {
     type: Schema.Types.ObjectId,
-    ref: 'UserWallet', // This should match the name of your wallet model
+    ref: UserWalletModel,
     index: true,
   },
   _toWallet: {
     type: Schema.Types.ObjectId,
-    ref: 'UserWallet', // This should match the name of your wallet model
+    ref: UserWalletModel,
     index: true,
   },
   _fromUser: {
     type: Schema.Types.ObjectId,
-    ref: 'User', // This should match the name of your user model
+    ref: UserModel,
     index: true,
   },
   _toUser: {
     type: Schema.Types.ObjectId,
-    ref: 'User', // This should match the name of your user model
+    ref: UserModel,
     index: true,
   },
   status: { type: Number, enum: TxStatus, index: true, default: TxStatus.Pending },
