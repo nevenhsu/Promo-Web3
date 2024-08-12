@@ -1,6 +1,12 @@
 import axios from 'axios'
 import type { UserStatus } from '@/models/userStatus'
-import type { Airdrop } from '@/models/airdrop'
+
+export type Airdrop = {
+  symbol: string
+  receivedAmount?: string
+  pendingAmount?: string
+  unsettledAmount: number
+}
 
 export type TUserStatus = {
   status: UserStatus

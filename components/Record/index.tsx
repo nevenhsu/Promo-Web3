@@ -144,7 +144,7 @@ function ScoreItem({ data }: { data: TUserActivityStatusData }) {
 }
 
 function AirdropItem({ data }: { data: TUserActivityStatusData }) {
-  const { _activity, airdropped } = data
+  const { _activity, airdropped, finalized } = data
   const { airdrop, details } = _activity
 
   const airdropShare = (data.totalScore / details.totalScore) * Number(airdrop.amount) || 0
@@ -169,7 +169,7 @@ function AirdropItem({ data }: { data: TUserActivityStatusData }) {
               </Title>
             </Box>
             <Text ta="center" fz="xs" c="dimmed">
-              {airdropped ? 'Received' : 'Pending'}
+              {finalized ? (airdropped ? 'Received' : 'Pending') : 'Unsettled'}
             </Text>
           </Stack>
 

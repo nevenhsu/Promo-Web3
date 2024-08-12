@@ -1,5 +1,5 @@
 import * as _ from 'lodash-es'
-import UserActivityStatusModel from '@/models/userActivityStatus'
+import UserActivityStatusModel, { type TUserActivityStatusData } from '@/models/userActivityStatus'
 import { ActivityStatus } from '@/types/db'
 import type { Activity } from '@/models/activity'
 
@@ -58,4 +58,15 @@ export async function getUserActivityStatuses(userId: string, options?: GetOptio
   }
 
   return { data, limit }
+}
+
+export async function getOngoingActivityStatuses(userId: string) {
+  const data: TUserActivityStatusData[] = await UserActivityStatusModel.find({
+    _user: userId,
+    finalized: { $in: [null, false] },
+  })
+    .populate<{ _activity: Activity }>('_activity')
+    .lean()
+
+  return data
 }

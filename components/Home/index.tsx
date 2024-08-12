@@ -2,8 +2,10 @@
 
 import * as _ from 'lodash-es'
 import Decimal from 'decimal.js'
+import { useMemo } from 'react'
 import { useAppSelector } from '@/hooks/redux'
 import { useReferral } from '@/store/contexts/app/referralContext'
+import { useWeb3 } from '@/wallet/Web3Context'
 import { Link } from '@/navigation'
 import { Stack, Group, Box, Paper, SimpleGrid, Divider, Space } from '@mantine/core'
 import { Title, Text, ThemeIcon, ActionIcon } from '@mantine/core'
@@ -11,23 +13,30 @@ import RwdLayout from '@/components/share/RwdLayout'
 import { formatNumber } from '@/utils/math'
 import { PiRocket, PiRocketLaunch, PiCurrencyCircleDollar } from 'react-icons/pi'
 import { PiCaretRight, PiBarcode } from 'react-icons/pi'
-import type { Airdrop } from '@/models/airdrop'
-
-// TODO: get activity counts from API
+import type { Airdrop } from '@/services/userStatus'
 
 export default function Home() {
   const { data, statusData } = useAppSelector(state => state.user)
   const { name } = data
 
   const { isReferred } = useReferral()
+  const {
+    pricesValues: { prices },
+  } = useWeb3()
 
   const { airdrops = [], progress, status } = statusData || {}
   const { referral1stScore, referral2ndScore, totalScore = 0, selfScore = 0 } = status || {}
 
   const referralScore = _.sum([referral1stScore, referral2ndScore]) || 0
-  const airdropValues = airdrops.map(getAirdropValue)
-  const receivedValue = _.sumBy(airdropValues, 'receivedValue')
-  const pendingValue = _.sumBy(airdropValues, 'pendingValue')
+
+  // calculate with price
+  const { receivedValue, pendingValue, unsettledValue } = useMemo(() => {
+    const airdropValues = airdrops.map(o => getAirdropValue(o, prices[o.symbol]))
+    const receivedValue = _.sumBy(airdropValues, 'received')
+    const pendingValue = _.sumBy(airdropValues, 'pending')
+    const unsettledValue = _.sumBy(airdropValues, 'unsettled')
+    return { receivedValue, pendingValue, unsettledValue }
+  }, [airdrops, prices])
 
   return (
     <>
@@ -114,7 +123,7 @@ export default function Home() {
             <Space h={16} />
             <Divider />
             <Space h={24} />
-            <SimpleGrid cols={2}>
+            <SimpleGrid cols={3}>
               <Box>
                 <Text size="xs" c="dimmed">
                   Received
@@ -126,6 +135,12 @@ export default function Home() {
                   Pending
                 </Text>
                 <Title order={4}>${formatNumber(pendingValue)}</Title>
+              </Box>
+              <Box>
+                <Text size="xs" c="dimmed">
+                  Unsettled
+                </Text>
+                <Title order={4}>${formatNumber(unsettledValue)}</Title>
               </Box>
             </SimpleGrid>
           </Paper>
@@ -187,10 +202,11 @@ export default function Home() {
   )
 }
 
-function getAirdropValue(data: Airdrop) {
-  const { symbol, receivedAmount, pendingAmount } = data
-  const price = 1 // get price from API
-  const receivedValue = new Decimal(receivedAmount).mul(price).toNumber()
-  const pendingValue = new Decimal(pendingAmount).mul(price).toNumber()
-  return { receivedValue, pendingValue }
+function getAirdropValue(data: Airdrop, _price?: Decimal) {
+  const { receivedAmount, pendingAmount, unsettledAmount } = data
+  const price = _price || new Decimal(0)
+  const received = new Decimal(receivedAmount || 0).mul(price).toNumber()
+  const pending = new Decimal(pendingAmount || 0).mul(price).toNumber()
+  const unsettled = new Decimal(unsettledAmount || 0).mul(price).toNumber()
+  return { received, pending, unsettled }
 }
