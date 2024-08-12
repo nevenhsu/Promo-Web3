@@ -16,3 +16,7 @@ export function formatAmount(displayAmount: Decimal.Value | bigint, decimal: num
 export function formatNumber(num: number | string) {
   return numeral(num).format('0,0.[00]a')
 }
+
+export function formatPercent(num: number | string) {
+  return numeral(num).format('0.00%')
+}

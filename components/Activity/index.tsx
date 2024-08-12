@@ -86,7 +86,7 @@ function ActivityItem({ data }: { data: TPublicActivity }) {
         <Paper px="md" radius="sm" shadow="xs" mih={168} display="flex">
           <Group wrap="nowrap" align="stretch" w="100%">
             {/* Left */}
-            <Stack py="md" w={56} flex="1 0 auto" justify="space-between">
+            <Stack py="md" w={64} flex="1 0 auto" justify="space-between">
               <Box ta="center">
                 <Text className="nowrap" fz="sm" lh={1}>
                   {data.airdrop.symbol}
@@ -113,8 +113,8 @@ function ActivityItem({ data }: { data: TPublicActivity }) {
                 </Text>
               </Box>
 
-              <Group justify="space-between">
-                <Group gap={24}>
+              <Group justify="space-between" wrap="nowrap">
+                <Group gap={24} wrap="nowrap">
                   <Box ta="center">
                     <Text fz="xs">{toUpper(data.socialMedia)}</Text>
                     <Text fz="xs" c="dimmed">
@@ -129,7 +129,7 @@ function ActivityItem({ data }: { data: TPublicActivity }) {
                   </Box>
                 </Group>
 
-                <Button size="sm" variant={data.joined ? 'outline' : 'filled'} px="md">
+                <Button variant={data.joined ? 'outline' : 'filled'} size="sm" px="md">
                   {data.joined ? 'Joined' : 'Join'}
                 </Button>
               </Group>
