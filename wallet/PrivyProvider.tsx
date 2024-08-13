@@ -10,19 +10,9 @@ export default function MyPrivyProvider({ children }: React.PropsWithChildren) {
     <PrivyProvider
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID}
       config={{
-        loginMethodsAndOrder: {
-          primary: ['google', 'twitter', 'instagram'],
-          overflow: [
-            'email',
-            'metamask',
-            'rabby_wallet',
-            'wallet_connect',
-            'coinbase_wallet',
-            'okx_wallet',
-          ],
-        },
         defaultChain,
         supportedChains,
+        loginMethods: ['email', 'wallet', 'google', 'twitter', 'instagram'],
         embeddedWallets: {
           createOnLogin: 'all-users',
         },

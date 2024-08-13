@@ -8,6 +8,7 @@ import { useGoBack } from '@/hooks/useGoBack'
 import { Group, Box, ActionIcon, Avatar } from '@mantine/core'
 import Logo from '@/public/logo.svg'
 import { PiCaretLeft } from 'react-icons/pi'
+import classes from './index.module.css'
 
 export default function Header() {
   usePromo() // Save promo code
@@ -33,7 +34,9 @@ export default function Header() {
 
   return (
     <>
-      <Group h="100%" px={16} justify="space-between">
+      <Box className={classes['header-bg']} />
+
+      <Group h="100%" px={16} justify="space-between" pos="relative">
         <Group gap="md">
           {showBack ? (
             <ActionIcon
