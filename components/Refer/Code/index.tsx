@@ -12,7 +12,7 @@ import { Space, Stack, Modal, Avatar, Group, Box } from '@mantine/core'
 import { Text, Title, Button, TextInput } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { getRefererByCode } from '@/services/referral'
-import { cleanCode } from '@/utils/helper'
+import { cleanCode, getShortName } from '@/utils/helper'
 import { PiBarcode } from 'react-icons/pi'
 
 export default function ReferCode() {
@@ -59,8 +59,8 @@ export default function ReferCode() {
   }
 
   const handleConfirm = async () => {
-    if (value) {
-      await createReferral(value)
+    if (userState.value?.username) {
+      await createReferral(userState.value.username)
     }
     close()
   }
@@ -80,25 +80,25 @@ export default function ReferCode() {
     <>
       <RwdLayout>
         <Stack gap="xl">
-          {isReferred ? (
+          {isReferred && referer ? (
             <>
               <Title order={3}>Your Referer</Title>
 
               <Stack align="center">
-                <Avatar size="lg" src={referer!.details.avatar}>
-                  {referer!.name?.substring(0, 1).toUpperCase()}
+                <Avatar size="lg" src={referer.details.avatar}>
+                  {getShortName(referer.name, referer.username)}
                 </Avatar>
                 <Box ta="center">
                   <Title order={4} fw={500}>
-                    {referer!.name || 'No name'}
+                    {referer.name || 'No name'}
                   </Title>
                   <Text fz="xs" c="dimmed">
-                    {referer!.username ? `@${referer!.username}` : 'Error'}
+                    {referer.username ? `@${referer!.username}` : 'Error'}
                   </Text>
                 </Box>
               </Stack>
 
-              <Button onClick={handleBack}>Back</Button>
+              <Button onClick={handleBack}>Done</Button>
             </>
           ) : (
             <>
@@ -137,7 +137,7 @@ export default function ReferCode() {
         <Stack gap="xl">
           <Stack align="center">
             <Avatar size="lg" src={userState.value?.details.avatar}>
-              {userState.value?.name?.substring(0, 1).toUpperCase()}
+              {getShortName(userState.value?.name, userState.value?.username)}
             </Avatar>
             <Box ta="center">
               <Title order={4} fw={500}>

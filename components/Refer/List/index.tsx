@@ -6,7 +6,7 @@ import RwdLayout from '@/components/share/RwdLayout'
 import { useReferral, TabValue } from '@/store/contexts/app/referralContext'
 import { isEnumMember } from '@/utils/helper'
 import { formatNumber } from '@/utils/math'
-import { formatLocalDate } from '@/utils/helper'
+import { formatLocalDate, getShortName } from '@/utils/helper'
 import type { TReferee } from '@/models/referral'
 
 export default function ReferList() {
@@ -109,19 +109,12 @@ export default function ReferList() {
 function RefereeItem({ data }: { data: TReferee }) {
   const { referee, score } = data
   const { username, name, details } = referee
-  const shortName =
-    name
-      ?.split(' ')
-      .map(n => n[0])
-      .join('')
-      .substring(0, 2)
-      .toUpperCase() || username?.substring(0, 1).toUpperCase()
 
   return (
     <Paper p={16} shadow="xs" h={80}>
       <Group justify="space-between" wrap="nowrap" h="100%">
         <Group wrap="nowrap">
-          <Avatar src={details.avatar}>{shortName}</Avatar>
+          <Avatar src={details.avatar}>{getShortName(name, username)}</Avatar>
           <Box>
             <Text fw={500} lineClamp={1}>
               {name || 'Anonymity'}

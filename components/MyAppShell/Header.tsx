@@ -8,6 +8,7 @@ import { useGoBack } from '@/hooks/useGoBack'
 import { Group, Box, ActionIcon, Avatar } from '@mantine/core'
 import Logo from '@/public/logo.svg'
 import { PiCaretLeft } from 'react-icons/pi'
+import { getShortName } from '@/utils/helper'
 import classes from './index.module.css'
 
 export default function Header() {
@@ -20,12 +21,6 @@ export default function Header() {
 
   // for user avatar
   const { name, username, details } = data
-  const shortName =
-    name
-      ?.split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase() || username?.substring(0, 1).toUpperCase()
 
   // for back button
   const hasPreviousPage =
@@ -57,7 +52,7 @@ export default function Header() {
         <Group>
           {bothAuth ? (
             <Link href="/profile">
-              <Avatar src={details?.avatar}>{shortName}</Avatar>
+              <Avatar src={details?.avatar}>{getShortName(name, username)}</Avatar>
             </Link>
           ) : null}
         </Group>
