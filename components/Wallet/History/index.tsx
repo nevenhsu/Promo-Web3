@@ -12,7 +12,7 @@ import { formatLocalDate, isEnumMember } from '@/utils/helper'
 import type { TTransaction } from '@/models/transaction'
 
 export default function History() {
-  const { total, current, activeTab, setActiveTab, handlePageChange, data, loading, limit, error } =
+  const { total, current, activeTab, setActiveTab, handlePageChange, data, loading } =
     useTransaction()
 
   const renderTransaction = () => {
@@ -23,7 +23,7 @@ export default function History() {
     if (!data.length) {
       return (
         <Center h={64}>
-          <Text c="dimmed">No {activeTab} found</Text>
+          <Text c="dimmed">No tx found</Text>
         </Center>
       )
     }
@@ -59,7 +59,12 @@ export default function History() {
         <Space h="md" />
 
         <Center>
-          <Pagination total={total} value={current} onChange={handlePageChange} />
+          <Pagination
+            total={total}
+            value={current}
+            onChange={handlePageChange}
+            disabled={loading}
+          />
         </Center>
       </RwdLayout>
 

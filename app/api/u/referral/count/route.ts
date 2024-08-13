@@ -1,11 +1,10 @@
-import * as _ from 'lodash-es'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
-import { getReferrer } from '@/lib/db/referral'
-import { filterUserData } from '@/lib/db/user'
+import { getReferralCount } from '@/lib/db/referral'
+import { ReferralLevel } from '@/types/db'
 
-// Get the referrer of the current user
+// Get the referral count of the current user
 export async function GET(req: NextRequest) {
   try {
     const token = await getToken({ req })
@@ -13,14 +12,10 @@ export async function GET(req: NextRequest) {
 
     await dbConnect()
 
-    const doc = await getReferrer(userId)
+    const lv1 = await getReferralCount(userId, ReferralLevel.First)
+    const lv2 = await getReferralCount(userId, ReferralLevel.Second)
 
-    if (!doc?._referrer) {
-      // No referrer
-      return NextResponse.json({})
-    }
-
-    return NextResponse.json({ referrer: filterUserData(doc._referrer) })
+    return NextResponse.json({ lv1, lv2 })
   } catch (error) {
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

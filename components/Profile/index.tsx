@@ -28,7 +28,7 @@ export default function Profile() {
             {/* Hide from users */}
             {isAdmin ? (
               <Link href="/admin">
-                <Button size="xs" variant="outline" color="black">
+                <Button size="xs" variant="outline" color="dark">
                   Go Admin
                 </Button>
               </Link>

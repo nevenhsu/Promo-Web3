@@ -189,7 +189,7 @@ export default function ProfileAccount() {
         </Stack>
         <Space h="xl" />
         <Group justify="right">
-          <Button onClick={close} variant="outline" color="black">
+          <Button onClick={close} variant="outline" color="dark">
             Cancel
           </Button>
           <Button

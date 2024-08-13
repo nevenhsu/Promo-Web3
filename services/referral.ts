@@ -8,14 +8,8 @@ export const getRefererByCode = async (code: string) => {
 }
 
 export const getReferrer = async (): Promise<PublicUser | undefined> => {
-  try {
-    const { data } = await axios.get<{ referrer: PublicUser }>('/api/u/referral')
-    const { referrer } = data
-    return referrer
-  } catch (err) {
-    console.error(err)
-    return undefined
-  }
+  const { data } = await axios.get<{ referrer?: PublicUser }>('/api/u/referral')
+  return data.referrer
 }
 
 export const createReferral = async (username: string) => {
@@ -26,23 +20,24 @@ export const createReferral = async (username: string) => {
   return referrer
 }
 
-export const getReferralByLevel = async (
-  level: ReferralLevel,
-  limit: number = 10,
-  skip: number = 0,
-  sort: 'desc' | 'asc' = 'desc'
-) => {
-  try {
-    const res = await axios.post<{ referrals: TReferee[] }>('/api/u/referral/list', {
-      level,
-      limit,
-      skip,
-      sort,
-    })
-    const { referrals } = res.data
-    return referrals
-  } catch (err) {
-    console.error(err)
-    return []
-  }
+export const getReferralByLevel = async (values: {
+  level: ReferralLevel
+  page: number
+  limit: number
+}) => {
+  const { page, limit, level } = values
+
+  const url = new URL('/api/u/referral/list', window.location.origin)
+  url.searchParams.append('page', page.toString())
+  url.searchParams.append('limit', limit.toString())
+  url.searchParams.append('level', level.toString())
+
+  const { data } = await axios.get<{ referrals: TReferee[]; limit: number }>(url.toString())
+
+  return data
+}
+
+export const getReferralCount = async () => {
+  const { data } = await axios.get<{ lv1: number; lv2: number }>('/api/u/referral/count')
+  return data
 }

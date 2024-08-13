@@ -88,7 +88,7 @@ export default function ProfileInfo() {
               <ThemeIcon
                 size="sm"
                 variant="light"
-                color="black"
+                color="dark"
                 style={{
                   position: 'absolute',
                   bottom: -4,
@@ -132,7 +132,7 @@ export default function ProfileInfo() {
 
               <Group justify="right">
                 <Link href="/profile">
-                  <Button variant="outline" color="black">
+                  <Button variant="outline" color="dark">
                     Back
                   </Button>
                 </Link>

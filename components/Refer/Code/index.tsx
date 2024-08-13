@@ -19,7 +19,7 @@ export default function ReferCode() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { data } = useAppSelector(state => state.user)
-  const { referer, isReferred, createState, createReferral } = useReferral()
+  const { referer, isReferred, createReferralState, createReferral } = useReferral()
 
   // Get promo code
   const promo = usePromo()
@@ -110,7 +110,7 @@ export default function ReferCode() {
                 error={
                   userState.error?.response?.data.error ||
                   userState.error?.message ||
-                  createState.error?.response?.data.error
+                  createReferralState.error?.response?.data.error
                 }
                 onChange={event => {
                   setValue(cleanCode(event.currentTarget.value.toUpperCase()))
@@ -150,10 +150,14 @@ export default function ReferCode() {
           </Stack>
 
           <Group justify="right">
-            <Button variant="outline" color="black" onClick={close}>
+            <Button variant="outline" color="dark" onClick={close}>
               Cancel
             </Button>
-            <Button onClick={handleConfirm} disabled={isReferred} loading={createState.loading}>
+            <Button
+              onClick={handleConfirm}
+              disabled={isReferred}
+              loading={createReferralState.loading}
+            >
               Confirm
             </Button>
           </Group>

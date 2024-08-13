@@ -78,7 +78,7 @@ export default function Refer() {
             </CopyButton>
 
             <Link href="/refer/list">
-              <Button size="md" variant="outline" w="100%">
+              <Button size="md" variant="outline" w="100%" color="dark">
                 View my friends
               </Button>
             </Link>

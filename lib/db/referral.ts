@@ -79,22 +79,28 @@ export async function updateReferralScore(
   return referral
 }
 
-export async function getReferralByLevel(
-  _referrer: string,
-  level: number,
-  skip: number = 0,
-  sort: 'desc' | 'asc' = 'desc',
-  limit: number = 10
-) {
-  const createdAt = sort === 'desc' ? -1 : 1
-  const n = _.min([limit, 100]) || 1
+export type GetOptions = {
+  page?: number
+  limit?: number
+}
 
-  const referral = await ReferralModel.find({ _referrer, level })
-    .sort({ createdAt })
-    .skip(skip)
-    .limit(n)
+export async function getReferralByLevel(_referrer: string, level: number, options?: GetOptions) {
+  const { page = 1 } = options || {}
+
+  // Limit the number of transactions to 100
+  const limit = _.min([options?.limit || 10, 100]) || 1
+
+  const docs = await ReferralModel.find({ _referrer, level })
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit)
     .lean()
     .populate<{ _referee: TUser }>('_referee')
 
-  return referral
+  return { docs, limit }
+}
+
+export async function getReferralCount(_referrer: string, level: number) {
+  const count = await ReferralModel.countDocuments({ _referrer, level })
+  return count
 }

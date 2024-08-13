@@ -23,4 +23,6 @@ export const schema = new Schema({
 export type UserStatus = InferSchemaType<typeof schema>
 
 const name = 'UserStatus'
-export default (models[name] as Model<UserStatus>) || model(name, schema)
+const UserStatusModel = (models[name] as Model<UserStatus>) || model(name, schema)
+
+export default UserStatusModel

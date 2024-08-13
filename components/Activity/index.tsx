@@ -12,8 +12,7 @@ import { toUpper, isEnumMember } from '@/utils/helper'
 import type { TPublicActivity } from '@/models/activity'
 
 export default function Activity() {
-  const { total, current, activeTab, setActiveTab, handlePageChange, data, loading, limit, error } =
-    useActivity()
+  const { total, current, activeTab, data, loading, setActiveTab, handlePageChange } = useActivity()
 
   const renderActivity = () => {
     if (loading) {
@@ -65,7 +64,12 @@ export default function Activity() {
         <Space h="md" />
 
         <Center>
-          <Pagination total={total} value={current} onChange={handlePageChange} />
+          <Pagination
+            total={total}
+            value={current}
+            onChange={handlePageChange}
+            disabled={loading}
+          />
         </Center>
       </RwdLayout>
 

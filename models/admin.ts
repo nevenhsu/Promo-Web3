@@ -26,4 +26,6 @@ export type Admin = InferSchemaType<typeof schema>
 export type TAdmin = Omit<Admin, '_user'> & { _user: TUser } // with populated _user
 
 const name = 'Admin'
-export default (models[name] as Model<Admin>) || model(name, schema)
+const AdminModel = (models[name] as Model<Admin>) || model(name, schema)
+
+export default AdminModel

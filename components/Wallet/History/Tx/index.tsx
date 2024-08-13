@@ -162,7 +162,7 @@ function TxLink({ val, onClick }: { val: string; onClick?: () => void }) {
         <Text fz="xs" style={{ wordBreak: 'break-word' }}>
           {val}
         </Text>
-        <ActionIcon color="black" onClick={onClick}>
+        <ActionIcon color="dark" onClick={onClick}>
           <PiLink size={16} />
         </ActionIcon>
       </Group>

@@ -17,7 +17,7 @@ enum TabValue {
 }
 
 export default function Record() {
-  const { current, total, limit, data, loading, error, handlePageChange } = useActivityStatus()
+  const { current, total, data, loading, handlePageChange } = useActivityStatus()
   const [activeTab, setActiveTab] = useState(TabValue.Score)
 
   const renderItem = () => {
@@ -74,7 +74,12 @@ export default function Record() {
         <Space h="md" />
 
         <Center>
-          <Pagination total={total} value={current} onChange={handlePageChange} />
+          <Pagination
+            total={total}
+            value={current}
+            onChange={handlePageChange}
+            disabled={loading}
+          />
         </Center>
       </RwdLayout>
 

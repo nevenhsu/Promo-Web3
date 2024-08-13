@@ -17,10 +17,18 @@ export default function Header() {
   const { bothAuth } = useLoginStatus()
   const { data } = useAppSelector(state => state.user)
 
-  const { name, details } = data
-  const avatar = details?.avatar || ''
+  // for user avatar
+  const { name, username, details } = data
+  const shortName =
+    name
+      ?.split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase() || username?.substring(0, 1).toUpperCase()
 
-  const hasPreviousPage = pathname.split('/').length > 2
+  // for back button
+  const hasPreviousPage =
+    pathname.split('/').length > 2 || ['/refer', '/profile'].includes(pathname)
   const showBack = canGoBack && hasPreviousPage
 
   return (
@@ -46,7 +54,7 @@ export default function Header() {
         <Group>
           {bothAuth ? (
             <Link href="/profile">
-              <Avatar src={avatar}>{name ? name.substring(0, 1).toUpperCase() : ''}</Avatar>
+              <Avatar src={details?.avatar}>{shortName}</Avatar>
             </Link>
           ) : null}
         </Group>

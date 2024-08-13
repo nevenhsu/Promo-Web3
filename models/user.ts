@@ -86,6 +86,7 @@ schema.pre<User>('updateMany', handleUpdate)
 
 const name = 'User'
 const UserModel = (models[name] as Model<User>) || model(name, schema)
+
 export default UserModel
 
 // Middleware to ensure unique username

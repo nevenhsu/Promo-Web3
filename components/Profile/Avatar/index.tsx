@@ -84,7 +84,7 @@ export default function Avatar() {
                   size="lg"
                   radius="xl"
                   variant="light"
-                  color="black"
+                  color="dark"
                   style={{
                     position: 'absolute',
                     bottom: 10,

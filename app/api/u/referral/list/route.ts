@@ -7,26 +7,30 @@ import { filterUserData } from '@/lib/db/user'
 import { ReferralLevel } from '@/types/db'
 
 // Get the referrals of the current user
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const token = await getToken({ req })
-    const userId = token?.user?.id!
+    // Parse query string parameters
+    const { searchParams } = new URL(req.url)
+    const page = Number(searchParams.get('page')) || 1
+    const limit = Number(searchParams.get('limit')) || 10
+    const level = Number(searchParams.get('level'))
+
+    const jwt = await getToken({ req })
+    const userId = jwt?.user?.id!
 
     await dbConnect()
-
-    const data = await req.json()
-    const { level, limit, skip, sort } = data
 
     if (!_.includes(ReferralLevel, level)) {
       return NextResponse.json({ error: 'Invalid referral level' }, { status: 400 })
     }
 
-    const referrals = await getReferralByLevel(userId, level, skip, sort, limit)
+    const data = await getReferralByLevel(userId, level, { page, limit })
 
     return NextResponse.json({
-      referrals: referrals.map(o => {
+      referrals: data.docs.map(o => {
         return { ...o, referee: filterUserData(o._referee) }
       }),
+      limit: data.limit,
     })
   } catch (error) {
     console.error(error)

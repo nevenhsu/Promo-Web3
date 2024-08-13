@@ -29,6 +29,7 @@ schema.index({ _referrer: 1, _referee: 1 }, { unique: true }) // unique index fo
 
 export type Referral = InferSchemaType<typeof schema>
 export type TReferral = {
+  _id: string
   _referrer: string
   _referee: string
   level: number
@@ -39,4 +40,5 @@ export type TReferee = Omit<TReferral, '_referee'> & { referee: PublicUser }
 
 const name = 'Referral'
 const ReferralModel = (models[name] as Model<Referral>) || model(name, schema)
+
 export default ReferralModel

@@ -27,4 +27,5 @@ schema.pre<Epoch>('save', async function (next) {
 
 const name = 'Epoch'
 const EpochModel = (models[name] as Model<Epoch>) || model(name, schema)
+
 export default EpochModel
