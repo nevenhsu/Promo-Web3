@@ -355,7 +355,9 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                   disabled={!linked || confirmed}
                   loading={statusDataLoading}
                 >
-                  {confirmed ? 'Completed' : `Confirm ${getActionLabel(data.activityType)}`}
+                  {confirmed
+                    ? 'Completed'
+                    : `Confirm ${getActionLabel(data.activityType).toLowerCase()}`}
                 </Button>
               </>
             ) : (

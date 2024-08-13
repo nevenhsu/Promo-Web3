@@ -120,13 +120,17 @@ function ActivityItem({ data }: { data: TPublicActivity }) {
               <Group justify="space-between" wrap="nowrap">
                 <Group gap={24} wrap="nowrap">
                   <Box ta="center">
-                    <Text fz="xs">{toUpper(data.socialMedia)}</Text>
+                    <Text className="nowrap" fz="xs">
+                      {toUpper(data.socialMedia)}
+                    </Text>
                     <Text fz="xs" c="dimmed">
                       Platform
                     </Text>
                   </Box>
                   <Box ta="center">
-                    <Text fz="xs">{getActionLabel(data.activityType)}</Text>
+                    <Text className="nowrap" fz="xs">
+                      {getActionLabel(data.activityType)}
+                    </Text>
                     <Text fz="xs" c="dimmed">
                       Action
                     </Text>

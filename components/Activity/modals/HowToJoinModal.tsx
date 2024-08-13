@@ -50,7 +50,7 @@ export function HowToJoinModal({ opened, onClose, activeStep }: HowToJoinModalPr
         <Timeline.Item
           lineVariant={activeStep > 3 ? 'solid' : 'dashed'}
           bullet={<PiCursorClickBold size={14} />}
-          title="Click confirmation button"
+          title="Click confirm button"
         >
           <Text c="dimmed" size="sm">
             Click the button to confirm your participation
