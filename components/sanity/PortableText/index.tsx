@@ -6,20 +6,8 @@ import FullDivider from '@/components/sanity/FullDivider'
 import Highlight from '@/components/sanity/Highlight'
 import Dimmed from '@/components/sanity/Dimmed'
 import Transparent from '@/components/sanity/Transparent'
-import {
-  RwdBlock,
-  Content,
-  MTable,
-  NumberList,
-  TitleCard,
-  ContentCard,
-  TextCard,
-  MySpace,
-  MyLink,
-  Member,
-  LottieImage,
-  Iframe,
-} from '@/components/common'
+import { Content, MTable, NumberList, TitleCard, ContentCard, TextCard } from '@/components/common'
+import { RwdBlock, MySpace, MyLink, Member, LottieImage, Iframe } from '@/components/common'
 import UnderlineMotion from '@/components/motion/Underline'
 import type { PortableTextBlock } from 'sanity'
 import classes from './index.module.css'

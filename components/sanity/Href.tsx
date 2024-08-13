@@ -1,4 +1,4 @@
-import { MyLink } from '@/components/MyLink'
+import { MyLink } from '@/components/sanity/MyLink'
 import UnderlineMotion from '@/components/motion/Underline'
 import type { HrefData } from '@/sanity/types/href'
 

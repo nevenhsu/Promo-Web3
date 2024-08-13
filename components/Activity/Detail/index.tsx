@@ -15,15 +15,18 @@ import { fetchUserActivityStatus, resetUserActivityStatus } from '@/store/slices
 import { getPublicActivityDetails } from '@/services/activity'
 import { notifications } from '@mantine/notifications'
 import { useDisclosure } from '@mantine/hooks'
-import { Group, Stack, Box, Space, Divider, Paper, Skeleton, Modal } from '@mantine/core'
-import { Title, Text, Button, ThemeIcon, ActionIcon, CopyButton, Progress } from '@mantine/core'
+import { Group, Stack, Box, Space, Divider, Paper } from '@mantine/core'
+import { Title, Text, Button, ThemeIcon, ActionIcon } from '@mantine/core'
+import { Skeleton, Progress, Center } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import LinkModal from '@/components/share/LinkModal'
 import LinkButton from '@/components/share/LinkButton'
+import { ReferralLinkModal } from '../modals/ReferralLinkModal'
+import { HowToJoinModal } from '../modals/HowToJoinModal'
 import { formatDate } from '@/utils/date'
 import { formatNumber } from '@/utils/math'
 import { getActionLabel, getErrorText } from '../variables'
-import { LinkAccountPlatform, ActivityStatus } from '@/types/db'
+import { ActivityStatus } from '@/types/db'
 import { toUpper } from '@/utils/helper'
 import { allTokens } from '@/contracts/tokens'
 import { PiLightning, PiPersonSimpleRun, PiTrophy, PiCheckBold } from 'react-icons/pi'
@@ -46,8 +49,9 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   const { isMobileDevice } = useAppContext().state
   const [opened, { open, close }] = useDisclosure(false)
 
-  // for share modal
+  // for modal
   const [shareOpened, shareActions] = useDisclosure(false)
+  const [joinOpened, joinActions] = useDisclosure(false)
 
   // Platform linked account from Privy
   const { user, linkTwitter } = usePrivy()
@@ -59,10 +63,11 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
   // Platform linked account from database
   const { linkedAccounts } = userData
-  const linkedX = useMemo(() => {
-    if (!linkedAccounts) return
-    return linkedAccounts.find(({ platform }) => platform === LinkAccountPlatform.X)
-  }, [linkedAccounts])
+  const { linked, linkedAccount } = useMemo(() => {
+    const linkedAccount = linkedAccounts?.find(({ platform }) => platform === socialMedia)
+    const linked = Boolean(linkedAccount)
+    return { linked, linkedAccount }
+  }, [linkedAccounts, socialMedia])
 
   // for use activity status
   const { userActivityStatus } = useAppSelector(state => state)
@@ -101,10 +106,6 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
       }
     },
   })
-
-  const getPromoLink = (code: string) => {
-    return `${window.location.origin}/activity/${slug}?promo=${code}`
-  }
 
   const handleConfirm = () => {
     // If the activity is completed or initial, do nothing
@@ -188,6 +189,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                 variant="outline"
                 size="md"
                 radius="md"
+                bg="white"
                 loading={!code}
                 onClick={shareActions.open}
               >
@@ -350,7 +352,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
                 <Button
                   onClick={handleConfirm}
-                  disabled={!linkedX || confirmed}
+                  disabled={!linked || confirmed}
                   loading={statusDataLoading}
                 >
                   {confirmed ? 'Completed' : `Confirm ${getActionLabel(data.activityType)}`}
@@ -361,6 +363,12 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                 Join now
               </Button>
             )}
+
+            <Center>
+              <Button color="dark" size="sm" variant="transparent" onClick={joinActions.open}>
+                How to join?
+              </Button>
+            </Center>
           </Stack>
 
           {/* Embedded Post */}
@@ -370,33 +378,15 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
       <LinkModal platform={socialMedia} opened={opened} onClose={close} />
 
-      <Modal
-        opened={shareOpened}
-        onClose={shareActions.close}
-        title="Activity referral link"
-        centered
-      >
-        <Stack gap="lg">
-          <Text fz="sm" c="dimmed">
-            Share this activity to your friends and earn more score
-          </Text>
+      {/* Referral link */}
+      <ReferralLinkModal slug={slug} opened={shareOpened} onClose={shareActions.close} />
 
-          {/* Link */}
-          <Paper p="xs" ta="center" c="orange" bd="1px dashed red" mb="sm">
-            <Text fz="sm" fw={500}>
-              {code ? getPromoLink(code) : 'Loading...'}
-            </Text>
-          </Paper>
-
-          <CopyButton value={code ? getPromoLink(code) : ''}>
-            {({ copied, copy }) => (
-              <Button size="md" onClick={copy} loading={!code}>
-                {copied ? 'Copied' : 'Copy my invite link'}
-              </Button>
-            )}
-          </CopyButton>
-        </Stack>
-      </Modal>
+      {/* How to join */}
+      <HowToJoinModal
+        opened={joinOpened}
+        onClose={joinActions.close}
+        activeStep={getActiveStep(linked, statusData?.status)}
+      />
 
       <Space h={100} />
     </>
@@ -435,5 +425,20 @@ function getStatusContent(userStatus?: TUserActivityStatus) {
       const color = 'dark'
       return { title, message, icon, color }
     }
+  }
+}
+
+function getActiveStep(linked: boolean, status?: ActivityStatus) {
+  if (!linked) return -1
+
+  switch (status) {
+    case ActivityStatus.Error:
+      return 2
+    case ActivityStatus.Initial:
+      return 3
+    case ActivityStatus.Completed:
+      return 4
+    default:
+      return 1
   }
 }

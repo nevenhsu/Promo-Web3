@@ -1,6 +1,5 @@
 import * as _ from 'lodash-es'
 import { defineType } from 'sanity'
-// import type { PortableTextBlock } from 'sanity'
 
 export default defineType({
   title: 'Content',
