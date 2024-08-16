@@ -29,11 +29,12 @@ export enum ActivityType {
 export enum LinkAccountPlatform {
   Google = 'google',
   X = 'x',
+  Instagram = 'instagram',
 }
 
 export enum SocialMedia {
-  Instagram = 'instagram',
   X = 'x',
+  Instagram = 'instagram',
 }
 
 export enum ReferralLevel {

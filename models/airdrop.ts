@@ -8,9 +8,9 @@ const schema = new Schema({
     required: true,
     index: true,
   },
-  symbol: { type: String, required: true },
-  receivedAmount: { type: String, default: '0' }, // Base unit, not wei, ex: 10 USDC
-  pendingAmount: { type: String, default: '0' }, // Base unit, not wei, ex: 10 USDC
+  symbol: { type: String, required: true, index: true },
+  receivedAmount: { type: Number, default: 0 }, // Base unit, not wei, ex: 10 USDC
+  pendingAmount: { type: Number, default: 0, index: true }, // Base unit, not wei, ex: 10 USDC
 })
 
 schema.index({ _user: 1, symbol: 1 }, { unique: true }) // unique index for user and symbol
