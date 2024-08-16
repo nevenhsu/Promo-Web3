@@ -14,7 +14,7 @@ export function useSyncAccounts() {
   const { data, fetched } = useAppSelector(state => state.user)
   const { bothAuth } = useLoginStatus()
   const { user } = usePrivy()
-  const { google, twitter, email } = user || {}
+  const { google, twitter, email, instagram } = user || {}
 
   const ready = fetched && bothAuth && user
 
@@ -25,6 +25,10 @@ export function useSyncAccounts() {
   )
   const linkedX = useMemo(
     () => linkedAccounts.find(account => account.platform === LinkAccountPlatform.X),
+    [linkedAccounts]
+  )
+  const linkedInstagram = useMemo(
+    () => linkedAccounts.find(account => account.platform === LinkAccountPlatform.Instagram),
     [linkedAccounts]
   )
 
@@ -55,15 +59,14 @@ export function useSyncAccounts() {
     const notLinked = twitter && !linkedX
     const outDated = twitter && linkedX && twitter.subject !== linkedX.userId
     const outDatedName =
-      twitter && linkedX && twitter.username && `@${twitter.username}` !== linkedX.username
+      twitter && linkedX && twitter.username && twitter.username !== linkedX.username
 
     if (notLinked || outDated || outDatedName) {
-      const username = twitter.username ? `@${twitter.username}` : twitter.name || ''
       dispatch(
         updateLinkAccount({
           userId: twitter.subject,
           platform: LinkAccountPlatform.X,
-          username,
+          username: twitter.username || '',
         })
       )
     } else if (!twitter && linkedX) {
@@ -86,6 +89,28 @@ export function useSyncAccounts() {
       )
     }
   }, [ready, linkedEmail, email])
+
+  // auto update instagram account
+  useEffect(() => {
+    if (!ready) return
+
+    const notLinked = instagram && !linkedInstagram
+    const outDated = instagram && linkedInstagram && instagram.subject !== linkedInstagram.userId
+    const outDatedName =
+      instagram && linkedInstagram && instagram.username !== linkedInstagram.username
+
+    if (notLinked || outDated || outDatedName) {
+      dispatch(
+        updateLinkAccount({
+          userId: instagram.subject,
+          platform: LinkAccountPlatform.Instagram,
+          username: instagram.username || '',
+        })
+      )
+    } else if (!instagram && linkedInstagram) {
+      dispatch(deleteLinkAccount(LinkAccountPlatform.Instagram))
+    }
+  }, [ready, linkedInstagram, instagram])
 
   return null
 }

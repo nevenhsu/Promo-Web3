@@ -6,21 +6,29 @@ import { usePrivy } from '@privy-io/react-auth'
 import { useAppSelector } from '@/hooks/redux'
 import { useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
-import { Stack, Paper, Space, Group, Modal } from '@mantine/core'
+import { Stack, Paper, Space, Group, Modal, Box } from '@mantine/core'
 import { Title, Text, Button, ActionIcon, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { PiLinkBreak, PiLink } from 'react-icons/pi'
+import {
+  PiLinkBreak,
+  PiLink,
+  PiEnvelope,
+  PiXLogo,
+  PiGoogleLogo,
+  PiInstagramLogo,
+} from 'react-icons/pi'
 
 enum AccountType {
   Email = 'Email',
   Google = 'Google',
   X = 'X',
+  Instagram = 'Instagram',
 }
 
 export default function ProfileAccount() {
-  const { user, linkEmail, linkGoogle, linkTwitter } = usePrivy()
-  const { unlinkEmail, unlinkGoogle, unlinkTwitter } = usePrivy()
-  const { email, google, twitter } = user || {}
+  const { user, linkEmail, linkGoogle, linkTwitter, linkInstagram } = usePrivy()
+  const { unlinkEmail, unlinkGoogle, unlinkTwitter, unlinkInstagram } = usePrivy()
+  const { email, google, twitter, instagram } = user || {}
 
   const { statusData } = useAppSelector(state => state.user)
   const locked = !statusData || statusData.progress.ongoing > 0 // prevent unlinking while ongoing
@@ -28,7 +36,8 @@ export default function ProfileAccount() {
   // for modal
   const [opened, { open, close }] = useDisclosure(false)
   const [type, setType] = useState<AccountType>()
-  const showLocked = locked && type === AccountType.X
+  // TODO: lock instagram account
+  const showLocked = locked && type && [AccountType.X].includes(type)
 
   const [unlinkState, unlink] = useAsyncFn(
     async (type: AccountType) => {
@@ -46,6 +55,11 @@ export default function ProfileAccount() {
         case AccountType.X: {
           if (!twitter || showLocked) return
           const result = await unlinkTwitter(twitter.subject)
+          return result
+        }
+        case AccountType.Instagram: {
+          if (!instagram) return
+          const result = await unlinkInstagram(instagram.subject)
           return result
         }
       }
@@ -92,6 +106,9 @@ export default function ProfileAccount() {
       case AccountType.X:
         linkTwitter()
         break
+      case AccountType.Instagram:
+        linkInstagram()
+        break
     }
   }
 
@@ -100,7 +117,7 @@ export default function ProfileAccount() {
       <Group gap={4} wrap="nowrap">
         {account ? (
           <>
-            <Text fz="sm" c="dimmed" ta="right">
+            <Text className="word-break-all" fz="sm" c="dimmed" ta="right">
               {account}
             </Text>
             <ActionIcon variant="transparent" color="red" onClick={() => handleOpenModal(type)}>
@@ -136,9 +153,12 @@ export default function ProfileAccount() {
 
           <Paper p="md" radius="sm" shadow="xs">
             <Group justify="space-between" wrap="nowrap">
-              <Title order={5} fw={500}>
-                Email
-              </Title>
+              <Group gap="sm" wrap="nowrap">
+                <PiEnvelope size={20} />
+                <Title order={5} fw={500}>
+                  Email
+                </Title>
+              </Group>
 
               {renderLink(AccountType.Email, email?.address)}
             </Group>
@@ -146,9 +166,12 @@ export default function ProfileAccount() {
 
           <Paper p="md" radius="sm" shadow="xs">
             <Group justify="space-between" wrap="nowrap">
-              <Title order={5} fw={500}>
-                Google
-              </Title>
+              <Group gap="sm" wrap="nowrap">
+                <PiGoogleLogo size={20} />
+                <Title order={5} fw={500}>
+                  Google
+                </Title>
+              </Group>
 
               {renderLink(AccountType.Google, getEmailAccount(google?.email))}
             </Group>
@@ -156,12 +179,15 @@ export default function ProfileAccount() {
 
           <Paper p="md" radius="sm" shadow="xs">
             <Group justify="space-between" wrap="nowrap">
-              <Title order={5} fw={500}>
-                X
-                <Text mx="xs" fz="xs" component="span" c="dimmed">
-                  Twitter
-                </Text>
-              </Title>
+              <Group gap="sm" wrap="nowrap">
+                <PiXLogo size={20} />
+                <Title order={5} fw={500}>
+                  X
+                  <Text mx="xs" fz="xs" component="span" c="dimmed">
+                    Twitter
+                  </Text>
+                </Title>
+              </Group>
 
               {renderLink(
                 AccountType.X,
@@ -169,11 +195,27 @@ export default function ProfileAccount() {
               )}
             </Group>
           </Paper>
+
+          <Paper p="md" radius="sm" shadow="xs">
+            <Group justify="space-between" wrap="nowrap">
+              <Group gap="sm" wrap="nowrap">
+                <PiInstagramLogo size={20} />
+                <Title order={5} fw={500}>
+                  Instagram
+                </Title>
+              </Group>
+
+              {renderLink(
+                AccountType.Instagram,
+                instagram?.username ? `@${instagram.username}` : undefined
+              )}
+            </Group>
+          </Paper>
         </Stack>
       </RwdLayout>
 
       <Modal opened={opened} onClose={close} title={`Unlink ${type}`} centered>
-        <Stack gap="xs" c="dimmed">
+        <Box c="dimmed">
           {showLocked ? (
             <>
               <Text fz="xs">
@@ -182,11 +224,11 @@ export default function ProfileAccount() {
             </>
           ) : (
             <>
-              <Text fz="xs">Are you sure you want to unlink your {type} account?</Text>
-              <Text fz="xs">You will not be able to sign in with this account anymore.</Text>
+              <Text fz="xs">You are about to unlink your {type} account.</Text>
+              <Text fz="xs">Are you sure you want to proceed?</Text>
             </>
           )}
-        </Stack>
+        </Box>
         <Space h="xl" />
         <Group justify="right">
           <Button onClick={close} variant="outline" color="dark">
