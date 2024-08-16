@@ -96,7 +96,7 @@ async function getAccountClient(wallet: ConnectedWallet, chainId: number | undef
     },
   })
 
-  const smartAccountAddress = kernelClient.account.address
+  const smartAccountAddress = account.address
   const kernelProvider = new KernelEIP1193Provider(kernelClient)
 
   return { kernelProvider, smartAccountAddress }

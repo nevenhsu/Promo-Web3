@@ -24,6 +24,7 @@ export const publicEnv = {
   timezone: process.env.NEXT_PUBLIC_TIME_ZONE,
   baseUrl: getBaseUrl(),
   defaultColorScheme: process.env.NEXT_PUBLIC_COLOR_SCHEME,
+  chainTestnet: toBool(process.env.NEXT_PUBLIC_CHAIN_TESTNET),
   sanity: {
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,

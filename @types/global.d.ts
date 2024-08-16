@@ -36,6 +36,7 @@ declare global {
       NEXT_PUBLIC_COLOR_SCHEME: 'dark' | 'light'
       NEXT_PUBLIC_PRIVY_APP_ID: string
       NEXT_PUBLIC_GOOGLE_ANALYTICS: string
+      NEXT_PUBLIC_CHAIN_TESTNET: 'true' | 'false'
 
       /// sanity
       NEXT_PUBLIC_SANITY_PROJECT_ID: string

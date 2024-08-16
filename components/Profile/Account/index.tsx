@@ -9,14 +9,9 @@ import { notifications } from '@mantine/notifications'
 import { Stack, Paper, Space, Group, Modal, Box } from '@mantine/core'
 import { Title, Text, Button, ActionIcon, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import {
-  PiLinkBreak,
-  PiLink,
-  PiEnvelope,
-  PiXLogo,
-  PiGoogleLogo,
-  PiInstagramLogo,
-} from 'react-icons/pi'
+import { PiLinkBreak, PiLink, PiEnvelope } from 'react-icons/pi'
+import { FcGoogle } from 'react-icons/fc'
+import { FaXTwitter, FaInstagram } from 'react-icons/fa6'
 
 enum AccountType {
   Email = 'Email',
@@ -112,10 +107,10 @@ export default function ProfileAccount() {
     }
   }
 
-  const renderLink = (type: AccountType, account?: string) => {
+  const renderLink = (type: AccountType, linked: boolean, account?: string) => {
     return (
       <Group gap={4} wrap="nowrap">
-        {account ? (
+        {linked ? (
           <>
             <Text className="word-break-all" fz="sm" c="dimmed" ta="right">
               {account}
@@ -160,27 +155,27 @@ export default function ProfileAccount() {
                 </Title>
               </Group>
 
-              {renderLink(AccountType.Email, email?.address)}
+              {renderLink(AccountType.Email, Boolean(email), email?.address)}
             </Group>
           </Paper>
 
           <Paper p="md" radius="sm" shadow="xs">
             <Group justify="space-between" wrap="nowrap">
               <Group gap="sm" wrap="nowrap">
-                <PiGoogleLogo size={20} />
+                <FcGoogle size={20} />
                 <Title order={5} fw={500}>
                   Google
                 </Title>
               </Group>
 
-              {renderLink(AccountType.Google, getEmailAccount(google?.email))}
+              {renderLink(AccountType.Google, Boolean(google), getEmailAccount(google?.email))}
             </Group>
           </Paper>
 
           <Paper p="md" radius="sm" shadow="xs">
             <Group justify="space-between" wrap="nowrap">
               <Group gap="sm" wrap="nowrap">
-                <PiXLogo size={20} />
+                <FaXTwitter size={20} />
                 <Title order={5} fw={500}>
                   X
                   <Text mx="xs" fz="xs" component="span" c="dimmed">
@@ -191,7 +186,8 @@ export default function ProfileAccount() {
 
               {renderLink(
                 AccountType.X,
-                twitter?.username ? `@${twitter.username}` : twitter?.name || twitter?.subject
+                Boolean(twitter),
+                twitter?.username ? `@${twitter.username}` : undefined
               )}
             </Group>
           </Paper>
@@ -199,7 +195,7 @@ export default function ProfileAccount() {
           <Paper p="md" radius="sm" shadow="xs">
             <Group justify="space-between" wrap="nowrap">
               <Group gap="sm" wrap="nowrap">
-                <PiInstagramLogo size={20} />
+                <FaInstagram size={20} />
                 <Title order={5} fw={500}>
                   Instagram
                 </Title>
@@ -207,6 +203,7 @@ export default function ProfileAccount() {
 
               {renderLink(
                 AccountType.Instagram,
+                Boolean(instagram),
                 instagram?.username ? `@${instagram.username}` : undefined
               )}
             </Group>
