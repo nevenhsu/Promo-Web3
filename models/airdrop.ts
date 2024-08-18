@@ -9,8 +9,20 @@ const schema = new Schema({
     index: true,
   },
   symbol: { type: String, required: true, index: true },
-  receivedAmount: { type: Number, default: 0 }, // Base unit, not wei, ex: 10 USDC
-  pendingAmount: { type: Number, default: 0, index: true }, // Base unit, not wei, ex: 10 USDC
+
+  receivedAmount: {
+    // Base unit, not wei, ex: 10 USDC
+    type: Schema.Types.Decimal128,
+    default: 0,
+    get: (v: Schema.Types.Decimal128) => v.toString(),
+  },
+  pendingAmount: {
+    // Base unit, not wei, ex: 10 USDC
+    type: Schema.Types.Decimal128,
+    default: 0,
+    get: (v: Schema.Types.Decimal128) => v.toString(),
+    index: true,
+  },
 })
 
 schema.index({ _user: 1, symbol: 1 }, { unique: true }) // unique index for user and symbol

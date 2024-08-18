@@ -8,7 +8,7 @@ import { logger } from './logger'
 const userPersistConfig = {
   key: 'user',
   storage,
-  version: 1,
+  version: 1.1,
   blacklist: ['fetched'],
 }
 
