@@ -9,17 +9,14 @@ const schema = new Schema({
     index: true,
   },
   symbol: { type: String, required: true, index: true },
-
   receivedAmount: {
     // Base unit, not wei, ex: 10 USDC
     type: Schema.Types.Decimal128,
-    default: 0,
     get: (v: Schema.Types.Decimal128) => v.toString(),
   },
   pendingAmount: {
     // Base unit, not wei, ex: 10 USDC
     type: Schema.Types.Decimal128,
-    default: 0,
     get: (v: Schema.Types.Decimal128) => v.toString(),
     index: true,
   },
