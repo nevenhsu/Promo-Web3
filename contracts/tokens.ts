@@ -1,7 +1,6 @@
 import * as _ from 'lodash-es'
 import { baseSepolia, arbitrum, arbitrumSepolia } from 'viem/chains'
-import ERC20 from '@/contracts/abi/ERC20.json'
-import Erc20Permit from '@/contracts/abi/Erc20Permit.json'
+import ERC20 from './abi/ERC20.json'
 import { unifyAddress } from '@/wallet/utils/helper'
 import type { Hash } from 'viem'
 
@@ -28,7 +27,7 @@ export const tokens: { [id: string]: Erc20[] } = {
       version: '2',
       isPermit: true,
       icon: '/icons/usdc-token.svg',
-      abi: Erc20Permit.abi,
+      abi: ERC20.abi,
     },
   ],
   [arbitrum.id]: [
@@ -41,7 +40,7 @@ export const tokens: { [id: string]: Erc20[] } = {
       version: '2',
       isPermit: true,
       icon: '/icons/usdc-token.svg',
-      abi: Erc20Permit.abi,
+      abi: ERC20.abi,
     },
   ],
   [arbitrumSepolia.id]: [
@@ -54,18 +53,18 @@ export const tokens: { [id: string]: Erc20[] } = {
       version: '2',
       isPermit: true,
       icon: '/icons/usdc-token.svg',
-      abi: Erc20Permit.abi,
+      abi: ERC20.abi,
     },
     {
       chainId: arbitrumSepolia.id,
       name: 'SharX',
       symbol: 'SHX',
       decimal: 18,
-      address: unifyAddress('0x52b1010586Bc3861d4B578774Be87AD5919Ef804'),
+      address: unifyAddress('0xfd39d0bC79F1bdf8E14604f5287F0f4216Db25BB'),
       version: '1',
       isPermit: true,
       icon: '/icons/sharx-token.svg',
-      abi: Erc20Permit.abi,
+      abi: ERC20.abi,
     },
   ],
 } as const

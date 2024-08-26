@@ -16,18 +16,20 @@ export default function Admin() {
             description="Manage admin accounts, settings"
             link="/admin/user"
           />
-          <CardAction
-            icon={<PiBalloon size={32} />}
-            title="Epoch Dashboard"
-            description="Manage epoch periods, settings"
-            link="/admin/epoch"
-          />
+
           <CardAction
             icon={<PiRocket size={32} />}
             title="Activity Dashboard"
             description="Manage activities"
             link="/admin/activity"
           />
+
+          {/* <CardAction
+            icon={<PiBalloon size={32} />}
+            title="Epoch Dashboard"
+            description="Manage epoch periods, settings"
+            link="/admin/epoch"
+          /> */}
         </Stack>
       </RwdLayout>
 
