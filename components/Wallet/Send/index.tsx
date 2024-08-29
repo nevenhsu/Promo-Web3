@@ -160,7 +160,7 @@ export default function Send() {
         </Stack>
       ),
       labels: { confirm: 'Confirm', cancel: 'Cancel' },
-      onConfirm: () => handleSubmit(values.to, rawAmount.toString()),
+      onConfirm: () => handleSubmit(values.to, rawAmount.toFixed(0)),
     })
   }
 
