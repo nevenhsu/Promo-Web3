@@ -37,14 +37,15 @@ export function useSyncAccounts() {
     if (!ready) return
 
     const notLinked = google && !linkedGoogle
-    const outDated = google && linkedGoogle && google.subject !== linkedGoogle.userId
+    const outDated = google && linkedGoogle && google.subject !== linkedGoogle.subject
 
     if (notLinked || outDated) {
       dispatch(
         updateLinkAccount({
-          userId: google.subject,
+          subject: google.subject,
           platform: LinkAccountPlatform.Google,
           username: google.name || '',
+          userId: '',
         })
       )
     } else if (!google && linkedGoogle) {
@@ -57,13 +58,14 @@ export function useSyncAccounts() {
     if (!ready) return
 
     const notLinked = twitter && !linkedX
-    const outDated = twitter && linkedX && twitter.subject !== linkedX.userId
+    const outDated = twitter && linkedX && twitter.subject !== linkedX.subject
     const outDatedName =
       twitter && linkedX && twitter.username && twitter.username !== linkedX.username
 
     if (notLinked || outDated || outDatedName) {
       dispatch(
         updateLinkAccount({
+          subject: twitter.subject,
           userId: twitter.subject,
           platform: LinkAccountPlatform.X,
           username: twitter.username || '',
@@ -95,16 +97,19 @@ export function useSyncAccounts() {
     if (!ready) return
 
     const notLinked = instagram && !linkedInstagram
-    const outDated = instagram && linkedInstagram && instagram.subject !== linkedInstagram.userId
+    const outDated = instagram && linkedInstagram && instagram.subject !== linkedInstagram.subject
     const outDatedName =
       instagram && linkedInstagram && instagram.username !== linkedInstagram.username
+
+    console.log('instagram', instagram)
 
     if (notLinked || outDated || outDatedName) {
       dispatch(
         updateLinkAccount({
-          userId: instagram.subject,
+          subject: instagram.subject,
           platform: LinkAccountPlatform.Instagram,
           username: instagram.username || '',
+          userId: '',
         })
       )
     } else if (!instagram && linkedInstagram) {

@@ -31,8 +31,8 @@ export default function ProfileAccount() {
   // for modal
   const [opened, { open, close }] = useDisclosure(false)
   const [type, setType] = useState<AccountType>()
-  // TODO: lock instagram account
-  const showLocked = locked && type && [AccountType.X].includes(type)
+  // lock social accounts while ongoing
+  const showLocked = locked && type && [AccountType.X, AccountType.Instagram].includes(type)
 
   const [unlinkState, unlink] = useAsyncFn(
     async (type: AccountType) => {

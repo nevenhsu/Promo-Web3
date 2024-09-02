@@ -29,9 +29,14 @@ export const updateUser = createAsyncThunk<TUser, Partial<TUser>>('user/update',
 export const updateLinkAccount = createAsyncThunk<TUser, LinkedAccount>(
   '/user/linkAccount',
   async data => {
-    const { userId, platform, username } = data
+    const { userId, subject, platform, username } = data
 
-    const user = await _updateLinkAccount(userId, platform, username || '')
+    const user = await _updateLinkAccount({
+      userId,
+      subject,
+      platform,
+      username,
+    })
     return user
   }
 )

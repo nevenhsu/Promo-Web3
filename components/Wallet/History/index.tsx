@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Decimal from 'decimal.js'
 import { Link } from '@/navigation'
 import { Tabs, Paper, Stack, Group, Space, Pagination } from '@mantine/core'
 import { Center, Text, ThemeIcon, Skeleton } from '@mantine/core'
@@ -108,7 +109,7 @@ function TxItem({ data }: { data: TTransaction }) {
           <Stack gap={4} ta="right">
             <Text fw={500} lh={1}>
               {isSender ? '-' : '+'}
-              {data.token?.amount || 'No data'}
+              {data.token?.amount ? new Decimal(data.token.amount).toFixed(6) : 'No data'}
             </Text>
             <Text fz="xs" c="dimmed" lh={1}>
               {formatLocalDate(data.createdAt, 'MMM dd yyyy h:mm:ss aa')}

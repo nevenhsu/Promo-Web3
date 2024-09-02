@@ -11,7 +11,7 @@ export async function PUT(req: NextRequest) {
     const _id = token?.user?.id!
 
     const data = await req.json()
-    const { platform, username, userId } = data
+    const { subject, platform, username, userId } = data
 
     await dbConnect()
 
@@ -20,7 +20,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid platform' }, { status: 400 })
     }
 
-    const user = await updateLinkAccount(_id, { userId, platform, username })
+    const user = await updateLinkAccount(_id, { subject, platform, userId, username })
 
     return NextResponse.json({ user })
   } catch (error) {

@@ -35,7 +35,7 @@ export default function Index() {
       }
 
       if (!wasAlreadyAuthenticated) {
-        setNextPage('/home')
+        setNextPage('/activity')
         return
       }
     },
@@ -43,7 +43,7 @@ export default function Index() {
 
   const handleClick = () => {
     if (privyAuth) {
-      setNextPage(callbackPath || '/home')
+      setNextPage(callbackPath || '/activity')
       return
     }
 

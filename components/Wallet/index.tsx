@@ -66,7 +66,7 @@ export default function Wallet() {
             <Stack gap={4}>
               <Text fz="xs">Balance</Text>
               <Title order={4} lh={1} className="nowrap">
-                USD {totalBalance.toDP(2).toString()}
+                USD {totalBalance.toFixed(2)}
               </Title>
             </Stack>
             <Stack gap={4} ta="right">
@@ -152,10 +152,10 @@ export default function Wallet() {
                     </Group>
                     <Stack gap={4} ta="right">
                       <Text fw={500} lh={1}>
-                        {bal.toDP(6).toString()}
+                        {bal.toFixed(6)}
                       </Text>
                       <Text fz="xs" c="dimmed" lh={1}>
-                        {p ? `USD ${p.toDP(2).toString()}` : 'No price yet'}
+                        {p ? `USD ${p.toFixed(2)}` : 'No price yet'}
                       </Text>
                     </Stack>
                   </Group>

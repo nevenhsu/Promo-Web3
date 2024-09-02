@@ -62,9 +62,9 @@ export async function removeLinkAccount(_id: string, platform: string) {
 }
 
 export async function updateLinkAccount(_id: string, data: LinkedAccount) {
-  const { userId, platform, username = '' } = data
+  const { subject, platform, userId, username } = data
 
-  if (!_id || !userId || !platform) {
+  if (!_id || !subject || !platform) {
     throw new Error('Missing required fields')
   }
 
@@ -73,9 +73,10 @@ export async function updateLinkAccount(_id: string, data: LinkedAccount) {
     { _id, 'linkedAccounts.platform': platform },
     {
       $set: {
-        'linkedAccounts.$.userId': userId,
-        'linkedAccounts.$.username': username,
+        'linkedAccounts.$.subject': subject,
         'linkedAccounts.$.platform': platform,
+        'linkedAccounts.$.username': username,
+        'linkedAccounts.$.userId': userId,
       },
     },
     { new: true }

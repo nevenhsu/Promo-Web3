@@ -44,12 +44,13 @@ export const getPublicUser = async (username: string): Promise<PublicUser | unde
   }
 }
 
-export const updateLinkAccount = async (userId: string, platform: string, username?: string) => {
-  const res = await axios.put<{ user: TUser }>(`/api/u/user/linkAccount`, {
-    userId,
-    platform,
-    username,
-  })
+export const updateLinkAccount = async (data: {
+  subject: string
+  platform: string
+  userId?: string
+  username?: string
+}) => {
+  const res = await axios.put<{ user: TUser }>(`/api/u/user/linkAccount`, data)
   const { user } = res.data
   return user
 }
