@@ -2,20 +2,22 @@ import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import { ActivityStatus, ActivityErrorCode } from '@/types/db'
 import ActivityModel, { type Activity } from '@/models/activity'
 import UserModel from '@/models/user'
+import { SocialMedia } from '@/types/db'
 
 export const schema = new Schema({
-  _activity: {
-    type: Schema.Types.ObjectId,
-    ref: ActivityModel,
-    required: true,
-    index: true,
-  },
   _user: {
     type: Schema.Types.ObjectId,
     ref: UserModel,
     required: true,
     index: true,
   },
+  _activity: {
+    type: Schema.Types.ObjectId,
+    ref: ActivityModel,
+    required: true,
+    index: true,
+  },
+  socialMedia: { type: String, enum: SocialMedia, required: true, index: true }, // social media type for activity
   status: {
     type: Number,
     enum: ActivityStatus,

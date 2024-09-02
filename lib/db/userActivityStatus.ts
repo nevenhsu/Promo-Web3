@@ -15,11 +15,14 @@ export async function getUserActivityStatus(userId: string, activityId: string) 
 export async function updateUserActivityStatus(
   userId: string,
   activityId: string,
-  status: ActivityStatus
+  data: {
+    status: ActivityStatus
+    socialMedia: string
+  }
 ) {
   const doc = await UserActivityStatusModel.findOneAndUpdate(
     { _user: userId, _activity: activityId },
-    { status, updatedAt: new Date() },
+    { ...data, updatedAt: new Date() },
     { upsert: true, new: true }
   )
 

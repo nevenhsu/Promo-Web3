@@ -1,8 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
+import { isAfter } from 'date-fns'
 import dbConnect from '@/lib/dbConnect'
 import { getUserActivityStatus, updateUserActivityStatus } from '@/lib/db/userActivityStatus'
-import { getActivityId } from '@/lib/db/activity'
+import { getActivityBySlug } from '@/lib/db/activity'
 import { ActivityStatus } from '@/types/db'
 
 export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
@@ -17,13 +18,13 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
     }
 
     await dbConnect()
-    const activityId = await getActivityId(slug)
+    const doc = await getActivityBySlug(slug)
 
-    if (!activityId) {
+    if (!doc) {
       return NextResponse.json({ error: 'Activity not found' }, { status: 404 })
     }
 
-    const status = await getUserActivityStatus(userId, activityId)
+    const status = await getUserActivityStatus(userId, doc._id.toString())
 
     return NextResponse.json({ status })
   } catch (error) {
@@ -32,23 +33,26 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
   }
 }
 
+// Set userActivityStatus to initial
 export async function PUT(req: NextRequest, { params }: { params: { slug: string } }) {
   try {
     const token = await getToken({ req })
     const userId = token?.user?.id!
-
     const { slug } = params
 
-    if (!slug) {
-      return NextResponse.json({ error: 'Slug is required' }, { status: 400 })
-    }
-
     await dbConnect()
-    const activityId = await getActivityId(slug)
 
-    if (!activityId) {
+    const activity = await getActivityBySlug(slug)
+
+    if (!activity) {
       return NextResponse.json({ error: 'Activity not found' }, { status: 404 })
     }
+
+    if (isAfter(new Date(), activity.endTime)) {
+      return NextResponse.json({ error: 'Activity has ended' }, { status: 400 })
+    }
+
+    const activityId = activity._id.toString()
 
     // Check if activity is already completed
     const doc = await getUserActivityStatus(userId, activityId)
@@ -57,7 +61,10 @@ export async function PUT(req: NextRequest, { params }: { params: { slug: string
     }
 
     // Update status to initial
-    const status = await updateUserActivityStatus(userId, activityId, ActivityStatus.Initial)
+    const status = await updateUserActivityStatus(userId, activityId, {
+      status: ActivityStatus.Initial,
+      socialMedia: activity.socialMedia,
+    })
     return NextResponse.json({ status })
   } catch (error) {
     console.error(error)

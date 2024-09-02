@@ -106,14 +106,12 @@ export async function getPublicActivityDetails(slug: string) {
 // Only for admin to create, update, delete activities
 // ========================
 
-export async function getActivityId(slug: string) {
+export async function getActivityBySlug(slug: string) {
   const data = await ActivityModel.findOne({
     slug,
-  })
-    .select('index')
-    .lean()
+  }).lean()
 
-  return data?._id.toString()
+  return data
 }
 
 type NewActivityData = {
@@ -133,8 +131,8 @@ export async function createActivity(data: NewActivityData) {
     throw new Error('Slug is required.')
   }
 
-  const existing = await getActivity(data.slug)
-  if (existing) {
+  const doc = await getActivityBySlug(data.slug)
+  if (doc) {
     throw new Error('Activity with the same slug already exists.')
   }
 
@@ -197,11 +195,6 @@ export async function getAllActivity() {
   const activities = await ActivityModel.find().sort({ index: -1 }).lean()
   console.log('All activities:', activities.length)
   return activities
-}
-
-export async function getActivity(slug: string) {
-  const activity = await ActivityModel.findOne({ slug }).lean().orFail()
-  return activity
 }
 
 function parseDetails(newDetail: Partial<ActivityDetail>) {
