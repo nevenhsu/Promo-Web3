@@ -21,10 +21,6 @@ export async function PUT(req: NextRequest) {
     const { longLivedAccessToken, expiredAt } = await getLongLivedAccessToken(accessToken)
     const { id, username } = await getMe(longLivedAccessToken)
 
-    if (!id || !username) {
-      return NextResponse.json({ error: 'Failed to get user info' }, { status: 400 })
-    }
-
     await dbConnect()
 
     // update access token

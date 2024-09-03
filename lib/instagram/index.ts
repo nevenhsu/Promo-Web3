@@ -13,6 +13,12 @@ export async function getMe(accessToken: string) {
     username: string
   }>(url.toString())
 
+  const { id, username } = data
+
+  if (!id || !username) {
+    throw new Error('Failed to get user info')
+  }
+
   return data
 }
 
@@ -36,6 +42,10 @@ export async function getLongLivedAccessToken(accessToken: string) {
   const { access_token, expires_in } = data
   const expiredAt = addSeconds(now, expires_in)
 
+  if (!access_token) {
+    throw new Error('Failed to get long lived access token')
+  }
+
   return { expiredAt, longLivedAccessToken: access_token }
 }
 
@@ -55,6 +65,10 @@ export async function refreshAccessToken(accessToken: string) {
 
   const { access_token, expires_in } = data
   const expiredAt = addSeconds(now, expires_in)
+
+  if (!access_token) {
+    throw new Error('Failed to refresh access token')
+  }
 
   return { expiredAt, longLivedAccessToken: access_token }
 }
