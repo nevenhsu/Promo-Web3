@@ -101,8 +101,6 @@ export function useSyncAccounts() {
     const outDatedName =
       instagram && linkedInstagram && instagram.username !== linkedInstagram.username
 
-    console.log('instagram', instagram)
-
     if (notLinked || outDated || outDatedName) {
       dispatch(
         updateLinkAccount({

@@ -23,6 +23,7 @@ declare global {
       DB_NAME: string
       PRIVY_APP_SECRET: string
       SANITY_API_READ_TOKEN: string
+      INSTAGRAM_SECRET: string
 
       // Next Auth
       NEXTAUTH_SECRET: string

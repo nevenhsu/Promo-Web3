@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAsyncFn } from 'react-use'
-import { usePrivy } from '@privy-io/react-auth'
+import { usePrivy, useOAuthTokens } from '@privy-io/react-auth'
 import { useAppSelector } from '@/hooks/redux'
 import { useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
@@ -23,6 +23,18 @@ enum AccountType {
 export default function ProfileAccount() {
   const { user, linkEmail, linkGoogle, linkTwitter, linkInstagram } = usePrivy()
   const { unlinkEmail, unlinkGoogle, unlinkTwitter, unlinkInstagram } = usePrivy()
+
+  const { reauthorize } = useOAuthTokens({
+    onOAuthTokenGrant(oAuthTokens, o) {
+      console.log('onOAuthTokenGrant', oAuthTokens)
+      console.log('o', o)
+    },
+  })
+
+  // useEffect(() => {
+  //   reauthorize({ provider: 'instagram' })
+  // }, [])
+
   const { email, google, twitter, instagram } = user || {}
 
   const { statusData } = useAppSelector(state => state.user)
