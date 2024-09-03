@@ -6,6 +6,7 @@ import dbConnect from '@/lib/dbConnect'
 import InstagramModel from '@/models/instagram'
 import UserModel from '@/models/user'
 import { refreshAccessToken, getMe } from '@/lib/instagram'
+import { updateLinkAccount } from '@/lib/db/user'
 import { LinkAccountPlatform } from '@/types/db'
 
 export async function GET(req: NextRequest) {
@@ -30,31 +31,24 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Instagram not linked' }, { status: 400 })
     }
 
-    const { accessToken, expiredAt } = doc
+    const { accessToken, expiredAt, refreshAt } = doc
     const { id, username } = await getMe(accessToken)
 
     await dbConnect()
 
     // update user linked instagram
-    const user = await UserModel.findOneAndUpdate(
-      {
-        _id: userId,
-        'linkedAccounts.platform': LinkAccountPlatform.Instagram,
-        'linkedAccounts.subject': id,
-      },
-      {
-        $set: {
-          'linkedAccounts.$.username': username,
-        },
-      },
-      { new: true }
-    )
+    const user = await updateLinkAccount(userId, {
+      subject: id,
+      platform: LinkAccountPlatform.Instagram,
+      username,
+    })
 
     const now = new Date()
-    const diffDays = differenceInDays(new Date(), expiredAt)
+    const diffDays = differenceInDays(expiredAt, now)
+    const refreshDays = differenceInDays(now, refreshAt)
 
     // at least 24 hours before the token expires
-    if (diffDays >= 1 && diffDays <= 3) {
+    if (diffDays >= 1 && diffDays <= 3 && refreshDays >= 1) {
       const { expiredAt: newExpiredAt, longLivedAccessToken } =
         await refreshAccessToken(accessToken)
 

@@ -69,33 +69,31 @@ export async function updateLinkAccount(_id: string, data: LinkedAccount) {
   }
 
   // Update the linked account if it already exists
-  const result = await UserModel.findOneAndUpdate(
-    { _id, 'linkedAccounts.platform': platform },
-    {
-      $set: {
-        'linkedAccounts.$.subject': subject,
-        'linkedAccounts.$.platform': platform,
-        'linkedAccounts.$.username': username,
-        'linkedAccounts.$.userId': userId,
-      },
-    },
-    { new: true }
-  )
+  const doc = await UserModel.findById(_id)
 
-  // If the linked account does not exist, insert a new one
-  if (!result) {
-    const upsertResult = await UserModel.findOneAndUpdate(
-      { _id },
-      {
-        $push: { linkedAccounts: data },
-      },
-      { new: true, upsert: true }
-    )
-
-    console.log('Upserted document:', upsertResult)
-    return upsertResult
+  if (!doc) {
+    throw new Error('User not found')
   }
 
-  console.log('Updated document:', result)
-  return result
+  const { linkedAccounts } = doc
+
+  const existingLinkedAccount = linkedAccounts.find(account => account.platform === platform)
+
+  if (existingLinkedAccount) {
+    existingLinkedAccount.subject = subject
+
+    if (!_.isNil(userId)) {
+      existingLinkedAccount.userId = userId
+    }
+
+    if (!_.isNil(username)) {
+      existingLinkedAccount.username = username
+    }
+
+    return UserModel.findByIdAndUpdate(_id, { linkedAccounts }, { new: true })
+  }
+
+  // Create a new linked account if it doesn't exist
+  linkedAccounts.push({ subject, platform, userId, username })
+  return UserModel.findByIdAndUpdate(_id, { linkedAccounts }, { new: true })
 }

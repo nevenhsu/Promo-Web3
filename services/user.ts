@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { TUser } from '@/models/user'
+import type { TUser, LinkedAccount } from '@/models/user'
 import type { ReferralCode } from '@/models/referralCode'
 import type { BucketType, PublicUser } from '@/types/db'
 
@@ -44,12 +44,7 @@ export const getPublicUser = async (username: string): Promise<PublicUser | unde
   }
 }
 
-export const updateLinkAccount = async (data: {
-  subject: string
-  platform: string
-  userId?: string
-  username?: string
-}) => {
+export const updateLinkAccount = async (data: LinkedAccount) => {
   const res = await axios.put<{ user: TUser }>(`/api/u/user/linkAccount`, data)
   const { user } = res.data
   return user

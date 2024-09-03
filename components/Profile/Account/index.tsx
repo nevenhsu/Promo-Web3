@@ -1,14 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useAsyncFn } from 'react-use'
-import { usePrivy, useOAuthTokens } from '@privy-io/react-auth'
+import { usePrivy } from '@privy-io/react-auth'
 import { useAppSelector } from '@/hooks/redux'
 import { useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import { Stack, Paper, Space, Group, Modal, Box } from '@mantine/core'
 import { Title, Text, Button, ActionIcon, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
+import { LinkAccountPlatform } from '@/types/db'
 import { PiLinkBreak, PiLink, PiEnvelope } from 'react-icons/pi'
 import { FcGoogle } from 'react-icons/fc'
 import { FaXTwitter, FaInstagram } from 'react-icons/fa6'
@@ -24,21 +25,15 @@ export default function ProfileAccount() {
   const { user, linkEmail, linkGoogle, linkTwitter, linkInstagram } = usePrivy()
   const { unlinkEmail, unlinkGoogle, unlinkTwitter, unlinkInstagram } = usePrivy()
 
-  const { reauthorize } = useOAuthTokens({
-    onOAuthTokenGrant(oAuthTokens, o) {
-      console.log('onOAuthTokenGrant', oAuthTokens)
-      console.log('o', o)
-    },
-  })
-
-  // useEffect(() => {
-  //   reauthorize({ provider: 'instagram' })
-  // }, [])
-
   const { email, google, twitter, instagram } = user || {}
-
-  const { statusData } = useAppSelector(state => state.user)
+  const { statusData, data } = useAppSelector(state => state.user)
   const locked = !statusData || statusData.progress.ongoing > 0 // prevent unlinking while ongoing
+
+  // auto update username by accessToken
+  const linkedInstagram = useMemo(
+    () => data.linkedAccounts?.find(account => account.platform === LinkAccountPlatform.Instagram),
+    [data]
+  )
 
   // for modal
   const [opened, { open, close }] = useDisclosure(false)
@@ -190,9 +185,6 @@ export default function ProfileAccount() {
                 <FaXTwitter size={20} />
                 <Title order={5} fw={500}>
                   X
-                  <Text mx="xs" fz="xs" component="span" c="dimmed">
-                    Twitter
-                  </Text>
                 </Title>
               </Group>
 
@@ -216,7 +208,7 @@ export default function ProfileAccount() {
               {renderLink(
                 AccountType.Instagram,
                 Boolean(instagram),
-                instagram?.username ? `@${instagram.username}` : undefined
+                linkedInstagram?.username ? `@${linkedInstagram.username}` : undefined
               )}
             </Group>
           </Paper>

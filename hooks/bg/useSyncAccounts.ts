@@ -45,7 +45,6 @@ export function useSyncAccounts() {
           subject: google.subject,
           platform: LinkAccountPlatform.Google,
           username: google.name || '',
-          userId: '',
         })
       )
     } else if (!google && linkedGoogle) {
@@ -59,10 +58,8 @@ export function useSyncAccounts() {
 
     const notLinked = twitter && !linkedX
     const outDated = twitter && linkedX && twitter.subject !== linkedX.subject
-    const outDatedName =
-      twitter && linkedX && twitter.username && twitter.username !== linkedX.username
 
-    if (notLinked || outDated || outDatedName) {
+    if (notLinked || outDated) {
       dispatch(
         updateLinkAccount({
           subject: twitter.subject,
@@ -98,16 +95,13 @@ export function useSyncAccounts() {
 
     const notLinked = instagram && !linkedInstagram
     const outDated = instagram && linkedInstagram && instagram.subject !== linkedInstagram.subject
-    const outDatedName =
-      instagram && linkedInstagram && instagram.username !== linkedInstagram.username
 
-    if (notLinked || outDated || outDatedName) {
+    if (notLinked || outDated) {
       dispatch(
         updateLinkAccount({
           subject: instagram.subject,
           platform: LinkAccountPlatform.Instagram,
           username: instagram.username || '',
-          userId: '',
         })
       )
     } else if (!instagram && linkedInstagram) {

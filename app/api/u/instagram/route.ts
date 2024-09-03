@@ -3,8 +3,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import InstagramModel from '@/models/instagram'
-import UserModel from '@/models/user'
 import { getLongLivedAccessToken, getMe } from '@/lib/instagram'
+import { updateLinkAccount } from '@/lib/db/user'
 import { LinkAccountPlatform } from '@/types/db'
 
 export async function PUT(req: NextRequest) {
@@ -21,6 +21,10 @@ export async function PUT(req: NextRequest) {
     const { longLivedAccessToken, expiredAt } = await getLongLivedAccessToken(accessToken)
     const { id, username } = await getMe(longLivedAccessToken)
 
+    if (!id || !username) {
+      return NextResponse.json({ error: 'Failed to get user info' }, { status: 400 })
+    }
+
     await dbConnect()
 
     // update access token
@@ -31,17 +35,12 @@ export async function PUT(req: NextRequest) {
     )
 
     // update user linked instagram
-    const user = await UserModel.findOneAndUpdate(
-      { _id: userId, 'linkedAccounts.platform': LinkAccountPlatform.Instagram },
-      {
-        $set: {
-          'linkedAccounts.$.subject': id,
-          'linkedAccounts.$.username': username,
-          'linkedAccounts.$.platform': LinkAccountPlatform.Instagram,
-        },
-      },
-      { new: true }
-    )
+    const user = await updateLinkAccount(userId, {
+      subject: id,
+      platform: LinkAccountPlatform.Instagram,
+      username,
+      userId: '',
+    })
 
     return NextResponse.json({ instagram, user })
   } catch (error) {
