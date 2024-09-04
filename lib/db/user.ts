@@ -76,24 +76,20 @@ export async function updateLinkAccount(_id: string, data: LinkedAccount) {
   }
 
   const { linkedAccounts } = doc
-
   const existingLinkedAccount = linkedAccounts.find(account => account.platform === platform)
 
   if (existingLinkedAccount) {
     existingLinkedAccount.subject = subject
-
     if (!_.isNil(userId)) {
       existingLinkedAccount.userId = userId
     }
-
     if (!_.isNil(username)) {
       existingLinkedAccount.username = username
     }
-
-    return UserModel.findByIdAndUpdate(_id, { linkedAccounts }, { new: true })
+  } else {
+    // Create a new linked account if it doesn't exist
+    linkedAccounts.push({ subject, platform, userId, username })
   }
 
-  // Create a new linked account if it doesn't exist
-  linkedAccounts.push({ subject, platform, userId, username })
   return UserModel.findByIdAndUpdate(_id, { linkedAccounts }, { new: true })
 }

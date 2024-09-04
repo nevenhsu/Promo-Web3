@@ -11,7 +11,7 @@ export const schema = new Schema({
   },
   uid: { type: String, required: true }, // api id, not ig_id
   accessToken: { type: String, required: true }, // long-lived access token
-  expiredAt: { type: Date, required: true },
+  expiredAt: { type: Date, index: true, required: true },
   refreshAt: { type: Date, index: true, default: Date.now },
 })
 
