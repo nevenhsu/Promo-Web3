@@ -6,8 +6,9 @@ import { useSearchParams } from 'next/navigation'
 import { usePromo } from '@/hooks/usePromo'
 import useLogin from '@/hooks/useLogin'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
-import { Button } from '@mantine/core'
+import { Button, Box } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
+import Animation from './Animation'
 
 export default function Index() {
   const router = useRouter()
@@ -58,11 +59,17 @@ export default function Index() {
   }, [nextPage, bothAuth])
 
   return (
-    <RwdLayout>
-      <Button onClick={handleClick} loading={loading || Boolean(nextPage)}>
-        Get Started
-      </Button>
-    </RwdLayout>
+    <>
+      <RwdLayout pos="relative">
+        <Box className="absolute-horizontal" w="100vw" h="100vh" top={0}>
+          <Animation />
+        </Box>
+
+        <Button onClick={handleClick} loading={loading || Boolean(nextPage)}>
+          Get Started
+        </Button>
+      </RwdLayout>
+    </>
   )
 }
 
