@@ -8,7 +8,7 @@ import useLogin from '@/hooks/useLogin'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { Button, Box } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import Animation from './Animation'
+import Animation from '@/components/Introduction/Animation'
 
 export default function Index() {
   const router = useRouter()
@@ -61,10 +61,20 @@ export default function Index() {
   return (
     <>
       <RwdLayout pos="relative">
-        <Box className="absolute-horizontal" w="100vw" h="100vh" top={0}>
-          <Animation />
+        <Box
+          className="absolute-horizontal"
+          style={{
+            top: 0,
+            width: '100%',
+            height: 'calc(100vh - 64px)',
+          }}
+        >
+          <Animation
+            src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/175711/open-peeps-sheet.png"
+            rows={15}
+            cols={7}
+          />
         </Box>
-
         <Button onClick={handleClick} loading={loading || Boolean(nextPage)}>
           Get Started
         </Button>

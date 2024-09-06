@@ -16,7 +16,11 @@ export default async function PagePage({ params: { lang, slug } }: PageProps) {
   const { isEnabled } = draftMode()
   const data = isEnabled ? {} : await getPageData(slug, lang)
 
-  return <>{<Page slug={slug} lang={lang} initialData={data} />}</>
+  return (
+    <>
+      <Page slug={slug} lang={lang} initialData={data} />
+    </>
+  )
 }
 
 export const revalidate = 3600 // revalidate at most every hour
