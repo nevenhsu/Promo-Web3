@@ -47,10 +47,10 @@ export default function Animation({ src, rows, cols }: AnimationProps) {
   }
 
   const resetPeeps = () => {
-    const { crowd, ready } = dataRef.current
+    const { allPeeps, ready } = dataRef.current
     if (!ready) return
 
-    _.forEach(crowd, peep => {
+    _.forEach(allPeeps, peep => {
       peep.walk?.kill()
     })
     dataRef.current.crowd = []
@@ -161,6 +161,7 @@ export default function Animation({ src, rows, cols }: AnimationProps) {
         dataRef.current.allPeeps.forEach(peep => {
           peep.walk?.kill()
         })
+        gsap.ticker.remove(render)
       }
     },
     { scope: rootRef }

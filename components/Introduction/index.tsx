@@ -69,11 +69,7 @@ export default function Index() {
             height: 'calc(100vh - 64px)',
           }}
         >
-          <Animation
-            src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/175711/open-peeps-sheet.png"
-            rows={15}
-            cols={7}
-          />
+          <Animation src="/images/peeps.png" rows={15} cols={7} />
         </Box>
         <Button onClick={handleClick} loading={loading || Boolean(nextPage)}>
           Get Started
