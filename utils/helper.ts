@@ -53,18 +53,3 @@ export function isEnumMember<T extends Record<string, unknown>>(
 ): value is T {
   return Object.values(enumType).includes(value)
 }
-
-export function getShortName(name?: string | null, username?: string | null) {
-  if (!name && !username) {
-    return ''
-  }
-
-  const shortName =
-    name
-      ?.split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase() || username?.substring(0, 1).toUpperCase()
-
-  return shortName
-}

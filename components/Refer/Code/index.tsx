@@ -12,7 +12,7 @@ import { Space, Stack, Modal, Avatar, Group, Box } from '@mantine/core'
 import { Text, Title, Button, TextInput } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { getRefererByCode } from '@/services/referral'
-import { cleanCode, getShortName } from '@/utils/helper'
+import { cleanCode } from '@/utils/helper'
 import { PiBarcode } from 'react-icons/pi'
 
 export default function ReferCode() {
@@ -85,9 +85,12 @@ export default function ReferCode() {
               <Title order={3}>Your Referer</Title>
 
               <Stack align="center">
-                <Avatar size="lg" src={referer.details.avatar}>
-                  {getShortName(referer.name, referer.username)}
-                </Avatar>
+                <Avatar
+                  size="lg"
+                  src={referer.details.avatar}
+                  name={referer.name || referer.username}
+                  color="initials"
+                />
                 <Box ta="center">
                   <Title order={4} fw={500}>
                     {referer.name || 'No name'}
@@ -136,9 +139,13 @@ export default function ReferCode() {
       >
         <Stack gap="xl">
           <Stack align="center">
-            <Avatar size="lg" src={userState.value?.details.avatar}>
-              {getShortName(userState.value?.name, userState.value?.username)}
-            </Avatar>
+            <Avatar
+              size="lg"
+              src={userState.value?.details.avatar}
+              name={userState.value?.name || userState.value?.username}
+              color="initials"
+            />
+
             <Box ta="center">
               <Title order={4} fw={500}>
                 {userState.value?.name || 'No name'}

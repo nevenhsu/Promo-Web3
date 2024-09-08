@@ -6,7 +6,8 @@ import { useSearchParams } from 'next/navigation'
 import { usePromo } from '@/hooks/usePromo'
 import useLogin from '@/hooks/useLogin'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
-import { Button, Box } from '@mantine/core'
+import { Button, Stack, Space, Box, Title, Text, Timeline } from '@mantine/core'
+import Marquee from 'react-fast-marquee'
 import RwdLayout from '@/components/share/RwdLayout'
 import Animation from '@/components/Introduction/Animation'
 
@@ -70,10 +71,31 @@ export default function Index() {
           }}
         >
           <Animation src="/images/peeps.png" rows={15} cols={7} />
+
+          <Marquee>
+            <Text bg="black" c="white" px="md" py="xs">
+              🎉 Share 2 Earn – Turn Your Reposts into Cryptocurrency!
+            </Text>
+          </Marquee>
         </Box>
-        <Button onClick={handleClick} loading={loading || Boolean(nextPage)}>
-          Get Started
-        </Button>
+        <Box pos="relative">
+          {/* Page 1 */}
+          <Box mih={'calc(100vh - 64px)'}>
+            <Stack ta="center" align="center" gap="lg">
+              <Title order={1}>Welcome to SharX</Title>
+              <Text fz="lg" mb="lg">
+                Make your social activity becomes a gateway to earning cryptocurrency.
+              </Text>
+              <Button size="lg" onClick={handleClick} loading={loading || Boolean(nextPage)}>
+                Join Now
+              </Button>
+            </Stack>
+          </Box>
+
+          {/* Page 2 */}
+        </Box>
+
+        <Space h={100} />
       </RwdLayout>
     </>
   )

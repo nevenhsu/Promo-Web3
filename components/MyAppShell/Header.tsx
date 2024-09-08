@@ -8,7 +8,6 @@ import { useGoBack } from '@/hooks/useGoBack'
 import { Group, Box, ActionIcon, Avatar } from '@mantine/core'
 import Logo from '@/public/logo.svg'
 import { PiCaretLeft } from 'react-icons/pi'
-import { getShortName } from '@/utils/helper'
 import classes from './index.module.css'
 
 export default function Header() {
@@ -52,7 +51,7 @@ export default function Header() {
         <Group>
           {bothAuth ? (
             <Link href="/profile">
-              <Avatar src={details?.avatar}>{getShortName(name, username)}</Avatar>
+              <Avatar src={details?.avatar} name={name || username} color="initials" />
             </Link>
           ) : null}
         </Group>
