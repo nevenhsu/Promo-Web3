@@ -1,5 +1,6 @@
 'use client'
 
+import { isAfter } from 'date-fns'
 import { Link } from '@/navigation'
 import { Tabs, Group, Stack, Paper, Box, Space, Pagination } from '@mantine/core'
 import { Title, Text, Button, Divider, Center, Skeleton } from '@mantine/core'
@@ -79,6 +80,7 @@ export default function Activity() {
 }
 
 function ActivityItem({ data }: { data: TPublicActivity }) {
+  const isEnd = isAfter(new Date(), new Date(data.endTime))
   return (
     <>
       <Link
@@ -138,7 +140,7 @@ function ActivityItem({ data }: { data: TPublicActivity }) {
                 </Group>
 
                 <Button variant={data.joined ? 'outline' : 'filled'} size="sm" px="md">
-                  {data.joined ? 'Joined' : 'Join'}
+                  {data.joined ? 'Joined' : isEnd ? 'End' : 'Join'}
                 </Button>
               </Group>
             </Stack>

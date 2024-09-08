@@ -40,7 +40,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
     thumbnailUrl: string
     published: boolean
   }>({
-    mode: 'uncontrolled',
+    mode: 'controlled',
     initialValues: {
       title: '',
       slug: '',
@@ -55,6 +55,16 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
       coverUrl: '',
       thumbnailUrl: '',
       published: false,
+    },
+    onValuesChange: values => {
+      // auto update activityType
+      const { socialMedia, activityType } = values
+      if (socialMedia === SocialMedia.X && activityType !== `${ActivityType.Repost}`) {
+        form.setFieldValue('activityType', `${ActivityType.Repost}`)
+      }
+      if (socialMedia === SocialMedia.Instagram && activityType !== `${ActivityType.Story}`) {
+        form.setFieldValue('activityType', `${ActivityType.Story}`)
+      }
     },
     validate: {
       startTime: (value, values) => {
@@ -237,18 +247,6 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
               />
 
               <TextInput label="Link" placeholder="Post ID" {...form.getInputProps('link')} />
-
-              <TextInput
-                label="Cover URL"
-                placeholder="Cover image URL"
-                {...form.getInputProps('coverUrl')}
-              />
-
-              <TextInput
-                label="Thumbnail URL"
-                placeholder="Thumbnail image URL"
-                {...form.getInputProps('thumbnailUrl')}
-              />
 
               <Switch
                 label="Published"

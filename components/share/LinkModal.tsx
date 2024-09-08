@@ -4,6 +4,7 @@ import { usePrivy } from '@privy-io/react-auth'
 import { Modal, Stack, Box, Text } from '@mantine/core'
 import LinkButton from './LinkButton'
 import { toUpper } from '@/utils/helper'
+import { SocialMedia } from '@/types/db'
 
 type LinkModalProps = {
   platform: string
@@ -12,12 +13,22 @@ type LinkModalProps = {
 }
 
 export default function LinkModal({ platform, opened, onClose }: LinkModalProps) {
-  const { user, linkTwitter } = usePrivy()
-  const { twitter } = user || {}
+  const { user, linkTwitter, linkInstagram } = usePrivy()
+  const { twitter, instagram } = user || {}
   const platformUpper = toUpper(platform)
 
   const handleLink = () => {
-    twitter ? onClose() : linkTwitter()
+    switch (platform) {
+      case SocialMedia.X: {
+        twitter ? onClose() : linkTwitter()
+        break
+      }
+      case SocialMedia.Instagram: {
+        instagram ? onClose() : linkInstagram()
+        break
+      }
+    }
+    return
   }
 
   return (

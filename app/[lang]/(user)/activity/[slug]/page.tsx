@@ -5,6 +5,7 @@ import { TweetSkeleton, EmbeddedTweet, TweetNotFound } from 'react-tweet'
 import ActivityDetail from '@/components/Activity/Detail'
 import dbConnect from '@/lib/dbConnect'
 import { getPublicActivity } from '@/lib/db/activity'
+import { SocialMedia } from '@/types/db'
 
 export const revalidate = 3600 // revalidate at most every hour
 
@@ -19,21 +20,26 @@ export default async function ActivityDetailPage({
 }) {
   await dbConnect()
   const activity = await getPublicActivity(slug)
-  const postLink = activity?.details.link || ''
 
   if (!activity) {
     // TODO: Show 404 page
     return null
   }
 
+  const { details, socialMedia } = activity
+  const postLink = details.link
+  const isX = socialMedia === SocialMedia.X
+
   //  Warning: Only plain objects can be passed to Client Components
   return (
     <>
       <ActivityDetail data={JSON.parse(JSON.stringify(activity))}>
         {/* Embedded Post */}
-        <Suspense fallback={<TweetSkeleton />}>
-          <TweetPage id={postLink} />
-        </Suspense>
+        {isX && (
+          <Suspense fallback={<TweetSkeleton />}>
+            <TweetPage id={postLink} />
+          </Suspense>
+        )}
       </ActivityDetail>
     </>
   )

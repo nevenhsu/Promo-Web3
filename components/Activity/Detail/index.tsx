@@ -1,6 +1,7 @@
 'use client'
 
 import * as _ from 'lodash-es'
+import { isAfter } from 'date-fns'
 import Image from 'next/image'
 import { useEffect, useMemo } from 'react'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
@@ -15,6 +16,7 @@ import { fetchUserActivityStatus, resetUserActivityStatus } from '@/store/slices
 import { getPublicActivityDetails } from '@/services/activity'
 import { notifications } from '@mantine/notifications'
 import { useDisclosure } from '@mantine/hooks'
+import { InstagramEmbed } from 'react-social-media-embed'
 import { Group, Stack, Box, Space, Divider, Paper } from '@mantine/core'
 import { Title, Text, Button, ThemeIcon, ActionIcon } from '@mantine/core'
 import { Skeleton, Progress, Center } from '@mantine/core'
@@ -26,7 +28,7 @@ import { HowToJoinModal } from '../modals/HowToJoinModal'
 import { formatDate } from '@/utils/date'
 import { formatNumber } from '@/utils/math'
 import { getActionLabel, getErrorText } from '../variables'
-import { ActivityStatus } from '@/types/db'
+import { ActivityStatus, SocialMedia } from '@/types/db'
 import { toUpper } from '@/utils/helper'
 import { allTokens } from '@/contracts/tokens'
 import { PiLightning, PiPersonSimpleRun, PiTrophy, PiCheckBold } from 'react-icons/pi'
@@ -37,8 +39,10 @@ import type { TUserActivityStatus } from '@/models/userActivityStatus'
 type ActivityDetailProps = { data: TPublicActivity; children?: React.ReactNode }
 
 export default function ActivityDetail({ data, children }: ActivityDetailProps) {
-  const { slug, airdrop, socialMedia } = data
+  const { slug, airdrop, socialMedia, endTime } = data
+  const postLink = data.details.link
   const token = _.find(allTokens, { symbol: airdrop.symbol })
+  const isEnd = isAfter(new Date(), new Date(endTime))
 
   const dispatch = useAppDispatch()
   const router = useRouter()
@@ -54,8 +58,8 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   const [joinOpened, joinActions] = useDisclosure(false)
 
   // Platform linked account from Privy
-  const { user, linkTwitter } = usePrivy()
-  const { twitter } = user || {}
+  const { user, linkTwitter, linkInstagram } = usePrivy()
+  const { twitter, instagram } = user || {}
 
   // User data
   const { data: userData, referralData } = useAppSelector(state => state.user)
@@ -130,9 +134,18 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   }
 
   const handleLinkAccount = () => {
-    if (twitter) return
-
-    isMobileDevice ? open() : linkTwitter()
+    switch (socialMedia) {
+      case SocialMedia.X: {
+        if (twitter) return
+        isMobileDevice ? open() : linkTwitter()
+        break
+      }
+      case SocialMedia.Instagram: {
+        if (instagram) return
+        isMobileDevice ? open() : linkInstagram()
+        break
+      }
+    }
   }
 
   // Fetch realtime activity details
@@ -177,6 +190,13 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
     <>
       <RwdLayout>
         <Stack gap="lg">
+          <Box>
+            <Paper display="inline-block" bg="var(--mantine-primary-color-5)" c="white">
+              <Text fz="xs" px={8}>
+                Share to Earn
+              </Text>
+            </Paper>
+          </Box>
           <Group wrap="nowrap" justify="space-between">
             <Box>
               <Text c="dimmed" fz="xs">
@@ -198,16 +218,26 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
             ) : null}
           </Group>
 
-          <Text fz="sm" c="dark">
+          <Text fz="sm" c="dark" mb="md">
             {data.description}
           </Text>
 
-          <Group gap="xs">
-            {token ? <Image src={token.icon} width={20} height={20} alt={token.symbol} /> : null}
-            <Title order={4} c="orange">
-              {formatNumber(data.airdrop.amount)} {data.airdrop.symbol}
-            </Title>
-          </Group>
+          <Paper radius="sm" p="md" shadow="xs">
+            <Group justify="space-between">
+              <Title order={4} c="orange">
+                Prize Pool
+              </Title>
+
+              <Group gap="xs">
+                {token ? (
+                  <Image src={token.icon} width={20} height={20} alt={token.symbol} />
+                ) : null}
+                <Title order={4}>
+                  {formatNumber(data.airdrop.amount)} {data.airdrop.symbol}
+                </Title>
+              </Group>
+            </Group>
+          </Paper>
 
           {bothAuth ? (
             <>
@@ -352,7 +382,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
                 <Button
                   onClick={handleConfirm}
-                  disabled={!linked || confirmed}
+                  disabled={!linked || confirmed || isEnd}
                   loading={statusDataLoading}
                 >
                   {confirmed
@@ -374,7 +404,19 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
           </Stack>
 
           {/* Embedded Post */}
-          {children}
+          <Box display="flex" style={{ justifyContent: 'center' }}>
+            {children}
+
+            {socialMedia === SocialMedia.Instagram && (
+              <InstagramEmbed
+                url={`https://www.instagram.com/p/${postLink}/`}
+                width="100%"
+                style={{
+                  maxWidth: 480,
+                }}
+              />
+            )}
+          </Box>
         </Stack>
       </RwdLayout>
 
@@ -416,7 +458,7 @@ function getStatusContent(userStatus?: TUserActivityStatus) {
       const title = 'Waiting for confirmation'
       const message = 'We will confirm your activity soon'
       const icon = <PiCircleDashedBold size={20} />
-      const color = 'dark'
+      const color = 'black'
       return { title, message, icon, color }
     }
     case ActivityStatus.Unjoined:
@@ -424,7 +466,7 @@ function getStatusContent(userStatus?: TUserActivityStatus) {
       const title = 'Join now'
       const message = 'Join this activity to earn rewards'
       const icon = <PiRocketLaunch size={20} />
-      const color = 'dark'
+      const color = 'black'
       return { title, message, icon, color }
     }
   }
