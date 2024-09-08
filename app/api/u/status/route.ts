@@ -5,7 +5,8 @@ import dbConnect from '@/lib/dbConnect'
 import { getUserStatus } from '@/lib/db/userStatus'
 import { getAllAirdrops } from '@/lib/db/airdrop'
 import { countUserActivityStatus, getOngoingActivityStatuses } from '@/lib/db/userActivityStatus'
-import type { TUserActivityStatusData } from '@/models/userActivityStatus'
+
+type OngoingActivityStatusesData = Awaited<ReturnType<typeof getOngoingActivityStatuses>>
 
 // Get the status of the current user
 export async function GET(req: NextRequest) {
@@ -45,7 +46,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-function calcUnsettledAirdrops(onGoingStatuses: TUserActivityStatusData[]) {
+function calcUnsettledAirdrops(onGoingStatuses: OngoingActivityStatusesData) {
   const unsettled = onGoingStatuses.map(data => {
     const { _activity } = data
     const { details, airdrop } = _activity

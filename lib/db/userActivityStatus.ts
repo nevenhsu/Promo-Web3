@@ -1,5 +1,5 @@
 import * as _ from 'lodash-es'
-import UserActivityStatusModel, { type TUserActivityStatusData } from '@/models/userActivityStatus'
+import UserActivityStatusModel from '@/models/userActivityStatus'
 import { ActivityStatus } from '@/types/db'
 import type { Activity } from '@/models/activity'
 
@@ -64,12 +64,13 @@ export async function getUserActivityStatuses(userId: string, options?: GetOptio
 }
 
 export async function getOngoingActivityStatuses(userId: string) {
-  const data: TUserActivityStatusData[] = await UserActivityStatusModel.find({
+  // TODO: return each status for social platforms
+  const data = await UserActivityStatusModel.find({
     _user: userId,
     finalized: { $in: [null, false] },
   })
-    .populate<{ _activity: Activity }>('_activity')
     .lean()
+    .populate<{ _activity: Activity }>('_activity')
 
   return data
 }
