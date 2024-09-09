@@ -50,14 +50,14 @@ export default function Activity() {
         >
           <Tabs.List>
             <Tabs.Tab value={TabValue.New}>New</Tabs.Tab>
-            <Tabs.Tab value={TabValue.End}>End</Tabs.Tab>
+            <Tabs.Tab value={TabValue.Ended}>Ended</Tabs.Tab>
           </Tabs.List>
 
           <Tabs.Panel value={TabValue.New}>
             <Stack py={40}>{renderActivity()}</Stack>
           </Tabs.Panel>
 
-          <Tabs.Panel value={TabValue.End}>
+          <Tabs.Panel value={TabValue.Ended}>
             <Stack py={40}>{renderActivity()}</Stack>
           </Tabs.Panel>
         </Tabs>

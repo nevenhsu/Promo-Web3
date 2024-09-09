@@ -9,7 +9,7 @@ import type { TPublicActivity } from '@/models/activity'
 
 export enum TabValue {
   New = 'new',
-  End = 'end',
+  Ended = 'ended',
 }
 
 type DataPage = {
@@ -48,7 +48,7 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const [pages, setPages] = useState<Pages>({
     new: { total: 1, current: 1, limit: 10 },
-    end: { total: 1, current: 1, limit: 10 },
+    ended: { total: 1, current: 1, limit: 10 },
   })
   const activePage = pages[activeTab]
   const { total, limit } = activePage
