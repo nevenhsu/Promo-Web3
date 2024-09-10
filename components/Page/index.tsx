@@ -77,7 +77,7 @@ export default function Blog({ slug, lang, initialData }: PageProps) {
 
       <RwdLayout>
         <MotionSlide delay={1}>
-          <Box w={{ base: '100%', sm: '66.66%', lg: '60%' }} mx="auto">
+          <Box w={{ base: '100%', sm: '66.66%', lg: '60%' }} maw={600} mx="auto">
             <Stack>
               <PageInfo data={data} />
               <Headline>{title}</Headline>
@@ -101,7 +101,7 @@ export default function Blog({ slug, lang, initialData }: PageProps) {
             transition={{ delay: isInit ? 0 : 2 }}
           >
             <Box pos="relative" py={{ base: 40 }}>
-              <Box w={{ base: '100%', sm: '66.66%', lg: '60%' }} mx="auto">
+              <Box w={{ base: '100%', sm: '66.66%', lg: '60%' }} maw={600} mx="auto">
                 <MyPortableText content={content || []} />
               </Box>
             </Box>

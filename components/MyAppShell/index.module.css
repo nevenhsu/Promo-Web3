@@ -9,21 +9,3 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
-
-/* Footer Start */
-
-.footer a {
-  text-align: center;
-}
-
-.footer svg {
-  display: block;
-  margin: auto;
-  margin-bottom: 4px;
-}
-
-.footer p {
-  font-size: 12px;
-}
-
-/* Footer End */

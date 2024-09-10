@@ -1,29 +1,30 @@
 'use client'
 
 import { Link, usePathname } from '@/navigation'
+import { useMediaQuery } from '@mantine/hooks'
 import { useAppSelector } from '@/hooks/redux'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
-import { usePromo } from '@/hooks/usePromo'
 import { useGoBack } from '@/hooks/useGoBack'
-import { Group, Box, ActionIcon, Avatar } from '@mantine/core'
+import { useClickLogin } from '@/hooks/useLogin'
+import { Group, Box, ActionIcon, Avatar, Button } from '@mantine/core'
 import Logo from '@/public/logo.svg'
 import { PiCaretLeft } from 'react-icons/pi'
 import classes from './index.module.css'
 
 export default function Header() {
-  usePromo() // Save promo code
+  const matches = useMediaQuery('(min-width: 36em)')
   const pathname = usePathname()
-
   const { canGoBack, goBack } = useGoBack()
   const { bothAuth } = useLoginStatus()
   const { data } = useAppSelector(state => state.user)
+  const { clickLogin, loading } = useClickLogin()
 
   // for user avatar
   const { name, username, details } = data
 
   // for back button
-  const hasPreviousPage =
-    pathname.split('/').length > 2 || ['/refer', '/profile'].includes(pathname)
+  const mobileBack = !matches && ['/refer'].includes(pathname)
+  const hasPreviousPage = pathname.split('/').length > 2 || mobileBack
   const showBack = canGoBack && hasPreviousPage
 
   return (
@@ -43,9 +44,11 @@ export default function Header() {
             </ActionIcon>
           ) : null}
 
-          <Box w={48} h={48} ml={-6}>
-            <Logo width="100%" height="100%" />
-          </Box>
+          <Link href="/">
+            <Box className="c-pointer" w={48} h={48} ml={-6}>
+              <Logo width="100%" height="100%" />
+            </Box>
+          </Link>
         </Group>
 
         <Group>
@@ -53,7 +56,11 @@ export default function Header() {
             <Link href="/profile">
               <Avatar src={details?.avatar} name={name || username} color="initials" />
             </Link>
-          ) : null}
+          ) : (
+            <Button variant="outline" size="sm" onClick={clickLogin} loading={loading}>
+              Login
+            </Button>
+          )}
         </Group>
       </Group>
     </>

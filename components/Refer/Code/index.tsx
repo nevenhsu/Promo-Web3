@@ -3,8 +3,8 @@
 import { useRouter } from '@/navigation'
 import { useState } from 'react'
 import { useAsyncFn } from 'react-use'
-import { useSearchParams } from 'next/navigation'
 import { usePromo } from '@/hooks/usePromo'
+import { useCallbackUrl } from '@/hooks/useCallbackUrl'
 import { useAppSelector } from '@/hooks/redux'
 import { useDisclosure } from '@mantine/hooks'
 import { useReferral } from '@/store/contexts/app/referralContext'
@@ -17,7 +17,7 @@ import { PiBarcode } from 'react-icons/pi'
 
 export default function ReferCode() {
   const router = useRouter()
-  const searchParams = useSearchParams()
+  const { callbackPath } = useCallbackUrl()
   const { data } = useAppSelector(state => state.user)
   const { referer, isReferred, createReferralState, createReferral } = useReferral()
 
@@ -67,10 +67,9 @@ export default function ReferCode() {
 
   const handleBack = () => {
     // handle auth callbackUrl
-    const callbackUrl = searchParams.get('callbackUrl')
-    if (callbackUrl?.startsWith('/')) {
+    if (callbackPath) {
       // @ts-ignore
-      router.push(callbackUrl)
+      router.push(callbackPath)
     } else {
       router.push('/activity')
     }

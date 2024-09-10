@@ -1,4 +1,5 @@
 import { Modal, Text, Timeline } from '@mantine/core'
+import { getActionLabel } from '../variables'
 import {
   PiCircleDashedBold,
   PiLinkSimpleHorizontalBold,
@@ -6,14 +7,19 @@ import {
   PiShareFatBold,
   PiCursorClickBold,
 } from 'react-icons/pi'
+import type { TPublicActivity } from '@/models/activity'
 
 type HowToJoinModalProps = {
+  activity: TPublicActivity
   opened: boolean
   onClose: () => void
   activeStep: number
 }
 
-export function HowToJoinModal({ opened, onClose, activeStep }: HowToJoinModalProps) {
+export function HowToJoinModal(props: HowToJoinModalProps) {
+  const { activity, opened, onClose, activeStep } = props
+  const actionLabel = getActionLabel(activity.activityType)
+
   return (
     <Modal opened={opened} onClose={onClose} title="How to join?" centered>
       <Timeline active={activeStep} bulletSize={24} lineWidth={2} pb="md">
@@ -30,10 +36,10 @@ export function HowToJoinModal({ opened, onClose, activeStep }: HowToJoinModalPr
         <Timeline.Item
           lineVariant={activeStep > 1 ? 'solid' : 'dashed'}
           bullet={<PiImageSquareBold size={14} />}
-          title="Open the post link"
+          title="Open the post"
         >
           <Text c="dimmed" size="sm">
-            Open the post on the social media app
+            Go to the post on the social media app
           </Text>
         </Timeline.Item>
 
@@ -43,14 +49,14 @@ export function HowToJoinModal({ opened, onClose, activeStep }: HowToJoinModalPr
           title="Share the post"
         >
           <Text c="dimmed" size="sm">
-            Share the post to your feed
+            {actionLabel} with your linked account
           </Text>
         </Timeline.Item>
 
         <Timeline.Item
           lineVariant={activeStep > 3 ? 'solid' : 'dashed'}
           bullet={<PiCursorClickBold size={14} />}
-          title="Click confirm button"
+          title="Tap confirm button"
         >
           <Text c="dimmed" size="sm">
             Click the button to confirm your participation

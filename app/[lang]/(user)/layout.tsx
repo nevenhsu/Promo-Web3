@@ -1,3 +1,4 @@
+import { Box } from '@mantine/core'
 import AuthGuard from '@/components/providers/AuthGuard'
 
 export default function UserLayout({
@@ -9,7 +10,11 @@ export default function UserLayout({
 }) {
   return (
     <>
-      <AuthGuard>{children}</AuthGuard>
+      <AuthGuard>
+        <Box w={{ base: '100%', sm: '66.66%', lg: '60%' }} maw={600} mx="auto">
+          {children}
+        </Box>
+      </AuthGuard>
     </>
   )
 }

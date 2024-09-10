@@ -13,7 +13,7 @@ export const getActionLabel = (type: number) => {
     case ActivityType.Story:
       return 'Add to story'
     default:
-      return 'All'
+      return ''
   }
 }
 

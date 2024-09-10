@@ -427,6 +427,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
       {/* How to join */}
       <HowToJoinModal
+        activity={data}
         opened={joinOpened}
         onClose={joinActions.close}
         activeStep={getActiveStep(linked, statusData?.status)}
