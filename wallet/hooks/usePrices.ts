@@ -14,7 +14,7 @@ type PriceData = {
 
 const baseUrl = 'https://api.binance.com'
 const baseToken = 'USDT'
-const validTokens = _.intersection(symbols, ['ETH', 'USDC'])
+const validTokens = _.intersection(symbols, ['USDC'])
 
 export function usePrices() {
   const [priceState, updatePrice] = useAsyncFn(async () => {
@@ -39,7 +39,7 @@ export function usePrices() {
 }
 
 async function fetchPrices() {
-  const val = validTokens.map(o => `${o}${baseToken}`)
+  const val = [...validTokens, 'ETH'].map(o => `${o}${baseToken}`)
   const url = `${baseUrl}/api/v3/ticker/price?symbols=${JSON.stringify(val)}`
   return axios.get<PriceData[]>(url)
 }

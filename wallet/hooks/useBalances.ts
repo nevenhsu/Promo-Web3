@@ -6,6 +6,7 @@ import { useAsyncFn } from 'react-use'
 import { getTokens } from '@/contracts/tokens'
 import { formatBalance } from '@/utils/math'
 import { getContract, type Contracts } from '@/wallet/lib/getContracts'
+import { publicClients } from '@/wallet/lib/publicClients'
 import type { WalletProviderValues } from '@/wallet/lib/getWalletProvider'
 
 type UseBalanceParams = {
@@ -28,10 +29,32 @@ export function useBalances({
 
   const [balances, setBalances] = useState<Balances>({})
 
+  const fetchEthBalance = async (chainId: number, address: `0x${string}`) => {
+    const client = publicClients[chainId]
+    if (client) {
+      try {
+        const balance = await client.getBalance({ address })
+        if (typeof balance === 'bigint') {
+          return {
+            symbol: 'ETH',
+            balance,
+            decimal: 18,
+          }
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+  }
+
   const [updateState, updateBalances] = useAsyncFn(async () => {
     const tokens = getTokens(chainId)
     if (notReady) return
 
+    // eth balance
+    const eth = await fetchEthBalance(chainId, walletAddress)
+
+    // erc20 balance
     const results = await Promise.all(
       tokens.map(async ({ address, symbol, decimal }) => {
         try {
@@ -48,11 +71,11 @@ export function useBalances({
       })
     )
 
-    const newBalances = results.reduce((acc, result) => {
+    const newBalances = [...results, eth].reduce((acc, result) => {
       if (result) {
         const { symbol, decimal, balance } = result
         acc[symbol] = balance
-        console.log(`${symbol} balance:`, formatBalance(balance, decimal).toDP(2).toString())
+        console.log(`${symbol} balance:`, formatBalance(balance, decimal).toFixed(2))
       }
       return acc
     }, {} as Balances)
