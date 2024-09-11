@@ -19,8 +19,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     }
 
     if (nextAuthFail) {
-      // Redirect to index if not authenticated
-      router.push('/')
+      // set callback url
+      const callbackUrl = encodeURIComponent(pathname)
+      const loginUrl = pathname !== '/' ? `/?callbackUrl=${callbackUrl}` : '/'
+
+      // @ts-ignore
+      router.push(loginUrl)
     }
   }, [isPublic, nextAuthFail])
 

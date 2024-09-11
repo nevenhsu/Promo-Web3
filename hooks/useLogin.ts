@@ -88,14 +88,5 @@ export function useClickLogin() {
     }
   }, [nextPage, pathname])
 
-  // TODO: remove this debugging
-  console.log({
-    bothAuth,
-    privyAuth,
-    loading,
-    nextPage,
-    callbackPath,
-  })
-
   return { clickLogin, loading: loading || (Boolean(nextPage) && privyAuth) }
 }

@@ -23,8 +23,9 @@ const authMiddleware = withAuth(
           return isAdmin(token)
         }
 
-        // TODO: check functionality token != null
-        return true
+        // Only supports the "jwt" session strategy
+        // FIXME: Bug in NextAuth.js: 4.24.7
+        return true // Boolean(token)
       },
     },
     pages: {
