@@ -5,26 +5,24 @@ import { useState, useEffect } from 'react'
 import { useAsyncFn } from 'react-use'
 import { getTokens } from '@/contracts/tokens'
 import { formatBalance } from '@/utils/math'
-import { getContract, type Contracts } from '@/wallet/lib/getContracts'
+import { useContracts } from '@/wallet/hooks/useContracts'
 import { publicClients } from '@/wallet/lib/publicClients'
-import type { WalletProviderValues } from '@/wallet/lib/getWalletProvider'
+import type { WalletClient } from 'viem'
+
+// Get current wallet values from Web3Context
+// instead of using this hook directly
 
 type UseBalanceParams = {
   chainId?: number
-  contracts?: Contracts
-  walletProviderValues?: WalletProviderValues
   loading: boolean
+  walletClient?: WalletClient
 }
 
 type Balances = { [symbol: string]: bigint | undefined } // smallest unit
 
-export function useBalances({
-  chainId,
-  contracts,
-  walletProviderValues,
-  loading,
-}: UseBalanceParams) {
-  const { walletAddress } = walletProviderValues || {}
+export function useBalances({ chainId, walletClient, loading }: UseBalanceParams) {
+  const { contracts, getContract } = useContracts(walletClient)
+  const walletAddress = walletClient?.account?.address
   const notReady = !chainId || !walletAddress || _.isEmpty(contracts) || loading
 
   const [balances, setBalances] = useState<Balances>({})
@@ -58,7 +56,7 @@ export function useBalances({
     const results = await Promise.all(
       tokens.map(async ({ address, symbol, decimal }) => {
         try {
-          const contract = getContract(address, contracts)
+          const contract = getContract(address)
           if (contract) {
             const balance = await contract.read.balanceOf([walletAddress])
             if (typeof balance === 'bigint') {

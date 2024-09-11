@@ -1,20 +1,18 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import React, { createContext, useContext, useMemo, useEffect } from 'react'
-import { useAsyncFn } from 'react-use'
+import React, { createContext, useContext, useMemo, useState } from 'react'
 import { useWallet } from '@/wallet/hooks/useWallet'
-import { getSmartAccount, type SmartAccountValues } from '@/wallet/lib/getSmartAccount'
-import { getWalletProvider, type WalletProviderValues } from '@/wallet/lib/getWalletProvider'
-import { getWalletClient } from '@/wallet/lib/getWalletClient'
-import { getContracts, type Contracts } from '@/wallet/lib/getContracts'
+import { useSmartAccount } from '@/wallet/hooks/useSmartAccount'
 import { useBalances } from '@/wallet/hooks/useBalances'
 import { usePrices } from '@/wallet/hooks/usePrices'
 import { supportedChains } from './variables'
 import { toChainId } from '@/wallet/utils/network'
 import { getTokens, type Erc20 } from '@/contracts/tokens'
-import type { WalletClient } from 'viem'
+import type { WalletClient, Hash } from 'viem'
 
+type WalletValues = ReturnType<typeof useWallet>
+type SmartAccountValues = ReturnType<typeof useSmartAccount>
 type BalancesValues = ReturnType<typeof useBalances>
 type PricesValues = ReturnType<typeof usePrices>
 
@@ -22,45 +20,43 @@ type Web3ContextType = {
   loading: boolean
   chainId?: number
   tokens: Erc20[]
-  walletAddress?: string
-  smartAccountValues?: SmartAccountValues
-  walletProviderValues?: WalletProviderValues
+  walletAddress?: Hash
   walletClient?: WalletClient
-  contracts?: Contracts
+  walletValues: WalletValues
+  smartAccountValues: SmartAccountValues
   balancesValues: BalancesValues
   pricesValues: PricesValues
+  onSmartAccount: boolean
+  setOnSmartAccount: (newValue: boolean) => void
   switchChain: (chainId: number) => Promise<void>
 }
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined)
 
 export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const wallet = useWallet()
+  // Get wallet values
+  const walletValues = useWallet()
+  const { wallet, currentWalletType } = walletValues
+  const isPrivy = currentWalletType === 'privy'
   const chainId = toChainId(wallet?.chainId)
   const tokens = useMemo(() => getTokens(chainId), [chainId])
 
-  // setup
-  const [valuesState, setupValues] = useAsyncFn(async () => {
-    if (!chainId || !wallet) return
-    // get values
-    const smartAccountValues = await getSmartAccount(chainId, wallet)
-    const walletProviderValues = await getWalletProvider(wallet, smartAccountValues)
-    const walletClient = getWalletClient(chainId, walletProviderValues)
-    const contracts = walletClient ? getContracts(chainId, walletClient) : {}
-    console.log('Current wallet: ', {
-      walletAddress: walletProviderValues.walletAddress,
-      isSmartAccount: walletProviderValues.isSmartAccount,
-    })
-    return { contracts, smartAccountValues, walletProviderValues, walletClient }
-  }, [chainId, wallet])
+  // Select smart account
+  const smartAccountValues = useSmartAccount()
+  const [onSmartAccount, setOnSmartAccount] = useState(true)
 
-  // state
-  const { value, loading } = valuesState
-  const { contracts, smartAccountValues, walletProviderValues, walletClient } = value || {}
-  const { walletAddress } = walletProviderValues || {}
+  const loading = walletValues.loading || smartAccountValues.loading
+
+  // Current wallet value
+  const walletClient = !loading
+    ? isPrivy && onSmartAccount
+      ? smartAccountValues.smartClientWithSponsor
+      : walletValues.walletClient
+    : undefined
+  const walletAddress = walletClient?.account?.address
 
   // hooks
-  const balancesValues = useBalances({ chainId, contracts, walletProviderValues, loading })
+  const balancesValues = useBalances({ chainId, walletClient, loading })
   const pricesValues = usePrices()
 
   const switchChain = async (chainId: number) => {
@@ -77,12 +73,6 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  useEffect(() => {
-    if (chainId && wallet) {
-      setupValues()
-    }
-  }, [chainId, wallet])
-
   return (
     <Web3Context.Provider
       value={{
@@ -91,11 +81,12 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
         tokens,
         walletAddress,
         walletClient,
+        walletValues,
         smartAccountValues,
-        walletProviderValues,
-        contracts,
         balancesValues,
         pricesValues,
+        onSmartAccount,
+        setOnSmartAccount,
         switchChain,
       }}
     >

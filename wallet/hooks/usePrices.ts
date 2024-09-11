@@ -7,6 +7,9 @@ import { useEffect } from 'react'
 import { useAsyncFn } from 'react-use'
 import { symbols } from '@/contracts/tokens'
 
+// Get current wallet values from Web3Context
+// instead of using this hook directly
+
 type PriceData = {
   symbol: string // "LTCBTC",
   price: string // "4.00000200"

@@ -1,21 +1,21 @@
 'use client'
 
-import { createWalletClient, custom, type WalletClient } from 'viem'
+import { createWalletClient, custom } from 'viem'
 import { supportedChains } from '@/wallet/variables'
-import type { WalletProviderValues } from '@/wallet/lib/getWalletProvider'
+import type { Hash, WalletClient } from 'viem'
+import type { EIP1193Provider } from '@privy-io/react-auth'
 
 export function getWalletClient(
   chainId: number,
-  walletProviderValues: WalletProviderValues
+  provider: EIP1193Provider,
+  account: Hash
 ): WalletClient | undefined {
-  const { provider, walletAddress } = walletProviderValues
-
   // set wallet client
   const chain = supportedChains.find(c => c.id === chainId)
-  if (chain && provider && walletAddress) {
+  if (chain) {
     // https://viem.sh/docs/clients/wallet#optional-hoist-the-account
     const walletClient = createWalletClient({
-      account: walletAddress,
+      account,
       chain,
       transport: custom(provider),
     })
