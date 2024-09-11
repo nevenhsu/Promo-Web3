@@ -52,7 +52,7 @@ export function useSyncAuth() {
     if (privyAuthFail && nextAuth) {
       dispatch(clearUser())
       dispatch(clearUserActivityStatus())
-      signOut({ callbackUrl: '/home' }) // NextAuth logout
+      signOut({ callbackUrl: '/' }) // NextAuth logout
     }
   }, [privyAuthFail, nextAuth])
 
