@@ -97,5 +97,5 @@ export function useClickLogin() {
     callbackPath,
   })
 
-  return { clickLogin, loading: loading || Boolean(nextPage) }
+  return { clickLogin, loading: loading || (Boolean(nextPage) && privyAuth) }
 }
