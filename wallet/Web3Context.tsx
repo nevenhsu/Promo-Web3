@@ -37,19 +37,19 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   // Get wallet values
   const walletValues = useWallet()
   const { wallet, currentWalletType } = walletValues
-  const isPrivy = currentWalletType === 'privy'
   const chainId = toChainId(wallet?.chainId)
   const tokens = useMemo(() => getTokens(chainId), [chainId])
 
   // Select smart account
   const smartAccountValues = useSmartAccount()
-  const [onSmartAccount, setOnSmartAccount] = useState(true)
-
+  const [_onSmartAccount, setOnSmartAccount] = useState(true)
+  const onSmartAccount = _onSmartAccount && currentWalletType === 'privy' // only for privy
   const loading = walletValues.loading || smartAccountValues.loading
 
   // Current wallet value
+
   const walletClient = !loading
-    ? isPrivy && onSmartAccount
+    ? onSmartAccount
       ? smartAccountValues.smartClientWithSponsor
       : walletValues.walletClient
     : undefined

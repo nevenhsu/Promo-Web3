@@ -1,7 +1,8 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useWeb3 } from '@/wallet/Web3Context'
 import { getTokens } from '@/contracts/tokens'
 import { getContract as createContract } from 'viem'
 import { unifyAddress } from '@/wallet/utils/helper'
@@ -11,7 +12,8 @@ export type Contracts = {
   [address: string]: GetContractReturnType<unknown[], WalletClient> | undefined
 }
 
-export function useContracts(walletClient?: WalletClient) {
+export function useContracts() {
+  const { walletClient } = useWeb3()
   const [contracts, setContracts] = useState<Contracts>({})
 
   const getContract = (address: string) => {
@@ -29,18 +31,21 @@ export function useContracts(walletClient?: WalletClient) {
         address,
         client,
       })
-
       contracts[unifyAddress(address)] = contract
     })
+
+    // Set contracts
     setContracts(contracts)
   }
 
   useEffect(() => {
+    // clear contracts
+    setContracts({})
+
+    // setup contracts
     const chainId = walletClient?.chain?.id
     if (walletClient && chainId) {
       setupContracts(walletClient, chainId)
-    } else {
-      setContracts({})
     }
   }, [walletClient])
 

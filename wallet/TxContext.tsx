@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState } from 'react'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { getPublicClient } from '@/wallet/lib/publicClients'
 import { wait } from '@/wallet/utils/helper'
-import { getContract } from '@/wallet/lib/getContracts'
+import { useContracts } from '@/wallet/hooks/useContracts'
 import { TxStatus } from '@/types/db'
 import type { Hash, SimulateContractReturnType, WriteContractReturnType } from 'viem'
 
@@ -47,7 +47,8 @@ interface TxContextType {
 const TxContext = createContext<TxContextType | undefined>(undefined)
 
 export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { chainId, contracts } = useWeb3()
+  const { chainId } = useWeb3()
+  const { getContract } = useContracts()
 
   const [txs, setTxs] = useState<Tx[]>([])
 
@@ -57,15 +58,14 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   const addTx = (values: AddTxValues, callback?: TxCallback) => {
     const { contractAddr, fnName, fnArgs, description } = values
-    const contract = getContract(contractAddr, contracts)
+    const contract = getContract(contractAddr)
 
     if (!chainId) return
 
     const simulateFn = contract?.simulate[fnName]
     const writeFn = contract?.write[fnName]
 
-    const valid = contract && simulateFn && writeFn
-
+    const valid = !!contract && !!simulateFn && !!writeFn
     const status = valid ? TxStatus.Init : TxStatus.Error
     const timestamp = Date.now() // unique id
 

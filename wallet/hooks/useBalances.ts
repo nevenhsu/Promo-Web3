@@ -21,7 +21,7 @@ type UseBalanceParams = {
 type Balances = { [symbol: string]: bigint | undefined } // smallest unit
 
 export function useBalances({ chainId, walletClient, loading }: UseBalanceParams) {
-  const { contracts, getContract } = useContracts(walletClient)
+  const { contracts, getContract } = useContracts()
   const walletAddress = walletClient?.account?.address
   const notReady = !chainId || !walletAddress || _.isEmpty(contracts) || loading
 
