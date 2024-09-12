@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { useAsyncFn } from 'react-use'
 import { getTokens } from '@/contracts/tokens'
 import { formatBalance } from '@/utils/math'
-import { useContracts } from '@/wallet/hooks/useContracts'
+import { createContract } from '@/wallet/lib/createContract'
 import { publicClients } from '@/wallet/lib/publicClients'
 import type { WalletClient } from 'viem'
 
@@ -21,9 +21,8 @@ type UseBalanceParams = {
 type Balances = { [symbol: string]: bigint | undefined } // smallest unit
 
 export function useBalances({ chainId, walletClient, loading }: UseBalanceParams) {
-  const { contracts, getContract } = useContracts()
   const walletAddress = walletClient?.account?.address
-  const notReady = !chainId || !walletAddress || _.isEmpty(contracts) || loading
+  const notReady = !chainId || !walletAddress || loading
 
   const [balances, setBalances] = useState<Balances>({})
 
@@ -54,12 +53,13 @@ export function useBalances({ chainId, walletClient, loading }: UseBalanceParams
 
     // erc20 balance
     const results = await Promise.all(
-      tokens.map(async ({ address, symbol, decimal }) => {
+      tokens.map(async o => {
         try {
-          const contract = getContract(address)
+          const contract = createContract(o, walletClient)
           if (contract) {
             const balance = await contract.read.balanceOf([walletAddress])
             if (typeof balance === 'bigint') {
+              const { symbol, decimal } = o
               return { symbol, decimal, balance }
             }
           }
@@ -79,7 +79,7 @@ export function useBalances({ chainId, walletClient, loading }: UseBalanceParams
     }, {} as Balances)
 
     setBalances(newBalances)
-  }, [notReady, chainId, walletAddress, contracts])
+  }, [notReady, chainId, walletAddress])
 
   useEffect(() => {
     // reset balances when loading contracts
@@ -93,7 +93,7 @@ export function useBalances({ chainId, walletClient, loading }: UseBalanceParams
 
     // auto update balances
     updateBalances()
-  }, [notReady, chainId, walletAddress, contracts])
+  }, [notReady, chainId, walletAddress])
 
   return { notReady, balances, loading: loading || updateState.loading, updateBalances }
 }

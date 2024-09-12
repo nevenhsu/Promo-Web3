@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState } from 'react'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { getPublicClient } from '@/wallet/lib/publicClients'
 import { wait } from '@/wallet/utils/helper'
-import { useContracts } from '@/wallet/hooks/useContracts'
+import { createContract, type ContractData } from '@/wallet/lib/createContract'
 import { TxStatus } from '@/types/db'
 import type { Hash, SimulateContractReturnType, WriteContractReturnType } from 'viem'
 
@@ -24,7 +24,6 @@ export type Tx = {
 }
 
 type AddTxValues = {
-  contractAddr: string
   fnName: string
   fnArgs: any[]
   description?: string
@@ -39,6 +38,7 @@ type TxCallback = (values: {
 interface TxContextType {
   txs: Tx[]
   addTx: (
+    contractData: ContractData,
     values: AddTxValues,
     callback?: TxCallback
   ) => { waitTx: () => Promise<Hash | undefined>; timestamp: number } | undefined
@@ -47,8 +47,7 @@ interface TxContextType {
 const TxContext = createContext<TxContextType | undefined>(undefined)
 
 export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { chainId } = useWeb3()
-  const { getContract } = useContracts()
+  const { chainId, walletClient } = useWeb3()
 
   const [txs, setTxs] = useState<Tx[]>([])
 
@@ -56,9 +55,9 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setTxs(prev => prev.map(o => (o.timestamp === timestamp ? { ...o, ...newValue } : o)))
   }
 
-  const addTx = (values: AddTxValues, callback?: TxCallback) => {
-    const { contractAddr, fnName, fnArgs, description } = values
-    const contract = getContract(contractAddr)
+  const addTx = (contractData: ContractData, values: AddTxValues, callback?: TxCallback) => {
+    const { fnName, fnArgs, description } = values
+    const contract = createContract(contractData, walletClient)
 
     if (!chainId) return
 
@@ -72,7 +71,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     const tx: Tx = {
       timestamp,
       chainId,
-      contractAddr,
+      contractAddr: contractData.address,
       fnName,
       status,
       description,

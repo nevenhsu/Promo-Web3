@@ -33,8 +33,7 @@ export default function Send() {
 
   const [opened, { open, close }] = useDisclosure(false)
   const [txTimestamp, setTxTimestamp] = useState(0)
-  const { chainId, walletProviderValues, balancesValues, pricesValues } = useWeb3()
-  const { walletAddress, isSmartAccount } = walletProviderValues || {}
+  const { chainId, walletAddress, balancesValues, pricesValues, onSmartAccount } = useWeb3()
   const { balances, updateBalances } = balancesValues
   const { prices } = pricesValues
   const { txs, addTx } = useTx()
@@ -169,8 +168,8 @@ export default function Send() {
 
     const displayAmount = formatBalance(rawAmount, token.decimal).toString() // display value
     const result = addTx(
+      token,
       {
-        contractAddr: token.address,
         fnName: 'transfer',
         fnArgs: [to, rawAmount],
         description: `Transfer ${displayAmount} ${token.symbol} to ${to}`,
@@ -255,7 +254,7 @@ export default function Send() {
                 <Stack pos="relative" gap={4}>
                   <Paper p="md" radius="sm" h={96}>
                     <Text fz="sm" fw={500} mb="xs">
-                      {isSmartAccount ? 'My smart wallet' : 'My embedded wallet'}
+                      {onSmartAccount ? 'My smart wallet' : 'My embedded wallet'}
                     </Text>
                     <Text className="nowrap" fz="sm">
                       {walletAddress || 'No wallet address'}
