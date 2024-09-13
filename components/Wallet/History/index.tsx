@@ -12,6 +12,8 @@ import { getToken } from '@/contracts/tokens'
 import { formatLocalDate, isEnumMember } from '@/utils/helper'
 import type { TTransaction } from '@/models/transaction'
 
+// TODO: add ETH and Erc20 types
+
 export default function History() {
   const { total, current, activeTab, setActiveTab, handlePageChange, data, loading } =
     useTransaction()

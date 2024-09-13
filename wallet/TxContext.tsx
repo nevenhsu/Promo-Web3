@@ -5,27 +5,22 @@ import React, { createContext, useContext, useState } from 'react'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { getPublicClient } from '@/wallet/lib/publicClients'
 import { wait } from '@/wallet/utils/helper'
-import { createContract, type ContractData } from '@/wallet/lib/createContract'
 import { TxStatus } from '@/types/db'
-import type { Hash, SimulateContractReturnType, WriteContractReturnType } from 'viem'
+import type { Hash, SimulateContractParameters, WalletClient } from 'viem'
 
-type SimulateFn = (...args: any[]) => Promise<SimulateContractReturnType>
-type WriteFn = (...args: any[]) => Promise<WriteContractReturnType>
+type NativeData = { to: Hash; value: bigint }
 
 export type Tx = {
   timestamp: number // unique id
   chainId: number
-  contractAddr: string
-  fnName: string
   status: TxStatus
+  params: NativeData | SimulateContractParameters
   hash?: Hash
   description?: string
   error?: string
 }
 
-type AddTxValues = {
-  fnName: string
-  fnArgs: any[]
+type OtherValues = {
   description?: string
 }
 
@@ -33,76 +28,157 @@ type TxCallback = (values: {
   hash: Hash
   waitSuccess: Promise<boolean>
   timestamp: number // Date.now()
+  chainId: number
+  account: Hash
 }) => Promise<void>
+
+export type TxResult = { timestamp: number; waitTx: () => Promise<Hash | undefined> } | undefined
+
+type AddTxFunc<T> = (data: T, others: OtherValues, callback?: TxCallback) => TxResult
 
 interface TxContextType {
   txs: Tx[]
-  addTx: (
-    contractData: ContractData,
-    values: AddTxValues,
-    callback?: TxCallback
-  ) => { waitTx: () => Promise<Hash | undefined>; timestamp: number } | undefined
+  addNativeTx: AddTxFunc<NativeData>
+  addContractTx: AddTxFunc<SimulateContractParameters>
 }
 
 const TxContext = createContext<TxContextType | undefined>(undefined)
 
 export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { chainId, walletClient } = useWeb3()
-
+  const { walletClient, onSmartAccount, smartAccountValues } = useWeb3()
   const [txs, setTxs] = useState<Tx[]>([])
 
   const updateTx = (timestamp: number, newValue: Partial<Tx>) => {
     setTxs(prev => prev.map(o => (o.timestamp === timestamp ? { ...o, ...newValue } : o)))
   }
 
-  const addTx = (contractData: ContractData, values: AddTxValues, callback?: TxCallback) => {
-    const { fnName, fnArgs, description } = values
-    const contract = createContract(contractData, walletClient)
+  // For native token transfer
+  const addNativeTx: AddTxFunc<NativeData> = (data, others, callback) => {
+    const chainId = walletClient?.chain?.id
+    if (!walletClient || !chainId || !data.to || !data.value) return
 
-    if (!chainId) return
-
-    const simulateFn = contract?.simulate[fnName]
-    const writeFn = contract?.write[fnName]
-
-    const valid = !!contract && !!simulateFn && !!writeFn
-    const status = valid ? TxStatus.Init : TxStatus.Error
     const timestamp = Date.now() // unique id
 
     const tx: Tx = {
       timestamp,
       chainId,
-      contractAddr: contractData.address,
-      fnName,
-      status,
-      description,
+      params: {
+        ...data,
+      },
+      status: TxStatus.Init,
+      ...others,
     }
 
     // add tx to list
     setTxs(prev => [...prev, tx])
 
-    if (valid) {
+    if (data.to && data.value) {
       // send tx
-      const txResult = sendTx({ timestamp, chainId }, { simulateFn, writeFn, fnArgs }, callback)
+      const txResult = sendNativeTx(
+        timestamp,
+        {
+          to: data.to,
+          value: data.value,
+        },
+        callback
+      )
 
       const waitTx = async () => {
         const hash = await txResult
         return hash
       }
 
-      return { timestamp, waitTx }
+      return { waitTx, timestamp }
     }
   }
 
-  const sendTx = async (
-    data: { timestamp: number; chainId: number },
-    fn: { simulateFn: SimulateFn; writeFn: WriteFn; fnArgs: any[] },
+  const sendNativeTx = async (
+    timestamp: number,
+    data: { to: Hash; value: bigint },
     callback?: TxCallback
   ) => {
-    const { timestamp, chainId } = data
-    const { simulateFn, writeFn, fnArgs } = fn
     try {
-      await simulateFn(fnArgs)
-      const hash = await writeFn(fnArgs)
+      const chainId = walletClient?.chain?.id
+      if (!chainId || !walletClient.account) {
+        throw new Error('Wallet not found')
+      }
+
+      // FIXME: UserOperation reverted during simulation with reason: 0x
+      // @ts-ignore
+      const hash = await walletClient.sendTransaction({
+        ...data,
+      })
+
+      // update tx hash
+      updateTx(timestamp, { hash, status: TxStatus.Pending })
+      console.log(`Transaction hash: ${hash}`)
+
+      // check tx status
+
+      const waitSuccess = handleTxStatus(timestamp, chainId, hash)
+
+      if (callback) {
+        callback({ hash, waitSuccess, timestamp, chainId, account: walletClient.account.address })
+      }
+
+      return hash
+    } catch (err) {
+      console.error(err)
+
+      const msg = _.get(err, 'details') || _.get(err, 'message', 'Unknown error')
+      const error = msg.includes('gas') ? 'Exceed gas limit. Please try again later.' : msg
+      updateTx(timestamp, { status: TxStatus.Failed, error })
+    }
+  }
+
+  // For contract interaction
+  const addContractTx: AddTxFunc<SimulateContractParameters> = (data, others, callback) => {
+    const timestamp = Date.now() // unique id
+
+    const chainId = walletClient?.chain?.id
+    if (!chainId) return
+
+    const tx: Tx = {
+      timestamp,
+      chainId,
+      params: data,
+      status: TxStatus.Init,
+      ...others,
+    }
+
+    // add tx to list
+    setTxs(prev => [...prev, tx])
+
+    // send tx
+    const txResult = sendContractTx(timestamp, walletClient, data, callback)
+
+    const waitTx = async () => {
+      const hash = await txResult
+      return hash
+    }
+
+    return { waitTx, timestamp }
+  }
+
+  const sendContractTx = async (
+    timestamp: number,
+    walletClient: WalletClient,
+    data: SimulateContractParameters,
+    callback?: TxCallback
+  ) => {
+    try {
+      const chainId = walletClient.chain?.id
+      if (!chainId || !walletClient.account) {
+        throw new Error('Wallet not found')
+      }
+
+      const publicClient = getPublicClient(chainId)
+      const { request } = await publicClient!.simulateContract({
+        ...data,
+        account: walletClient.account,
+      })
+
+      const hash = await walletClient.writeContract(request)
 
       // update tx hash
       updateTx(timestamp, { hash, status: TxStatus.Pending })
@@ -112,7 +188,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       const waitSuccess = handleTxStatus(timestamp, chainId, hash)
 
       if (callback) {
-        callback({ hash, waitSuccess, timestamp })
+        callback({ hash, waitSuccess, timestamp, chainId, account: walletClient.account.address })
       }
 
       return hash
@@ -138,7 +214,8 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     <TxContext.Provider
       value={{
         txs,
-        addTx,
+        addNativeTx,
+        addContractTx,
       }}
     >
       {children}
@@ -156,10 +233,8 @@ export const useTx = (): TxContextType => {
 
 async function checkTxStatus(chainId: number, hash: Hash) {
   try {
-    const client = getPublicClient(chainId)
-    if (!client) return false
-
-    const { status, blockNumber } = await client.getTransactionReceipt({ hash })
+    const publicClient = getPublicClient(chainId)
+    const { status, blockNumber } = await publicClient!.getTransactionReceipt({ hash })
 
     console.log('TransactionReceipt', { status, blockNumber, hash })
 

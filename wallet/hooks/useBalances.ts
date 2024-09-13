@@ -3,7 +3,7 @@
 import * as _ from 'lodash-es'
 import { useState, useEffect } from 'react'
 import { useAsyncFn } from 'react-use'
-import { getTokens } from '@/contracts/tokens'
+import { getTokens, eth } from '@/contracts/tokens'
 import { formatBalance } from '@/utils/math'
 import { createContract } from '@/wallet/lib/createContract'
 import { publicClients } from '@/wallet/lib/publicClients'
@@ -33,9 +33,8 @@ export function useBalances({ chainId, walletClient, loading }: UseBalanceParams
         const balance = await client.getBalance({ address })
         if (typeof balance === 'bigint') {
           return {
-            symbol: 'ETH',
             balance,
-            decimal: 18,
+            ...eth,
           }
         }
       } catch (err) {

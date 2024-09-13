@@ -36,14 +36,14 @@ const Web3Context = createContext<Web3ContextType | undefined>(undefined)
 export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Get wallet values
   const walletValues = useWallet()
-  const { wallet, currentWalletType } = walletValues
+  const { wallet } = walletValues
   const chainId = toChainId(wallet?.chainId)
   const tokens = useMemo(() => getTokens(chainId), [chainId])
 
   // Select smart account
   const smartAccountValues = useSmartAccount()
   const [_onSmartAccount, setOnSmartAccount] = useState(true)
-  const onSmartAccount = _onSmartAccount && currentWalletType === 'privy' // only for privy
+  const onSmartAccount = _onSmartAccount && wallet?.walletClientType === 'privy' // only for privy
   const loading = walletValues.loading || smartAccountValues.loading
 
   // Current wallet value

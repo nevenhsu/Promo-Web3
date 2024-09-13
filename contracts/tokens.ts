@@ -4,6 +4,14 @@ import ERC20 from './abi/ERC20.json'
 import { unifyAddress } from '@/wallet/utils/helper'
 import type { Hash } from 'viem'
 
+export type ETH = {
+  name: 'Ethereum'
+  symbol: 'ETH'
+  decimal: 18
+  icon: '/icons/eth.svg'
+  isNative: true
+}
+
 export type Erc20 = {
   chainId: number
   name: string
@@ -11,9 +19,18 @@ export type Erc20 = {
   decimal: number
   address: Hash
   version: string
-  isPermit: boolean
   icon: string
-  abi: unknown[]
+  abi: any[]
+}
+
+export type Token = ETH | Erc20
+
+export const eth: ETH = {
+  name: 'Ethereum',
+  symbol: 'ETH',
+  decimal: 18,
+  icon: '/icons/eth.svg',
+  isNative: true,
 }
 
 export const tokens: { [id: string]: Erc20[] } = {
@@ -25,7 +42,6 @@ export const tokens: { [id: string]: Erc20[] } = {
       decimal: 6,
       address: unifyAddress('0x036CbD53842c5426634e7929541eC2318f3dCF7e'),
       version: '2',
-      isPermit: true,
       icon: '/icons/usdc-token.svg',
       abi: ERC20.abi,
     },
@@ -38,7 +54,6 @@ export const tokens: { [id: string]: Erc20[] } = {
       decimal: 6,
       address: unifyAddress('0xaf88d065e77c8cc2239327c5edb3a432268e5831'),
       version: '2',
-      isPermit: true,
       icon: '/icons/usdc-token.svg',
       abi: ERC20.abi,
     },
@@ -51,7 +66,6 @@ export const tokens: { [id: string]: Erc20[] } = {
       decimal: 6,
       address: unifyAddress('0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d'),
       version: '2',
-      isPermit: true,
       icon: '/icons/usdc-token.svg',
       abi: ERC20.abi,
     },
@@ -62,7 +76,6 @@ export const tokens: { [id: string]: Erc20[] } = {
       decimal: 18,
       address: unifyAddress('0xfd39d0bC79F1bdf8E14604f5287F0f4216Db25BB'),
       version: '1',
-      isPermit: true,
       icon: '/icons/sharx-token.svg',
       abi: ERC20.abi,
     },
@@ -80,4 +93,12 @@ export function getTokens(chainId?: number) {
 export function getToken(chainId?: number, symbol?: string) {
   const tokens = getTokens(chainId)
   return tokens.find(o => o.chainId === chainId && o.symbol === symbol)
+}
+
+export function isErc20(token: object): token is Erc20 {
+  return token && 'address' in token
+}
+
+export function isETH(token: object): token is ETH {
+  return token && 'isNative' in token
 }

@@ -43,6 +43,11 @@ export function useSmartAccount() {
   const setupSmartAccount = async (privyWallet: ConnectedWallet, chainId: number) => {
     try {
       setLoading(true)
+      // Reset smart account values
+      setSmartClientWithSponsor(undefined)
+      setSmartClientNoSponsor(undefined)
+      setSmartAccountAddress(undefined)
+
       const res = await getAccountClient(privyWallet, chainId)
 
       if (!res?.smartAccountAddress) {
@@ -61,9 +66,6 @@ export function useSmartAccount() {
       )
     } catch (err) {
       console.error(err)
-      setSmartAccountAddress(undefined)
-      setSmartClientWithSponsor(undefined)
-      setSmartClientNoSponsor(undefined)
     } finally {
       setLoading(false)
     }

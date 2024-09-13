@@ -31,8 +31,8 @@ export default function Wallet() {
   const { data } = useAppSelector(state => state.user)
   const { name } = data
 
-  const { chainId, tokens, walletProviderValues, balancesValues, pricesValues, loading } = useWeb3()
-  const { isSmartAccount, walletAddress } = walletProviderValues || {}
+  const { chainId, tokens, walletAddress, onSmartAccount, balancesValues, pricesValues, loading } =
+    useWeb3()
   const { balances, updateBalances, loading: balLoading } = balancesValues
   const { prices } = pricesValues
 
@@ -72,7 +72,7 @@ export default function Wallet() {
             </Stack>
             <Stack gap={4} ta="right">
               <Text fz="xs">
-                {loading ? 'Connecting' : isSmartAccount ? 'Smart wallet' : 'Embedded wallet'}
+                {loading ? 'Connecting' : onSmartAccount ? 'Smart wallet' : 'Embedded wallet'}
               </Text>
               <Text fz="xs" className="word-break-all" lh={1.2}>
                 {loading ? ' ' : formatAddress(walletAddress)}

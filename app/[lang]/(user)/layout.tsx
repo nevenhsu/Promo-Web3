@@ -11,7 +11,7 @@ export default function UserLayout({
   return (
     <>
       <AuthGuard>
-        <Box w={{ base: '100%', sm: '66.66%', lg: '60%' }} maw={600} mx="auto">
+        <Box w={{ base: '100%', sm: '80%', lg: '60%' }} maw={600} mx="auto">
           {children}
         </Box>
       </AuthGuard>

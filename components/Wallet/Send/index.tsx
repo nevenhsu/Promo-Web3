@@ -6,21 +6,21 @@ import { useRouter } from '@/navigation'
 import { useState, useMemo, useEffect } from 'react'
 import { useForm } from '@mantine/form'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { useTx, type Tx } from '@/wallet/TxContext'
+import { useTx } from '@/wallet/TxContext'
 import { modals } from '@mantine/modals'
 import { useDisclosure } from '@mantine/hooks'
 import { Paper, Stack, Group, Title, Text, Space, Divider, Box } from '@mantine/core'
 import { Button, TextInput, NumberInput, Select } from '@mantine/core'
 import { ThemeIcon, Modal, FocusTrap } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { getTokens, getToken } from '@/contracts/tokens'
+import { getTokens, isErc20, isETH, eth, type Token } from '@/contracts/tokens'
 import { formatBalance, formatAmount } from '@/utils/math'
 import { getNetwork } from '@/wallet/utils/network'
 import { createTransaction } from '@/services/transaction'
 import { TxStatus, TxType } from '@/types/db'
 import { PiArrowDown } from 'react-icons/pi'
 import { isAddressEqual, isAddress } from '@/wallet/utils/helper'
-import { type Erc20 } from '@/contracts/tokens'
+import type { Tx, TxResult } from '@/wallet/TxContext'
 
 type FormData = {
   symbol: string // token
@@ -36,14 +36,14 @@ export default function Send() {
   const { chainId, walletAddress, balancesValues, pricesValues, onSmartAccount } = useWeb3()
   const { balances, updateBalances } = balancesValues
   const { prices } = pricesValues
-  const { txs, addTx } = useTx()
+  const { txs, addNativeTx, addContractTx } = useTx()
 
   const tx = useMemo(() => {
     return txTimestamp ? _.find(txs, { timestamp: txTimestamp }) : undefined
   }, [txs, txTimestamp])
 
   // Get tokens and network info
-  const tokens = useMemo(() => getTokens(chainId), [chainId])
+  const tokens = useMemo(() => [eth, ...getTokens(chainId)], [chainId])
   const network = useMemo(() => getNetwork(chainId), [chainId])
 
   const form = useForm<FormData>({
@@ -84,9 +84,9 @@ export default function Send() {
 
   // Get token info
   const { token, balance, price } = useMemo(() => {
-    const token = getToken(chainId, symbol)
+    const token = _.find(tokens, { symbol })
     return { token, balance: balances[symbol], price: prices[symbol] }
-  }, [chainId, symbol, balances, prices])
+  }, [tokens, symbol, balances, prices])
 
   const handlePaste = async () => {
     try {
@@ -166,23 +166,64 @@ export default function Send() {
   const handleSubmit = async (to: string, rawAmount: string) => {
     if (!token) return
 
+    let result: TxResult | undefined
+
     const displayAmount = formatBalance(rawAmount, token.decimal).toString() // display value
-    const result = addTx(
-      token,
-      {
-        fnName: 'transfer',
-        fnArgs: [to, rawAmount],
-        description: `Transfer ${displayAmount} ${token.symbol} to ${to}`,
-      },
-      async ({ hash, waitSuccess, timestamp }) => {
-        if (chainId && walletAddress) {
+    const description = `Transfer ${displayAmount} ${token.symbol} to ${to}`
+
+    if (isETH(token)) {
+      result = addNativeTx(
+        {
+          to: to as `0x${string}`,
+          value: BigInt(rawAmount),
+        },
+        {
+          description,
+        },
+        async ({ hash, waitSuccess, timestamp, chainId, account }) => {
           try {
             const success = await waitSuccess
             // save to db
             const tx = await createTransaction({
               chainId,
               hash,
-              from: walletAddress,
+              from: account,
+              type: TxType.Native,
+              to,
+              token: {
+                symbol: token.symbol,
+                amount: displayAmount,
+              },
+              status: success ? TxStatus.Success : TxStatus.Failed,
+              createdAt: new Date(timestamp),
+            })
+            console.log('Transaction saved: ', tx.hash)
+          } catch (err) {
+            console.error(err)
+          }
+        }
+      )
+    }
+
+    if (isErc20(token)) {
+      result = addContractTx(
+        {
+          address: token.address,
+          functionName: 'transfer',
+          args: [to, rawAmount],
+          abi: token.abi,
+        },
+        {
+          description,
+        },
+        async ({ hash, waitSuccess, timestamp, chainId, account }) => {
+          try {
+            const success = await waitSuccess
+            // save to db
+            const tx = await createTransaction({
+              chainId,
+              hash,
+              from: account,
               type: TxType.ERC20,
               to,
               contract: token.address,
@@ -198,8 +239,8 @@ export default function Send() {
             console.error(err)
           }
         }
-      }
-    )
+      )
+    }
 
     if (result) {
       const { timestamp } = result
@@ -323,7 +364,7 @@ export default function Send() {
                 />
 
                 {/* Amount */}
-                <Stack gap={4}>
+                <Stack gap={4} pos="relative">
                   <NumberInput
                     label="Amount"
                     placeholder=""
@@ -337,13 +378,22 @@ export default function Send() {
                     {...form.getInputProps('amount')}
                   />
 
-                  <Group justify="space-between">
-                    <Text fz="xs" c="dimmed">
-                      {token
-                        ? `Available Balance: ${formatBalance(balance || 0, token.decimal).toDP(6)}`
-                        : ''}
-                    </Text>
+                  <Text
+                    fz="xs"
+                    c="dimmed"
+                    ta="right"
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: 4,
+                    }}
+                  >
+                    {token
+                      ? `Available Balance: ${formatBalance(balance || 0, token.decimal).toDP(6)}`
+                      : ''}
+                  </Text>
 
+                  <Group justify="right">
                     <Text fz="xs" c="dimmed">
                       {price ? `USD ${price.mul(Number(amount) || '0').toDP(2)}` : 'No price yet'}
                     </Text>
@@ -384,7 +434,7 @@ function Transaction({
   onBack,
 }: {
   tx?: Tx
-  token?: Erc20
+  token?: Token
   values: FormData
   onOk: () => void
   onBack: () => void

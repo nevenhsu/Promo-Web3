@@ -12,19 +12,19 @@ import type { ConnectedWallet } from '@privy-io/react-auth'
 
 export function useWallet() {
   const { wallets } = useWallets()
-  const [currentWalletType, setCurrentWalletType] = useState('privy')
+  const [walletClientType, _setWalletClientType] = useState('privy')
   const [walletClient, setWalletClient] = useState<WalletClient>()
   const [loading, setLoading] = useState(true)
 
   // Find the wallet by the walletClientType
-  const wallet = wallets.find(wallet => wallet.walletClientType === currentWalletType)
+  const wallet = wallets.find(wallet => wallet.walletClientType === walletClientType)
   const chainId = toChainId(wallet?.chainId)
   const walletClientTypes = wallets.map(wallet => wallet.walletClientType)
   const walletAddress: Hash | undefined = wallet?.address as any
 
   const setWalletClientType = (type: string) => {
     if (walletClientTypes.includes(type)) {
-      setCurrentWalletType(type)
+      _setWalletClientType(type)
     }
   }
 
@@ -52,7 +52,7 @@ export function useWallet() {
     wallet,
     walletAddress,
     walletClient,
-    currentWalletType,
+    walletClientType,
     walletClientTypes,
     loading,
     setWalletClientType,

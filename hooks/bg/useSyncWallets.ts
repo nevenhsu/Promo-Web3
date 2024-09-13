@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useWallet } from '@/wallet/hooks/useWallet'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { updateWallet } from '@/services/userWallet'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
@@ -9,9 +8,9 @@ import { useLoginStatus } from '@/hooks/useLoginStatus'
 // save wallets to db
 
 export function useSyncWallets() {
-  const wallet = useWallet()
-  const { walletProviderValues } = useWeb3()
   const { bothAuth } = useLoginStatus()
+  const { walletValues, walletAddress, onSmartAccount } = useWeb3()
+  const { wallet } = walletValues
 
   useEffect(() => {
     if (!bothAuth) return
@@ -24,15 +23,15 @@ export function useSyncWallets() {
         supported: true,
       }).catch(console.error)
     }
-    if (walletProviderValues && walletProviderValues.isSmartAccount) {
+    if (walletAddress && onSmartAccount) {
       updateWallet({
-        address: walletProviderValues.walletAddress,
+        address: walletAddress,
         walletClientType: 'zerodev',
         connectorType: 'embedded',
         supported: true,
       }).catch(console.error)
     }
-  }, [bothAuth, wallet, walletProviderValues])
+  }, [bothAuth, wallet, walletAddress, onSmartAccount])
 
   return null
 }

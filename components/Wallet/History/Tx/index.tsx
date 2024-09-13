@@ -14,6 +14,8 @@ import { formatAddress } from '@/wallet/utils/helper'
 import { PiCopy, PiLink } from 'react-icons/pi'
 import { TxStatus } from '@/types/db'
 
+// TODO: add ETH and Erc20 types
+
 export default function HistoryTx({ tx }: { tx: string }) {
   const [TxState, fetchTx] = useAsyncFn(() => getUserTransaction(tx), [tx])
 
