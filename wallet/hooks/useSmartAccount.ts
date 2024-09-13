@@ -7,7 +7,6 @@ import {
   createZeroDevPaymasterClient,
   createKernelAccount,
   createKernelAccountClient,
-  type KernelSmartAccount,
 } from '@zerodev/sdk'
 import { signerToEcdsaValidator } from '@zerodev/ecdsa-validator'
 import { KernelEIP1193Provider } from '@zerodev/sdk/providers'
@@ -19,13 +18,25 @@ import { getWalletClient } from '@/wallet/lib/getWalletClient'
 import { toChainId } from '@/wallet/utils/network'
 import type { ConnectedWallet } from '@privy-io/react-auth'
 import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types'
-import type { Hash, Chain, WalletClient } from 'viem'
+import type { Hash, Chain, WalletClient, Transport } from 'viem'
+import type { KernelSmartAccount, KernelAccountClient } from '@zerodev/sdk'
 
 // Get current wallet values from Web3Context
 // instead of using this hook directly
 
+export type KernelAccount = KernelSmartAccount<ENTRYPOINT_ADDRESS_V07_TYPE, Transport, Chain>
 export type KernelProvider = KernelEIP1193Provider<ENTRYPOINT_ADDRESS_V07_TYPE>
-type KernelAccount = KernelSmartAccount<ENTRYPOINT_ADDRESS_V07_TYPE>
+export type KernelClient = KernelAccountClient<
+  ENTRYPOINT_ADDRESS_V07_TYPE,
+  Transport,
+  Chain,
+  KernelAccount
+>
+export type Kernel = {
+  client: KernelClient
+  provider: KernelProvider
+  walletClient: WalletClient
+}
 
 const kernelVersion = KERNEL_V3_1
 
@@ -35,18 +46,20 @@ export function useSmartAccount() {
   const chainId = toChainId(wallet?.chainId)
 
   // Smart account values
+  const [smartAccount, setSmartAccount] = useState<KernelAccount>()
   const [smartAccountAddress, setSmartAccountAddress] = useState<Hash>()
-  const [smartClientWithSponsor, setSmartClientWithSponsor] = useState<WalletClient>()
-  const [smartClientNoSponsor, setSmartClientNoSponsor] = useState<WalletClient>()
+  const [withSponsor, setWithSponsor] = useState<Kernel>()
+  const [noSponsor, setNoSponsor] = useState<Kernel>()
   const [loading, setLoading] = useState(true)
 
   const setupSmartAccount = async (privyWallet: ConnectedWallet, chainId: number) => {
     try {
       setLoading(true)
       // Reset smart account values
-      setSmartClientWithSponsor(undefined)
-      setSmartClientNoSponsor(undefined)
+      setSmartAccount(undefined)
       setSmartAccountAddress(undefined)
+      setWithSponsor(undefined)
+      setNoSponsor(undefined)
 
       const res = await getAccountClient(privyWallet, chainId)
 
@@ -56,14 +69,11 @@ export function useSmartAccount() {
 
       console.log('Smart account created:', res.smartAccountAddress)
 
-      const { kernelProvider, smartAccountAddress } = res
+      const { smartAccount, smartAccountAddress, withSponsor, noSponsor } = res
+      setSmartAccount(smartAccount)
       setSmartAccountAddress(smartAccountAddress)
-      setSmartClientWithSponsor(
-        getWalletClient(chainId, kernelProvider.withSponsor, smartAccountAddress)
-      )
-      setSmartClientNoSponsor(
-        getWalletClient(chainId, kernelProvider.noSponsor, smartAccountAddress)
-      )
+      setWithSponsor(withSponsor)
+      setNoSponsor(noSponsor)
     } catch (err) {
       console.error(err)
     } finally {
@@ -79,9 +89,10 @@ export function useSmartAccount() {
   }, [wallet, chainId])
 
   return {
+    smartAccount,
     smartAccountAddress,
-    smartClientWithSponsor,
-    smartClientNoSponsor,
+    withSponsor,
+    noSponsor,
     loading,
   }
 }
@@ -91,7 +102,7 @@ async function getAccountClient(wallet: ConnectedWallet, chainId: number | undef
   const publicClient = getPublicClient(chainId)
 
   // Check if the ZeroDev and public client are available
-  if (!zeroDev || !publicClient) return
+  if (!zeroDev || !chainId || !publicClient) return
 
   // Get the EIP1193 provider from Privy
   const provider = await wallet.getEthereumProvider()
@@ -110,7 +121,7 @@ async function getAccountClient(wallet: ConnectedWallet, chainId: number | undef
   })
 
   // Create a Kernel account from the ECDSA validator
-  const account = await createKernelAccount(publicClient, {
+  const smartAccount = await createKernelAccount(publicClient, {
     plugins: {
       sudo: ecdsaValidator,
     },
@@ -119,16 +130,32 @@ async function getAccountClient(wallet: ConnectedWallet, chainId: number | undef
   })
 
   // Create a Kernel account client to send user operations from the smart account
-  const withSponsor = new KernelEIP1193Provider(createAccountClient(account, chain, zeroDev, true))
-  const noSponsor = new KernelEIP1193Provider(createAccountClient(account, chain, zeroDev, false))
-  const smartAccountAddress = account.address
+  const smartAccountAddress = smartAccount.address
+  // kernel client
+  const withSponsor = createAccountClient(smartAccount, chain, zeroDev, true)
+  const noSponsor = createAccountClient(smartAccount, chain, zeroDev, false)
+
+  // provider
+  const providerWithSponsor = new KernelEIP1193Provider(withSponsor)
+  const providerNoSponsor = new KernelEIP1193Provider(noSponsor)
+
+  // wallet client
+  const walletClientWithSponsor = getWalletClient(chainId, providerWithSponsor, smartAccountAddress)
+  const walletClientNoSponsor = getWalletClient(chainId, providerNoSponsor, smartAccountAddress)
 
   return {
-    kernelProvider: {
-      withSponsor,
-      noSponsor,
-    },
+    smartAccount,
     smartAccountAddress,
+    withSponsor: {
+      client: withSponsor,
+      provider: providerWithSponsor,
+      walletClient: walletClientWithSponsor,
+    },
+    noSponsor: {
+      client: noSponsor,
+      provider: providerNoSponsor,
+      walletClient: walletClientNoSponsor,
+    },
   }
 }
 
