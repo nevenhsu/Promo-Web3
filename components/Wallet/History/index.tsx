@@ -8,8 +8,9 @@ import { Center, Text, ThemeIcon, Skeleton } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiArrowCircleUp, PiArrowCircleDown } from 'react-icons/pi'
 import { useTransaction, TabValue } from '@/store/contexts/app/transactionContext'
-import { getToken } from '@/contracts/tokens'
+import { getToken, eth } from '@/contracts/tokens'
 import { formatLocalDate, isEnumMember } from '@/utils/helper'
+import { TxType } from '@/types/db'
 import type { TTransaction } from '@/models/transaction'
 
 export default function History() {
@@ -75,8 +76,9 @@ export default function History() {
 }
 
 function TxItem({ data }: { data: TTransaction }) {
-  const { chainId, isSender, isAirdrop } = data
-  const token = getToken(chainId, data.token?.symbol)
+  const { chainId, isSender, isAirdrop, type } = data
+  const isNative = type === TxType.Native
+  const token = isNative ? eth : getToken(chainId, data.token?.symbol)
 
   return (
     <Link

@@ -7,21 +7,22 @@ import { Paper, Stack, Group, Space, Box, Divider, Skeleton } from '@mantine/cor
 import { Title, Text, CopyButton, ActionIcon, Pill, Center } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { getUserTransaction } from '@/services/transaction'
-import { getToken } from '@/contracts/tokens'
+import { getToken, eth } from '@/contracts/tokens'
 import { formatLocalDate } from '@/utils/helper'
 import { getNetwork } from '@/wallet/utils/network'
 import { formatAddress } from '@/wallet/utils/helper'
 import { PiCopy, PiLink } from 'react-icons/pi'
-import { TxStatus } from '@/types/db'
+import { TxStatus, TxType } from '@/types/db'
 
 export default function HistoryTx({ tx }: { tx: string }) {
   const [TxState, fetchTx] = useAsyncFn(() => getUserTransaction(tx), [tx])
 
   const { value, loading, error } = TxState
 
-  const network = getNetwork(value?.chainId)
-  const token = getToken(value?.chainId, value?.token?.symbol)
+  const isNative = value?.type === TxType.Native
+  const token = isNative ? eth : getToken(value?.chainId, value?.token?.symbol)
   const label = getStatusLabel(value?.status)
+  const network = getNetwork(value?.chainId)
 
   const handleLink = () => {
     if (value?.hash && network.blockExplorerUrl) {

@@ -11,9 +11,7 @@ import { getNetwork } from '@/wallet/utils/network'
 import classes from './index.module.css'
 
 export default function Receive() {
-  const { chainId, walletProviderValues } = useWeb3()
-  const { isSmartAccount, walletAddress = '' } = walletProviderValues || {}
-
+  const { chainId, onSmartAccount, walletAddress = '' } = useWeb3()
   const network = getNetwork(chainId)
 
   return (
@@ -45,7 +43,7 @@ export default function Receive() {
                 <Text fz="lg" fw={500} lh={1}>
                   My wallet
                 </Text>
-                <Pill>{isSmartAccount ? 'Smart wallet' : 'Embedded wallet'}</Pill>
+                <Pill>{onSmartAccount ? 'Smart wallet' : 'Embedded wallet'}</Pill>
               </Group>
 
               <Text
@@ -64,7 +62,7 @@ export default function Receive() {
                   variant="outline"
                   onClick={() =>
                     modals.open({
-                      title: isSmartAccount ? 'Smart wallet' : 'Embedded wallet',
+                      title: onSmartAccount ? 'Smart wallet' : 'Embedded wallet',
                       children: (
                         <>
                           <AspectRatio className={classes.qrcode} ratio={1}>

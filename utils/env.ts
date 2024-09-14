@@ -31,6 +31,10 @@ export const publicEnv = {
     apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2023-05-03',
     useCdn: toBool(process.env.NEXT_PUBLIC_SANITY_CDN),
   },
+  api: {
+    infuraKey: process.env.NEXT_PUBLIC_INFURA_KEY,
+    alchemyKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+  },
 }
 
 // methods

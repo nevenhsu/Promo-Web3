@@ -11,6 +11,7 @@ import { useWeb3 } from '@/wallet/Web3Context'
 import { Space, Group, Stack, Paper, Button, Text, Title, ThemeIcon } from '@mantine/core'
 import NetworkButton from '@/components/Wallet/NetworkButton'
 import RwdLayout from '@/components/share/RwdLayout'
+import Token from './Token'
 import CreateWallet from './CreateWallet'
 import { formatAddress } from '@/wallet/utils/helper'
 import { PiArrowUpBold, PiArrowDownBold, PiClockBold, PiCreditCardBold } from 'react-icons/pi'
@@ -30,8 +31,8 @@ export default function Wallet() {
   const { data } = useAppSelector(state => state.user)
   const { name } = data
 
-  const { chainId, tokens, walletProviderValues, balancesValues, pricesValues, loading } = useWeb3()
-  const { isSmartAccount, walletAddress } = walletProviderValues || {}
+  const { chainId, tokens, walletAddress, onSmartAccount, balancesValues, pricesValues, loading } =
+    useWeb3()
   const { balances, updateBalances, loading: balLoading } = balancesValues
   const { prices } = pricesValues
 
@@ -71,7 +72,7 @@ export default function Wallet() {
             </Stack>
             <Stack gap={4} ta="right">
               <Text fz="xs">
-                {loading ? 'Connecting' : isSmartAccount ? 'Smart wallet' : 'Embedded wallet'}
+                {loading ? 'Connecting' : onSmartAccount ? 'Smart wallet' : 'Embedded wallet'}
               </Text>
               <Text fz="xs" className="word-break-all" lh={1.2}>
                 {loading ? ' ' : formatAddress(walletAddress)}
@@ -127,39 +128,27 @@ export default function Wallet() {
         <Space h={24} />
 
         <Stack>
-          {/* Item */}
+          <Token
+            symbol="ETH"
+            icon="/icons/eth.svg"
+            name="Ethereum"
+            decimal={18}
+            balance={balances.ETH}
+            price={prices['ETH']}
+          />
+          {/* ERC20 */}
           {Boolean(chainId) &&
             tokens.map(o => {
-              const balance = balances[o.symbol]
-              const price = prices[o.symbol]
-              const bal = Decimal.div(balance?.toString() || 0, 10 ** o.decimal)
-              const p = price ? price.mul(bal) : undefined
-
               return (
-                <Paper key={o.symbol} radius="md" p="md" shadow="xs">
-                  <Group justify="space-between">
-                    <Group>
-                      <Image className={classes.icon} src={o.icon} width={32} height={32} alt="" />
-
-                      <Stack gap={4}>
-                        <Text fw={500} lh={1}>
-                          {o.name}
-                        </Text>
-                        <Text fz="xs" c="dimmed" lh={1}>
-                          {o.symbol}
-                        </Text>
-                      </Stack>
-                    </Group>
-                    <Stack gap={4} ta="right">
-                      <Text fw={500} lh={1}>
-                        {bal.toFixed(6)}
-                      </Text>
-                      <Text fz="xs" c="dimmed" lh={1}>
-                        {p ? `USD ${p.toFixed(2)}` : 'No price yet'}
-                      </Text>
-                    </Stack>
-                  </Group>
-                </Paper>
+                <Token
+                  key={o.symbol}
+                  symbol={o.symbol}
+                  icon={o.icon}
+                  name={o.name}
+                  decimal={o.decimal}
+                  balance={balances[o.symbol]}
+                  price={prices[o.symbol]}
+                />
               )
             })}
         </Stack>

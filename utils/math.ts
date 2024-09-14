@@ -20,3 +20,8 @@ export function formatNumber(num: number | string) {
 export function formatPercent(num: number | string) {
   return numeral(num).format('0.00%')
 }
+
+export function formatFixedNumber(val: Decimal.Value | bigint, fixed?: number) {
+  const str = new Decimal(val.toString()).toFixed(fixed)
+  return str.replace(/(\.\d*?[1-9])0+$/g, '$1').replace(/\.0+$/, '')
+}

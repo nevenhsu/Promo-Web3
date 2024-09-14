@@ -1,6 +1,6 @@
 import { arbitrum, arbitrumSepolia, baseSepolia } from 'viem/chains'
 
-type ZeroDev = {
+export type ZeroDev = {
   projectId: string
   bundlerRpc: string
   paymasterRpc: string
