@@ -2,34 +2,37 @@ import { ENTRYPOINT_ADDRESS_V07, bundlerActions } from 'permissionless'
 import { encodeFunctionData } from 'viem'
 import { getPublicClient } from '@/wallet/lib/publicClients'
 import { wait } from '@/wallet/utils/helper'
-import type { Hash, SimulateContractParameters } from 'viem'
+import type { Hash, Chain, Account } from 'viem'
+import type { SimulateContractParameters, SendTransactionParameters } from 'viem'
 import type { KernelClient, WalletClient } from '@/types/wallet'
 
 type Data = { to: Hash; value: bigint; data: Hash }
-export type Calldata = Data | Data[]
+export type CalldataArgs = Data | Data[]
+export type Calldata = SendTransactionParameters<Chain, Account> & Data
 
 export async function simulateTx(
   client: WalletClient | KernelClient,
-  data: SimulateContractParameters
+  params: SimulateContractParameters
 ) {
   const chainId = client.chain.id
   const publicClient = getPublicClient(chainId)
   const { request } = await publicClient!.simulateContract({
-    ...data,
+    ...params,
     account: client.account,
   })
 
-  const calldata = encodeFunctionData(data)
-  return { request, calldata }
-}
-
-export async function writeTx(
-  client: WalletClient | KernelClient,
-  data: SimulateContractParameters
-) {
-  const { request } = await simulateTx(client, data)
-  const hash = await client.writeContract(request)
-  return { transactionHash: hash }
+  const data = encodeFunctionData(params)
+  const { abi, address, args, dataSuffix, functionName, value, ...others } = request
+  const calldata: Calldata = {
+    data: `${data}${dataSuffix ? dataSuffix.replace('0x', '') : ''}`,
+    to: address,
+    value: value || BigInt(0),
+    ...others,
+  }
+  return {
+    request,
+    calldata,
+  }
 }
 
 export async function getReceipt(chainId: number, hash: Hash, retry = 5) {
@@ -53,9 +56,8 @@ export async function getReceipt(chainId: number, hash: Hash, retry = 5) {
   }
 }
 
-export async function sendUserOp(client: KernelClient, data: Calldata) {
+export async function sendUserOp(client: KernelClient, data: CalldataArgs) {
   const callData = await client.account.encodeCallData(data)
-
   const userOpHash = await client.sendUserOperation({
     userOperation: { callData },
   })
@@ -81,4 +83,8 @@ async function getOpReceipt(client: KernelClient, userOpHash: Hash) {
 
 export function isKernelClient(client: WalletClient | KernelClient): client is KernelClient {
   return (client as KernelClient).sendUserOperation !== undefined
+}
+
+export function isWalletClient(client: WalletClient | KernelClient): client is WalletClient {
+  return (client as WalletClient).sendTransaction !== undefined
 }

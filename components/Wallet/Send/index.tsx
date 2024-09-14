@@ -16,11 +16,11 @@ import RwdLayout from '@/components/share/RwdLayout'
 import { getTokens, isErc20, isETH, eth, type Token } from '@/contracts/tokens'
 import { formatBalance, formatAmount } from '@/utils/math'
 import { getNetwork } from '@/wallet/utils/network'
-import { createTransaction } from '@/services/transaction'
 import { TxStatus, TxType } from '@/types/db'
 import { PiArrowDown } from 'react-icons/pi'
 import { isAddressEqual, isAddress } from '@/wallet/utils/helper'
-import type { Tx, TxResult } from '@/wallet/TxContext'
+import { saveTxCallback } from './txCallback'
+import type { Tx, AddTxReturn } from '@/wallet/TxContext'
 
 type FormData = {
   symbol: string // token
@@ -36,7 +36,7 @@ export default function Send() {
   const { chainId, walletAddress, balancesValues, pricesValues, onSmartAccount } = useWeb3()
   const { balances, updateBalances } = balancesValues
   const { prices } = pricesValues
-  const { txs, addNativeTx, addContractTx } = useTx()
+  const { txs, addTx } = useTx()
 
   const tx = useMemo(() => {
     return txTimestamp ? _.find(txs, { timestamp: txTimestamp }) : undefined
@@ -166,47 +166,27 @@ export default function Send() {
   const handleSubmit = async (to: string, rawAmount: string) => {
     if (!token) return
 
-    let result: TxResult | undefined
+    let result: AddTxReturn
 
     const displayAmount = formatBalance(rawAmount, token.decimal).toString() // display value
     const description = `Transfer ${displayAmount} ${token.symbol} to ${to}`
 
     if (isETH(token)) {
-      result = addNativeTx(
+      result = addTx(
         {
           to: to as `0x${string}`,
           value: BigInt(rawAmount),
+          native: true,
         },
         {
           description,
         },
-        async ({ hash, waitSuccess, timestamp, chainId, account }) => {
-          try {
-            const success = await waitSuccess
-            // save to db
-            const tx = await createTransaction({
-              chainId,
-              hash,
-              from: account,
-              type: TxType.Native,
-              to,
-              token: {
-                symbol: token.symbol,
-                amount: displayAmount,
-              },
-              status: success ? TxStatus.Success : TxStatus.Failed,
-              createdAt: new Date(timestamp),
-            })
-            console.log('Transaction saved: ', tx.hash)
-          } catch (err) {
-            console.error(err)
-          }
-        }
+        saveTxCallback({ to, symbol: token.symbol, type: TxType.Native, displayAmount })
       )
     }
 
     if (isErc20(token)) {
-      result = addContractTx(
+      result = addTx(
         {
           address: token.address,
           functionName: 'transfer',
@@ -216,29 +196,7 @@ export default function Send() {
         {
           description,
         },
-        async ({ hash, waitSuccess, timestamp, chainId, account }) => {
-          try {
-            const success = await waitSuccess
-            // save to db
-            const tx = await createTransaction({
-              chainId,
-              hash,
-              from: account,
-              type: TxType.ERC20,
-              to,
-              contract: token.address,
-              token: {
-                symbol: token.symbol,
-                amount: displayAmount,
-              },
-              status: success ? TxStatus.Success : TxStatus.Failed,
-              createdAt: new Date(timestamp),
-            })
-            console.log('Transaction saved: ', tx.hash)
-          } catch (err) {
-            console.error(err)
-          }
-        }
+        saveTxCallback({ to, symbol: token.symbol, type: TxType.ERC20, displayAmount })
       )
     }
 
@@ -411,7 +369,7 @@ export default function Send() {
         </RwdLayout>
       </form>
 
-      <Modal opened={opened} onClose={() => {}} withCloseButton={false} size="xl" centered>
+      <Modal opened={opened} onClose={() => {}} withCloseButton={false} centered>
         <Transaction
           tx={tx}
           token={token}
