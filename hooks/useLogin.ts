@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from '@/navigation'
+import { useRouter, usePathname } from '@/navigation'
 import { useLogin as _useLogin } from '@privy-io/react-auth'
 import { usePrivy } from '@privy-io/react-auth'
 import { usePromo } from '@/hooks/usePromo'
@@ -39,6 +39,7 @@ export default function useLogin(val?: LoginValue) {
 
 export function useClickLogin() {
   const router = useRouter()
+  const pathname = usePathname()
   const promo = usePromo()
   const { callbackPath } = useCallbackUrl()
   const { bothAuth, privyAuth, loading } = useLoginStatus()
@@ -59,7 +60,6 @@ export function useClickLogin() {
 
       if (!wasAlreadyAuthenticated) {
         setNextPage('/activity')
-        return
       }
     },
   })
@@ -74,11 +74,19 @@ export function useClickLogin() {
   }
 
   useEffect(() => {
+    // Redirect to the next page if the user logs in
     if (nextPage && bothAuth) {
       // @ts-ignore
       router.push(nextPage)
     }
   }, [nextPage, bothAuth])
 
-  return { clickLogin, loading: loading || Boolean(nextPage) }
+  useEffect(() => {
+    // Clear the next page if the user navigates to it
+    if (nextPage && pathname.startsWith(nextPage)) {
+      setNextPage(undefined)
+    }
+  }, [nextPage, pathname])
+
+  return { clickLogin, loading: loading || (Boolean(nextPage) && privyAuth) }
 }
