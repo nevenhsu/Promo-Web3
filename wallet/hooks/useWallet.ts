@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react'
 import { useWallets } from '@privy-io/react-auth'
 import { getWalletClient } from '@/wallet/lib/getWalletClient'
 import { toChainId } from '@/wallet/utils/network'
-import type { WalletClient, Hash } from 'viem'
+import type { Hash } from 'viem'
 import type { ConnectedWallet } from '@privy-io/react-auth'
+import type { WalletClient } from '@/types/wallet'
 
 // Get current wallet values from Web3Context
 // instead of using this hook directly

@@ -45,8 +45,9 @@ declare global {
       NEXT_PUBLIC_SANITY_API_VERSION: string
       NEXT_PUBLIC_SANITY_CDN: 'true' | 'false'
 
-      /// Contracts
-      NEXT_PUBLIC_TOKEN: string
+      /// api keys
+      NEXT_PUBLIC_ALCHEMY_KEY: string
+      NEXT_PUBLIC_INFURA_KEY: string
     }
   }
 }

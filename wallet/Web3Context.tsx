@@ -9,7 +9,8 @@ import { usePrices } from '@/wallet/hooks/usePrices'
 import { supportedChains } from './variables'
 import { toChainId } from '@/wallet/utils/network'
 import { getTokens, type Erc20 } from '@/contracts/tokens'
-import type { WalletClient, Hash } from 'viem'
+import type { WalletClient } from '@/types/wallet'
+import type { Hash } from 'viem'
 
 type WalletValues = ReturnType<typeof useWallet>
 type SmartAccountValues = ReturnType<typeof useSmartAccount>

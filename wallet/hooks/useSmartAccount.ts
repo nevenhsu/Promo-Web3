@@ -17,24 +17,15 @@ import { getPublicClient } from '@/wallet/lib/publicClients'
 import { getWalletClient } from '@/wallet/lib/getWalletClient'
 import { toChainId } from '@/wallet/utils/network'
 import type { ConnectedWallet } from '@privy-io/react-auth'
-import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types'
-import type { Hash, Chain, WalletClient, Transport } from 'viem'
-import type { KernelSmartAccount, KernelAccountClient } from '@zerodev/sdk'
+import type { Hash, Chain } from 'viem'
+import type { KernelAccount, KernelProvider, KernelClient, WalletClient } from '@/types/wallet'
 
 // Get current wallet values from Web3Context
 // instead of using this hook directly
 
-export type KernelAccount = KernelSmartAccount<ENTRYPOINT_ADDRESS_V07_TYPE, Transport, Chain>
-export type KernelProvider = KernelEIP1193Provider<ENTRYPOINT_ADDRESS_V07_TYPE>
-export type KernelClient = KernelAccountClient<
-  ENTRYPOINT_ADDRESS_V07_TYPE,
-  Transport,
-  Chain,
-  KernelAccount
->
 export type Kernel = {
-  client: KernelClient
   provider: KernelProvider
+  kernelClient: KernelClient
   walletClient: WalletClient
 }
 
@@ -147,13 +138,13 @@ async function getAccountClient(wallet: ConnectedWallet, chainId: number | undef
     smartAccount,
     smartAccountAddress,
     withSponsor: {
-      client: withSponsor,
       provider: providerWithSponsor,
+      kernelClient: withSponsor,
       walletClient: walletClientWithSponsor,
     },
     noSponsor: {
-      client: noSponsor,
       provider: providerNoSponsor,
+      kernelClient: noSponsor,
       walletClient: walletClientNoSponsor,
     },
   }

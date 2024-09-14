@@ -3,10 +3,10 @@
 import * as _ from 'lodash-es'
 import React, { createContext, useContext, useState } from 'react'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { getPublicClient } from '@/wallet/lib/publicClients'
-import { wait } from '@/wallet/utils/helper'
 import { TxStatus } from '@/types/db'
-import type { Hash, SimulateContractParameters, WalletClient } from 'viem'
+import { writeTx, getReceipt, sendUserOp, isKernelClient, type Calldata } from './tx'
+import type { Hash, SimulateContractParameters } from 'viem'
+import type { KernelClient, WalletClient } from '@/types/wallet'
 
 type NativeData = { to: Hash; value: bigint }
 
@@ -26,6 +26,7 @@ type OtherValues = {
 
 type TxCallback = (values: {
   hash: Hash
+  userOpHash?: Hash
   waitSuccess: Promise<boolean>
   timestamp: number // Date.now()
   chainId: number
@@ -38,33 +39,31 @@ type AddTxFunc<T> = (data: T, others: OtherValues, callback?: TxCallback) => TxR
 
 interface TxContextType {
   txs: Tx[]
-  addNativeTx: AddTxFunc<NativeData>
+  addEthTx: AddTxFunc<NativeData>
   addContractTx: AddTxFunc<SimulateContractParameters>
 }
 
 const TxContext = createContext<TxContextType | undefined>(undefined)
 
 export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { walletClient, onSmartAccount, smartAccountValues } = useWeb3()
+  const { walletAddress, walletClient, onSmartAccount, smartAccountValues } = useWeb3()
   const [txs, setTxs] = useState<Tx[]>([])
 
   const updateTx = (timestamp: number, newValue: Partial<Tx>) => {
     setTxs(prev => prev.map(o => (o.timestamp === timestamp ? { ...o, ...newValue } : o)))
   }
 
-  // For native token transfer
-  const addNativeTx: AddTxFunc<NativeData> = (data, others, callback) => {
-    const chainId = walletClient?.chain?.id
-    if (!walletClient || !chainId || !data.to || !data.value) return
+  // === Native token transfer === //
+  const addEthTx: AddTxFunc<NativeData> = (data, others, callback) => {
+    const chainId = walletClient?.chain.id
+    if (!walletAddress || !chainId || !data.to || !data.value) return
 
     const timestamp = Date.now() // unique id
 
     const tx: Tx = {
       timestamp,
       chainId,
-      params: {
-        ...data,
-      },
+      params: data,
       status: TxStatus.Init,
       ...others,
     }
@@ -74,7 +73,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
     if (data.to && data.value) {
       // send tx
-      const txResult = sendNativeTx(
+      const txResult = sendEthTx(
         timestamp,
         {
           to: data.to,
@@ -92,30 +91,43 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }
   }
 
-  const sendNativeTx = async (
+  const sendEthTx = async (
     timestamp: number,
     data: { to: Hash; value: bigint },
     callback?: TxCallback
   ) => {
     try {
-      const chainId = walletClient?.chain?.id
-      if (!chainId || !walletClient.account) {
+      const client = onSmartAccount ? smartAccountValues.withSponsor?.kernelClient : walletClient
+      const chainId = client?.chain.id
+      if (!chainId || !client) {
         throw new Error('Wallet not found')
       }
 
-      // FIXME: UserOperation reverted during simulation with reason: 0x
-      // @ts-ignore
-      const hash = await walletClient.sendTransaction({
-        ...data,
-      })
+      // Send transaction by smart account
+      if (onSmartAccount && isKernelClient(client)) {
+        updateTx(timestamp, { status: TxStatus.Pending })
+
+        const result = await sendUserOp(client, { ...data, data: '0x' })
+
+        const { success, transactionHash, userOpHash } = result
+
+        updateTx(timestamp, {
+          hash: transactionHash,
+          status: success ? TxStatus.Success : TxStatus.Failed,
+          error: success ? '' : 'Transaction failed',
+        })
+
+        return hash
+      }
+
+      const hash = await sendEth(client, data)
 
       // update tx hash
       updateTx(timestamp, { hash, status: TxStatus.Pending })
       console.log(`Transaction hash: ${hash}`)
 
       // check tx status
-
-      const waitSuccess = handleTxStatus(timestamp, chainId, hash)
+      const waitSuccess = getTxReceipt(timestamp, walletClient, hash)
 
       if (callback) {
         callback({ hash, waitSuccess, timestamp, chainId, account: walletClient.account.address })
@@ -130,8 +142,9 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       updateTx(timestamp, { status: TxStatus.Failed, error })
     }
   }
+  // === End of native token transfer === //
 
-  // For contract interaction
+  // === Contract tx === //
   const addContractTx: AddTxFunc<SimulateContractParameters> = (data, others, callback) => {
     const timestamp = Date.now() // unique id
 
@@ -150,7 +163,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setTxs(prev => [...prev, tx])
 
     // send tx
-    const txResult = sendContractTx(timestamp, walletClient, data, callback)
+    const txResult = sendContractTx(timestamp, data, callback)
 
     const waitTx = async () => {
       const hash = await txResult
@@ -162,30 +175,23 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   const sendContractTx = async (
     timestamp: number,
-    walletClient: WalletClient,
     data: SimulateContractParameters,
     callback?: TxCallback
   ) => {
     try {
-      const chainId = walletClient.chain?.id
+      const chainId = walletClient?.chain.id
       if (!chainId || !walletClient.account) {
         throw new Error('Wallet not found')
       }
 
-      const publicClient = getPublicClient(chainId)
-      const { request } = await publicClient!.simulateContract({
-        ...data,
-        account: walletClient.account,
-      })
-
-      const hash = await walletClient.writeContract(request)
+      const hash = await writeTx(walletClient, data)
 
       // update tx hash
       updateTx(timestamp, { hash, status: TxStatus.Pending })
       console.log(`Transaction hash: ${hash}`)
 
       // check tx status
-      const waitSuccess = handleTxStatus(timestamp, chainId, hash)
+      const waitSuccess = getTxReceipt(timestamp, walletClient, hash)
 
       if (callback) {
         callback({ hash, waitSuccess, timestamp, chainId, account: walletClient.account.address })
@@ -200,9 +206,11 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       updateTx(timestamp, { status: TxStatus.Failed, error })
     }
   }
+  // === End of contract tx === //
 
-  const handleTxStatus = async (timestamp: number, chainId: number, hash: Hash) => {
-    const success = await checkTxStatus(chainId, hash)
+  const getTxReceipt = async (timestamp: number, walletClient: WalletClient, hash: Hash) => {
+    const { success } = await getReceipt(walletClient, hash)
+
     updateTx(timestamp, {
       status: success ? TxStatus.Success : TxStatus.Failed,
       error: success ? '' : 'Transaction failed',
@@ -210,11 +218,23 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     return success
   }
 
+  // === Send Eth === //
+  const sendEthBySmartAccount = async (client: KernelClient, data: NativeData) => {
+    const { userOpHash, wait } = await sendUserOp(client, { ...data, data: '0x' })
+    return { userOpHash, wait }
+  }
+
+  const sendEthByWallet = async (client: WalletClient, data: NativeData) => {
+    const transactionHash = await client.sendTransaction({ ...data, data: '0x' })
+    const wait = getReceipt(client.chain.id, transactionHash)
+    return { transactionHash, wait }
+  }
+
   return (
     <TxContext.Provider
       value={{
         txs,
-        addNativeTx,
+        addNativeTx: addEthTx,
         addContractTx,
       }}
     >
@@ -229,20 +249,4 @@ export const useTx = (): TxContextType => {
     throw new Error('useTx must be used within an TxProvider')
   }
   return context
-}
-
-async function checkTxStatus(chainId: number, hash: Hash) {
-  try {
-    const publicClient = getPublicClient(chainId)
-    const { status, blockNumber } = await publicClient!.getTransactionReceipt({ hash })
-
-    console.log('TransactionReceipt', { status, blockNumber, hash })
-
-    return status === 'success'
-  } catch (err) {
-    console.log('Transaction not found or not yet mined.', err)
-
-    await wait(1000)
-    return checkTxStatus(chainId, hash)
-  }
 }

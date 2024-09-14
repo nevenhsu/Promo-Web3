@@ -1,6 +1,6 @@
 import * as _ from 'lodash-es'
 import { createPublicClient, http } from 'viem'
-import { supportedChains } from '@/wallet/variables'
+import { supportedChains, getProviderUrl } from '@/wallet/variables'
 
 const clients = supportedChains.map(chain =>
   createPublicClient({
@@ -8,13 +8,13 @@ const clients = supportedChains.map(chain =>
       multicall: true,
     },
     chain,
-    transport: http(chain.rpcUrls.default.http[0]),
+    transport: http(getProviderUrl(chain.id) || chain.rpcUrls.default.http[0]),
   })
 )
 
 const publicClients = _.keyBy(clients, o => o.chain.id)
 
-export function getPublicClient(chainId?: number) {
+export function getPublicClient(chainId: number | undefined) {
   return chainId ? publicClients[chainId] : undefined
 }
 
