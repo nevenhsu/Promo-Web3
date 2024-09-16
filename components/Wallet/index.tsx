@@ -2,17 +2,15 @@
 
 import * as _ from 'lodash-es'
 import Decimal from 'decimal.js'
-import Image from 'next/image'
 import { useMemo } from 'react'
 import { Link } from '@/navigation'
-import { usePrivy } from '@privy-io/react-auth'
 import { useAppSelector } from '@/hooks/redux'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { Space, Group, Stack, Paper, Button, Text, Title, ThemeIcon } from '@mantine/core'
 import NetworkButton from '@/components/Wallet/NetworkButton'
 import RwdLayout from '@/components/share/RwdLayout'
 import Token from './Token'
-import CreateWallet from './CreateWallet'
+import { eth } from '@/contracts/tokens'
 import { formatAddress } from '@/wallet/utils/helper'
 import { PiArrowUpBold, PiArrowDownBold, PiClockBold, PiCreditCardBold } from 'react-icons/pi'
 import classes from './index.module.css'
@@ -27,7 +25,6 @@ const ThemeAction = ThemeIcon.withProps({
 })
 
 export default function Wallet() {
-  const { user } = usePrivy()
   const { data } = useAppSelector(state => state.user)
   const { name } = data
 
@@ -37,23 +34,16 @@ export default function Wallet() {
   const { prices } = pricesValues
 
   const totalBalance = useMemo(() => {
+    const ethValue = calcTokenValue(eth.decimal, prices[eth.symbol], balances[eth.symbol])
     return _.reduce(
       tokens,
       (acc, o) => {
-        const price = prices[o.symbol]
-        const balance = balances[o.symbol]
-        const bal = Decimal.div(balance?.toString() || 0, 10 ** o.decimal)
-        const val = price ? price.mul(bal) : new Decimal(0)
+        const val = calcTokenValue(o.decimal, prices[o.symbol], balances[o.symbol])
         return acc.add(val)
       },
-      new Decimal(0)
+      ethValue
     )
   }, [balances, prices, tokens])
-
-  // TODO: only for smart account
-  if (!user?.wallet?.address) {
-    return <CreateWallet />
-  }
 
   return (
     <>
@@ -157,4 +147,10 @@ export default function Wallet() {
       <Space h={100} />
     </>
   )
+}
+
+function calcTokenValue(decimal: number, price: Decimal | undefined, balance: bigint | undefined) {
+  const bal = Decimal.div(balance?.toString() || 0, 10 ** decimal)
+  const val = price ? price.mul(bal) : new Decimal(0)
+  return val
 }
