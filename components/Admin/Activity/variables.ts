@@ -1,11 +1,3 @@
-import { ActivityType } from '@/types/db'
-
-export const activityTypes = [
-  { label: 'None', value: ActivityType.None },
-  { label: 'Repost', value: ActivityType.Repost },
-  { label: 'Add to story', value: ActivityType.Story },
-]
-
 export function createSlug(text: string): string {
   return text
     .toLowerCase() // 转换为小写

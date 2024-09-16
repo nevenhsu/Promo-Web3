@@ -1,5 +1,5 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
-import { ActivityType, SocialMedia } from '@/types/db'
+import { ActivityType, ActivitySettingType, SocialMedia } from '@/types/db'
 
 const detailSchema = new Schema({
   link: { type: String, required: true }, // post id
@@ -20,6 +20,11 @@ const bonusSchema = new Schema({
   finalized: { type: Boolean, default: false, index: true }, // bonus share finalized
 })
 
+const settingSchema = new Schema({
+  data: { type: Object }, // custom settings
+  type: { type: Number, enum: ActivitySettingType },
+})
+
 export const schema = new Schema({
   index: { type: Number, required: true, unique: true, index: true },
   startTime: { type: Date, required: true, index: true },
@@ -29,7 +34,7 @@ export const schema = new Schema({
   description: String,
   activityType: { type: Number, enum: ActivityType, required: true },
   socialMedia: { type: String, enum: SocialMedia, required: true },
-  requirements: { type: Object, default: {} }, // requirements for join
+  setting: { type: settingSchema }, // custom settings
   details: { type: detailSchema, required: true },
   airdrop: { type: airdropSchema, required: true },
   bonus: { type: bonusSchema, default: {} },
@@ -38,9 +43,10 @@ export const schema = new Schema({
 
 export type Activity = InferSchemaType<typeof schema>
 export type ActivityDetail = InferSchemaType<typeof detailSchema>
+export type ActivitySetting = InferSchemaType<typeof settingSchema>
 export type ActivityAirDrop = InferSchemaType<typeof airdropSchema>
 export type ActivityBonus = InferSchemaType<typeof bonusSchema>
-export type ActivityData = Omit<Activity, 'index' | 'details' | 'requirements' | 'bonus'>
+export type ActivityData = Omit<Activity, 'index' | 'details' | 'setting' | 'bonus'>
 export type NewActivityData = ActivityData & { details: ActivityDetail }
 export type TActivity = {
   index: number // auto increase
@@ -51,7 +57,7 @@ export type TActivity = {
   description: string
   activityType: number // ActivityType
   socialMedia: string // SocialMedia
-  requirements: Record<string, any>
+  setting: ActivitySetting
   details: ActivityDetail
   airdrop: ActivityAirDrop
   bonus: ActivityBonus
