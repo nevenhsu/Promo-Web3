@@ -35,7 +35,7 @@ export const schema = new Schema({
   description: { type: String, default: '' },
   activityType: { type: Number, enum: ActivityType, required: true },
   socialMedia: { type: String, enum: SocialMedia, required: true },
-  setting: { type: settingSchema }, // custom settings
+  setting: { type: settingSchema, default: {} }, // custom settings
   details: { type: detailSchema, required: true },
   airdrop: { type: airdropSchema, required: true },
   bonus: { type: bonusSchema, default: {} },
@@ -44,9 +44,10 @@ export const schema = new Schema({
 
 export type Activity = InferSchemaType<typeof schema>
 export type ActivityDetail = InferSchemaType<typeof detailSchema>
+export type ActivityAirdrop = InferSchemaType<typeof airdropSchema>
 export type ActivityData = Omit<Activity, 'index' | 'details' | 'airdrop' | 'bonus'> & {
   details: Omit<ActivityDetail, 'participants' | 'totalScore'>
-  airdrop: Omit<InferSchemaType<typeof airdropSchema>, 'finalized'>
+  airdrop: Omit<ActivityAirdrop, 'finalized'>
   bonus: Omit<InferSchemaType<typeof bonusSchema>, 'finalized'>
 }
 export type TActivity = Omit<Activity, 'startTime' | 'endTime'> & {

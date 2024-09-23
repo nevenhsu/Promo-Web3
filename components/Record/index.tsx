@@ -1,5 +1,6 @@
 'use client'
 
+import Decimal from 'decimal.js'
 import { useState } from 'react'
 import { isBefore } from 'date-fns'
 import { Link } from '@/navigation'
@@ -9,6 +10,7 @@ import RwdLayout from '@/components/share/RwdLayout'
 import { useActivityStatus } from '@/store/contexts/app/activityStatusContext'
 import { formatNumber, formatPercent } from '@/utils/math'
 import { isEnumMember } from '@/utils/helper'
+import { calculateShare } from '@/lib/shareCalculator'
 import type { TUserActivityStatusData } from '@/models/userActivityStatus'
 
 enum TabValue {
@@ -149,10 +151,16 @@ function ScoreItem({ data }: { data: TUserActivityStatusData }) {
 }
 
 function AirdropItem({ data }: { data: TUserActivityStatusData }) {
-  const { _activity, airdropped, finalized } = data
-  const { airdrop, details } = _activity
+  const { _activity, airdrop: userAirdrop, finalized } = data
+  const { airdrop, setting, details } = _activity
 
-  const airdropShare = (data.totalScore / details.totalScore) * Number(airdrop.amount) || 0
+  const { shareRatio, airdropAmount } = calculateShare(setting, details, airdrop, data)
+
+  const share = userAirdrop?.amount
+    ? new Decimal(userAirdrop.amount).div(airdrop.amount).toFixed(6)
+    : shareRatio
+
+  const finalAmount = userAirdrop?.amount || airdropAmount.toFixed(6)
 
   return (
     <Link
@@ -170,11 +178,11 @@ function AirdropItem({ data }: { data: TUserActivityStatusData }) {
                 {airdrop.symbol}
               </Text>
               <Title className="nowrap" order={3} c="orange">
-                {formatNumber(airdropShare)}
+                {formatNumber(finalAmount)}
               </Title>
             </Box>
             <Text ta="center" fz="xs" c="dimmed">
-              {finalized ? (airdropped ? 'Received' : 'Pending') : 'Unsettled'}
+              {finalized ? (userAirdrop?.airdropped ? 'Received' : 'Pending') : 'Unsettled'}
             </Text>
           </Stack>
 
@@ -195,7 +203,7 @@ function AirdropItem({ data }: { data: TUserActivityStatusData }) {
                   </Text>
                 </Box>
                 <Box ta="center">
-                  <Text fz="xs">{formatPercent(data.totalScore / details.totalScore)}</Text>
+                  <Text fz="xs">{formatPercent(share)}</Text>
                   <Text fz="xs" c="dimmed">
                     Share
                   </Text>
