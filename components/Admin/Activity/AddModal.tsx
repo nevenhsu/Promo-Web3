@@ -8,7 +8,7 @@ import { Modal, Stack, Box, Button, Text } from '@mantine/core'
 import Form, { type FormRef } from './Form'
 import FormFields from './Form/Fields'
 import { publicEnv } from '@/utils/env'
-import type { NewActivityData } from '@/models/activity'
+import type { ActivityData } from '@/models/activity'
 
 export type AddModalRef = {
   open: () => void
@@ -31,7 +31,7 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
     close()
   }
 
-  const handleSubmit = async (data: NewActivityData) => {
+  const handleSubmit = async (data: ActivityData) => {
     const newActivity = await createActivity(data)
     if (newActivity) {
       handleClose()
@@ -42,21 +42,19 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
 
   return (
     <>
-      <Modal opened={opened} onClose={handleClose} title="Add new activity" centered>
+      <Modal opened={opened} onClose={handleClose} title="Add new activity" centered keepMounted>
         <Box mx="auto">
           <Form ref={formRef}>
             <form
               onSubmit={formRef.current?.getForm().onSubmit(
                 values => {
-                  const { startTime, endTime, activityType, details, airdrop, ...rest } = values
+                  const { startTime, endTime, activityType, ...rest } = values
                   if (startTime && endTime) {
                     handleSubmit({
                       ...rest,
                       startTime,
                       endTime,
                       activityType: Number(activityType),
-                      details: { ...details, participants: 0, totalScore: 0 },
-                      airdrop: { ...airdrop, finalized: false },
                     })
                   }
                 },

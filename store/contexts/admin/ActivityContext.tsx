@@ -7,13 +7,7 @@ import {
   updateActivity as _updateActivity,
   deleteActivity as _deleteActivity,
 } from '@/services/private/activity'
-import type {
-  TActivity,
-  ActivityDetail,
-  ActivityAirDrop,
-  ActivityData,
-  NewActivityData,
-} from '@/models/activity'
+import type { TActivity, ActivityData } from '@/models/activity'
 
 interface ActivityContextType {
   activities: TActivity[]
@@ -22,12 +16,10 @@ interface ActivityContextType {
   loading: boolean
   setSelectedIndex: (index: number) => void
   fetchActivities: () => void
-  createActivity: (newData: NewActivityData) => Promise<TActivity | undefined>
+  createActivity: (newData: ActivityData) => Promise<TActivity | undefined>
   updateActivity: (
     index: number,
-    updateData: Partial<ActivityData>,
-    updateDetails: Partial<ActivityDetail>,
-    updateAirdrop: Partial<ActivityAirDrop>
+    updateData: Partial<ActivityData>
   ) => Promise<TActivity | undefined>
   deleteActivity: (index: number) => Promise<TActivity | undefined>
 }
@@ -57,7 +49,7 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }
 
-  const createActivity = async (newData: NewActivityData) => {
+  const createActivity = async (newData: ActivityData) => {
     try {
       setLoading(true)
       const activity = await _createActivity(newData)
@@ -72,15 +64,10 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }
 
-  const updateActivity = async (
-    index: number,
-    updateData: Partial<ActivityData>,
-    updateDetails: Partial<ActivityDetail>,
-    updateAirdrop: Partial<ActivityAirDrop>
-  ) => {
+  const updateActivity = async (index: number, updateData: Partial<ActivityData>) => {
     try {
       setLoading(true)
-      const updated = await _updateActivity(index, updateData, updateDetails, updateAirdrop)
+      const updated = await _updateActivity(index, updateData)
       if (updated) {
         setActivities(prev => prev.map(o => (o.index === index ? { ...o, ...updated } : o)))
         return updated

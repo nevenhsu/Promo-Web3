@@ -1,7 +1,6 @@
 'use client'
 
 import { createFormContext } from '@mantine/form'
-import type { ActivitySettingTypeNone, ActivitySettingTypeA } from '@/types/activitySetting'
 
 // Definition of form values is required
 export interface FormValues {
@@ -18,10 +17,12 @@ export interface FormValues {
   }
   details: {
     link: string
+    fullLink: string
     coverUrl?: string | null
     thumbnailUrl?: string | null
   }
-  setting: ActivitySettingTypeNone | ActivitySettingTypeA
+  bonus: { data: Record<string, unknown> }
+  setting: { type: string; data: Record<string, unknown> }
   published: boolean
 }
 

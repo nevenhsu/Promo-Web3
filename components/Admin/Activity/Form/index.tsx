@@ -16,7 +16,7 @@ type FormProps = {
   children: React.ReactNode
 }
 
-export default forwardRef<FormRef, FormProps>(function AddModal({ children }, ref) {
+export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
   const form = useForm({
     mode: 'controlled',
     initialValues: {
@@ -33,6 +33,7 @@ export default forwardRef<FormRef, FormProps>(function AddModal({ children }, re
       },
       details: {
         link: '',
+        fullLink: '',
         coverUrl: '',
         thumbnailUrl: '',
       },
@@ -40,6 +41,7 @@ export default forwardRef<FormRef, FormProps>(function AddModal({ children }, re
         type: ActivitySettingType.None,
         data: {},
       },
+      bonus: { data: {} },
       published: false,
     },
     validate: {
@@ -71,6 +73,7 @@ export default forwardRef<FormRef, FormProps>(function AddModal({ children }, re
       },
       details: {
         link: value => (value ? null : 'Should not be empty'),
+        fullLink: value => (value ? null : 'Should not be empty'),
       },
     },
   })

@@ -8,7 +8,8 @@ import { Modal, Stack, Box, Text, Button } from '@mantine/core'
 import Form, { type FormRef } from './Form'
 import FormFields from './Form/Fields'
 import { publicEnv } from '@/utils/env'
-import type { ActivityDetail, ActivityAirDrop, ActivityData } from '@/models/activity'
+import { ActivitySettingType } from '@/types/db'
+import type { ActivityData } from '@/models/activity'
 
 export type UpdateModalRef = {
   open: () => void
@@ -21,14 +22,22 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
   const { updateActivity, selectedActivity, loading } = useActivity()
 
   useEffect(() => {
-    if (opened && selectedActivity) {
-      const { startTime, endTime, activityType, bonus, setting, ...rest } = selectedActivity
-      formRef.current?.getForm().setValues({
+    const form = formRef.current?.getForm()
+
+    if (opened && selectedActivity && form) {
+      const { startTime, endTime, activityType, setting, ...rest } = selectedActivity
+      form.setValues({
         startTime: new Date(startTime),
         endTime: new Date(endTime),
         activityType: `${activityType}`,
+        setting: {
+          type: setting?.type || ActivitySettingType.None,
+          data: setting?.data || {},
+        },
         ...rest,
       })
+    } else {
+      form?.reset()
     }
   }, [selectedActivity, opened])
 
@@ -38,13 +47,9 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
     },
   }))
 
-  const handleSubmit = async (
-    data: Partial<ActivityData>,
-    details: Partial<ActivityDetail>,
-    airdrop: Partial<ActivityAirDrop>
-  ) => {
+  const handleSubmit = async (data: Partial<ActivityData>) => {
     if (selectedActivity) {
-      const updated = await updateActivity(selectedActivity.index, data, details, airdrop)
+      const updated = await updateActivity(selectedActivity.index, data)
       if (updated) {
         close()
       } else {
@@ -55,7 +60,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
 
   return (
     <>
-      <Modal opened={opened} onClose={close} title="Update admin" centered>
+      <Modal opened={opened} onClose={close} title="Update admin" centered keepMounted>
         <Box mx="auto">
           <Form ref={formRef}>
             <form
@@ -63,6 +68,12 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
                 values => {
                   const { startTime, endTime, activityType } = values
                   if (startTime && endTime) {
+                    handleSubmit({
+                      ...values,
+                      startTime,
+                      endTime,
+                      activityType: parseInt(activityType),
+                    })
                   }
                 },
                 (validationErrors, values, event) => {

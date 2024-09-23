@@ -3,16 +3,19 @@
 import * as _ from 'lodash-es'
 import { useMemo, useEffect } from 'react'
 import { isBefore } from 'date-fns'
-import { TextInput, Textarea, Select, Switch, Button } from '@mantine/core'
+import { TextInput, NumberInput, Textarea, Select, Switch, Button, Space } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
 import { symbols } from '@/contracts/tokens'
 import { useFormContext } from './Context'
-import { ActivityType, SocialMedia } from '@/types/db'
+import { ActivityType, SocialMedia, ActivitySettingType } from '@/types/db'
 import { createSlug } from '../variables'
+import { isTypeA } from '@/types/activitySetting'
 
 export default function FormFields() {
   const form = useFormContext()
-  const { socialMedia, activityType } = form.values
+  const { socialMedia, activityType, setting, airdrop } = form.values
+  const settingType = setting.type
+  const airdropAmount = Number(airdrop.amount)
 
   const activityTypes = useMemo(() => {
     if (socialMedia === SocialMedia.X) {
@@ -24,6 +27,7 @@ export default function FormFields() {
     return []
   }, [socialMedia])
 
+  // Set default activity type based on social media
   useEffect(() => {
     if (socialMedia === SocialMedia.X && activityType !== `${ActivityType.Repost}`) {
       form.setFieldValue('activityType', `${ActivityType.Repost}`)
@@ -32,6 +36,19 @@ export default function FormFields() {
       form.setFieldValue('activityType', `${ActivityType.Story}`)
     }
   }, [socialMedia, activityType])
+
+  useEffect(() => {
+    if (settingType === ActivitySettingType.None) {
+      form.setFieldValue('setting.data', {})
+    }
+    if (settingType === ActivitySettingType.A) {
+      const amount = Number(form.values.airdrop.amount)
+      form.setFieldValue('setting.data', {
+        maxTotalScore: amount ? amount * 1000 : 0,
+        maxSelfScore: 10000,
+      })
+    }
+  }, [settingType])
 
   return (
     <>
@@ -89,6 +106,7 @@ export default function FormFields() {
         label="Social Media"
         placeholder="Pick one"
         withCheckIcon={false}
+        allowDeselect={false}
         data={_.map(SocialMedia, (value, label) => ({ value, label }))}
         key={form.key('socialMedia')}
         {...form.getInputProps('socialMedia')}
@@ -98,6 +116,7 @@ export default function FormFields() {
         label="Activity Type"
         placeholder="Pick one"
         withCheckIcon={false}
+        allowDeselect={false}
         data={activityTypes.map(({ value, label }) => ({ value, label }))}
         key={form.key('activityType')}
         {...form.getInputProps('activityType')}
@@ -114,17 +133,63 @@ export default function FormFields() {
 
       <TextInput
         label="Airdrop Amount"
-        placeholder="0"
         key={form.key('airdrop.amount')}
         {...form.getInputProps('airdrop.amount')}
       />
 
       <TextInput
-        label="Link"
-        placeholder="Post ID"
+        label="Post Id"
+        placeholder="123456789"
         key={form.key('details.link')}
         {...form.getInputProps('details.link')}
       />
+
+      <TextInput
+        label="Full Link"
+        placeholder={
+          socialMedia === SocialMedia.X
+            ? 'https://x.com/user/status/post_id'
+            : socialMedia === SocialMedia.Instagram
+              ? 'https://www.instagram.com/p/post_id'
+              : ''
+        }
+        key={form.key('details.fullLink')}
+        {...form.getInputProps('details.fullLink')}
+      />
+
+      <Select
+        label="Setting Type"
+        withCheckIcon={false}
+        allowDeselect={false}
+        data={_.map(ActivitySettingType, (value, label) => ({ label, value }))}
+        key={form.key('setting.type')}
+        {...form.getInputProps('setting.type')}
+      />
+
+      {settingType === ActivitySettingType.A ? (
+        <>
+          <NumberInput
+            label="Max Total Score"
+            description={
+              isTypeA(setting) && airdropAmount
+                ? `Airdrop 1 : ${setting.data.maxTotalScore / airdropAmount}`
+                : ''
+            }
+            min={0}
+            key={form.key('setting.data.maxTotalScore')}
+            {...form.getInputProps('setting.data.maxTotalScore')}
+          />
+
+          <NumberInput
+            label="Max Self Score"
+            min={0}
+            key={form.key('setting.data.maxSelfScore')}
+            {...form.getInputProps('setting.data.maxSelfScore')}
+          />
+        </>
+      ) : null}
+
+      <Space />
 
       <Switch
         label="Published"
