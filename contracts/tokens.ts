@@ -64,7 +64,7 @@ export const tokens: { [id: string]: Erc20[] } = {
       name: 'USD Coin',
       symbol: 'USDC',
       decimal: 6,
-      address: unifyAddress('0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d'),
+      address: unifyAddress('0x43660fBE273F7107C3f6Ce448a85f3C96a78367D'),
       version: '2',
       icon: '/icons/usdc-token.svg',
       abi: ERC20.abi,

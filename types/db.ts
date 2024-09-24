@@ -26,6 +26,11 @@ export enum ActivityType {
   Story = 11,
 }
 
+export enum ActivitySettingType {
+  None = '0',
+  A = '1',
+}
+
 export enum LinkAccountPlatform {
   Google = 'google',
   X = 'x',

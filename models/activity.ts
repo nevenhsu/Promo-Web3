@@ -1,8 +1,9 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
-import { ActivityType, SocialMedia } from '@/types/db'
+import { ActivityType, SocialMedia, ActivitySettingType } from '@/types/db'
 
 const detailSchema = new Schema({
-  link: { type: String, required: true }, // post id
+  link: { type: String, required: true }, // post id, ex: post_id
+  fullLink: { type: String, default: '' }, // full post link, ex: https://twitter.com/username/status/post_id
   participants: { type: Number, default: 0 },
   totalScore: { type: Number, default: 0.0 },
   coverUrl: String,
@@ -20,16 +21,21 @@ const bonusSchema = new Schema({
   finalized: { type: Boolean, default: false, index: true }, // bonus share finalized
 })
 
+const settingSchema = new Schema({
+  data: { type: Object }, // custom settings
+  type: { type: String, enum: ActivitySettingType },
+})
+
 export const schema = new Schema({
   index: { type: Number, required: true, unique: true, index: true },
   startTime: { type: Date, required: true, index: true },
   endTime: { type: Date, required: true, index: true },
   slug: { type: String, required: true, unique: true, index: true },
-  title: String,
-  description: String,
+  title: { type: String, default: '' },
+  description: { type: String, default: '' },
   activityType: { type: Number, enum: ActivityType, required: true },
   socialMedia: { type: String, enum: SocialMedia, required: true },
-  requirements: { type: Object, default: {} }, // requirements for join
+  setting: { type: settingSchema, default: {} }, // custom settings
   details: { type: detailSchema, required: true },
   airdrop: { type: airdropSchema, required: true },
   bonus: { type: bonusSchema, default: {} },
@@ -38,24 +44,15 @@ export const schema = new Schema({
 
 export type Activity = InferSchemaType<typeof schema>
 export type ActivityDetail = InferSchemaType<typeof detailSchema>
-export type ActivityAirDrop = InferSchemaType<typeof airdropSchema>
-export type ActivityBonus = InferSchemaType<typeof bonusSchema>
-export type ActivityData = Omit<Activity, 'index' | 'details' | 'requirements' | 'bonus'>
-export type NewActivityData = ActivityData & { details: ActivityDetail }
-export type TActivity = {
-  index: number // auto increase
+export type ActivityAirdrop = InferSchemaType<typeof airdropSchema>
+export type ActivityData = Omit<Activity, 'index' | 'details' | 'airdrop' | 'bonus'> & {
+  details: Omit<ActivityDetail, 'participants' | 'totalScore'>
+  airdrop: Omit<ActivityAirdrop, 'finalized'>
+  bonus: Omit<InferSchemaType<typeof bonusSchema>, 'finalized'>
+}
+export type TActivity = Omit<Activity, 'startTime' | 'endTime'> & {
   startTime: string // ISO 8601 date string
   endTime: string // ISO 8601 date string
-  slug: string
-  title: string
-  description: string
-  activityType: number // ActivityType
-  socialMedia: string // SocialMedia
-  requirements: Record<string, any>
-  details: ActivityDetail
-  airdrop: ActivityAirDrop
-  bonus: ActivityBonus
-  published: boolean // for public view
 }
 export type TPublicActivity = TActivity & { joined: boolean }
 

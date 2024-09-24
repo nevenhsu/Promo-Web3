@@ -29,17 +29,20 @@ import { formatDate } from '@/utils/date'
 import { formatNumber } from '@/utils/math'
 import { getActionLabel, getErrorText } from '../variables'
 import { ActivityStatus, SocialMedia } from '@/types/db'
+import { calculateShare } from '@/lib/shareCalculator'
 import { toUpper } from '@/utils/helper'
 import { allTokens } from '@/contracts/tokens'
-import { PiLightning, PiPersonSimpleRun, PiTrophy, PiCheckBold } from 'react-icons/pi'
-import { PiWarningBold, PiCircleDashedBold, PiRocketLaunch, PiShareFatFill } from 'react-icons/pi'
+import { PiTrophy, PiLightning, PiPersonSimpleRun, PiCheckBold } from 'react-icons/pi'
+import { PiWarningBold, PiRocketLaunch, PiShareFatFill } from 'react-icons/pi'
+import { PiCircleDashedBold, PiArrowSquareOutBold, PiRocket } from 'react-icons/pi'
+import { isTypeA } from '@/types/activitySetting'
 import type { TPublicActivity } from '@/models/activity'
 import type { TUserActivityStatus } from '@/models/userActivityStatus'
 
 type ActivityDetailProps = { data: TPublicActivity; children?: React.ReactNode }
 
 export default function ActivityDetail({ data, children }: ActivityDetailProps) {
-  const { slug, airdrop, socialMedia, endTime } = data
+  const { slug, airdrop, socialMedia, endTime, setting } = data
   const postLink = data.details.link
   const token = _.find(allTokens, { symbol: airdrop.symbol })
   const isEnd = isAfter(new Date(), new Date(endTime))
@@ -67,7 +70,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
   // Platform linked account from database
   const { linkedAccounts } = userData
-  const { linked, linkedAccount } = useMemo(() => {
+  const { linked } = useMemo(() => {
     const linkedAccount = linkedAccounts?.find(({ platform }) => platform === socialMedia)
     const linked = Boolean(linkedAccount)
     return { linked, linkedAccount }
@@ -80,7 +83,9 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   const statusDataFetched = userActivityStatus.fetched[slug]
   const statusLoading = statusDataLoading || !statusDataFetched // not fetched yet
   const bonusScore = _.sum([statusData?.referral1stScore, statusData?.referral2ndScore])
-  const confirmed = statusData?.status === ActivityStatus.Completed
+  const confirmed =
+    (statusData?.status || -1) >= 0 && statusData?.status !== ActivityStatus.Completed
+  const completed = statusData?.status === ActivityStatus.Completed
 
   // Activity details
   const [fetchDetailsState, fetchDetails] = useAsyncFn(async (slug: string) => {
@@ -90,11 +95,12 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
   const details = fetchDetailsState.value || data.details
 
-  const airdropShare = useMemo(() => {
-    if (!details || !statusData?.totalScore) return 0
-    if (!details.totalScore) return 0
-    return (statusData.totalScore / details.totalScore) * Number(airdrop.amount) || 0
-  }, [statusData, details, airdrop])
+  const { shareRatio, airdropAmount, maxScore } = calculateShare(
+    setting,
+    details,
+    airdrop,
+    statusData
+  )
 
   // Login to join activity
   const { login } = useLogin({
@@ -113,7 +119,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
   const handleConfirm = () => {
     // If the activity is completed or initial, do nothing
-    if (confirmed) {
+    if (completed) {
       notifications.show({
         title: 'Activity completed',
         message: 'You have already completed this activity',
@@ -268,11 +274,11 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
                               <Progress.Root size="sm">
                                 <Progress.Section
-                                  value={(statusData.selfScore / details.totalScore) * 100}
+                                  value={(statusData.selfScore / maxScore) * 100}
                                   color="orange"
                                 />
                                 <Progress.Section
-                                  value={(bonusScore / details.totalScore) * 100}
+                                  value={(bonusScore / maxScore) * 100}
                                   color="orange.3"
                                 />
                               </Progress.Root>
@@ -283,7 +289,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                                   <Text fz="sm">Bonus: {formatNumber(bonusScore)}</Text>
                                 </Group>
                                 <Text fz="sm" c="dimmed">
-                                  Total: {formatNumber(details.totalScore)}
+                                  Max: {formatNumber(maxScore)}
                                 </Text>
                               </Group>
                             </Box>
@@ -305,7 +311,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                             Airdrop reward
                           </Title>
                           <Title order={4} c="orange">
-                            {formatNumber(airdropShare)} {airdrop.symbol}
+                            {formatNumber(airdropAmount.toFixed(6))} {airdrop.symbol}
                           </Title>
                         </Group>
 
@@ -318,14 +324,11 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                                 Current estimated reward
                               </Text>
 
-                              <Progress
-                                size="sm"
-                                value={(airdropShare / Number(airdrop.amount)) * 100}
-                              />
+                              <Progress size="sm" value={shareRatio * 100} />
 
                               <Group mt="xs" gap={4}>
                                 <Text fz="sm" c="orange">
-                                  {formatNumber(airdropShare)}
+                                  {formatNumber(airdropAmount.toFixed(6))}
                                 </Text>
                                 <Text fz="sm" c="dimmed">
                                   / {formatNumber(airdrop.amount)}
@@ -334,10 +337,16 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                             </Box>
                           </Stack>
 
-                          <Text fz="xs" c="dimmed">
-                            Airdrop will finalized after{' '}
-                            {formatDate(new Date(data.endTime), 'dd MMM yyyy HH:mm')}
-                          </Text>
+                          {statusData.airdrop?.airdropped ? (
+                            <Text fz="xs" c="dimmed">
+                              Airdrop reward has been distributed
+                            </Text>
+                          ) : (
+                            <Text fz="xs" c="dimmed">
+                              Airdrop will finalized after{' '}
+                              {formatDate(new Date(data.endTime), 'dd MMM yyyy HH:mm')}
+                            </Text>
+                          )}
                         </Stack>
                       </Paper>
                     </Skeleton>
@@ -346,6 +355,52 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
               </Stack>
             </>
           ) : null}
+
+          <Stack>
+            {bothAuth ? (
+              <>
+                <LinkButton platform={socialMedia} onLink={handleLinkAccount} />
+
+                <a target="_blank" href={details.fullLink} rel="noopener noreferrer">
+                  <Button
+                    w="100%"
+                    variant="outline"
+                    color="dark"
+                    rightSection={<PiArrowSquareOutBold size={14} />}
+                  >
+                    Open the post
+                  </Button>
+                </a>
+
+                <Button
+                  onClick={() => {
+                    if (confirmed || completed || isEnd) return
+                    handleConfirm()
+                  }}
+                  color={confirmed || completed ? 'dark' : ''}
+                  disabled={!linked}
+                  loading={statusDataLoading}
+                  leftSection={confirmed || completed ? <PiCheckBold size={14} /> : null}
+                >
+                  {completed
+                    ? 'Completed'
+                    : confirmed
+                      ? 'Confirming your activity'
+                      : `Confirm ${getActionLabel(data.activityType).toLowerCase()}`}
+                </Button>
+              </>
+            ) : (
+              <Button onClick={login} loading={loading}>
+                Join now
+              </Button>
+            )}
+
+            <Center>
+              <Button color="dark" size="sm" variant="transparent" onClick={joinActions.open}>
+                How to join?
+              </Button>
+            </Center>
+          </Stack>
 
           <>
             <Divider />
@@ -371,37 +426,18 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                   </Group>
                 </>
               ) : null}
+
+              {isTypeA(setting) ? (
+                <>
+                  <Group gap="xs">
+                    <PiRocket size={20} />
+                    <Text fz="sm">{formatNumber(setting.data.maxTotalScore)} Max score</Text>
+                  </Group>
+                </>
+              ) : null}
             </Stack>
             <Divider />
           </>
-
-          <Stack>
-            {bothAuth ? (
-              <>
-                <LinkButton platform={socialMedia} onLink={handleLinkAccount} />
-
-                <Button
-                  onClick={handleConfirm}
-                  disabled={!linked || confirmed || isEnd}
-                  loading={statusDataLoading}
-                >
-                  {confirmed
-                    ? 'Completed'
-                    : `Confirm ${getActionLabel(data.activityType).toLowerCase()}`}
-                </Button>
-              </>
-            ) : (
-              <Button onClick={login} loading={loading}>
-                Join now
-              </Button>
-            )}
-
-            <Center>
-              <Button color="dark" size="sm" variant="transparent" onClick={joinActions.open}>
-                How to join?
-              </Button>
-            </Center>
-          </Stack>
 
           {/* Embedded Post */}
           <Box display="flex" style={{ justifyContent: 'center' }}>

@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { useAppSelector } from '@/hooks/redux'
 import { Button } from '@mantine/core'
 import { toUpper } from '@/utils/helper'
+import { PiCheckBold } from 'react-icons/pi'
 
 type LinkButtonProps = {
   platform: string
@@ -20,7 +21,13 @@ export default function LinkButton({ platform, onLink }: LinkButtonProps) {
   }, [linkedAccounts, platform])
 
   return (
-    <Button variant="outline" onClick={onLink} loading={linking}>
+    <Button
+      variant="outline"
+      color={account ? 'dark' : ''}
+      loading={linking}
+      onClick={onLink}
+      leftSection={<PiCheckBold size={14} />}
+    >
       {account ? `Linked as ${account.username}` : `Link your ${toUpper(platform)}`}
     </Button>
   )

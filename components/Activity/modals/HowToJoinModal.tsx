@@ -46,10 +46,10 @@ export function HowToJoinModal(props: HowToJoinModalProps) {
         <Timeline.Item
           lineVariant={activeStep > 2 ? 'solid' : 'dashed'}
           bullet={<PiShareFatBold size={14} />}
-          title="Share the post"
+          title={actionLabel}
         >
           <Text c="dimmed" size="sm">
-            {actionLabel} with your linked account
+            Share the post with your linked account
           </Text>
         </Timeline.Item>
 

@@ -1,8 +1,9 @@
 import * as _ from 'lodash-es'
+import dot from 'dot-object'
 import ActivityModel from '@/models/activity'
 import UserActivityStatusModel from '@/models/userActivityStatus'
 import { setMilliseconds } from 'date-fns'
-import type { Activity, ActivityDetail, ActivityAirDrop } from '@/models/activity'
+import type { ActivityData } from '@/models/activity'
 
 // ========================
 // Public functions to fetch activities
@@ -114,19 +115,7 @@ export async function getActivityBySlug(slug: string) {
   return data
 }
 
-type NewActivityData = {
-  startTime: any
-  endTime: any
-  title: string
-  slug: string
-  description: string
-  activityType: number // ActivityType
-  socialMedia: string // SocialMedia
-  details: ActivityDetail
-  airdrop: ActivityAirDrop
-}
-
-export async function createActivity(data: NewActivityData) {
+export async function createActivity(data: ActivityData) {
   if (!data.slug) {
     throw new Error('Slug is required.')
   }
@@ -147,12 +136,7 @@ export async function createActivity(data: NewActivityData) {
   return activity
 }
 
-export async function updateActivity(
-  index: number,
-  updateData: Partial<Omit<Activity, 'details' | 'airdrop'>>,
-  updateDetails: Partial<ActivityDetail>,
-  updateAirdrop: Partial<ActivityAirDrop>
-) {
+export async function updateActivity(index: number, updateData: Partial<ActivityData>) {
   if (updateData.startTime) {
     updateData.startTime = setMilliseconds(updateData.startTime, 0)
   }
@@ -160,12 +144,15 @@ export async function updateActivity(
     updateData.endTime = setMilliseconds(updateData.endTime, 0)
   }
 
-  const parsedDetails = parseDetails(updateDetails)
-  const parsedAirdrop = parseAirdrop(updateAirdrop)
+  const { setting, ...rest } = updateData
+  const parsedData = dot.dot(rest)
+  if (setting) {
+    parsedData.setting = setting
+  }
 
   const updated = await ActivityModel.findOneAndUpdate(
     { index },
-    { $set: { ...updateData, ...parsedDetails, ...parsedAirdrop } },
+    { $set: parsedData },
     { new: true } // Options to return the updated document
   )
 
@@ -195,24 +182,4 @@ export async function getAllActivity() {
   const activities = await ActivityModel.find().sort({ index: -1 }).lean()
   console.log('All activities:', activities.length)
   return activities
-}
-
-function parseDetails(newDetail: Partial<ActivityDetail>) {
-  const parsed: { [key: string]: any } = {}
-
-  for (const [key, value] of Object.entries(newDetail)) {
-    parsed[`details.${key}`] = value
-  }
-
-  return parsed
-}
-
-function parseAirdrop(newDetail: Partial<ActivityAirDrop>) {
-  const parsed: { [key: string]: any } = {}
-
-  for (const [key, value] of Object.entries(newDetail)) {
-    parsed[`airdrop.${key}`] = value
-  }
-
-  return parsed
 }

@@ -1,6 +1,8 @@
+import * as _ from 'lodash-es'
 import { NextResponse, type NextRequest } from 'next/server'
 import dbConnect from '@/lib/dbConnect'
 import { updateActivity } from '@/lib/db/activity'
+import type { ActivityData } from '@/models/activity'
 
 // body: { data, details }
 export async function PUT(req: NextRequest, { params }: { params: { index: string } }) {
@@ -9,9 +11,9 @@ export async function PUT(req: NextRequest, { params }: { params: { index: strin
 
     await dbConnect()
 
-    const { data, details, airdrop } = await req.json()
+    const { data } = await req.json()
 
-    const updated = await updateActivity(index, data, details, airdrop)
+    const updated = await updateActivity(index, filterData(data))
 
     if (!updated) {
       return NextResponse.json({ error: 'activity not found' }, { status: 404 })
@@ -22,4 +24,14 @@ export async function PUT(req: NextRequest, { params }: { params: { index: strin
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
+}
+
+function filterData(data: Partial<ActivityData>) {
+  return _.omit(data, [
+    'index',
+    'details.participants',
+    'details.totalScore',
+    'airdrop.finalized',
+    'bonus.finalized',
+  ])
 }

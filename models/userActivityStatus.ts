@@ -4,6 +4,12 @@ import ActivityModel, { type Activity } from '@/models/activity'
 import UserModel from '@/models/user'
 import { SocialMedia } from '@/types/db'
 
+const airdropSchema = new Schema({
+  symbol: { type: String, default: '', index: true }, // Token symbol, ex: USDC
+  amount: { type: String, default: '' }, // Base unit, not wei, ex: 10 USDC
+  airdropped: { type: Boolean, default: false, index: true },
+})
+
 export const schema = new Schema({
   _user: {
     type: Schema.Types.ObjectId,
@@ -32,7 +38,7 @@ export const schema = new Schema({
   details: { type: Object, default: {} }, // additional details
   updatedAt: { type: Date, default: Date.now, index: true }, // last updated date
   finalized: { type: Boolean, default: false, index: true }, // airdrop amount finalized
-  airdropped: { type: Boolean, default: false, index: true }, // airdrop sent
+  airdrop: { type: airdropSchema, default: { amount: '', airdropped: false } }, // airdrop amount
 })
 
 schema.index({ _activity: 1, _user: 1 }, { unique: true }) // unique index for activity and user
