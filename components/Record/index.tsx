@@ -1,6 +1,5 @@
 'use client'
 
-import Decimal from 'decimal.js'
 import { useState } from 'react'
 import { isBefore } from 'date-fns'
 import { Link } from '@/navigation'
@@ -151,16 +150,12 @@ function ScoreItem({ data }: { data: TUserActivityStatusData }) {
 }
 
 function AirdropItem({ data }: { data: TUserActivityStatusData }) {
-  const { _activity, airdrop: userAirdrop, finalized } = data
+  const { _activity, finalized } = data
   const { airdrop, setting, details } = _activity
+  const { airdropped, amount } = data.airdrop || {}
 
   const { shareRatio, airdropAmount } = calculateShare(setting, details, airdrop, data)
-
-  const share = userAirdrop?.amount
-    ? new Decimal(userAirdrop.amount).div(airdrop.amount).toFixed(6)
-    : shareRatio
-
-  const finalAmount = userAirdrop?.amount || airdropAmount.toFixed(6)
+  const finalAmount = airdropped ? amount : airdropAmount.toFixed(6)
 
   return (
     <Link
@@ -182,7 +177,7 @@ function AirdropItem({ data }: { data: TUserActivityStatusData }) {
               </Title>
             </Box>
             <Text ta="center" fz="xs" c="dimmed">
-              {finalized ? (userAirdrop?.airdropped ? 'Received' : 'Pending') : 'Unsettled'}
+              {finalized ? (airdropped ? 'Received' : 'Pending') : 'Unsettled'}
             </Text>
           </Stack>
 
@@ -203,7 +198,7 @@ function AirdropItem({ data }: { data: TUserActivityStatusData }) {
                   </Text>
                 </Box>
                 <Box ta="center">
-                  <Text fz="xs">{formatPercent(share)}</Text>
+                  <Text fz="xs">{formatPercent(shareRatio.toFixed(6))}</Text>
                   <Text fz="xs" c="dimmed">
                     Share
                   </Text>

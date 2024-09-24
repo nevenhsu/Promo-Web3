@@ -1,6 +1,6 @@
 'use client'
 
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import clsx from 'clsx'
 import { useState, useEffect } from 'react'
 import useQuery from '@/sanity/hooks/useQuery'

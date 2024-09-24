@@ -5,6 +5,7 @@ import UserModel from '@/models/user'
 import { SocialMedia } from '@/types/db'
 
 const airdropSchema = new Schema({
+  symbol: { type: String, default: '', index: true }, // Token symbol, ex: USDC
   amount: { type: String, default: '' }, // Base unit, not wei, ex: 10 USDC
   airdropped: { type: Boolean, default: false, index: true },
 })
