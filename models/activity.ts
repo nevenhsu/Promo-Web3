@@ -17,13 +17,13 @@ const airdropSchema = new Schema({
 })
 
 const bonusSchema = new Schema({
-  data: { type: Object, default: {} }, // custom bonus data
+  data: { type: Object, default: { _: '' } }, // custom bonus data
   finalized: { type: Boolean, default: false, index: true }, // bonus share finalized
 })
 
 const settingSchema = new Schema({
-  data: { type: Object }, // custom settings
-  type: { type: String, enum: ActivitySettingType },
+  data: { type: Object, default: { _: '' } }, // custom settings
+  type: { type: String, enum: ActivitySettingType, default: ActivitySettingType.None },
 })
 
 export const schema = new Schema({

@@ -32,7 +32,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
         activityType: `${activityType}`,
         setting: {
           type: setting?.type || ActivitySettingType.None,
-          data: setting?.data || {},
+          data: setting?.data || { _: '' },
         },
         ...rest,
       })

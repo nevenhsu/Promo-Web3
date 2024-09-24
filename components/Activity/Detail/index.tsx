@@ -92,7 +92,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
   const details = fetchDetailsState.value || data.details
   const isTypeASetting = isTypeA(setting)
-  const remainingScore = _.max([setting.data.maxTotalScore - details.totalScore, 0]) || 0
+  const remainingScore = _.max([setting.data?.maxTotalScore - details.totalScore, 0]) || 0
 
   const { shareRatio, airdropAmount, maxScore } = calculateShare(
     setting,
@@ -408,7 +408,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                   {completed
                     ? 'Completed'
                     : confirmed
-                      ? 'Confirming your activity'
+                      ? 'Wait for confirmation'
                       : `Confirm ${getActionLabel(data.activityType).toLowerCase()}`}
                 </Button>
               </>
