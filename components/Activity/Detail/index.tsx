@@ -16,7 +16,6 @@ import { fetchUserActivityStatus, resetUserActivityStatus } from '@/store/slices
 import { getPublicActivityDetails } from '@/services/activity'
 import { notifications } from '@mantine/notifications'
 import { useDisclosure } from '@mantine/hooks'
-import { InstagramEmbed } from 'react-social-media-embed'
 import { Group, Stack, Box, Space, Divider, Paper } from '@mantine/core'
 import { Title, Text, Button, ThemeIcon, ActionIcon } from '@mantine/core'
 import { Skeleton, Progress, Center } from '@mantine/core'
@@ -324,7 +323,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                                 Current estimated reward
                               </Text>
 
-                              <Progress size="sm" value={shareRatio * 100} />
+                              <Progress size="sm" value={shareRatio.mul(100).toNumber()} />
 
                               <Group mt="xs" gap={4}>
                                 <Text fz="sm" c="orange">
@@ -361,16 +360,18 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
               <>
                 <LinkButton platform={socialMedia} onLink={handleLinkAccount} />
 
-                <a target="_blank" href={details.fullLink} rel="noopener noreferrer">
-                  <Button
-                    w="100%"
-                    variant="outline"
-                    color="dark"
-                    rightSection={<PiArrowSquareOutBold size={14} />}
-                  >
-                    Open the post
-                  </Button>
-                </a>
+                {details.fullLink ? (
+                  <a target="_blank" href={details.fullLink} rel="noopener noreferrer">
+                    <Button
+                      w="100%"
+                      variant="outline"
+                      color="dark"
+                      rightSection={<PiArrowSquareOutBold size={14} />}
+                    >
+                      Open the post
+                    </Button>
+                  </a>
+                ) : null}
 
                 <Button
                   onClick={() => {
@@ -442,16 +443,6 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
           {/* Embedded Post */}
           <Box display="flex" style={{ justifyContent: 'center' }}>
             {children}
-
-            {socialMedia === SocialMedia.Instagram && (
-              <InstagramEmbed
-                url={`https://www.instagram.com/p/${postLink}/`}
-                width="100%"
-                style={{
-                  maxWidth: 480,
-                }}
-              />
-            )}
           </Box>
         </Stack>
       </RwdLayout>
