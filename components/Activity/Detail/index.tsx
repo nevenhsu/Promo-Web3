@@ -33,7 +33,7 @@ import { toUpper } from '@/utils/helper'
 import { allTokens } from '@/contracts/tokens'
 import { PiTrophy, PiLightning, PiPersonSimpleRun, PiCheckBold } from 'react-icons/pi'
 import { PiWarningBold, PiRocketLaunch, PiShareFatFill } from 'react-icons/pi'
-import { PiCircleDashedBold, PiArrowSquareOutBold, PiRocket } from 'react-icons/pi'
+import { PiCircleDashedBold, PiArrowSquareOutBold } from 'react-icons/pi'
 import { isTypeA } from '@/types/activitySetting'
 import type { TPublicActivity } from '@/models/activity'
 import type { TUserActivityStatus } from '@/models/userActivityStatus'
@@ -42,7 +42,6 @@ type ActivityDetailProps = { data: TPublicActivity; children?: React.ReactNode }
 
 export default function ActivityDetail({ data, children }: ActivityDetailProps) {
   const { slug, airdrop, socialMedia, endTime, setting } = data
-  const postLink = data.details.link
   const token = _.find(allTokens, { symbol: airdrop.symbol })
   const isEnd = isAfter(new Date(), new Date(endTime))
 
@@ -92,6 +91,8 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   }, [])
 
   const details = fetchDetailsState.value || data.details
+  const isTypeASetting = isTypeA(setting)
+  const remainingScore = _.max([setting.data.maxTotalScore - details.totalScore, 0]) || 0
 
   const { shareRatio, airdropAmount, maxScore } = calculateShare(
     setting,
@@ -242,6 +243,28 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
               </Group>
             </Group>
           </Paper>
+
+          {/* Remaining score for type A */}
+          {isTypeASetting ? (
+            <>
+              <Paper radius="sm" p="md" shadow="xs">
+                <Group justify="space-between" mb="xs">
+                  <Title order={6}>Remaining Score</Title>
+
+                  <Group gap="xs">
+                    <Title order={6}>
+                      <Box component="span" c="orange">
+                        {formatNumber(remainingScore)}
+                      </Box>
+                      {` / ${formatNumber(setting.data.maxTotalScore)}`}
+                    </Title>
+                  </Group>
+                </Group>
+
+                <Progress size="sm" value={(remainingScore / setting.data.maxTotalScore) * 100} />
+              </Paper>
+            </>
+          ) : null}
 
           {bothAuth ? (
             <>
@@ -423,15 +446,6 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                   <Group gap="xs">
                     <PiTrophy size={20} />
                     <Text fz="sm">{formatNumber(details.totalScore)} Total score</Text>
-                  </Group>
-                </>
-              ) : null}
-
-              {isTypeA(setting) ? (
-                <>
-                  <Group gap="xs">
-                    <PiRocket size={20} />
-                    <Text fz="sm">{formatNumber(setting.data.maxTotalScore)} Max score</Text>
                   </Group>
                 </>
               ) : null}
