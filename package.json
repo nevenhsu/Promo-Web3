@@ -10,7 +10,8 @@
     "dev": "next dev --experimental-https",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "user": "git config user.name 'XeraTeam' && git config user.email devteam@xera.vip"
   },
   "dependencies": {
     "@gsap/react": "^2.1.1",
