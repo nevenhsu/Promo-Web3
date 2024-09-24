@@ -82,8 +82,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   const statusDataFetched = userActivityStatus.fetched[slug]
   const statusLoading = statusDataLoading || !statusDataFetched // not fetched yet
   const bonusScore = _.sum([statusData?.referral1stScore, statusData?.referral2ndScore])
-  const confirmed =
-    (statusData?.status || -1) >= 0 && statusData?.status !== ActivityStatus.Completed
+  const confirmed = statusData?.status === ActivityStatus.Initial
   const completed = statusData?.status === ActivityStatus.Completed
 
   // Activity details
