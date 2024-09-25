@@ -139,7 +139,7 @@ function ActivityItem({ data }: { data: TPublicActivity }) {
                   </Box>
                 </Group>
 
-                <Button variant={data.joined ? 'outline' : 'filled'} size="sm" px="md">
+                <Button variant={data.joined || isEnd ? 'outline' : 'filled'} size="sm" px="md">
                   {data.joined ? 'Joined' : isEnd ? 'End' : 'Join'}
                 </Button>
               </Group>

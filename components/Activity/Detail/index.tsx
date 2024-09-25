@@ -32,8 +32,8 @@ import { calculateShare } from '@/lib/shareCalculator'
 import { toUpper } from '@/utils/helper'
 import { allTokens } from '@/contracts/tokens'
 import { PiTrophy, PiLightning, PiPersonSimpleRun, PiCheckBold } from 'react-icons/pi'
-import { PiWarningBold, PiRocketLaunch, PiShareFatFill } from 'react-icons/pi'
-import { PiCircleDashedBold, PiArrowSquareOutBold } from 'react-icons/pi'
+import { PiWarningBold, PiRocketLaunch, PiShareFatFill, PiCalendarBlank } from 'react-icons/pi'
+import { PiCircleDashedBold, PiArrowSquareOutBold, PiTriangleDashedBold } from 'react-icons/pi'
 import { isTypeA } from '@/types/activitySetting'
 import type { TPublicActivity } from '@/models/activity'
 import type { TUserActivityStatus } from '@/models/userActivityStatus'
@@ -82,6 +82,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   const statusLoading = statusDataLoading || !statusDataFetched // not fetched yet
   const bonusScore = _.sum([statusData?.referral1stScore, statusData?.referral2ndScore])
   const confirmed = statusData?.status === ActivityStatus.Initial
+  const inWaitList = statusData?.status === ActivityStatus.WaitList
   const completed = statusData?.status === ActivityStatus.Completed
 
   // Activity details
@@ -118,7 +119,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
   const handleConfirm = () => {
     // If the activity is completed or initial, do nothing
-    if (completed) {
+    if (completed || inWaitList) {
       notifications.show({
         title: 'Activity completed',
         message: 'You have already completed this activity',
@@ -167,7 +168,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   }, [bothAuth, slug])
 
   const renderStatus = (userStatus?: TUserActivityStatus) => {
-    const { title, message, icon, color } = getStatusContent(userStatus)
+    const { title, message, icon, color } = getStatusContent(userStatus, isEnd)
     return (
       <>
         <Skeleton visible={statusLoading}>
@@ -229,42 +230,48 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
 
           <Paper radius="sm" p="md" shadow="xs">
             <Group justify="space-between">
-              <Title order={4} c="orange">
-                Prize Pool
-              </Title>
+              <Title order={4}>Prize Pool</Title>
 
               <Group gap="xs">
                 {token ? (
                   <Image src={token.icon} width={20} height={20} alt={token.symbol} />
                 ) : null}
                 <Title order={4}>
-                  {formatNumber(data.airdrop.amount)} {data.airdrop.symbol}
+                  <Box c="orange" component="span">
+                    {formatNumber(data.airdrop.amount)}
+                  </Box>
+                  {` ${data.airdrop.symbol}`}
                 </Title>
               </Group>
             </Group>
-          </Paper>
 
-          {/* Remaining score for type A */}
-          {isTypeASetting ? (
-            <>
-              <Paper radius="sm" p="md" shadow="xs">
-                <Group justify="space-between" mb="xs">
-                  <Title order={6}>Remaining Score</Title>
+            {/* Remaining score for type A */}
+            {isTypeASetting ? (
+              <>
+                <Progress
+                  size="xs"
+                  value={(remainingScore / setting.data.maxTotalScore) * 100}
+                  mt="md"
+                  mb="xs"
+                />
+
+                <Group justify="space-between">
+                  <Text fz="sm" fw={500}>
+                    Remaining Score
+                  </Text>
 
                   <Group gap="xs">
-                    <Title order={6}>
+                    <Text fz="sm" fw={500}>
                       <Box component="span" c="orange">
                         {formatNumber(remainingScore)}
                       </Box>
                       {` / ${formatNumber(setting.data.maxTotalScore)}`}
-                    </Title>
+                    </Text>
                   </Group>
                 </Group>
-
-                <Progress size="sm" value={(remainingScore / setting.data.maxTotalScore) * 100} />
-              </Paper>
-            </>
-          ) : null}
+              </>
+            ) : null}
+          </Paper>
 
           {bothAuth ? (
             <>
@@ -380,37 +387,45 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
           <Stack>
             {bothAuth ? (
               <>
-                <LinkButton platform={socialMedia} onLink={handleLinkAccount} />
+                {!isEnd ? (
+                  <>
+                    <LinkButton platform={socialMedia} onLink={handleLinkAccount} />
 
-                {details.fullLink ? (
-                  <a target="_blank" href={details.fullLink} rel="noopener noreferrer">
+                    {details.fullLink ? (
+                      <a target="_blank" href={details.fullLink} rel="noopener noreferrer">
+                        <Button
+                          w="100%"
+                          variant="outline"
+                          color="dark"
+                          rightSection={<PiArrowSquareOutBold size={14} />}
+                        >
+                          Open the post
+                        </Button>
+                      </a>
+                    ) : null}
+
                     <Button
-                      w="100%"
-                      variant="outline"
-                      color="dark"
-                      rightSection={<PiArrowSquareOutBold size={14} />}
+                      onClick={() => {
+                        if (confirmed || completed || inWaitList || isEnd) return
+                        handleConfirm()
+                      }}
+                      color={confirmed || completed || inWaitList ? 'dark' : ''}
+                      disabled={!linked}
+                      loading={statusDataLoading}
+                      leftSection={
+                        confirmed || completed || inWaitList ? <PiCheckBold size={14} /> : null
+                      }
                     >
-                      Open the post
+                      {completed
+                        ? 'Completed'
+                        : inWaitList
+                          ? 'Waiting for more score limit'
+                          : confirmed
+                            ? 'Wait for confirmation'
+                            : `Confirm ${getActionLabel(data.activityType).toLowerCase()}`}
                     </Button>
-                  </a>
+                  </>
                 ) : null}
-
-                <Button
-                  onClick={() => {
-                    if (confirmed || completed || isEnd) return
-                    handleConfirm()
-                  }}
-                  color={confirmed || completed ? 'dark' : ''}
-                  disabled={!linked}
-                  loading={statusDataLoading}
-                  leftSection={confirmed || completed ? <PiCheckBold size={14} /> : null}
-                >
-                  {completed
-                    ? 'Completed'
-                    : confirmed
-                      ? 'Wait for confirmation'
-                      : `Confirm ${getActionLabel(data.activityType).toLowerCase()}`}
-                </Button>
               </>
             ) : (
               <Button onClick={login} loading={loading}>
@@ -429,6 +444,11 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
             <Divider />
             <Title order={6}>Event Details</Title>
             <Stack gap="xs">
+              <Group gap="xs">
+                <PiCalendarBlank size={20} />
+                <Text fz="sm">End at {formatDate(new Date(endTime), 'dd MMM yyyy HH:mm')}</Text>
+              </Group>
+
               <Group gap="xs">
                 <PiLightning size={20} />
                 <Text fz="sm">
@@ -478,7 +498,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   )
 }
 
-function getStatusContent(userStatus?: TUserActivityStatus) {
+function getStatusContent(userStatus: TUserActivityStatus | undefined, isEnd: boolean) {
   const { status, error } = userStatus || {}
 
   switch (status) {
@@ -495,6 +515,15 @@ function getStatusContent(userStatus?: TUserActivityStatus) {
       const color = 'red'
       return { title, message, icon, color }
     }
+    case ActivityStatus.WaitList: {
+      const title = !isEnd ? 'Waiting for higher score limit' : 'Missed the event'
+      const message = !isEnd
+        ? 'We may adjust the score limit in the future'
+        : 'Join sooner to earn more rewards'
+      const icon = !isEnd ? <PiTriangleDashedBold size={20} /> : <PiRocketLaunch size={20} />
+      const color = 'black'
+      return { title, message, icon, color }
+    }
     case ActivityStatus.Initial: {
       const title = 'Waiting for confirmation'
       const message = 'We will confirm your activity soon'
@@ -504,8 +533,8 @@ function getStatusContent(userStatus?: TUserActivityStatus) {
     }
     case ActivityStatus.Unjoined:
     default: {
-      const title = 'Join now'
-      const message = 'Join this activity to earn rewards'
+      const title = !isEnd ? 'Join now' : 'Event ended'
+      const message = !isEnd ? 'Join this activity to earn rewards' : 'Check out other events'
       const icon = <PiRocketLaunch size={20} />
       const color = 'black'
       return { title, message, icon, color }
@@ -521,6 +550,7 @@ function getActiveStep(linked: boolean, status?: ActivityStatus) {
       return 2
     case ActivityStatus.Initial:
       return 3
+    case ActivityStatus.WaitList:
     case ActivityStatus.Completed:
       return 4
     default:

@@ -51,6 +51,7 @@ export enum ActivityStatus {
   Unjoined = -1, // Created by referees
   Initial = 0,
   Completed = 1,
+  WaitList = 2, // Waiting for more remaining score
   Error = 4,
 }
 

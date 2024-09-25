@@ -23,7 +23,7 @@ const bonusSchema = new Schema({
 
 const settingSchema = new Schema({
   data: { type: Object, default: { _: '' } }, // custom settings
-  type: { type: String, enum: ActivitySettingType, default: ActivitySettingType.None },
+  type: { type: String, enum: ActivitySettingType, default: ActivitySettingType.None, index: true },
 })
 
 export const schema = new Schema({

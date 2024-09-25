@@ -1,3 +1,4 @@
+import * as _ from 'lodash-es'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import { isAfter } from 'date-fns'
@@ -54,9 +55,10 @@ export async function PUT(req: NextRequest, { params }: { params: { slug: string
 
     const activityId = activity._id.toString()
 
-    // Check if activity is already completed
+    // Check if activity status is not completed, waitList, or initial
     const doc = await getUserActivityStatus(userId, activityId)
-    if (doc && doc.status === ActivityStatus.Completed) {
+    const skipStatus = [ActivityStatus.Completed, ActivityStatus.WaitList, ActivityStatus.Initial]
+    if (doc && _.includes(skipStatus, doc.status)) {
       return NextResponse.json({ status: doc })
     }
 

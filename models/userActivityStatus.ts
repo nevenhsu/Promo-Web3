@@ -35,7 +35,7 @@ export const schema = new Schema({
   selfScore: { type: Number, default: 0.0 },
   referral1stScore: { type: Number, default: 0.0 }, // 1st level referral score
   referral2ndScore: { type: Number, default: 0.0 }, // 2nd level referral score
-  details: { type: Object, default: {} }, // additional details
+  details: { type: Object }, // additional details
   updatedAt: { type: Date, default: Date.now, index: true }, // last updated date
   finalized: { type: Boolean, default: false, index: true }, // airdrop amount finalized
   airdrop: { type: airdropSchema, default: { amount: '', airdropped: false } }, // airdrop amount
