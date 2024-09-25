@@ -17,7 +17,7 @@ import { getPublicClient } from '@/wallet/lib/publicClients'
 import { getWalletClient } from '@/wallet/lib/getWalletClient'
 import { toChainId } from '@/wallet/utils/network'
 import type { ConnectedWallet } from '@privy-io/react-auth'
-import type { Hash, Chain } from 'viem'
+import type { Hash, Chain, EIP1193Provider } from 'viem'
 import type { KernelAccount, KernelProvider, KernelClient, WalletClient } from '@/types/wallet'
 
 // Get current wallet values from Web3Context
@@ -96,10 +96,10 @@ async function getAccountClient(wallet: ConnectedWallet, chainId: number | undef
   if (!zeroDev || !chainId || !publicClient) return
 
   // Get the EIP1193 provider from Privy
-  const provider = await wallet.getEthereumProvider()
+  const provider = (await wallet.getEthereumProvider()) as EIP1193Provider
 
   // Use the EIP1193 `provider` from Privy to create a `SmartAccountSigner`
-  const smartAccountSigner = await providerToSmartAccountSigner(provider as any)
+  const smartAccountSigner = await providerToSmartAccountSigner(provider)
 
   // Initialize a viem public client on your app's desired network
   const { chain } = publicClient
@@ -112,13 +112,13 @@ async function getAccountClient(wallet: ConnectedWallet, chainId: number | undef
   })
 
   // Create a Kernel account from the ECDSA validator
-  const smartAccount = await createKernelAccount(publicClient, {
+  const smartAccount = (await createKernelAccount(publicClient, {
     plugins: {
       sudo: ecdsaValidator,
     },
     entryPoint: ENTRYPOINT_ADDRESS_V07,
     kernelVersion,
-  })
+  })) as KernelAccount
 
   // Create a Kernel account client to send user operations from the smart account
   const smartAccountAddress = smartAccount.address
@@ -127,8 +127,8 @@ async function getAccountClient(wallet: ConnectedWallet, chainId: number | undef
   const noSponsor = createAccountClient(smartAccount, chain, zeroDev, false)
 
   // provider
-  const providerWithSponsor = new KernelEIP1193Provider(withSponsor)
-  const providerNoSponsor = new KernelEIP1193Provider(noSponsor)
+  const providerWithSponsor = new KernelEIP1193Provider(withSponsor as any)
+  const providerNoSponsor = new KernelEIP1193Provider(noSponsor as any)
 
   // wallet client
   const walletClientWithSponsor = getWalletClient(chainId, providerWithSponsor, smartAccountAddress)
