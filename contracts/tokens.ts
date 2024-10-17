@@ -102,3 +102,16 @@ export function isErc20(token: object): token is Erc20 {
 export function isETH(token: object): token is ETH {
   return token && 'isNative' in token
 }
+
+export function getTokenInfo(symbol: string) {
+  switch (symbol) {
+    case 'ETH':
+      return { name: 'Ethereum', icon: '/icons/eth.svg' }
+    case 'USDC':
+      return { name: 'USD Coin', icon: '/icons/usdc-token.svg' }
+    case 'SHX':
+      return { name: 'SharX', icon: '/icons/sharx-token.svg' }
+    default:
+      return { name: '', icon: '/icons/token.svg' }
+  }
+}

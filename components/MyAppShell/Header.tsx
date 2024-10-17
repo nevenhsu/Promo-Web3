@@ -15,7 +15,7 @@ export default function Header() {
   const matches = useMediaQuery('(min-width: 36em)')
   const pathname = usePathname()
   const { canGoBack, goBack } = useGoBack()
-  const { bothAuth } = useLoginStatus()
+  const { bothAuth, nextAuthFail } = useLoginStatus()
   const { data } = useAppSelector(state => state.user)
   const { clickLogin, loading } = useClickLogin()
 
@@ -56,11 +56,12 @@ export default function Header() {
             <Link href="/profile">
               <Avatar src={details?.avatar} name={name || username} color="initials" />
             </Link>
-          ) : (
+          ) : null}
+          {nextAuthFail ? (
             <Button variant="outline" size="sm" onClick={clickLogin} loading={loading}>
               Login
             </Button>
-          )}
+          ) : null}
         </Group>
       </Group>
     </>

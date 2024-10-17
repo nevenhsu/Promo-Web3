@@ -1,12 +1,14 @@
 'use client'
 
+import { useRouter } from '@/navigation'
 import { useClickLogin } from '@/hooks/useLogin'
-import { Button, Stack, Space, Box, Title, Text, Timeline } from '@mantine/core'
+import { Button, Stack, Space, Box, Group, Title, Text, Timeline } from '@mantine/core'
 import Marquee from 'react-fast-marquee'
 import RwdLayout from '@/components/share/RwdLayout'
 import Animation from '@/components/Introduction/Animation'
 
 export default function Index() {
+  const router = useRouter()
   const { clickLogin, loading } = useClickLogin()
 
   return (
@@ -44,9 +46,20 @@ export default function Index() {
               <Text fz="lg" mb="lg">
                 Make your social activity becomes a gateway to earning cryptocurrency.
               </Text>
-              <Button size="md" onClick={clickLogin} loading={loading}>
-                Join Now
-              </Button>
+
+              <Group>
+                <Button
+                  size="md"
+                  variant="outline"
+                  bg="white"
+                  onClick={() => router.push('/activity')}
+                >
+                  Explore
+                </Button>
+                <Button size="md" onClick={clickLogin} loading={loading}>
+                  Join Now
+                </Button>
+              </Group>
             </Stack>
           </Box>
 

@@ -56,10 +56,10 @@ export function HowToJoinModal(props: HowToJoinModalProps) {
         <Timeline.Item
           lineVariant={activeStep > 3 ? 'solid' : 'dashed'}
           bullet={<PiCursorClickBold size={14} />}
-          title="Tap confirm button"
+          title="Hit claim button"
         >
           <Text c="dimmed" size="sm">
-            Click the button to confirm your participation
+            Claim your prize after sharing the post
           </Text>
         </Timeline.Item>
 

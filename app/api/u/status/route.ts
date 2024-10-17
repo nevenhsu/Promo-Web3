@@ -1,9 +1,11 @@
 import * as _ from 'lodash-es'
+import Decimal from 'decimal.js'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { getUserStatus } from '@/lib/db/userStatus'
 import { getAllAirdrops } from '@/lib/db/airdrop'
+import { calculateShare } from '@/lib/shareCalculator'
 import { countUserActivityStatus, getOngoingActivityStatuses } from '@/lib/db/userActivityStatus'
 
 type OngoingActivityStatusesData = Awaited<ReturnType<typeof getOngoingActivityStatuses>>
@@ -32,7 +34,7 @@ export async function GET(req: NextRequest) {
     const airdrops = symbols.map(symbol => {
       const airdrop = airdropData.find(({ symbol: airdropSymbol }) => airdropSymbol === symbol)
       const { receivedAmount, pendingAmount } = airdrop || {}
-      const unsettledAmount = unsettledAirDrops[symbol] || 0
+      const unsettledAmount = unsettledAirDrops[symbol]?.toNumber() || 0
       return { symbol, receivedAmount, pendingAmount, unsettledAmount }
     })
 
@@ -49,23 +51,23 @@ export async function GET(req: NextRequest) {
 function calcUnsettledAirdrops(onGoingStatuses: OngoingActivityStatusesData) {
   const unsettled = onGoingStatuses.map(data => {
     const { _activity } = data
-    const { details, airdrop } = _activity
+    const { details, airdrop, setting } = _activity
     // Calculate airdrop share
-    const airdropShare = data.totalScore / details.totalScore || 0
-    const unsettledAmount = airdropShare * Number(airdrop.amount) || 0
-    return { symbol: airdrop.symbol, unsettledAmount }
+    const { airdropAmount } = calculateShare(setting, details, airdrop, data)
+    return { symbol: airdrop.symbol, unsettledAmount: airdropAmount }
   })
   const unsettledAirDrops = _.reduce(
     unsettled,
     (acc, { symbol, unsettledAmount }) => {
-      if (acc[symbol]) {
-        acc[symbol] += unsettledAmount
+      const current = acc[symbol]
+      if (current) {
+        acc[symbol] = unsettledAmount.add(current)
       } else {
         acc[symbol] = unsettledAmount
       }
       return acc
     },
-    {} as { [symbol: string]: number }
+    {} as { [symbol: string]: Decimal }
   )
   return unsettledAirDrops
 }

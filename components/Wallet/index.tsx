@@ -12,7 +12,7 @@ import RwdLayout from '@/components/share/RwdLayout'
 import Token from './Token'
 import { eth } from '@/contracts/tokens'
 import { formatAddress } from '@/wallet/utils/helper'
-import { PiArrowUpBold, PiArrowDownBold, PiClockBold, PiCreditCardBold } from 'react-icons/pi'
+import { PiArrowUpBold, PiArrowDownBold, PiClockBold, PiParachuteBold } from 'react-icons/pi'
 import classes from './index.module.css'
 
 const ThemeAction = ThemeIcon.withProps({
@@ -91,11 +91,11 @@ export default function Wallet() {
               </ThemeAction>
               <Text fz="sm">History</Text>
             </Link>
-            <Link href="/wallet/buy">
+            <Link href="/wallet/airdrop">
               <ThemeAction>
-                <PiCreditCardBold size={24} />
+                <PiParachuteBold size={24} />
               </ThemeAction>
-              <Text fz="sm">Buy</Text>
+              <Text fz="sm">Airdrop</Text>
             </Link>
           </Group>
         </Paper>
@@ -117,7 +117,7 @@ export default function Wallet() {
 
         <Space h={24} />
 
-        <Stack>
+        <Stack gap="xs">
           <Token
             symbol="ETH"
             icon="/icons/eth.svg"

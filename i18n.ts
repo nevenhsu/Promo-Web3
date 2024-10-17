@@ -34,7 +34,7 @@ export const i18nConfig = {
     '/wallet': '/wallet',
     '/wallet/send': '/wallet/send',
     '/wallet/receive': '/wallet/receive',
-    '/wallet/buy': '/wallet/buy',
+    '/wallet/airdrop': '/wallet/airdrop',
     '/wallet/history': '/wallet/history',
     '/wallet/history/[tx]': '/wallet/history/[tx]',
 

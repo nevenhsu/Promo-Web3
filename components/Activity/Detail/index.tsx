@@ -422,7 +422,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
                           ? 'Waiting for more score limit'
                           : confirmed
                             ? 'Wait for confirmation'
-                            : `Confirm ${getActionLabel(data.activityType).toLowerCase()}`}
+                            : `Claim prize`}
                     </Button>
                   </>
                 ) : null}
