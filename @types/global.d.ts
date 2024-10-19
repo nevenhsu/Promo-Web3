@@ -48,6 +48,12 @@ declare global {
       /// api keys
       NEXT_PUBLIC_ALCHEMY_KEY: string
       NEXT_PUBLIC_INFURA_KEY: string
+
+      /// gcp
+      GCP_PROJECT_ID: string
+      GCP_BUCKET_NAME: string
+      GCP_CLIENT_EMAIL: string
+      GCP_PRIVATE_KEY: string
     }
   }
 }

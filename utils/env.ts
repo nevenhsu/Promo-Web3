@@ -15,6 +15,12 @@ export const env = {
         isAdmin: true,
         adminRole: process.env.DEV_ADMIN_ROLE ? Number(process.env.DEV_ADMIN_ROLE) : undefined,
       },
+  gcp: {
+    projectId: process.env.GCP_PROJECT_ID,
+    bucketName: process.env.GCP_BUCKET_NAME,
+    clientEmail: process.env.GCP_CLIENT_EMAIL,
+    privateKey: process.env.GCP_PRIVATE_KEY,
+  },
 }
 
 // for browser by prefixing with NEXT_PUBLIC_
