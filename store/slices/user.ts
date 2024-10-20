@@ -3,8 +3,10 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import {
   getUserInfo,
   updateUser as _updateUser,
+  updateProfile as _updateProfile,
   updateLinkAccount as _updateLinkAccount,
   deleteLinkAccount as _deleteLinkAccount,
+  type ProfileData,
 } from '@/services/user'
 import { getUserStatus, type TUserStatus } from '@/services/userStatus'
 import type { PayloadAction } from '@reduxjs/toolkit'
@@ -25,6 +27,14 @@ export const updateUser = createAsyncThunk<TUser, Partial<TUser>>('user/update',
   const updateData = await _updateUser(data)
   return updateData || {}
 })
+
+export const updateProfile = createAsyncThunk<TUser, ProfileData>(
+  'user/updateProfile',
+  async data => {
+    const updateData = await _updateProfile(data)
+    return updateData || {}
+  }
+)
 
 export const updateLinkAccount = createAsyncThunk<TUser, LinkedAccount>(
   '/user/linkAccount',
@@ -96,6 +106,18 @@ export const slice = createSlice({
       state.updating = true
     })
     builder.addCase(updateUser.fulfilled, (state, action) => {
+      const newData = action.payload
+      state.updating = false
+      if (newData) {
+        state.data.linkedAccounts = [] // prevent duplicate
+        _.merge(state.data, newData)
+      }
+    })
+    builder.addCase(updateProfile.pending, (state, action) => {
+      state.updating = true
+      state.data.details!.avatar = ''
+    })
+    builder.addCase(updateProfile.fulfilled, (state, action) => {
       const newData = action.payload
       state.updating = false
       if (newData) {

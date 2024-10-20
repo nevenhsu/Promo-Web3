@@ -19,7 +19,7 @@ export const env = {
     projectId: process.env.GCP_PROJECT_ID,
     bucketName: process.env.GCP_BUCKET_NAME,
     clientEmail: process.env.GCP_CLIENT_EMAIL,
-    privateKey: process.env.GCP_PRIVATE_KEY,
+    privateKey: process.env.GCP_PRIVATE_KEY?.replace(/\\n/g, '\n'),
   },
 }
 

@@ -1,4 +1,6 @@
-import _ from 'lodash'
+import 'server-only'
+
+import * as _ from 'lodash-es'
 import mimeTypes from 'mime-types'
 import { Storage } from '@google-cloud/storage'
 import { toWebp } from './sharp'
@@ -25,8 +27,17 @@ const storage = new Storage({
  * @param {string} name userId-imageId
  * @returns {string} url from gcp bucket
  */
-export async function uploadImage(dataURI: string, path: string, name: string) {
-  const webp = await toWebp(dataURI)
+export async function uploadImage(
+  dataURI: string,
+  path: string,
+  name: string,
+  size?: { width: number; height: number }
+) {
+  if (!isImageURI(dataURI)) {
+    throw new Error('invalid data')
+  }
+
+  const webp = await toWebp(dataURI, size)
 
   if (!webp || !path || !name) {
     throw new Error('invalid params')
@@ -34,7 +45,7 @@ export async function uploadImage(dataURI: string, path: string, name: string) {
 
   const fileSizeInMB = webp.length / (1024 * 1024)
   if (fileSizeInMB > 10) {
-    throw new Error('file size cannot exceed 10MB')
+    throw new Error('file size cannot exceed 10mb')
   }
 
   // convert dataURI to buffer
@@ -67,4 +78,11 @@ const dataURItoBuffer = (dataURI: string, name: string) => {
   const fileName = `${name}.${extension}`
   const buffer = Buffer.from(arr[1], 'base64')
   return { fileName, contentType, extension, buffer }
+}
+
+export function isImageURI(str?: string) {
+  if (!str) return false
+
+  const regex = /^data:image\/[a-zA-Z0-9.+-]+;base64,[a-zA-Z0-9+/]+={0,2}$/
+  return regex.test(str)
 }

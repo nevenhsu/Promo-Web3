@@ -1,11 +1,17 @@
 import axios from 'axios'
 import type { TUser, LinkedAccount } from '@/models/user'
 import type { ReferralCode } from '@/models/referralCode'
-import type { BucketType, PublicUser } from '@/types/db'
+import type { PublicUser } from '@/types/db'
 
 export type UserData = {
   user: TUser
   referralData: ReferralCode
+}
+
+export type ProfileData = {
+  name: string
+  username: string
+  avatarURI: string
 }
 
 export const getUserInfo = async () => {
@@ -19,18 +25,19 @@ export const updateUser = async (body: Partial<TUser>) => {
   return user
 }
 
-export const uploadImage = async (dataURI: string, type: BucketType) => {
+export const updateProfile = async (body: ProfileData) => {
+  const res = await axios.put<{ user: TUser }>(`/api/u/user/updateProfile`, body)
+  const { user } = res.data
+  return user
+}
+
+export const uploadImage = async (dataURI: string, name: string) => {
   // data:image/png;base64,iVBORw0...
-  try {
-    const { data } = await axios.post<{ url: string }>('/api/u/user/uploadImage', {
-      dataURI,
-      type,
-    })
-    return data.url
-  } catch (err) {
-    console.error(err)
-    return undefined
-  }
+  const { data } = await axios.put<{ url: string }>('/api/u/uploadImage', {
+    dataURI,
+    name,
+  })
+  return data.url
 }
 
 export const getPublicUser = async (username: string): Promise<PublicUser | undefined> => {

@@ -1,4 +1,5 @@
 import * as _ from 'lodash-es'
+import { parseData } from './common'
 import UserModel from '@/models/user'
 import type { User, TUser, LinkedAccount } from '@/models/user'
 
@@ -31,9 +32,11 @@ export async function getUserByUsername(username: string) {
 }
 
 export async function updateUserById(_id: string, updateData: Partial<User>) {
+  const parsedData = parseData(updateData)
+
   const updatedUser = await UserModel.findByIdAndUpdate(
     _id,
-    updateData,
+    { $set: parsedData },
     { new: true } // Options to return the updated document
   )
 

@@ -1,35 +1,32 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from '@/navigation'
-import { Stack, Box, Space, Group, Divider } from '@mantine/core'
-import { Avatar, TextInput, Button, ThemeIcon } from '@mantine/core'
+import { Stack, Box, Space, Group, Divider, Text } from '@mantine/core'
+import { TextInput, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { notifications } from '@mantine/notifications'
-import { updateUser } from '@/store/slices/user'
+import { updateProfile } from '@/store/slices/user'
 import { useAppSelector, useAppDispatch } from '@/hooks/redux'
 import { useForm, hasLength } from '@mantine/form'
 import { usePrevious } from 'react-use'
+import AvatarButton, { type AvatarButtonRef } from './AvatarButton'
 import { getPublicUser } from '@/services/user'
 import { cleanup } from '@/utils/helper'
-import { PiImageFill } from 'react-icons/pi'
 
 export default function ProfileInfo() {
   const dispatch = useAppDispatch()
 
+  const avatarRef = useRef<AvatarButtonRef>(null)
+
   const { updating, data } = useAppSelector(state => state.user)
   const { username = '', name = '', details } = data
+  const avatar = details?.avatar || ''
   const prevUpdating = usePrevious(updating)
 
-  useEffect(() => {
-    if (prevUpdating && !updating) {
-      notifications.show({
-        title: 'Profile updated',
-        message: 'Your profile has been updated successfully',
-        color: 'green',
-      })
-    }
-  }, [updating, prevUpdating])
+  const [image, setImage] = useState<string>(avatar)
+  const [imageError, setImageError] = useState<string>()
+  const avatarURI = imageError ? '' : image
 
   const form = useForm({
     mode: 'controlled',
@@ -48,16 +45,17 @@ export default function ProfileInfo() {
   })
 
   const values = form.getValues()
-  const alreadyUpdated = values.username === username && values.name === name
+  const alreadyUpdated =
+    values.username === username && values.name === name && avatar === avatarURI
 
   const handleSubmit = (values: typeof form.values) => {
     if (values.name && values.username) {
       // Update user info
-      updateInfo(values.name, cleanup(values.username))
+      updateInfo(values.name, cleanup(values.username), avatarURI)
     }
   }
 
-  const updateInfo = async (name: string, username: string) => {
+  const updateInfo = async (name: string, username: string, avatarURI: string) => {
     try {
       // Check if username is unique
       if (username !== data.username) {
@@ -69,36 +67,54 @@ export default function ProfileInfo() {
       }
 
       // Update user info
-      dispatch(updateUser({ name, username }))
+      dispatch(updateProfile({ name, username, avatarURI }))
     } catch (err) {
       console.error(err)
       // TODO: Show error notification
     }
   }
 
+  useEffect(() => {
+    if (prevUpdating && !updating) {
+      notifications.show({
+        title: 'Profile updated',
+        message: 'Your profile has been updated successfully',
+        color: 'green',
+      })
+    }
+  }, [updating, prevUpdating])
+
+  useEffect(() => {
+    setImage(details?.avatar || '')
+  }, [details?.avatar])
+
   return (
     <>
       <RwdLayout>
         <Stack gap="xl">
-          {/* Avatar */}
-          <Box pos="relative" w={64} h={64} mx="auto">
-            <Link href="/profile/info/avatar">
-              <Avatar w="100%" h="100%" color="white" src={details?.avatar} />
-
-              <ThemeIcon
-                size="sm"
-                variant="light"
-                color="dark"
-                style={{
-                  position: 'absolute',
-                  bottom: -4,
-                  right: -4,
+          <Stack gap="xs">
+            {/* Avatar */}
+            <Box pos="relative" w={64} h={64} mx="auto">
+              <AvatarButton
+                ref={avatarRef}
+                url={avatar}
+                onChange={file => {
+                  if (file && file.size >= 1024 * 1024 * 10) {
+                    setImageError('Image size cannot exceed 10mb')
+                  } else {
+                    setImageError(undefined)
+                  }
                 }}
-              >
-                <PiImageFill size={16} />
-              </ThemeIcon>
-            </Link>
-          </Box>
+                onDataURLChange={dataURI => {
+                  setImage(dataURI || '')
+                }}
+              />
+            </Box>
+
+            <Text fz="xs" ta="center" c="red">
+              {imageError}
+            </Text>
+          </Stack>
 
           <Divider />
 

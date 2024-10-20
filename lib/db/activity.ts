@@ -1,8 +1,8 @@
 import * as _ from 'lodash-es'
-import dot from 'dot-object'
+import { setMilliseconds } from 'date-fns'
 import ActivityModel from '@/models/activity'
 import UserActivityStatusModel from '@/models/userActivityStatus'
-import { setMilliseconds } from 'date-fns'
+import { parseData } from './common'
 import type { ActivityData } from '@/models/activity'
 
 // ========================
@@ -145,7 +145,7 @@ export async function updateActivity(index: number, updateData: Partial<Activity
   }
 
   const { setting, ...rest } = updateData
-  const parsedData = dot.dot(rest)
+  const parsedData = parseData(rest)
   if (setting) {
     parsedData.setting = setting
   }
