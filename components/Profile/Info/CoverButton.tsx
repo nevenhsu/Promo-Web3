@@ -1,30 +1,36 @@
 'use client'
 
 import { useState, forwardRef, useImperativeHandle } from 'react'
-import { FileButton, Avatar, ThemeIcon } from '@mantine/core'
+import { FileButton, ThemeIcon, Box, AspectRatio, Button } from '@mantine/core'
 import { PiImageFill } from 'react-icons/pi'
 
-export type AvatarButtonRef = {
-  getFile: () => { file: File | null; dataURI: string | undefined }
-}
-
-type AvatarButtonProps = {
+type CoverButtonProps = {
   url: string
   onChange?: (file: File | null) => void
   onDataURLChange?: (dataURI: string | undefined) => void
 }
 
-export default forwardRef<AvatarButtonRef, AvatarButtonProps>(function AvatarButton(props, ref) {
+export default function CoverButton(props: CoverButtonProps) {
   const { url, onChange, onDataURLChange } = props
   const [file, setFile] = useState<File | null>(null)
   const [dataURI, setDataURI] = useState<string>()
 
-  useImperativeHandle(ref, () => ({
-    getFile: () => ({ file, dataURI }),
-  }))
+  const imgSrc = dataURI || url
 
   return (
-    <>
+    <Box pos="relative">
+      <AspectRatio ratio={4 / 1}>
+        <Box bg="gray.1" style={{ borderRadius: 4, overflow: 'hidden' }}>
+          {imgSrc ? (
+            <img
+              src={imgSrc}
+              alt="cover"
+              style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : null}
+        </Box>
+      </AspectRatio>
+
       <FileButton
         onChange={file => {
           setFile(file)
@@ -55,23 +61,21 @@ export default forwardRef<AvatarButtonRef, AvatarButtonProps>(function AvatarBut
         accept="image/*"
       >
         {props => (
-          <span {...props} className="c-pointer">
-            <Avatar w="100%" h="100%" color="white" src={dataURI || url} />
-            <ThemeIcon
-              size="sm"
-              variant="light"
-              color="dark"
-              style={{
-                position: 'absolute',
-                bottom: -4,
-                right: -4,
-              }}
-            >
-              <PiImageFill size={16} />
-            </ThemeIcon>
-          </span>
+          <Button
+            {...props}
+            size="compact-xs"
+            variant="light"
+            color="dark"
+            style={{
+              position: 'absolute',
+              top: 8,
+              right: 4,
+            }}
+          >
+            Upload cover
+          </Button>
         )}
       </FileButton>
-    </>
+    </Box>
   )
-})
+}

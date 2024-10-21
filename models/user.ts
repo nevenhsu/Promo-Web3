@@ -8,6 +8,9 @@ import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mon
 // no sensitive data here
 const detailSchema = new Schema({
   avatar: String,
+  cover: String,
+  bio: String,
+  link: String,
 })
 
 const linkedAccountSchema = new Schema({

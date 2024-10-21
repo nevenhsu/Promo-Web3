@@ -113,9 +113,19 @@ export const slice = createSlice({
         _.merge(state.data, newData)
       }
     })
+    builder.addCase(updateUser.rejected, (state, action) => {
+      state.updating = false
+    })
     builder.addCase(updateProfile.pending, (state, action) => {
       state.updating = true
-      state.data.details!.avatar = ''
+
+      const { arg } = action.meta
+      if (arg.avatarURI.startsWith('data:')) {
+        state.data.details!.avatar = ''
+      }
+      if (arg.coverURI.startsWith('data:')) {
+        state.data.details!.cover = ''
+      }
     })
     builder.addCase(updateProfile.fulfilled, (state, action) => {
       const newData = action.payload
@@ -124,6 +134,9 @@ export const slice = createSlice({
         state.data.linkedAccounts = [] // prevent duplicate
         _.merge(state.data, newData)
       }
+    })
+    builder.addCase(updateProfile.rejected, (state, action) => {
+      state.updating = false
     })
     builder.addCase(updateLinkAccount.pending, (state, action) => {
       state.linking = true
@@ -135,6 +148,9 @@ export const slice = createSlice({
         state.data.linkedAccounts = [] // prevent duplicate
         _.merge(state.data, newData)
       }
+    })
+    builder.addCase(updateLinkAccount.rejected, (state, action) => {
+      state.linking = false
     })
     builder.addCase(deleteLinkAccount.fulfilled, (state, action) => {
       const newData = action.payload

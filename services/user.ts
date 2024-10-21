@@ -12,6 +12,9 @@ export type ProfileData = {
   name: string
   username: string
   avatarURI: string
+  coverURI: string
+  bio: string
+  link: string
 }
 
 export const getUserInfo = async () => {

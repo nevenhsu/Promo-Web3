@@ -9,14 +9,14 @@ const userPersistConfig = {
   key: 'user',
   storage,
   version: 1.1,
-  blacklist: ['fetched'],
+  blacklist: ['fetched', 'updating', 'linking'],
 }
 
 const userActivityStatusPersistConfig = {
   key: 'userActivityStatus',
   storage,
   version: 1,
-  blacklist: ['fetched'],
+  blacklist: ['fetched', 'loading'],
 }
 
 const rootReducer = combineReducers({

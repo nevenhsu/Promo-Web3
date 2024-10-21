@@ -10,7 +10,7 @@ export async function PUT(req: NextRequest) {
     const token = await getToken({ req })
     const userId = token?.user?.id!
 
-    const { name, username, avatarURI } = await req.json()
+    const { name, username, avatarURI, coverURI, bio, link } = await req.json()
 
     await dbConnect()
 
@@ -22,16 +22,30 @@ export async function PUT(req: NextRequest) {
       }
     }
 
+    let details: { [k: string]: string } = {
+      bio,
+      link,
+    }
+
     // upload image to GCP
-    let details = {}
     if (isImageURI(avatarURI)) {
       const path = `images/${userId}`
       const fileName = 'avatar'
       const url = await uploadImage(avatarURI, path, fileName, { width: 200, height: 200 })
       if (!url) {
-        return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 })
+        return NextResponse.json({ error: 'Failed to upload avatar' }, { status: 500 })
       }
-      details = { avatar: url }
+      details.avatar = url
+    }
+
+    if (isImageURI(coverURI)) {
+      const path = `images/${userId}`
+      const fileName = 'cover'
+      const url = await uploadImage(coverURI, path, fileName, { width: 1400, height: 350 })
+      if (!url) {
+        return NextResponse.json({ error: 'Failed to upload cover' }, { status: 500 })
+      }
+      details.cover = url
     }
 
     const user = await updateUserById(userId, {

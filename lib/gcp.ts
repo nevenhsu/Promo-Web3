@@ -59,7 +59,8 @@ export async function uploadImage(
   const metadata = { contentType: 'image/webp' }
   await file.save(webp, { metadata })
 
-  const gcpUrl = `https://storage.googleapis.com/${gcp.bucketName}/${file.name}`
+  // avoid cache
+  const gcpUrl = `https://storage.googleapis.com/${gcp.bucketName}/${file.name}?t=${Date.now()}`
   return gcpUrl
 }
 
