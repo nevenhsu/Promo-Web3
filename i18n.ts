@@ -30,6 +30,10 @@ export const i18nConfig = {
     '/activity': '/activity',
     '/activity/[slug]': '/activity/[slug]',
 
+    // user
+    '/u': '/u',
+    '/u/[username]': '/u/[username]',
+
     // wallet
     '/wallet': '/wallet',
     '/wallet/send': '/wallet/send',
@@ -47,7 +51,6 @@ export const i18nConfig = {
     // profile
     '/profile': '/profile',
     '/profile/info': '/profile/info',
-    '/profile/info/avatar': '/profile/info/avatar',
     '/profile/account': '/profile/account',
 
     // refer

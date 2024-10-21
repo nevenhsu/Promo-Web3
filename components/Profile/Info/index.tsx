@@ -48,6 +48,15 @@ export default function ProfileInfo() {
         form.setFieldValue('username', cleaned)
         return hasLength({ min: 2, max: 20 }, 'Should be between 2 and 20 characters')(cleaned)
       },
+      link: o => {
+        if (!o) return
+        // Check if link is valid
+        try {
+          new URL(o)
+        } catch {
+          return 'Please include http:// or https://'
+        }
+      },
     },
   })
 
@@ -171,7 +180,7 @@ export default function ProfileInfo() {
               <Textarea label="Bio" key={form.key('bio')} {...form.getInputProps('bio')} />
 
               <TextInput
-                label="Link"
+                label="Website link"
                 key={form.key('link')}
                 {...form.getInputProps('link')}
                 placeholder="https://"

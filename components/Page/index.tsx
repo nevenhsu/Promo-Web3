@@ -77,20 +77,17 @@ export default function Blog({ slug, lang, initialData }: PageProps) {
 
       <RwdLayout>
         <MotionSlide delay={1}>
-          <Box w={{ base: '100%', sm: '80%', lg: '60%' }} maw={600} mx="auto">
-            <Stack>
-              <PageInfo data={data} />
-              <Headline>{title}</Headline>
-              {author ? <MyAvatar data={author} /> : null}
-            </Stack>
-          </Box>
+          <Stack>
+            <PageInfo data={data} />
+            <Headline>{title}</Headline>
+            {author ? <MyAvatar data={author} /> : null}
+          </Stack>
         </MotionSlide>
       </RwdLayout>
 
       {/*   Content   */}
       <Box
         style={{
-          width: '100vw',
           overflowX: 'hidden',
         }}
       >
@@ -101,9 +98,7 @@ export default function Blog({ slug, lang, initialData }: PageProps) {
             transition={{ delay: isInit ? 0 : 2 }}
           >
             <Box pos="relative" py={{ base: 40 }}>
-              <Box w={{ base: '100%', sm: '80%', lg: '60%' }} maw={600} mx="auto">
-                <MyPortableText content={content || []} />
-              </Box>
+              <MyPortableText content={content || []} />
             </Box>
           </motion.div>
         </RwdLayout>
