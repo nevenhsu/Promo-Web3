@@ -8,10 +8,6 @@ import { env } from '@/utils/env'
 
 const { gcp } = env
 
-if (!gcp.bucketName || !gcp.projectId || !gcp.clientEmail || !gcp.privateKey) {
-  throw new Error('no GCP keys')
-}
-
 const storage = new Storage({
   projectId: gcp.projectId,
   credentials: {

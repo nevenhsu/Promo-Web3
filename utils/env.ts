@@ -68,9 +68,13 @@ function getBaseUrl() {
 
 function getGCPKey(): { project_id?: string; client_email?: string; private_key?: string } {
   try {
-    const key = JSON.parse(Buffer.from(process.env.GCP_KEY || 'e30=', 'base64').toString())
+    const key = JSON.parse(
+      Buffer.from(process.env.GCP_KEY || 'e30=', 'base64')
+        .toString()
+        .replace(/\n/g, '')
+    )
 
-    if (!key.project_id || !key.client_email || !key.private_key) {
+    if (!key.project_id || !key.client_emanil || !key.private_key) {
       throw new Error('Invalid GCP_KEY')
     }
 
