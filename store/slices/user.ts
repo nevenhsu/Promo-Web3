@@ -9,6 +9,7 @@ import {
   type ProfileData,
 } from '@/services/user'
 import { getUserStatus, type TUserStatus } from '@/services/userStatus'
+import { notifications } from '@mantine/notifications'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { TUser, LinkedAccount } from '@/models/user'
 import type { ReferralCode } from '@/models/referralCode'
@@ -115,6 +116,12 @@ export const slice = createSlice({
     })
     builder.addCase(updateUser.rejected, (state, action) => {
       state.updating = false
+
+      notifications.show({
+        title: 'Profile update failed',
+        message: 'Please try again later',
+        color: 'red',
+      })
     })
     builder.addCase(updateProfile.pending, (state, action) => {
       state.updating = true
@@ -133,10 +140,22 @@ export const slice = createSlice({
       if (newData) {
         state.data.linkedAccounts = [] // prevent duplicate
         _.merge(state.data, newData)
+
+        notifications.show({
+          title: 'Profile updated',
+          message: 'Your profile has been updated successfully',
+          color: 'green',
+        })
       }
     })
     builder.addCase(updateProfile.rejected, (state, action) => {
       state.updating = false
+
+      notifications.show({
+        title: 'Profile update failed',
+        message: 'Please try again later',
+        color: 'red',
+      })
     })
     builder.addCase(updateLinkAccount.pending, (state, action) => {
       state.linking = true

@@ -10,7 +10,7 @@ export async function PUT(req: NextRequest) {
     const token = await getToken({ req })
     const userId = token?.user?.id!
 
-    const { name, username, avatarURI, coverURI, bio, link } = await req.json()
+    const { name, username, avatarURI, coverURI, bio = '', link = '' } = await req.json()
 
     await dbConnect()
 
@@ -61,6 +61,10 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ user })
   } catch (error) {
     console.error(error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+
+    return NextResponse.json(
+      { error: _.get(error, 'message', 'Internal server error') },
+      { status: 500 }
+    )
   }
 }

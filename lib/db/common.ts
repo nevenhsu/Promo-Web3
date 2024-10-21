@@ -3,5 +3,5 @@ import dot from 'dot-object'
 
 export function parseData(data: any) {
   const parsedData = dot.dot(data)
-  return _.omitBy(parsedData, _.isEmpty)
+  return _.omitBy(parsedData, o => _.isPlainObject(o) && _.isEmpty(o))
 }

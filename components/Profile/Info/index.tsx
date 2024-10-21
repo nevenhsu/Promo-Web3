@@ -1,15 +1,13 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from '@/navigation'
 import { Stack, Box, Space, Group, Divider, Text, Textarea } from '@mantine/core'
 import { TextInput, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { notifications } from '@mantine/notifications'
 import { updateProfile } from '@/store/slices/user'
 import { useAppSelector, useAppDispatch } from '@/hooks/redux'
 import { useForm, hasLength } from '@mantine/form'
-import { usePrevious } from 'react-use'
 import AvatarButton from './AvatarButton'
 import CoverButton from './CoverButton'
 import { getPublicUser } from '@/services/user'
@@ -17,9 +15,7 @@ import { cleanup } from '@/utils/helper'
 
 export default function ProfileInfo() {
   const dispatch = useAppDispatch()
-
   const { updating, data } = useAppSelector(state => state.user)
-  const prevUpdating = usePrevious(updating)
 
   const { username = '', name = '', details } = data
   const avatar = details?.avatar || ''
@@ -32,6 +28,7 @@ export default function ProfileInfo() {
   const [imageError, setImageError] = useState<string>()
   const avatarURI = imageError ? '' : image
 
+  // cover
   const [coverImg, setCoverImg] = useState<string>(cover)
   const [coverError, setCoverError] = useState<string>()
   const coverURI = coverError ? '' : coverImg
@@ -89,16 +86,6 @@ export default function ProfileInfo() {
       // TODO: Show error notification
     }
   }
-
-  useEffect(() => {
-    if (prevUpdating && !updating) {
-      notifications.show({
-        title: 'Profile updated',
-        message: 'Your profile has been updated successfully',
-        color: 'green',
-      })
-    }
-  }, [updating, prevUpdating])
 
   // update image when details change
   useEffect(() => {
