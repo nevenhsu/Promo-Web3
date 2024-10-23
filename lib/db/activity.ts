@@ -46,6 +46,9 @@ export async function getPublicActivities(
   if (ongoing !== undefined) {
     const now = new Date()
     query.endTime = ongoing ? { $gt: now } : { $lte: now }
+    if (ongoing) {
+      query.startTime = { $lte: now }
+    }
   }
 
   const docs = await ActivityModel.find(query)
@@ -88,6 +91,8 @@ export async function getPublicActivity(slug: string) {
     slug,
     published: true,
   }).lean()
+
+  console.log('Activity found:', { slug, activity })
 
   return activity
 }
@@ -136,7 +141,7 @@ export async function createActivity(data: ActivityData) {
   return activity
 }
 
-export async function updateActivity(index: number, updateData: Partial<ActivityData>) {
+export async function updateActivity(_id: string, updateData: Partial<ActivityData>) {
   if (updateData.startTime) {
     updateData.startTime = setMilliseconds(updateData.startTime, 0)
   }
@@ -151,35 +156,34 @@ export async function updateActivity(index: number, updateData: Partial<Activity
   }
 
   const updated = await ActivityModel.findOneAndUpdate(
-    { index },
+    { _id },
     { $set: parsedData },
     { new: true } // Options to return the updated document
   )
 
   if (!updated) {
-    console.log('No activity found with the index.')
+    console.log('No activity found with the id.')
     return null
   }
-
-  console.log('Updated activity:', updated)
 
   return updated
 }
 
-export async function deleteActivity(index: number) {
-  const deleted = await ActivityModel.findOneAndDelete({ index })
+export async function getActivities(options?: GetOptions) {
+  const { page = 1 } = options || {}
+  const limit = _.min([options?.limit || 10, 100]) || 1
 
-  if (!deleted) {
-    console.log('No activity found with the index.')
-    return null
+  const activities = await ActivityModel.find({})
+    .sort({ startTime: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .lean()
+
+  // return the total number of transactions
+  if (page === 1) {
+    const total = await ActivityModel.countDocuments({})
+    return { total, activities, limit }
   }
 
-  console.log('Deleted activity:', deleted)
-  return deleted
-}
-
-export async function getAllActivity() {
-  const activities = await ActivityModel.find().sort({ index: -1 }).lean()
-  console.log('All activities:', activities.length)
-  return activities
+  return { activities, limit }
 }

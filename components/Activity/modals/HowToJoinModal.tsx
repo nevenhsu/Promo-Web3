@@ -69,7 +69,7 @@ export function HowToJoinModal(props: HowToJoinModalProps) {
           title="Wait for confirmation"
         >
           <Text c="dimmed" size="sm">
-            Wait for confirmation to get your score
+            We will check your post if it meets the requirements
           </Text>
         </Timeline.Item>
       </Timeline>

@@ -49,7 +49,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
 
   const handleSubmit = async (data: Partial<ActivityData>) => {
     if (selectedActivity) {
-      const updated = await updateActivity(selectedActivity.index, data)
+      const updated = await updateActivity(selectedActivity._id, data)
       if (updated) {
         close()
       } else {
@@ -60,7 +60,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
 
   return (
     <>
-      <Modal opened={opened} onClose={close} title="Update admin" centered keepMounted>
+      <Modal opened={opened} onClose={close} title="Update activity" centered keepMounted>
         <Box mx="auto">
           <Form ref={formRef}>
             <form

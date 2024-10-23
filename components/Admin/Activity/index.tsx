@@ -2,14 +2,13 @@
 
 import { useRef } from 'react'
 import { isAfter } from 'date-fns'
-import { Stack, Paper, Table, Group, Divider } from '@mantine/core'
-import { Button, ActionIcon, Text, Box, ThemeIcon } from '@mantine/core'
+import { Stack, Paper, Table, Group, Pagination, Space, Center } from '@mantine/core'
+import { Button, ActionIcon, Text, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { useActivity } from '@/store/contexts/admin/ActivityContext'
 import AddModel, { type AddModalRef } from './AddModal'
 import UpdateModal, { type UpdateModalRef } from './UpdateModal'
-import DeleteModal, { type DeleteModalRef } from './DeleteModal'
-import { PiCheckCircle, PiXCircle, PiPencil, PiTrash } from 'react-icons/pi'
+import { PiCheckCircle, PiXCircle, PiPencil } from 'react-icons/pi'
 import { PiPauseFill, PiPlayFill, PiStopFill } from 'react-icons/pi'
 import { formatZonedDate } from '@/utils/helper'
 import { formatNumber } from '@/utils/math'
@@ -18,14 +17,13 @@ import classes from './index.module.css'
 export default function AdminEpoch() {
   const addRef = useRef<AddModalRef>(null)
   const updateRef = useRef<UpdateModalRef>(null)
-  const deleteRef = useRef<DeleteModalRef>(null)
 
-  const { activities, setSelectedIndex } = useActivity()
+  const { data, total, current, loading, setSelectedId, handlePageChange } = useActivity()
 
-  const rows = activities.map(o => {
+  const rows = data.map(o => {
     const ended = isAfter(new Date(), o.endTime)
     return (
-      <Table.Tr key={o.index}>
+      <Table.Tr key={o._id}>
         <Table.Td>
           <ThemeIcon variant="white" color={o.published ? (ended ? 'black' : 'green') : 'red'}>
             {o.published ? (
@@ -71,22 +69,12 @@ export default function AdminEpoch() {
           <Group gap="xs" wrap="nowrap">
             <ActionIcon
               onClick={() => {
-                setSelectedIndex(o.index)
+                setSelectedId(o._id)
                 updateRef.current?.open()
               }}
               color="blue"
             >
               <PiPencil />
-            </ActionIcon>
-            <Divider orientation="vertical" />
-            <ActionIcon
-              color="red"
-              onClick={() => {
-                setSelectedIndex(o.index)
-                deleteRef.current?.open()
-              }}
-            >
-              <PiTrash />
             </ActionIcon>
           </Group>
         </Table.Td>
@@ -123,7 +111,7 @@ export default function AdminEpoch() {
               </Table>
             </Table.ScrollContainer>
 
-            {!activities.length && (
+            {!data.length && (
               <>
                 <Text className="absolute-center" ta="center" c="dimmed" mt="md">
                   No activity yet...
@@ -131,12 +119,24 @@ export default function AdminEpoch() {
               </>
             )}
           </Paper>
+
+          <Space h="md" />
+
+          <Center>
+            <Pagination
+              total={total}
+              value={current}
+              onChange={handlePageChange}
+              disabled={loading}
+            />
+          </Center>
         </Stack>
       </RwdLayout>
 
+      <Space h={100} />
+
       <AddModel ref={addRef} />
       <UpdateModal ref={updateRef} />
-      <DeleteModal ref={deleteRef} />
     </>
   )
 }

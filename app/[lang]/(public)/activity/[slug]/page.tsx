@@ -15,10 +15,12 @@ const getTweet = unstable_cache(async (id: string) => _getTweet(id), ['tweet'], 
 })
 
 export default async function ActivityDetailPage({
-  params: { lang, slug },
+  params,
 }: {
   params: { lang: string; slug: string }
 }) {
+  const slug = decodeURIComponent(params.slug)
+
   await dbConnect()
   const activity = await getPublicActivity(slug)
 

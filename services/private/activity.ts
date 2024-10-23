@@ -14,11 +14,11 @@ export const createActivity = async (newData: ActivityData): Promise<TActivity |
 }
 
 export const updateActivity = async (
-  index: number,
+  _id: string,
   updateData: Partial<ActivityData>
 ): Promise<TActivity | undefined> => {
   try {
-    const { data } = await axios.put<{ activity: TActivity }>(`${api}/update/${index}`, {
+    const { data } = await axios.put<{ activity: TActivity }>(`${api}/update/${_id}`, {
       data: updateData,
     })
     return data.activity
@@ -28,22 +28,18 @@ export const updateActivity = async (
   }
 }
 
-export const deleteActivity = async (index: number): Promise<TActivity | undefined> => {
-  try {
-    const { data } = await axios.delete<{ activity: TActivity }>(`${api}/delete/${index}`)
-    return data.activity
-  } catch (err) {
-    console.error(err)
-    return undefined
-  }
-}
+export const getActivities = async (values: { page: number; limit: number }) => {
+  const { page, limit } = values
 
-export const getAllActivities = async (): Promise<TActivity[] | undefined> => {
-  try {
-    const { data } = await axios.get<{ activities: TActivity[] }>(api)
-    return data.activities
-  } catch (err) {
-    console.error(err)
-    return undefined
-  }
+  const url = new URL(api, window.location.origin)
+  url.searchParams.append('page', page.toString())
+  url.searchParams.append('limit', limit.toString())
+  // log url: http://localhost:3000/api/private/activity?page=1&limit=10
+
+  const { data } = await axios.get<{
+    activities: TActivity[]
+    limit: number
+    total?: number
+  }>(url.toString())
+  return data
 }

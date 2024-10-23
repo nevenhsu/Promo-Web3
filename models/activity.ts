@@ -27,7 +27,7 @@ const settingSchema = new Schema({
 })
 
 export const schema = new Schema({
-  index: { type: Number, required: true, unique: true, index: true },
+  nftId: { type: Number, unique: true, index: true },
   startTime: { type: Date, required: true, index: true },
   endTime: { type: Date, required: true, index: true },
   slug: { type: String, required: true, unique: true, index: true },
@@ -45,28 +45,17 @@ export const schema = new Schema({
 export type Activity = InferSchemaType<typeof schema>
 export type ActivityDetail = InferSchemaType<typeof detailSchema>
 export type ActivityAirdrop = InferSchemaType<typeof airdropSchema>
-export type ActivityData = Omit<Activity, 'index' | 'details' | 'airdrop' | 'bonus'> & {
+export type ActivityData = Omit<Activity, 'nftId' | 'details' | 'airdrop' | 'bonus'> & {
   details: Omit<ActivityDetail, 'participants' | 'totalScore'>
   airdrop: Omit<ActivityAirdrop, 'finalized'>
   bonus: Omit<InferSchemaType<typeof bonusSchema>, 'finalized'>
 }
 export type TActivity = Omit<Activity, 'startTime' | 'endTime'> & {
+  _id: string
   startTime: string // ISO 8601 date string
   endTime: string // ISO 8601 date string
 }
 export type TPublicActivity = TActivity & { joined: boolean }
-
-schema.set('validateBeforeSave', false)
-
-// Middleware to auto-increment the `index` field
-schema.pre<Activity>('save', async function (next) {
-  const last = await ActivityModel.findOne().sort({ index: -1 })
-  this.index = last ? last.index + 1 : 0
-
-  /* @ts-expect-error */
-  await this.validate()
-  next()
-})
 
 const name = 'Activity'
 const ActivityModel = (models[name] as Model<Activity>) || model(name, schema)
