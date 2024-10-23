@@ -132,7 +132,7 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 export const useActivity = (): ActivityContextType => {
   const context = useContext(ActivityContext)
   if (context === undefined) {
-    throw new Error('useReferral must be used within an ActivityProvider')
+    throw new Error('useActivity must be used within an ActivityProvider')
   }
   return context
 }

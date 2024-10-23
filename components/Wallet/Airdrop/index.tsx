@@ -1,16 +1,49 @@
 'use client'
 
-import { useAppSelector } from '@/hooks/redux'
-import { Title, Stack, Space, Paper, Center, Text } from '@mantine/core'
+import { Title, Stack, Space, Paper, Center, Text, Skeleton, Pagination } from '@mantine/core'
 import Token from './Token'
 import RwdLayout from '@/components/share/RwdLayout'
 import { getTokenInfo } from '@/contracts/tokens'
+import { useAirdrop } from '@/store/contexts/app/airdropContext'
 
 export default function WalletAirdrop() {
-  const { statusData } = useAppSelector(state => state.user)
-  const { airdrops = [] } = statusData || {}
+  const { data, total, current, loading, handlePageChange } = useAirdrop()
 
-  // TODO: get token data from server
+  const renderData = () => {
+    if (loading) {
+      return (
+        <>
+          <Skeleton radius="md" h={64} />
+        </>
+      )
+    }
+
+    if (data.length === 0) {
+      return (
+        <Paper radius="md" p="md" shadow="xs">
+          <Center>
+            <Text fz="sm" c="dimmed">
+              No airdrop yet
+            </Text>
+          </Center>
+        </Paper>
+      )
+    }
+
+    return data.map((o, i) => {
+      const info = getTokenInfo(o.symbol)
+      return (
+        <Token
+          key={o.symbol}
+          symbol={o.symbol}
+          icon={info.icon}
+          name={info.name}
+          received={o.receivedAmount}
+          pending={o.pendingAmount}
+        />
+      )
+    })
+  }
 
   return (
     <>
@@ -23,30 +56,18 @@ export default function WalletAirdrop() {
             </Text>
           </Stack>
 
-          <Stack gap="xs">
-            {airdrops.length === 0 && (
-              <Paper radius="md" p="md" shadow="xs">
-                <Center>
-                  <Text fz="sm" c="dimmed">
-                    No airdrop yet
-                  </Text>
-                </Center>
-              </Paper>
-            )}
-            {airdrops.map((o, i) => {
-              const info = getTokenInfo(o.symbol)
-              return (
-                <Token
-                  key={o.symbol}
-                  symbol={o.symbol}
-                  icon={info.icon}
-                  name={info.name}
-                  received={o.receivedAmount}
-                  pending={o.pendingAmount}
-                />
-              )
-            })}
-          </Stack>
+          <Stack gap="xs">{renderData()}</Stack>
+
+          <Space h="md" />
+
+          <Center>
+            <Pagination
+              total={total}
+              value={current}
+              onChange={handlePageChange}
+              disabled={loading}
+            />
+          </Center>
         </Stack>
       </RwdLayout>
 

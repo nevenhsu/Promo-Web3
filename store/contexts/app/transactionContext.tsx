@@ -120,7 +120,7 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({ c
 export const useTransaction = () => {
   const context = useContext(TxContext)
   if (!context) {
-    throw new Error('useTx must be used within a TransactionProvider')
+    throw new Error('useTransaction must be used within a TransactionProvider')
   }
   return context
 }

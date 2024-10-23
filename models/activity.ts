@@ -30,7 +30,7 @@ export const schema = new Schema({
   nftId: { type: Number, unique: true, index: true },
   startTime: { type: Date, required: true, index: true },
   endTime: { type: Date, required: true, index: true },
-  slug: { type: String, required: true, unique: true, index: true },
+  slug: { type: String, unique: true, index: true, default: '' },
   title: { type: String, default: '' },
   description: { type: String, default: '' },
   activityType: { type: Number, enum: ActivityType, required: true },

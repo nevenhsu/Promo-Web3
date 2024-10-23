@@ -5,6 +5,15 @@ import UserActivityStatusModel from '@/models/userActivityStatus'
 import { parseData } from './common'
 import type { ActivityData } from '@/models/activity'
 
+export type GetOptions = {
+  page?: number
+  limit?: number
+}
+
+export type GetFilters = {
+  ongoing?: boolean
+}
+
 // ========================
 // Public functions to fetch activities
 // ========================
@@ -17,15 +26,6 @@ export async function getPublicActivitiesTotal(ongoing: boolean = true) {
   }).exec()
 
   return total
-}
-
-export type GetOptions = {
-  page?: number
-  limit?: number
-}
-
-export type GetFilters = {
-  ongoing?: boolean
 }
 
 export async function getPublicActivities(
@@ -121,20 +121,21 @@ export async function getActivityBySlug(slug: string) {
 }
 
 export async function createActivity(data: ActivityData) {
-  if (!data.slug) {
-    throw new Error('Slug is required.')
-  }
-
-  const doc = await getActivityBySlug(data.slug)
-  if (doc) {
-    throw new Error('Activity with the same slug already exists.')
-  }
-
   const activity = new ActivityModel({
     ...data,
     startTime: setMilliseconds(data.startTime, 0),
     endTime: setMilliseconds(data.endTime, 0),
   })
+
+  if (!activity.slug) {
+    activity.slug = activity._id.toString()
+  } else {
+    const doc = await getActivityBySlug(data.slug)
+    if (doc) {
+      throw new Error('Activity with the same slug already exists.')
+    }
+  }
+
   await activity.save()
 
   console.log('Activity created:', activity)

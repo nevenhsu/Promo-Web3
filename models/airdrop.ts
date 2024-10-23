@@ -24,7 +24,11 @@ const schema = new Schema({
 
 schema.index({ _user: 1, symbol: 1 }, { unique: true }) // unique index for user and symbol
 
-export type Airdrop = InferSchemaType<typeof schema>
+export type Airdrop = InferSchemaType<typeof schema> & { _id: string }
+export type TAirdrop = Airdrop & {
+  receivedAmount: string
+  pendingAmount: string
+}
 
 const name = 'Airdrop'
 const AirdropModel = (models[name] as Model<Airdrop>) || model(name, schema)

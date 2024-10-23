@@ -12,7 +12,7 @@ import RwdLayout from '@/components/share/RwdLayout'
 import Token from './Token'
 import { eth } from '@/contracts/tokens'
 import { formatAddress } from '@/wallet/utils/helper'
-import { PiArrowUpBold, PiArrowDownBold, PiClockBold, PiParachuteBold } from 'react-icons/pi'
+import { PiArrowUpBold, PiArrowDownBold, PiClockBold, PiGiftBold } from 'react-icons/pi'
 import classes from './index.module.css'
 
 const ThemeAction = ThemeIcon.withProps({
@@ -93,7 +93,7 @@ export default function Wallet() {
             </Link>
             <Link href="/wallet/airdrop">
               <ThemeAction>
-                <PiParachuteBold size={24} />
+                <PiGiftBold size={24} />
               </ThemeAction>
               <Text fz="sm">Airdrop</Text>
             </Link>
