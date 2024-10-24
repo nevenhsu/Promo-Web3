@@ -25,14 +25,8 @@ const initialState: AppState = {
   pages: [],
 }
 
-const initValue: AppValue = {
-  state: initialState,
-  setState: () => {},
-  updateState: () => {},
-}
-
 // Create the context
-const AppContext = createContext(initValue)
+const AppContext = createContext<AppValue | undefined>(undefined)
 
 // Create a provider component
 type AppProviderProps = {
@@ -42,19 +36,13 @@ type AppProviderProps = {
 }
 
 export const AppProvider = ({ isPreview, isMobileDevice, children }: AppProviderProps) => {
-  const [state, setState] = useState({ ...initialState, isPreview, isMobileDevice })
+  const [state, setState] = useState<AppState>({ ...initialState, isPreview, isMobileDevice })
 
-  const updateState = (next: Partial<AppState>) =>
+  const updateState = (next: Partial<AppState>) => {
     setState(prev => {
       // console.log('updateState', next)
       return { ...prev, ...next }
     })
-
-  // Define any functions or values you want to provide
-  const value: AppValue = {
-    state,
-    setState,
-    updateState,
   }
 
   useEffect(() => {
@@ -65,8 +53,26 @@ export const AppProvider = ({ isPreview, isMobileDevice, children }: AppProvider
     updateState({ isMobileDevice })
   }, [isMobileDevice])
 
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>
+  return (
+    <AppContext.Provider
+      value={{
+        state,
+        setState,
+        updateState,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  )
 }
 
 // Export the context
-export const useAppContext = () => useContext(AppContext)
+export const useAppContext = () => {
+  const context = useContext(AppContext)
+
+  if (!context) {
+    throw new Error('useAppContext must be used within an AppProvider')
+  }
+
+  return context
+}

@@ -58,15 +58,15 @@ export default function LocaleLayout({
       </head>
       <body style={{ width: '100vw', overflowX: 'hidden' }}>
         <NextIntlClientProvider locale={lang} messages={messages}>
-          <Providers>
-            <AppProvider isPreview={isEnabled} isMobileDevice={isMobileDevice}>
+          <AppProvider isPreview={isEnabled} isMobileDevice={isMobileDevice}>
+            <Providers>
               {isEnabled ? (
                 <PreviewProvider token={env.sanityToken}>{renderContent()}</PreviewProvider>
               ) : (
                 <>{renderContent()}</>
               )}
-            </AppProvider>
-          </Providers>
+            </Providers>
+          </AppProvider>
         </NextIntlClientProvider>
       </body>
     </html>

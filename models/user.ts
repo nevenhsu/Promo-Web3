@@ -43,7 +43,7 @@ export const schema = new Schema({
 
 // Types for redux store
 export type LinkedAccount = InferSchemaType<typeof linkedAccountSchema>
-export type User = InferSchemaType<typeof schema>
+export type User = InferSchemaType<typeof schema> & { _id: string }
 export type TUser = LeanDocumentArray<User> & { _id: string }
 
 // Function to generate a random string

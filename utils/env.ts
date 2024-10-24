@@ -80,7 +80,6 @@ function getGCPKey(): { project_id?: string; client_email?: string; private_key?
 
     return key
   } catch (error) {
-    console.error(error)
     return {}
   }
 }
