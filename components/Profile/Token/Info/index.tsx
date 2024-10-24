@@ -4,18 +4,21 @@ import { useState } from 'react'
 import { arbitrum, arbitrumSepolia } from 'viem/chains'
 import Image from 'next/image'
 import { Link } from '@/navigation'
+import { useDisclosure } from '@mantine/hooks'
 import { Title, Stack, Space, Paper, Group, Divider } from '@mantine/core'
-import { Text, Button, TextInput, Box } from '@mantine/core'
+import { Text, Button, TextInput, Box, Modal } from '@mantine/core'
 import { useForm, hasLength } from '@mantine/form'
 import RwdLayout from '@/components/share/RwdLayout'
 import IconButton from './IconButton'
 import { cleanSymbol } from '@/utils/helper'
-import { getNetwork } from '@/wallet/utils/network'
+import { getNetwork, type NetworkInfo } from '@/wallet/utils/network'
 
 const arbitrumNetwork = getNetwork(arbitrum.id)
 const arbitrumSepoliaNetwork = getNetwork(arbitrumSepolia.id)
 
 export default function TokenInfo() {
+  const [opened, { open, close }] = useDisclosure(false)
+
   // avatar
   const [icon, setIcon] = useState<string>()
   const [iconError, setIconError] = useState<string>()
@@ -45,18 +48,32 @@ export default function TokenInfo() {
 
   const alreadyUpdated = false
 
+  const renderNetwork = (network: NetworkInfo) => {
+    return (
+      <Paper p="md" shadow="xs" radius="sm">
+        <Group justify="space-between">
+          <Group>
+            <Image src={network.icon} width={40} height={40} alt={network.name} />
+            <Stack gap={4}>
+              <Text fz="lg" fw={500} lh={1}>
+                {network.name}
+              </Text>
+              <Text fz="xs" c="dimmed" lh={1}>
+                {network.subtitle}
+              </Text>
+            </Stack>
+          </Group>
+          <Button onClick={open}>Mint</Button>
+        </Group>
+      </Paper>
+    )
+  }
+
   return (
     <>
       <RwdLayout>
-        <Stack gap="xl">
-          <Box>
-            <Title order={3} mb="sm">
-              Token info
-            </Title>
-            <Text fz="sm" c="dimmed">
-              You can set the unique name and symbol before minted on the network
-            </Text>
-          </Box>
+        <Stack gap="lg">
+          <Title order={3}>Token setting</Title>
 
           <Box mx="auto">
             <IconButton
@@ -94,9 +111,7 @@ export default function TokenInfo() {
                 {...form.getInputProps('symbol')}
               />
 
-              <span />
-
-              <Group justify="right">
+              <Group justify="right" mt="sm">
                 <Link href="/profile/token">
                   <Button variant="outline" color="dark">
                     Back
@@ -108,59 +123,40 @@ export default function TokenInfo() {
             </Stack>
           </form>
 
-          <Divider />
+          <Divider my="md" />
 
           <Title order={4}>Network</Title>
 
           <Stack>
             {/* Network */}
-            <Paper p="md" shadow="xs" radius="sm">
-              <Group justify="space-between">
-                <Group>
-                  <Image
-                    src={arbitrumNetwork.icon}
-                    width={40}
-                    height={40}
-                    alt={arbitrumNetwork.name}
-                  />
-                  <Stack gap={4}>
-                    <Text fz="lg" fw={500} lh={1}>
-                      {arbitrumNetwork.name}
-                    </Text>
-                    <Text fz="xs" c="dimmed" lh={1}>
-                      {arbitrumNetwork.subtitle}
-                    </Text>
-                  </Stack>
-                </Group>
-
-                <Button>Mint</Button>
-              </Group>
-            </Paper>
-
-            <Paper p="md" shadow="xs" radius="sm">
-              <Group justify="space-between">
-                <Group>
-                  <Image
-                    src={arbitrumSepoliaNetwork.icon}
-                    width={40}
-                    height={40}
-                    alt={arbitrumSepoliaNetwork.name}
-                  />
-                  <Stack gap={4}>
-                    <Text fz="lg" fw={500} lh={1}>
-                      {arbitrumSepoliaNetwork.name}
-                    </Text>
-                    <Text fz="xs" c="dimmed" lh={1}>
-                      {arbitrumSepoliaNetwork.subtitle}
-                    </Text>
-                  </Stack>
-                </Group>
-                <Button>Mint</Button>
-              </Group>
-            </Paper>
+            {[arbitrumNetwork, arbitrumSepoliaNetwork].map(o => (
+              <Box key={o.name}>{renderNetwork(o)}</Box>
+            ))}
           </Stack>
         </Stack>
       </RwdLayout>
+
+      <Modal
+        centered
+        opened={opened}
+        onClose={close}
+        title={
+          <Text fz="lg" fw={500}>
+            Confirm to mint token
+          </Text>
+        }
+      >
+        <Stack>
+          <Text>Name and symbol cannot be changed after minting</Text>
+
+          <Group justify="right" mt="md">
+            <Button variant="outline" color="dark" onClick={close}>
+              Cancel
+            </Button>
+            <Button>Confirm</Button>
+          </Group>
+        </Stack>
+      </Modal>
 
       <Space h={100} />
     </>

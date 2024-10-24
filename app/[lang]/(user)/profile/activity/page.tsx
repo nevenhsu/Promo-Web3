@@ -1,9 +1,9 @@
-import ProfileToken from '@/components/Profile/Token'
+import ProfileActivity from '@/components/Profile/Activity'
 
-export default function ProfileTokenPage() {
+export default function ProfileActivityPage() {
   return (
     <>
-      <ProfileToken />
+      <ProfileActivity />
     </>
   )
 }

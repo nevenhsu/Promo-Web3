@@ -16,7 +16,7 @@ export default function Token() {
           <Paper radius="md" p="md" shadow="xs" mb="md">
             <Group justify="space-between">
               <Group>
-                <Avatar src={''} name={'token'} color="initials" size={40}>
+                <Avatar src={''} name={''} color="initials" size={40}>
                   {' '}
                 </Avatar>
 

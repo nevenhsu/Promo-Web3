@@ -50,7 +50,7 @@ export default function IconButton(props: IconButtonProps) {
         {props => (
           <>
             <Box {...props} className="c-pointer" pos="relative">
-              <Avatar src={imgSrc} name={''} color="initials" size={120}>
+              <Avatar src={imgSrc} name={''} color="initials" size={80}>
                 {' '}
               </Avatar>
 
