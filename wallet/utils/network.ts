@@ -50,6 +50,7 @@ export function getNetwork(chainId?: string | number) {
   const chainIdNum = toChainId(chainId || '0')
   const network = networks.find(o => o.chainId === chainIdNum)
   const fallback = {
+    id: 'unknown',
     chainId: chainIdNum,
     name: 'Unknown',
     icon: '/icons/base.svg',

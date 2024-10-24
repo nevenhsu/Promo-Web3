@@ -1,15 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { FileButton, Box, AspectRatio, Button } from '@mantine/core'
+import { FileButton, Box, Text, Avatar } from '@mantine/core'
 
-type CoverButtonProps = {
+type IconButtonProps = {
   url: string
   onChange?: (file: File | null) => void
   onDataURLChange?: (dataURI: string | undefined) => void
 }
 
-export default function CoverButton(props: CoverButtonProps) {
+export default function IconButton(props: IconButtonProps) {
   const { url, onChange, onDataURLChange } = props
   const [file, setFile] = useState<File | null>(null)
   const [dataURI, setDataURI] = useState<string>()
@@ -18,18 +18,6 @@ export default function CoverButton(props: CoverButtonProps) {
 
   return (
     <Box pos="relative">
-      <AspectRatio ratio={4 / 1}>
-        <Box bg="gray.1" style={{ borderRadius: 4, overflow: 'hidden' }}>
-          {imgSrc ? (
-            <img
-              src={imgSrc}
-              alt="cover"
-              style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          ) : null}
-        </Box>
-      </AspectRatio>
-
       <FileButton
         onChange={file => {
           setFile(file)
@@ -60,19 +48,17 @@ export default function CoverButton(props: CoverButtonProps) {
         accept="image/*"
       >
         {props => (
-          <Button
-            {...props}
-            size="compact-xs"
-            variant="light"
-            color="dark"
-            style={{
-              position: 'absolute',
-              top: 8,
-              right: 4,
-            }}
-          >
-            Upload cover
-          </Button>
+          <>
+            <Box {...props} className="c-pointer" pos="relative">
+              <Avatar src={imgSrc} name={''} color="initials" size={120}>
+                {' '}
+              </Avatar>
+
+              <Text className="absolute-center nowrap" fz="xs">
+                Upload icon
+              </Text>
+            </Box>
+          </>
         )}
       </FileButton>
     </Box>

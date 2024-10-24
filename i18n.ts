@@ -52,6 +52,11 @@ export const i18nConfig = {
     '/profile': '/profile',
     '/profile/info': '/profile/info',
     '/profile/account': '/profile/account',
+    '/profile/token': '/profile/token',
+    '/profile/token/info': '/profile/token/info',
+    '/profile/nft': '/profile/nft',
+    '/profile/activity': '/profile/activity',
+    '/profile/donation': '/profile/donation',
 
     // refer
     '/refer': '/refer',

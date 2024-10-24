@@ -26,8 +26,12 @@ const settingSchema = new Schema({
   type: { type: String, enum: ActivitySettingType, default: ActivitySettingType.None, index: true },
 })
 
+const nftSchema = new Schema({
+  chainId: { type: Number, required: true, index: true },
+  nftId: { type: Number, required: true, index: true },
+})
+
 export const schema = new Schema({
-  nftId: { type: Number, unique: true, index: true },
   startTime: { type: Date, required: true, index: true },
   endTime: { type: Date, required: true, index: true },
   slug: { type: String, unique: true, index: true, default: '' },
@@ -39,13 +43,14 @@ export const schema = new Schema({
   details: { type: detailSchema, required: true },
   airdrop: { type: airdropSchema, required: true },
   bonus: { type: bonusSchema, default: {} },
+  nft: { type: nftSchema },
   published: { type: Boolean, default: false, index: true },
 })
 
 export type Activity = InferSchemaType<typeof schema>
 export type ActivityDetail = InferSchemaType<typeof detailSchema>
 export type ActivityAirdrop = InferSchemaType<typeof airdropSchema>
-export type ActivityData = Omit<Activity, 'nftId' | 'details' | 'airdrop' | 'bonus'> & {
+export type ActivityData = Omit<Activity, 'nft' | 'details' | 'airdrop' | 'bonus'> & {
   details: Omit<ActivityDetail, 'participants' | 'totalScore'>
   airdrop: Omit<ActivityAirdrop, 'finalized'>
   bonus: Omit<InferSchemaType<typeof bonusSchema>, 'finalized'>

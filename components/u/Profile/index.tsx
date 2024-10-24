@@ -2,10 +2,13 @@
 
 import { useDisclosure } from '@mantine/hooks'
 import { useAppSelector } from '@/hooks/redux'
-import { Space, Group, Stack, Box, AspectRatio, Avatar, Text, Tabs } from '@mantine/core'
+import { Link } from '@/navigation'
+import { Space, Group, Stack, Box, AspectRatio, Paper } from '@mantine/core'
+import { Tabs, Avatar, Text, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import RwdModal from '@/components/share/RwdModal'
 import { PiCrownSimple, PiHandHeart, PiRocket, PiGlobe, PiArrowSquareOut } from 'react-icons/pi'
+import { PiCoinVertical, PiImageSquare } from 'react-icons/pi'
 import { FaXTwitter, FaInstagram } from 'react-icons/fa6'
 import { LinkAccountPlatform } from '@/types/db'
 import type { TUser } from '@/models/user'
@@ -16,6 +19,15 @@ enum Tab {
   Activity = 'activity',
   Donate = 'donate',
 }
+
+const ThemeAction = ThemeIcon.withProps({
+  variant: 'light',
+  color: 'white',
+  size: 'xl',
+  radius: 'sm',
+  mb: 'xs',
+  bg: 'rgba(255,255,255,0.1)',
+})
 
 export default function UserProfile({ data }: { data: TUser }) {
   const [opened, { open, close }] = useDisclosure(false)
@@ -52,42 +64,73 @@ export default function UserProfile({ data }: { data: TUser }) {
           </Box>
         </Box>
 
-        <Stack mb="lg">
-          <Group justify="space-between">
-            <Box>
-              <Text fz="lg" fw={500}>
-                {name}
-              </Text>
-              <Text fz="xs" c="dimmed">
-                {`@${username}`}
-              </Text>
-            </Box>
+        <Stack gap="lg">
+          <Stack>
+            <Group justify="space-between">
+              <Box>
+                <Text fz="lg" fw={500}>
+                  {name}
+                </Text>
+                <Text fz="xs" c="dimmed">
+                  {`@${username}`}
+                </Text>
+              </Box>
 
-            <Group className="c-pointer" onClick={open} wrap="nowrap">
-              {x ? <FaXTwitter size={20} /> : null}
-              {instagram ? <FaInstagram size={20} /> : null}
-              {link ? <PiGlobe size={20} /> : null}
+              <Group className="c-pointer" onClick={open} wrap="nowrap">
+                {x ? <FaXTwitter size={20} /> : null}
+                {instagram ? <FaInstagram size={20} /> : null}
+                {link ? <PiGlobe size={20} /> : null}
+              </Group>
             </Group>
-          </Group>
 
-          <Text fz="sm" c="dimmed">
-            {bio}
-          </Text>
+            <Text fz="sm" c="dimmed">
+              {bio}
+            </Text>
+          </Stack>
+
+          <Paper p="sm" c="white" shadow="xs" bg="var(--mantine-primary-color-5)">
+            <Group className={classes.actions} grow>
+              <Link href="/profile/token">
+                <ThemeAction>
+                  <PiCoinVertical size={24} />
+                </ThemeAction>
+                <Text fz="sm">Token</Text>
+              </Link>
+              <Link href="/profile/nft">
+                <ThemeAction>
+                  <PiImageSquare size={24} />
+                </ThemeAction>
+                <Text fz="sm">NFT</Text>
+              </Link>
+              <Link href="/profile/activity">
+                <ThemeAction>
+                  <PiRocket size={24} />
+                </ThemeAction>
+                <Text fz="sm">Activity</Text>
+              </Link>
+              <Link href="/profile/donation">
+                <ThemeAction>
+                  <PiHandHeart size={24} />
+                </ThemeAction>
+                <Text fz="sm">Donation</Text>
+              </Link>
+            </Group>
+          </Paper>
+
+          <Tabs defaultValue={Tab.Ranking}>
+            <Tabs.List grow>
+              <Tabs.Tab value={Tab.Ranking} leftSection={<PiCrownSimple size={16} />}>
+                Ranking
+              </Tabs.Tab>
+              <Tabs.Tab value={Tab.Activity} leftSection={<PiRocket size={16} />}>
+                Activity
+              </Tabs.Tab>
+              <Tabs.Tab value={Tab.Donate} leftSection={<PiHandHeart size={16} />}>
+                Donate
+              </Tabs.Tab>
+            </Tabs.List>
+          </Tabs>
         </Stack>
-
-        <Tabs defaultValue={Tab.Ranking}>
-          <Tabs.List grow>
-            <Tabs.Tab value={Tab.Ranking} leftSection={<PiCrownSimple size={16} />}>
-              Ranking
-            </Tabs.Tab>
-            <Tabs.Tab value={Tab.Activity} leftSection={<PiRocket size={16} />}>
-              Activity
-            </Tabs.Tab>
-            <Tabs.Tab value={Tab.Donate} leftSection={<PiHandHeart size={16} />}>
-              Donate
-            </Tabs.Tab>
-          </Tabs.List>
-        </Tabs>
       </RwdLayout>
 
       <Space h={100} />
