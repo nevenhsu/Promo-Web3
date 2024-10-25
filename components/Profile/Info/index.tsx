@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Link } from '@/navigation'
+import { Link } from '@/i18n/routing'
 import { Stack, Box, Space, Group, Divider, Text, Textarea } from '@mantine/core'
 import { TextInput, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'

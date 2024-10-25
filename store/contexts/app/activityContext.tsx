@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname } from '@/navigation'
+import { usePathname } from '@/i18n/routing'
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react'
 import { useAsyncFn, usePrevious } from 'react-use'
 import { useAppSelector } from '@/hooks/redux'

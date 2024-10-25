@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from '@/navigation'
+import { useRouter } from '@/i18n/routing'
 import { useState } from 'react'
 import { useAsyncFn } from 'react-use'
 import { usePromo } from '@/hooks/usePromo'

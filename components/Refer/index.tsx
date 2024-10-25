@@ -1,7 +1,7 @@
 'use client'
 
 import { useAppSelector } from '@/hooks/redux'
-import { Link } from '@/navigation'
+import { Link } from '@/i18n/routing'
 import { Space, Divider, Stack, Group, Box, Paper } from '@mantine/core'
 import { ThemeIcon, Text, Title, Button, CopyButton } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'

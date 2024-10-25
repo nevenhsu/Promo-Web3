@@ -19,7 +19,8 @@ export default async function ActivityDetailPage({
 }: {
   params: { lang: string; slug: string }
 }) {
-  const slug = decodeURIComponent(params.slug)
+  const { slug: _slug } = await params
+  const slug = decodeURIComponent(_slug)
 
   await dbConnect()
   const activity = await getPublicActivity(slug)

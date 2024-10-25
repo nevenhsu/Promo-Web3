@@ -2,7 +2,7 @@ import { Box } from '@mantine/core'
 
 export default function UserLayout({
   children,
-  params: { lang },
+  params,
 }: {
   children: React.ReactNode
   params: { lang: string }

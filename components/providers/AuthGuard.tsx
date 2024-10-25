@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter, usePathname } from '@/navigation'
+import { useRouter, usePathname } from '@/i18n/routing'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { isPublicPage } from '@/middleware'
 

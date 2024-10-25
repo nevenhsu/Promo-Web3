@@ -7,7 +7,6 @@ import { colorInput } from '@sanity/color-input'
 import { schemaTypes } from '@/sanity/schemas'
 import { defaultDocumentNode } from '@/sanity/defaultDocumentNode'
 import { publicEnv } from '@/utils/env'
-import LogoIcon from '@/public/logo-orange.svg'
 
 const { projectId, dataset } = publicEnv.sanity
 
@@ -20,6 +19,4 @@ export default defineConfig({
   schema: {
     types: schemaTypes,
   },
-
-  icon: LogoIcon,
 })

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Decimal from 'decimal.js'
-import { Link } from '@/navigation'
+import { Link } from '@/i18n/routing'
 import { Tabs, Paper, Stack, Group, Space, Pagination } from '@mantine/core'
 import { Center, Text, ThemeIcon, Skeleton } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'

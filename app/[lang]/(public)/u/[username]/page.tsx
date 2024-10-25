@@ -5,10 +5,12 @@ import { getUserByUsername } from '@/lib/db/user'
 export const revalidate = 3600 // revalidate at most every hour
 
 export default async function UserProfilePage({
-  params: { lang, username },
+  params,
 }: {
   params: { lang: string; username: string }
 }) {
+  const { username } = await params
+
   await dbConnect()
 
   const user = await getUserByUsername(username)

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, usePathname } from '@/navigation'
+import { useRouter, usePathname } from '@/i18n/routing'
 import { useLogin as _useLogin } from '@privy-io/react-auth'
 import { usePrivy } from '@privy-io/react-auth'
 import { usePromo } from '@/hooks/usePromo'

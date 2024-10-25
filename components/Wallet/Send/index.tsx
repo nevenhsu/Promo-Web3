@@ -2,7 +2,7 @@
 
 import * as _ from 'lodash-es'
 import Image from 'next/image'
-import { useRouter } from '@/navigation'
+import { useRouter } from '@/i18n/routing'
 import { useState, useMemo, useEffect } from 'react'
 import { useForm } from '@mantine/form'
 import { useWeb3 } from '@/wallet/Web3Context'

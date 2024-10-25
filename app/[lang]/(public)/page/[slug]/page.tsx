@@ -1,4 +1,3 @@
-import { unstable_setRequestLocale } from 'next-intl/server'
 import { draftMode } from 'next/headers'
 import { getSlugData, getPageData } from '@/sanity/queries'
 import Page from '@/components/Page'
@@ -10,10 +9,9 @@ type PageProps = {
   params: { lang: string; slug: string }
 }
 
-export default async function PagePage({ params: { lang, slug } }: PageProps) {
-  unstable_setRequestLocale(lang)
-
-  const { isEnabled } = draftMode()
+export default async function PagePage({ params }: PageProps) {
+  const { lang, slug } = await params
+  const { isEnabled } = await draftMode()
   const data = isEnabled ? {} : await getPageData(slug, lang)
 
   return (

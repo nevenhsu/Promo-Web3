@@ -1,7 +1,7 @@
 'use client'
 
-import { usePathname } from '@/navigation'
-import { Link } from '@/navigation'
+import { usePathname } from '@/i18n/routing'
+import { Link } from '@/i18n/routing'
 import { Group, Stack, Text, Button } from '@mantine/core'
 import { PiHouse, PiRocket, PiTrophy, PiCardholder } from 'react-icons/pi'
 import { PiUserCircle, PiRocketLaunch } from 'react-icons/pi'

@@ -3,7 +3,7 @@
 import * as _ from 'lodash-es'
 import Decimal from 'decimal.js'
 import { useMemo } from 'react'
-import { Link } from '@/navigation'
+import { Link } from '@/i18n/routing'
 import { useAppSelector } from '@/hooks/redux'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { Space, Group, Stack, Paper, Button, Text, Title, ThemeIcon } from '@mantine/core'

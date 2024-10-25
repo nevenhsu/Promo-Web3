@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname } from '@/navigation'
+import { usePathname } from '@/i18n/routing'
 import { useMediaQuery } from '@mantine/hooks'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { AppShell } from '@mantine/core'

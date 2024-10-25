@@ -1,7 +1,7 @@
 'use client'
 
 import { isAfter } from 'date-fns'
-import { Link } from '@/navigation'
+import { Link } from '@/i18n/routing'
 import { Tabs, Group, Stack, Paper, Box, Space, Pagination } from '@mantine/core'
 import { Title, Text, Button, Divider, Center, Skeleton } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'

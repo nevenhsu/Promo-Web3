@@ -1,17 +1,8 @@
-import { notFound } from 'next/navigation'
-import { getRequestConfig } from 'next-intl/server'
+import { defineRouting } from 'next-intl/routing'
+import { createNavigation } from 'next-intl/navigation'
 import { env } from '@/utils/env'
 
-export default getRequestConfig(async ({ locale }) => {
-  // Validate that the incoming `locale` parameter is valid
-  if (!env.locales.includes(locale as any)) notFound()
-
-  return {
-    messages: (await import(`./messages/${locale}.json`)).default,
-  }
-})
-
-export const i18nConfig = {
+export const routing = defineRouting({
   // A list of all locales that are supported
   locales: env.locales,
 
@@ -56,6 +47,7 @@ export const i18nConfig = {
     '/profile/token/info': '/profile/token/info',
     '/profile/nft': '/profile/nft',
     '/profile/activity': '/profile/activity',
+    '/profile/activity/new': '/profile/activity/new',
     '/profile/donation': '/profile/donation',
 
     // refer
@@ -63,4 +55,8 @@ export const i18nConfig = {
     '/refer/list': '/refer/list',
     '/refer/code': '/refer/code',
   },
-} as const
+})
+
+// Lightweight wrappers around Next.js' navigation APIs
+// that will consider the routing configuration
+export const { Link, redirect, usePathname, useRouter } = createNavigation(routing)

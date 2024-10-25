@@ -1,6 +1,6 @@
 'use client'
 
-import { Link } from '@/navigation'
+import { Link } from '@/i18n/routing'
 import { Group, Stack, Space, Card, Text, Title, ActionIcon, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { PiArrowRight, PiCactus, PiBalloon, PiRocket } from 'react-icons/pi'

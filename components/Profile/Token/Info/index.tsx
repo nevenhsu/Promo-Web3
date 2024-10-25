@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { arbitrum, arbitrumSepolia } from 'viem/chains'
 import Image from 'next/image'
-import { Link } from '@/navigation'
+import { Link } from '@/i18n/routing'
 import { useDisclosure } from '@mantine/hooks'
 import { Title, Stack, Space, Paper, Group, Divider } from '@mantine/core'
 import { Text, Button, TextInput, Box, Modal } from '@mantine/core'

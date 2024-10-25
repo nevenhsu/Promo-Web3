@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from '@/navigation'
+import { useRouter } from '@/i18n/routing'
 import { useClickLogin } from '@/hooks/useLogin'
 import { Button, Stack, Space, Box, Group, Title, Text, Timeline } from '@mantine/core'
 import Marquee from 'react-fast-marquee'

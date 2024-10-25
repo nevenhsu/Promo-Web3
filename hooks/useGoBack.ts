@@ -1,8 +1,8 @@
 'use client'
 
-import { useRouter } from '@/navigation'
+import { useRouter } from '@/i18n/routing'
 import { useEffect } from 'react'
-import { usePathname } from '@/navigation'
+import { usePathname } from '@/i18n/routing'
 import { useAppContext } from '@/store/AppContext'
 
 export function useGoBack() {

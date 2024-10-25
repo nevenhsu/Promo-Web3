@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from '@/navigation'
+import { useRouter } from '@/i18n/routing'
 import { useSession } from 'next-auth/react'
 
 export default function AdminGuard({ children }: { children: React.ReactNode }) {

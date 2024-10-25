@@ -1,7 +1,7 @@
 'use client'
 
 import Decimal from 'decimal.js'
-import { Link } from '@/navigation'
+import { Link } from '@/i18n/routing'
 import { Title, Stack, Space, Paper, Group, ActionIcon } from '@mantine/core'
 import { Text, Button, ThemeIcon, Box, Divider } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
@@ -18,7 +18,9 @@ export default function ProfileActivity() {
         <Stack gap="xl">
           <Group justify="space-between">
             <Title order={3}>Activity</Title>
-            <Button size="sm">New</Button>
+            <Link href="/profile/activity/new">
+              <Button size="sm">New</Button>
+            </Link>
           </Group>
 
           <Link href="/profile/token">

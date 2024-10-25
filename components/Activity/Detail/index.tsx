@@ -5,7 +5,7 @@ import { isAfter } from 'date-fns'
 import Image from 'next/image'
 import { useEffect, useMemo } from 'react'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
-import { useRouter } from '@/navigation'
+import { useRouter } from '@/i18n/routing'
 import { useAsyncFn } from 'react-use'
 import { usePrivy } from '@privy-io/react-auth'
 import useLogin from '@/hooks/useLogin'
@@ -75,7 +75,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   }, [linkedAccounts, socialMedia])
 
   // for use activity status
-  const { userActivityStatus } = useAppSelector(state => state)
+  const userActivityStatus = useAppSelector(state => state.userActivityStatus)
   const statusData = userActivityStatus.data[slug]
   const statusDataLoading = userActivityStatus.loading[slug]
   const statusDataFetched = userActivityStatus.fetched[slug]

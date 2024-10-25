@@ -1,6 +1,6 @@
 'use client'
 
-import { Link } from '@/navigation'
+import { Link } from '@/i18n/routing'
 import { Title, Stack, Space, Paper, Group, Divider } from '@mantine/core'
 import { Text, Avatar, Button, ThemeIcon, Box } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'

@@ -1,13 +1,13 @@
 'use client'
 
-import { Link, usePathname } from '@/navigation'
+import Image from 'next/image'
+import { Link, usePathname } from '@/i18n/routing'
 import { useMediaQuery } from '@mantine/hooks'
 import { useAppSelector } from '@/hooks/redux'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { useGoBack } from '@/hooks/useGoBack'
 import { useClickLogin } from '@/hooks/useLogin'
 import { Group, Box, ActionIcon, Avatar, Button } from '@mantine/core'
-import Logo from '@/public/logo.svg'
 import { PiCaretLeft } from 'react-icons/pi'
 import classes from './index.module.css'
 
@@ -46,7 +46,7 @@ export default function Header() {
 
           <Link href="/">
             <Box className="c-pointer" w={48} h={48} ml={-6}>
-              <Logo width="100%" height="100%" />
+              <Image src="/logo.svg" width={48} height={48} alt="" />
             </Box>
           </Link>
         </Group>

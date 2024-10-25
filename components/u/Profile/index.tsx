@@ -2,7 +2,7 @@
 
 import { useDisclosure } from '@mantine/hooks'
 import { useAppSelector } from '@/hooks/redux'
-import { Link } from '@/navigation'
+import { Link } from '@/i18n/routing'
 import { Space, Group, Stack, Box, AspectRatio, Paper } from '@mantine/core'
 import { Tabs, Avatar, Text, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'

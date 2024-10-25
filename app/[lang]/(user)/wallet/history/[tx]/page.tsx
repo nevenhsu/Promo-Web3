@@ -1,10 +1,11 @@
 import HistoryTx from '@/components/Wallet/History/Tx'
 
-export default function ActivityDetailPage({
-  params: { lang, tx },
+export default async function ActivityDetailPage({
+  params,
 }: {
   params: { lang: string; tx: string }
 }) {
+  const { tx } = await params
   return (
     <>
       <HistoryTx tx={tx} />

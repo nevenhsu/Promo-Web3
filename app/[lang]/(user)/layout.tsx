@@ -3,7 +3,7 @@ import AuthGuard from '@/components/providers/AuthGuard'
 
 export default function UserLayout({
   children,
-  params: { lang },
+  params,
 }: {
   children: React.ReactNode
   params: { lang: string }

@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname } from '@/navigation'
+import { usePathname } from '@/i18n/routing'
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { useAsyncFn, usePrevious } from 'react-use'
 import { getTransactions } from '@/services/transaction'

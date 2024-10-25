@@ -2,7 +2,7 @@
 
 import { useAppSelector } from '@/hooks/redux'
 import { useSession } from 'next-auth/react'
-import { Link } from '@/navigation'
+import { Link } from '@/i18n/routing'
 import { Group, Paper, Avatar, Stack, Space, Box, Divider } from '@mantine/core'
 import { Title, Text, ActionIcon, Button, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'

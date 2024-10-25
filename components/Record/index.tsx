@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { isBefore } from 'date-fns'
-import { Link } from '@/navigation'
+import { Link } from '@/i18n/routing'
 import { Group, Stack, Paper, Space, Box, Tabs, Center, Pagination } from '@mantine/core'
 import { Title, Text, Button, Divider, Skeleton } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'

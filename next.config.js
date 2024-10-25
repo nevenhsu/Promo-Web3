@@ -9,17 +9,6 @@ const compiler = isProd ? { removeConsole: true } : {}
 const nextConfig = {
   compiler,
   webpack: (config, options) => {
-    // svgr
-    config.module.rules.map(rule => {
-      if (rule.test && rule.test.source && rule.test.source.includes('|svg|')) {
-        rule.test = new RegExp(rule.test.source.replace('|svg|', '|'))
-      }
-    })
-    config.module.rules.push({
-      test: /\.svg$/i,
-      issuer: /\.[jt]sx?$/,
-      use: ['@svgr/webpack'],
-    })
     // mongoose: https://github.com/Automattic/mongoose/issues/13402#issuecomment-1548826056
     Object.assign(config.resolve.alias, {
       '@mongodb-js/zstd': false,

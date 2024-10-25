@@ -38,7 +38,8 @@ export async function GET(request: Request) {
   // }
 
   // Enable Draft Mode by setting the cookie
-  draftMode().enable()
+  const { enable } = await draftMode()
+  enable()
 
   return NextResponse.redirect(new URL(path, request.url))
 

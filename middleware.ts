@@ -2,12 +2,12 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { withAuth } from 'next-auth/middleware'
 import { getToken, type JWT } from 'next-auth/jwt'
 import createIntlMiddleware from 'next-intl/middleware'
-import { i18nConfig } from './i18n'
+import { routing } from '@/i18n/routing'
 import { env } from '@/utils/env'
 
 export const publicPages = ['/', '/page(/.*)?', '/activity(/.*)?', '/u(/.*)?']
 
-const intlMiddleware = createIntlMiddleware(i18nConfig)
+const intlMiddleware = createIntlMiddleware(routing)
 
 const authMiddleware = withAuth(
   // Note that this callback is only invoked if
@@ -79,7 +79,7 @@ export const config = {
 }
 
 export function isPublicPage(pathname: string) {
-  const { locales } = i18nConfig
+  const { locales } = routing
 
   const publicPathnameRegex = RegExp(
     `^(/(${locales.join('|')}))?(${publicPages

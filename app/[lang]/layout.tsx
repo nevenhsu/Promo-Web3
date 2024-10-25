@@ -1,8 +1,10 @@
-import { unstable_setRequestLocale } from 'next-intl/server'
-import { NextIntlClientProvider, useMessages } from 'next-intl'
+import { NextIntlClientProvider } from 'next-intl'
 import Script from 'next/script'
 import dynamic from 'next/dynamic'
 import { draftMode } from 'next/headers'
+import { getMessages, setRequestLocale } from 'next-intl/server'
+import { routing } from '@/i18n/routing'
+import { notFound } from 'next/navigation'
 import { ColorSchemeScript } from '@mantine/core'
 import { detectDevice } from '@/lib/userAgent'
 import { AppProvider } from '@/store/AppContext'
@@ -22,25 +24,36 @@ export function generateStaticParams() {
   return env.locales.map(lang => ({ lang }))
 }
 
-export default function LocaleLayout({
+export default async function LocaleLayout({
   children,
-  params: { lang },
+  params,
 }: {
   children: React.ReactNode
   params: { lang: string }
 }) {
-  unstable_setRequestLocale(lang)
+  const { lang } = await params
 
-  const { isEnabled } = draftMode()
-  const { isMobileDevice } = detectDevice()
-  const messages = useMessages()
+  // Ensure that the incoming `locale` is valid
+  if (!routing.locales.includes(lang as any)) {
+    notFound()
+  }
+
+  // Enable static rendering
+  setRequestLocale(lang)
+
+  // Providing all messages to the client
+  // side is the easiest way to get started
+  const messages = await getMessages()
+
+  const { isEnabled } = await draftMode()
+  const { isMobileDevice } = await detectDevice()
 
   const renderContent = () => {
     return <MyAppShell>{children}</MyAppShell>
   }
 
   return (
-    <html lang={lang} className={fontVariables}>
+    <html lang={lang} className={fontVariables} suppressHydrationWarning>
       <head>
         <Script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></Script>
         <Script id="google-analytics">
@@ -49,7 +62,6 @@ export default function LocaleLayout({
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-
               gtag('config', '${gaId}');
             `
             : null}

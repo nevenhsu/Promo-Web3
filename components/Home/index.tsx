@@ -3,7 +3,7 @@
 import * as _ from 'lodash-es'
 import { useAppSelector } from '@/hooks/redux'
 import { useReferral } from '@/store/contexts/app/referralContext'
-import { Link } from '@/navigation'
+import { Link } from '@/i18n/routing'
 import { Stack, Group, Box, Paper, SimpleGrid, Divider, Space } from '@mantine/core'
 import { Title, Text, ThemeIcon, ActionIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
