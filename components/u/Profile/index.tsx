@@ -138,7 +138,11 @@ export default function UserProfile({ data }: { data: TUser }) {
       <RwdModal
         opened={opened}
         onClose={close}
-        title="Social account"
+        title={
+          <Text fz="xl" fw={500}>
+            Social account
+          </Text>
+        }
         sizes={{ mobile: 240, tablet: 'sm' }}
       >
         <Stack py="sm" className={classes.modal}>

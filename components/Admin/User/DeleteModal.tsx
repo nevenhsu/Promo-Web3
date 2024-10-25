@@ -32,7 +32,16 @@ export default forwardRef<DeleteModalRef, {}>(function AddModal(props, ref) {
 
   return (
     <>
-      <Modal opened={opened} onClose={close} title="Delete admin" centered>
+      <Modal
+        opened={opened}
+        onClose={close}
+        title={
+          <Text fz="xl" fw={500}>
+            Delete admin
+          </Text>
+        }
+        centered
+      >
         <Box mx="auto">
           <Stack>
             <Box>

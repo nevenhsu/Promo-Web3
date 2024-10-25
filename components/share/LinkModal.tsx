@@ -33,7 +33,16 @@ export default function LinkModal({ platform, opened, onClose }: LinkModalProps)
 
   return (
     <>
-      <Modal opened={opened} onClose={onClose} title="Link social account" centered>
+      <Modal
+        opened={opened}
+        onClose={onClose}
+        title={
+          <Text fz="xl" fw={500}>
+            Link social account
+          </Text>
+        }
+        centered
+      >
         <Stack gap="xl">
           <Box>
             <Text fz="sm" mb="xs">

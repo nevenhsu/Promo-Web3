@@ -132,7 +132,11 @@ export default function ReferCode() {
       <Modal
         opened={opened && !isReferred}
         onClose={close}
-        title="Confirm your friend"
+        title={
+          <Text fz="xl" fw={500}>
+            Confirm your friend
+          </Text>
+        }
         size="lg"
         centered
       >

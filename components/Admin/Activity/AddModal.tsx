@@ -42,7 +42,17 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
 
   return (
     <>
-      <Modal opened={opened} onClose={handleClose} title="Add new activity" centered keepMounted>
+      <Modal
+        opened={opened}
+        onClose={handleClose}
+        title={
+          <Text fz="xl" fw={500}>
+            Add new activity
+          </Text>
+        }
+        centered
+        keepMounted
+      >
         <Box mx="auto">
           <Form ref={formRef}>
             <form

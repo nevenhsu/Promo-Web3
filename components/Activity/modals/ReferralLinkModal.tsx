@@ -23,7 +23,11 @@ export function ReferralLinkModal({ slug, opened, onClose }: ReferralLinkModalPr
     <Modal
       opened={opened}
       onClose={onClose}
-      title="Activity referral link"
+      title={
+        <Text fz="xl" fw={500}>
+          Activity referral link
+        </Text>
+      }
       centered
       styles={{
         header: {

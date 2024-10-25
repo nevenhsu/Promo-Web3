@@ -3,7 +3,7 @@
 import { forwardRef, useImperativeHandle } from 'react'
 import { useForm, hasLength } from '@mantine/form'
 import { useDisclosure } from '@mantine/hooks'
-import { Modal, Stack, Box, TextInput, Button, Select } from '@mantine/core'
+import { Modal, Stack, Box, Text, TextInput, Button, Select } from '@mantine/core'
 import { useAdmin } from '@/store/contexts/admin/AdminContext'
 import { labelData } from './variables'
 
@@ -50,7 +50,16 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
 
   return (
     <>
-      <Modal opened={opened} onClose={handleClose} title="Add new admin" centered>
+      <Modal
+        opened={opened}
+        onClose={handleClose}
+        title={
+          <Text fz="xl" fw={500}>
+            Add new admin
+          </Text>
+        }
+        centered
+      >
         <Box mx="auto">
           <form
             onSubmit={form.onSubmit(

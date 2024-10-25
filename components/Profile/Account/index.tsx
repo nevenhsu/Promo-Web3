@@ -215,7 +215,16 @@ export default function ProfileAccount() {
         </Stack>
       </RwdLayout>
 
-      <Modal opened={opened} onClose={close} title={`Unlink ${type}`} centered>
+      <Modal
+        opened={opened}
+        onClose={close}
+        title={
+          <Text fz="xl" fw={500}>
+            {`Unlink ${type}`}
+          </Text>
+        }
+        centered
+      >
         <Box c="dimmed">
           {showLocked ? (
             <>

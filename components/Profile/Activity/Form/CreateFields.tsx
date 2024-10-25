@@ -3,17 +3,21 @@
 import * as _ from 'lodash-es'
 import { useMemo, useEffect } from 'react'
 import { isBefore } from 'date-fns'
-import { Paper, TextInput, Select, Stack, Text } from '@mantine/core'
+import { Paper, TextInput, Select, Stack, Group, Text, ThemeIcon } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
 import { symbols } from '@/contracts/tokens'
 import { useFormContext } from './Context'
+import { getXPostId, getInstagramPostId } from '@/utils/socialMedia'
+import { PiNumberOneBold, PiNumberTwoBold, PiNumberThreeBold } from 'react-icons/pi'
 import { ActivityType, SocialMedia, ActivitySettingType } from '@/types/db'
 
 export default function FormFields() {
   const form = useFormContext()
-  const { socialMedia, activityType, setting } = form.values
+  const { socialMedia, activityType, setting, details } = form.values
   const settingType = setting.type
+  const { fullLink } = details
 
+  // Activity types based on social media
   const activityTypes = useMemo(() => {
     if (socialMedia === SocialMedia.X) {
       return [{ label: 'Repost', value: `${ActivityType.Repost}` }]
@@ -34,6 +38,7 @@ export default function FormFields() {
     }
   }, [socialMedia, activityType])
 
+  // Set default setting data based on setting type
   useEffect(() => {
     if (settingType === ActivitySettingType.None) {
       form.setFieldValue('setting.data', {})
@@ -47,11 +52,28 @@ export default function FormFields() {
     }
   }, [settingType])
 
+  // Extract post id from full link
+  useEffect(() => {
+    if (socialMedia === SocialMedia.X) {
+      const postId = getXPostId(fullLink)
+      form.setFieldValue('details.link', postId)
+    }
+    if (socialMedia === SocialMedia.Instagram) {
+      const postId = getInstagramPostId(fullLink)
+      form.setFieldValue('details.link', postId)
+    }
+  }, [socialMedia, fullLink])
+
   return (
     <>
       <Paper p="md" radius="md">
         <Stack gap="sm">
-          <Text fw={500}>What is the date of activity?</Text>
+          <Group gap="xs">
+            <ThemeIcon size="xs" color="dark" mb={4}>
+              <PiNumberOneBold />
+            </ThemeIcon>
+            <Text fw={500}> What is the date of this activity?</Text>
+          </Group>
           <DateTimePicker
             valueFormat="DD MMM YYYY hh:mm A"
             label="Start Time"
@@ -73,7 +95,12 @@ export default function FormFields() {
 
       <Paper p="md" radius="md">
         <Stack gap="sm">
-          <Text fw={500}>What is the post to be shared?</Text>
+          <Group gap="xs">
+            <ThemeIcon size="xs" color="dark" mb={4}>
+              <PiNumberTwoBold />
+            </ThemeIcon>
+            <Text fw={500}>What is the post to be shared?</Text>
+          </Group>
           <Select
             label="Social Media"
             placeholder="Pick one"
@@ -110,7 +137,12 @@ export default function FormFields() {
 
       <Paper p="md" radius="md">
         <Stack gap="sm">
-          <Text fw={500}>What is the prize for supporters?</Text>
+          <Group gap="xs">
+            <ThemeIcon size="xs" color="dark" mb={4}>
+              <PiNumberThreeBold />
+            </ThemeIcon>
+            <Text fw={500}>How much is the prize for supporters?</Text>
+          </Group>
           <Select
             label="Token"
             placeholder="Pick one"
@@ -123,6 +155,7 @@ export default function FormFields() {
           <TextInput
             label="Prize"
             key={form.key('airdrop.amount')}
+            placeholder="Balance available: 4,936.25"
             {...form.getInputProps('airdrop.amount')}
           />
         </Stack>

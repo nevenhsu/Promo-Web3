@@ -60,7 +60,17 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
 
   return (
     <>
-      <Modal opened={opened} onClose={close} title="Update activity" centered keepMounted>
+      <Modal
+        opened={opened}
+        onClose={close}
+        title={
+          <Text fz="xl" fw={500}>
+            Update activity
+          </Text>
+        }
+        centered
+        keepMounted
+      >
         <Box mx="auto">
           <Form ref={formRef}>
             <form

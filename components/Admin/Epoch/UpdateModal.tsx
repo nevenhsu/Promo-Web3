@@ -89,7 +89,16 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
 
   return (
     <>
-      <Modal opened={opened} onClose={close} title="Update admin" centered>
+      <Modal
+        opened={opened}
+        onClose={close}
+        title={
+          <Text fz="xl" fw={500}>
+            Update admin
+          </Text>
+        }
+        centered
+      >
         <Box mx="auto">
           <form
             onSubmit={form.onSubmit(
