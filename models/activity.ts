@@ -1,9 +1,11 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
+import UserModel from '@/models/user'
 import { ActivityType, SocialMedia, ActivitySettingType } from '@/types/db'
 
 const detailSchema = new Schema({
   link: { type: String, required: true }, // post id, ex: post_id
   fullLink: { type: String, default: '' }, // full post link, ex: https://twitter.com/username/status/post_id
+  externalLink: { type: String, default: '' }, // external link, ex: https://example.com
   participants: { type: Number, default: 0 },
   totalScore: { type: Number, default: 0.0 },
   coverUrl: String,
@@ -32,6 +34,11 @@ const nftSchema = new Schema({
 })
 
 export const schema = new Schema({
+  _user: {
+    type: Schema.Types.ObjectId,
+    ref: UserModel,
+    index: true,
+  },
   startTime: { type: Date, required: true, index: true },
   endTime: { type: Date, required: true, index: true },
   slug: { type: String, unique: true, index: true, default: '' },
@@ -50,7 +57,7 @@ export const schema = new Schema({
 export type Activity = InferSchemaType<typeof schema>
 export type ActivityDetail = InferSchemaType<typeof detailSchema>
 export type ActivityAirdrop = InferSchemaType<typeof airdropSchema>
-export type ActivityData = Omit<Activity, 'nft' | 'details' | 'airdrop' | 'bonus'> & {
+export type ActivityData = Omit<Activity, '_user' | 'nft' | 'details' | 'airdrop' | 'bonus'> & {
   details: Omit<ActivityDetail, 'participants' | 'totalScore'>
   airdrop: Omit<ActivityAirdrop, 'finalized'>
   bonus: Omit<InferSchemaType<typeof bonusSchema>, 'finalized'>

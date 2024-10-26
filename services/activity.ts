@@ -1,5 +1,9 @@
 import axios from 'axios'
-import type { TPublicActivity, ActivityDetail } from '@/models/activity'
+import type { TPublicActivity, ActivityDetail, TActivity } from '@/models/activity'
+
+// ====================
+// Public Activity
+// ====================
 
 export const getPublicActivityDetails = async (slug: string) => {
   if (!slug) return null
@@ -27,4 +31,39 @@ export async function getPublicActivities(values: {
     total?: number
   }>(url.toString())
   return data
+}
+
+// ====================
+// Owned Activity
+// ====================
+
+export async function getOwnedActivity(slug: string) {
+  const { data } = await axios.get<{
+    activity: TActivity
+  }>(`/api/u/activity/${slug}`)
+
+  return data.activity
+}
+
+export type UpdateData = {
+  title: string
+  description: string
+  details: {
+    externalLink: string
+  }
+  setting: {
+    data: {
+      maxTotalScore: number
+      minFollowers: number
+    }
+  }
+  published: boolean
+}
+
+export async function updateOwnedActivity(slug: string, data: Partial<UpdateData>) {
+  const { data: updated } = await axios.put<{ activity: TActivity }>(`/api/u/activity/${slug}`, {
+    data,
+  })
+
+  return updated.activity
 }

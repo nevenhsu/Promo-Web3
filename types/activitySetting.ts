@@ -2,13 +2,16 @@ import { ActivitySettingType } from './db'
 
 export type ActivitySettingTypeNone = {
   type?: ActivitySettingType.None
-  data?: {}
+  data?: {
+    minFollowers: number
+  }
 }
 
 export type ActivitySettingTypeA = {
   type: ActivitySettingType.A
   data: {
     maxTotalScore: number
+    minFollowers: number
     maxSelfScore: number
   }
 }

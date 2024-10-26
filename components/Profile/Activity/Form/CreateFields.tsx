@@ -9,12 +9,12 @@ import { symbols } from '@/contracts/tokens'
 import { useFormContext } from './Context'
 import { getXPostId, getInstagramPostId } from '@/utils/socialMedia'
 import { PiNumberOneBold, PiNumberTwoBold, PiNumberThreeBold } from 'react-icons/pi'
-import { ActivityType, SocialMedia, ActivitySettingType } from '@/types/db'
+import { ActivityType, SocialMedia } from '@/types/db'
 
 export default function FormFields() {
   const form = useFormContext()
-  const { socialMedia, activityType, setting, details } = form.values
-  const settingType = setting.type
+  const { socialMedia, activityType, details, airdrop } = form.values
+  const { symbol, amount } = airdrop
   const { fullLink } = details
 
   // Activity types based on social media
@@ -40,26 +40,27 @@ export default function FormFields() {
 
   // Set default setting data based on setting type
   useEffect(() => {
-    if (settingType === ActivitySettingType.None) {
-      form.setFieldValue('setting.data', {})
-    }
-    if (settingType === ActivitySettingType.A) {
-      const amount = Number(form.values.airdrop.amount)
-      form.setFieldValue('setting.data', {
-        maxTotalScore: amount ? amount * 1000 : 0,
-        maxSelfScore: 10000,
-      })
-    }
-  }, [settingType])
+    const amountNum = Number(amount) || 0
+
+    form.setFieldValue('setting.data', {
+      maxTotalScore: symbol === 'USDC' ? amountNum * 1000 : amountNum,
+      maxSelfScore: 10000,
+      minFollowers: 100,
+    })
+  }, [symbol, amount])
 
   // Extract post id from full link
   useEffect(() => {
+    const trimmed = _.trim(fullLink)
+    if (trimmed !== fullLink) {
+      form.setFieldValue('details.fullLink', trimmed)
+    }
     if (socialMedia === SocialMedia.X) {
-      const postId = getXPostId(fullLink)
+      const postId = getXPostId(trimmed)
       form.setFieldValue('details.link', postId)
     }
     if (socialMedia === SocialMedia.Instagram) {
-      const postId = getInstagramPostId(fullLink)
+      const postId = getInstagramPostId(trimmed)
       form.setFieldValue('details.link', postId)
     }
   }, [socialMedia, fullLink])
@@ -72,7 +73,7 @@ export default function FormFields() {
             <ThemeIcon size="xs" color="dark" mb={4}>
               <PiNumberOneBold />
             </ThemeIcon>
-            <Text fw={500}> What is the date of this activity?</Text>
+            <Text fw={500}>What is the date of this activity?</Text>
           </Group>
           <DateTimePicker
             valueFormat="DD MMM YYYY hh:mm A"

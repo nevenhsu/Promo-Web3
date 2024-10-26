@@ -18,10 +18,18 @@ export interface FormValues {
   details: {
     link: string
     fullLink: string
+    externalLink: string
     coverUrl?: string | null
     thumbnailUrl?: string | null
   }
-  setting: { type: string; data: Record<string, unknown> }
+  setting: {
+    type: string
+    data: {
+      maxTotalScore: number
+      maxSelfScore: number
+      minFollowers: number
+    }
+  }
   bonus: { data: Record<string, unknown> }
   published: boolean
 }

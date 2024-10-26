@@ -1,7 +1,5 @@
 import Decimal from 'decimal.js'
-import Image from 'next/image'
-import { Group, Stack, Paper, Text } from '@mantine/core'
-import classes from './index.module.css'
+import { Group, Stack, Paper, Text, Avatar } from '@mantine/core'
 import { formatFixedNumber } from '@/utils/math'
 
 type TokenProps = {
@@ -23,7 +21,7 @@ export default function Token(props: TokenProps) {
     <Paper radius="md" p="md" shadow="xs">
       <Group justify="space-between">
         <Group>
-          <Image className={classes.icon} src={icon} width={32} height={32} alt="" />
+          <Avatar src={icon} size={32} alt="" />
 
           <Stack gap={4}>
             <Text fw={500} lh={1}>

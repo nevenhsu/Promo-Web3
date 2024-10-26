@@ -25,7 +25,7 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
   const form = useForm({
     mode: 'controlled',
     initialValues: {
-      title: '',
+      title: 'My activity',
       slug: '',
       startTime: null,
       endTime: null,
@@ -39,17 +39,23 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
       details: {
         link: '',
         fullLink: '',
+        externalLink: '',
         coverUrl: '',
         thumbnailUrl: '',
       },
       setting: {
         type: ActivitySettingType.A,
-        data: {},
+        data: {
+          maxTotalScore: 0,
+          maxSelfScore: 10000,
+          minFollowers: 100,
+        },
       },
       bonus: { data: {} },
       published: false,
     },
     validate: {
+      title: value => (value ? null : 'Should not be empty'),
       startTime: (value, values) => {
         if (!value) {
           return 'Should not be empty'
@@ -103,6 +109,21 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
 
           return null
         },
+        externalLink: (value, values) => {
+          const trimmed = _.trim(value)
+
+          if (trimmed && !checkURL(trimmed)) {
+            return 'Should be a valid URL'
+          }
+
+          return null
+        },
+      },
+      setting: {
+        data: {
+          minFollowers: value => (value >= 100 ? null : 'Should be greater than or equal to 100'),
+          maxTotalScore: value => (value > 0 ? null : 'Should be greater than 0'),
+        },
       },
     },
   })
@@ -113,3 +134,12 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
 
   return <FormProvider form={form}>{children}</FormProvider>
 })
+
+function checkURL(url: string) {
+  try {
+    new URL(url)
+    return true
+  } catch (e) {
+    return false
+  }
+}

@@ -30,7 +30,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
 function filterData(data: Partial<ActivityData>) {
   return _.omit(data, [
-    'nftId',
+    '_user',
+    'nft',
     'details.participants',
     'details.totalScore',
     'airdrop.finalized',

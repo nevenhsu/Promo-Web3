@@ -6,7 +6,6 @@ import { useDisclosure } from '@mantine/hooks'
 import { Stack, Space, Group, Modal, Loader } from '@mantine/core'
 import { Title, Text, Button, Checkbox } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import ActivityItem from '@/components/share/ActivityItem'
 import Form, { type FormRef } from '../Form'
 import CreateFields from '../Form/CreateFields'
 import { formatDate } from '@/utils/date'
@@ -96,7 +95,7 @@ export default function ProfileActivityNew() {
 
                     <span />
 
-                    <Button type="submit" loading={createActivityState.loading}>
+                    <Button type="submit" loading={loading}>
                       Create
                     </Button>
                   </Stack>
