@@ -56,7 +56,7 @@ export default forwardRef<AvatarButtonRef, AvatarButtonProps>(function AvatarBut
       >
         {props => (
           <span {...props} className="c-pointer">
-            <Avatar w="100%" h="100%" color="white" src={dataURI || url} />
+            <Avatar w="100%" h="100%" color="white" src={dataURI || url || null} />
             <ThemeIcon
               size="sm"
               variant="light"

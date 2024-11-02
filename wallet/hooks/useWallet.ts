@@ -44,7 +44,7 @@ export function useWallet() {
 
   useEffect(() => {
     if (wallet && chainId) {
-      console.log('Current wallet:', wallet.address)
+      console.log('EOA wallet:', wallet.address)
       setupWalletClient(wallet, chainId)
     }
   }, [wallet, chainId])

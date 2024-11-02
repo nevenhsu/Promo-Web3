@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { arbitrum, arbitrumSepolia } from 'viem/chains'
+import * as _ from 'lodash-es'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Link } from '@/i18n/routing'
 import { useDisclosure } from '@mantine/hooks'
@@ -10,19 +10,27 @@ import { Text, Button, TextInput, Box, Modal } from '@mantine/core'
 import { useForm, hasLength } from '@mantine/form'
 import RwdLayout from '@/components/share/RwdLayout'
 import IconButton from './IconButton'
+import { activityManagers } from '@/contracts'
+import { useUserToken } from '@/store/contexts/app/userToken'
+import { useWeb3 } from '@/wallet/Web3Context'
 import { cleanSymbol } from '@/utils/helper'
 import { getNetwork, type NetworkInfo } from '@/wallet/utils/network'
 
-const arbitrumNetwork = getNetwork(arbitrum.id)
-const arbitrumSepoliaNetwork = getNetwork(arbitrumSepolia.id)
-
 export default function TokenInfo() {
+  const { smartAccountValues } = useWeb3()
+  const { smartAccountAddress } = smartAccountValues
+
+  const { data, loading, updateToken } = useUserToken()
+  const { userToken, tokens = [] } = data || {}
+  const icon = userToken?.icon || ''
+  const minted = Boolean(tokens.length)
+
   const [opened, { open, close }] = useDisclosure(false)
 
   // avatar
-  const [icon, setIcon] = useState<string>()
+  const [iconImg, setIconImg] = useState('')
   const [iconError, setIconError] = useState<string>()
-  const iconURI = iconError ? '' : icon
+  const iconURI = iconError ? '' : iconImg
 
   const form = useForm({
     mode: 'controlled',
@@ -34,21 +42,24 @@ export default function TokenInfo() {
       name: value =>
         hasLength({ min: 3, max: 12 }, 'Name must be 3-12 characters long')(value.trim()),
       symbol: value =>
-        hasLength({ min: 3, max: 6 }, 'Symbol must be 3-6 characters long')(cleanSymbol(value)),
+        hasLength({ min: 2, max: 8 }, 'Symbol must be 2-8 characters long')(cleanSymbol(value)),
     },
   })
 
   const handleSubmit = (values: typeof form.values) => {
     const name = values.name.trim()
-    const cleaned = cleanSymbol(values.symbol)
-    if (name && cleaned) {
-      // Update token info
+    const symbol = cleanSymbol(values.symbol)
+    if (name && symbol && smartAccountAddress) {
+      updateToken({ name, symbol, icon, iconURI, walletAddr: smartAccountAddress })
     }
   }
 
-  const alreadyUpdated = false
+  const { name, symbol } = form.getValues()
+  const alreadyUpdated =
+    userToken?.name === name && userToken?.symbol === symbol && icon === iconImg
 
   const renderNetwork = (network: NetworkInfo) => {
+    const minted = Boolean(_.find(tokens, { chainId: network.chainId }))
     return (
       <Paper p="md" shadow="xs" radius="sm">
         <Group justify="space-between">
@@ -63,11 +74,31 @@ export default function TokenInfo() {
               </Text>
             </Stack>
           </Group>
-          <Button onClick={open}>Mint</Button>
+          <Button onClick={open} disabled={minted}>
+            {minted ? 'Minted' : 'Mint'}
+          </Button>
         </Group>
       </Paper>
     )
   }
+
+  // Set initial values if userToken exists
+  useEffect(() => {
+    if (userToken) {
+      form.setValues({
+        name: userToken.name,
+        symbol: userToken.symbol,
+      })
+      setIconImg(userToken.icon || '')
+    }
+  }, [userToken])
+
+  // Clean symbol
+  useEffect(() => {
+    if (symbol) {
+      form.setValues({ symbol: cleanSymbol(symbol) })
+    }
+  }, [symbol])
 
   return (
     <>
@@ -75,9 +106,9 @@ export default function TokenInfo() {
         <Stack gap="lg">
           <Title order={3}>Token info</Title>
 
-          <Box mx="auto">
+          <Stack align="center" gap="xs">
             <IconButton
-              url=""
+              url={icon}
               onChange={file => {
                 if (file && file.size >= 1024 * 1024 * 10) {
                   setIconError('Image size cannot exceed 10mb')
@@ -86,10 +117,14 @@ export default function TokenInfo() {
                 }
               }}
               onDataURLChange={dataURI => {
-                setIcon(dataURI || '')
+                setIconImg(dataURI || '')
               }}
             />
-          </Box>
+
+            <Text fz="xs" ta="center" c="red">
+              {iconError || ''}
+            </Text>
+          </Stack>
 
           <form
             onSubmit={form.onSubmit(
@@ -104,11 +139,18 @@ export default function TokenInfo() {
             )}
           >
             <Stack>
-              <TextInput label="Name" key={form.key('name')} {...form.getInputProps('name')} />
+              <TextInput
+                label="Name"
+                key={form.key('name')}
+                {...form.getInputProps('name')}
+                disabled={minted}
+              />
+
               <TextInput
                 label="Symbol"
                 key={form.key('symbol')}
                 {...form.getInputProps('symbol')}
+                disabled={minted}
               />
 
               <Group justify="right" mt="sm">
@@ -118,7 +160,13 @@ export default function TokenInfo() {
                   </Button>
                 </Link>
 
-                <Button type="submit">{alreadyUpdated ? 'Updated' : 'Update'}</Button>
+                <Button
+                  type="submit"
+                  loading={loading}
+                  disabled={!smartAccountAddress || alreadyUpdated}
+                >
+                  {alreadyUpdated ? 'Updated' : 'Update'}
+                </Button>
               </Group>
             </Stack>
           </form>
@@ -129,9 +177,10 @@ export default function TokenInfo() {
 
           <Stack>
             {/* Network */}
-            {[arbitrumNetwork, arbitrumSepoliaNetwork].map(o => (
-              <Box key={o.name}>{renderNetwork(o)}</Box>
-            ))}
+            {_.map(activityManagers, o => {
+              const network = getNetwork(o.chainId)
+              return <Box key={o.chainId}>{renderNetwork(network)}</Box>
+            })}
           </Stack>
         </Stack>
       </RwdLayout>
@@ -147,7 +196,7 @@ export default function TokenInfo() {
         }
       >
         <Stack>
-          <Text>Name and symbol cannot be changed after minting</Text>
+          <Text fz="sm">Name and symbol cannot be changed after minting</Text>
 
           <Group justify="right" mt="md">
             <Button variant="outline" color="dark" onClick={close}>

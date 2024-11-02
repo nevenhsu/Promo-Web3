@@ -49,13 +49,13 @@ export default function IconButton(props: IconButtonProps) {
       >
         {props => (
           <>
-            <Box {...props} className="c-pointer" pos="relative">
-              <Avatar src={imgSrc} name={''} color="initials" size={80}>
+            <Box {...props} className="c-pointer" pos="relative" w={80}>
+              <Avatar src={imgSrc || null} name={''} color="initials" size={80}>
                 {' '}
               </Avatar>
 
               <Text className="absolute-center nowrap" fz="xs">
-                Upload icon
+                {imgSrc ? '' : 'Upload icon'}
               </Text>
             </Box>
           </>

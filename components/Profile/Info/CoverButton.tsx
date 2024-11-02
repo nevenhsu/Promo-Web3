@@ -22,7 +22,7 @@ export default function CoverButton(props: CoverButtonProps) {
         <Box bg="gray.1" style={{ borderRadius: 4, overflow: 'hidden' }}>
           {imgSrc ? (
             <img
-              src={imgSrc}
+              src={imgSrc || undefined}
               alt="cover"
               style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
             />

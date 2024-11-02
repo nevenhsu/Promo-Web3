@@ -11,6 +11,7 @@ import { AirdropProvider } from '@/store/contexts/app/airdropContext'
 import { ActivityProvider } from '@/store/contexts/app/activityContext'
 import { TransactionProvider } from '@/store/contexts/app/transactionContext'
 import { ActivityStatusProvider } from '@/store/contexts/app/activityStatusContext'
+import { UserTokenProvider } from '@/store/contexts/app/userToken'
 import BackgroundTask from './BackgroundTask'
 
 export default function Providers({ children }: React.PropsWithChildren) {
@@ -37,15 +38,17 @@ export default function Providers({ children }: React.PropsWithChildren) {
 function DataProviders({ children }: React.PropsWithChildren) {
   return (
     <>
-      <ReferralProvider>
-        <ActivityProvider>
-          <TransactionProvider>
-            <AirdropProvider>
-              <ActivityStatusProvider>{children}</ActivityStatusProvider>
-            </AirdropProvider>
-          </TransactionProvider>
-        </ActivityProvider>
-      </ReferralProvider>
+      <UserTokenProvider>
+        <ReferralProvider>
+          <ActivityProvider>
+            <TransactionProvider>
+              <AirdropProvider>
+                <ActivityStatusProvider>{children}</ActivityStatusProvider>
+              </AirdropProvider>
+            </TransactionProvider>
+          </ActivityProvider>
+        </ReferralProvider>
+      </UserTokenProvider>
     </>
   )
 }

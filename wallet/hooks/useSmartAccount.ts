@@ -58,7 +58,7 @@ export function useSmartAccount() {
         throw new Error('Smart account not created')
       }
 
-      console.log('Smart account created:', res.smartAccountAddress)
+      console.log('Smart account:', res.smartAccountAddress)
 
       const { smartAccount, smartAccountAddress, withSponsor, noSponsor } = res
       setSmartAccount(smartAccount)

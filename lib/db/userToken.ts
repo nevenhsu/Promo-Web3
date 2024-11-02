@@ -1,6 +1,6 @@
 import UserTokenModel from '@/models/userToken'
-import TokenModel from '@/models/token'
 import { getUserWallet } from '@/lib/db/userWallet'
+import { getTokens } from '@/lib/db/token'
 
 export async function getUserToken(userId: string) {
   return UserTokenModel.findOne({ _user: userId })
@@ -8,11 +8,11 @@ export async function getUserToken(userId: string) {
 
 export async function updateUserToken(
   userId: string,
-  data: {
+  data: Partial<{
     name: string
     symbol: string
-    cover: string
-  },
+    icon: string
+  }>,
   walletAddr?: string
 ) {
   const _data = { ...data, _wallet: '' }
@@ -22,8 +22,8 @@ export async function updateUserToken(
   _data._wallet = userToken?._wallet.toString() || ''
 
   if (userToken) {
-    const token = await TokenModel.find({ _userToken: userToken._id })
-    if (token) {
+    const token = await getTokens(userToken._id.toString())
+    if (token.length) {
       // Overwrite name and symbol if token exists
       _data.name = userToken.name
       _data.symbol = userToken.symbol

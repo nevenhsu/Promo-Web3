@@ -12,7 +12,7 @@ export function cleanup(val: string, toLowerCase = true) {
 
 export function cleanSymbol(val: string) {
   // only keep A-Z
-  return val.replace(/[^A-Z]/g, '')
+  return val.toUpperCase().replace(/[^A-Z]/g, '')
 }
 
 export function cleanCode(val: string) {

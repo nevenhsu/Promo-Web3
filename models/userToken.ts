@@ -17,7 +17,7 @@ export const schema = new Schema({
   },
   name: { type: String, required: true },
   symbol: { type: String, required: true },
-  cover: String,
+  icon: String,
   minted: { type: Boolean, default: false },
 })
 

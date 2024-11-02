@@ -26,27 +26,27 @@ export async function POST(req: NextRequest) {
   try {
     const jwt = await getToken({ req })
     const userId = jwt?.user?.id!
-    const { walletAddr, name, symbol, cover, coverURI } = await req.json()
+    const { walletAddr, name, symbol, icon, iconURI } = await req.json()
 
     const data = {
       name,
       symbol,
-      cover,
+      icon,
     }
 
     // upload image to GCP
-    if (isImageURI(coverURI)) {
+    if (isImageURI(iconURI)) {
       const path = `images/${userId}`
       const fileName = 'token-cover'
-      const url = await uploadImage(coverURI, path, fileName, { width: 80, height: 80 })
+      const url = await uploadImage(iconURI, path, fileName, { width: 80, height: 80 })
       if (!url) {
         return NextResponse.json({ error: 'Failed to upload token cover' }, { status: 500 })
       }
-      data.cover = url
+      data.icon = url
     }
 
     await dbConnect()
-    const userToken = await updateUserToken(userId, data, walletAddr)
+    const userToken = await updateUserToken(userId, _.omitBy(data, _.isEmpty), walletAddr)
 
     return NextResponse.json({ userToken })
   } catch (error) {
