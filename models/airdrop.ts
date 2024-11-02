@@ -1,5 +1,6 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import UserModel from '@/models/user'
+import TokenModel from '@/models/token'
 
 const schema = new Schema({
   _user: {
@@ -7,6 +8,11 @@ const schema = new Schema({
     ref: UserModel,
     required: true,
     index: true,
+  },
+  _token: {
+    // Only for Club token
+    type: Schema.Types.ObjectId,
+    ref: TokenModel,
   },
   symbol: { type: String, required: true, index: true },
   receivedAmount: {

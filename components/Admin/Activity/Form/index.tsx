@@ -41,7 +41,6 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
         type: ActivitySettingType.None,
         data: {},
       },
-      bonus: { data: {} },
       published: false,
     },
     validate: {

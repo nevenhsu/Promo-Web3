@@ -30,7 +30,6 @@ export interface FormValues {
       minFollowers: number
     }
   }
-  bonus: { data: Record<string, unknown> }
   published: boolean
 }
 

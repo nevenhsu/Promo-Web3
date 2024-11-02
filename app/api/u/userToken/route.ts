@@ -36,11 +36,11 @@ export async function POST(req: NextRequest) {
     }
 
     // check if name or symbol is banned
-    if (banNames.includes(name)) {
+    if ([...banNames, ...banSymbols].includes(name.toLowerCase())) {
       return NextResponse.json({ error: 'Name is banned' }, { status: 400 })
     }
 
-    if (banSymbols.includes(symbol)) {
+    if (banSymbols.includes(symbol.toLowerCase())) {
       return NextResponse.json({ error: 'Symbol is banned' }, { status: 400 })
     }
 

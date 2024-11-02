@@ -1,5 +1,6 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import UserModel from '@/models/user'
+import TokenModel from '@/models/token'
 import { ActivityType, SocialMedia, ActivitySettingType } from '@/types/db'
 
 const detailSchema = new Schema({
@@ -13,14 +14,14 @@ const detailSchema = new Schema({
 })
 
 const airdropSchema = new Schema({
+  _token: {
+    // Only for Club token
+    type: Schema.Types.ObjectId,
+    ref: TokenModel,
+  },
   symbol: { type: String, required: true },
   amount: { type: String, required: true }, // Base unit, not wei, ex: 10 USDC
   finalized: { type: Boolean, default: false, index: true }, // airdrop share finalized
-})
-
-const bonusSchema = new Schema({
-  data: { type: Object, default: { _: '' } }, // custom bonus data
-  finalized: { type: Boolean, default: false, index: true }, // bonus share finalized
 })
 
 const settingSchema = new Schema({
@@ -49,7 +50,6 @@ export const schema = new Schema({
   setting: { type: settingSchema, default: {} }, // custom settings
   details: { type: detailSchema, required: true },
   airdrop: { type: airdropSchema, required: true },
-  bonus: { type: bonusSchema, default: {} },
   nft: { type: nftSchema },
   published: { type: Boolean, default: false, index: true },
 })
@@ -57,10 +57,9 @@ export const schema = new Schema({
 export type Activity = InferSchemaType<typeof schema>
 export type ActivityDetail = InferSchemaType<typeof detailSchema>
 export type ActivityAirdrop = InferSchemaType<typeof airdropSchema>
-export type ActivityData = Omit<Activity, '_user' | 'nft' | 'details' | 'airdrop' | 'bonus'> & {
+export type ActivityData = Omit<Activity, '_user' | 'nft' | 'details' | 'airdrop'> & {
   details: Omit<ActivityDetail, 'participants' | 'totalScore'>
-  airdrop: Omit<ActivityAirdrop, 'finalized'>
-  bonus: Omit<InferSchemaType<typeof bonusSchema>, 'finalized'>
+  airdrop: Omit<ActivityAirdrop, '_token' | 'finalized'>
 }
 export type TActivity = Omit<Activity, 'startTime' | 'endTime'> & {
   _id: string

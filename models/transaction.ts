@@ -3,9 +3,15 @@ import { TxStatus, TxType } from '@/types/db'
 import { unifyAddress } from '@/wallet/utils/helper'
 import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
 import UserModel, { type User } from '@/models/user'
+import TokenModel from '@/models/token'
 import UserWalletModel from '@/models/userWallet'
 
 const tokenSchema = new Schema({
+  _token: {
+    // Only for Club token
+    type: Schema.Types.ObjectId,
+    ref: TokenModel,
+  },
   symbol: { type: String, required: true },
   amount: { type: String, required: true }, // Base unit, not wei, ex: 10 USDC
 })

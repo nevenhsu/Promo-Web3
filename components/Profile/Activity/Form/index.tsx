@@ -51,7 +51,6 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
           minFollowers: 100,
         },
       },
-      bonus: { data: {} },
       published: false,
     },
     validate: {

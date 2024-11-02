@@ -21,7 +21,6 @@ export interface FormValues {
     coverUrl?: string | null
     thumbnailUrl?: string | null
   }
-  bonus: { data: Record<string, unknown> }
   setting: { type: string; data: Record<string, unknown> }
   published: boolean
 }

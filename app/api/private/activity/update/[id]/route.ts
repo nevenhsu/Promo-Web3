@@ -34,7 +34,7 @@ function filterData(data: Partial<ActivityData>) {
     'nft',
     'details.participants',
     'details.totalScore',
+    'airdrop._token',
     'airdrop.finalized',
-    'bonus.finalized',
   ])
 }

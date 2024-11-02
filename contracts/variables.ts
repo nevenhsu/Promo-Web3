@@ -7,10 +7,10 @@ export const banNames = [
   'USD Coin',
   'USDC',
   'Dai',
+  'Binance',
   'Binance USD',
   'Dogecoin',
   'Solana',
-  'XRP',
   'TRON',
   'Cardano',
   'Shiba Inu',
@@ -21,7 +21,8 @@ export const banNames = [
   'Monero',
   'Arbitrum',
   'Optimism',
-]
+  'Sharx',
+].map(s => s.toLowerCase())
 
 export const banSymbols = [
   'BTC',
@@ -44,4 +45,5 @@ export const banSymbols = [
   'XMR',
   'ARB',
   'OP',
-]
+  'SHX',
+].map(s => s.toLowerCase())
