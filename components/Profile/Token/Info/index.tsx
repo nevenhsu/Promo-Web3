@@ -73,7 +73,7 @@ export default function TokenInfo() {
     <>
       <RwdLayout>
         <Stack gap="lg">
-          <Title order={3}>Token setting</Title>
+          <Title order={3}>Token info</Title>
 
           <Box mx="auto">
             <IconButton

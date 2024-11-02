@@ -5,7 +5,10 @@ import { supportedChains, getProviderUrl } from '@/wallet/variables'
 const clients = supportedChains.map(chain =>
   createPublicClient({
     batch: {
-      multicall: true,
+      multicall: {
+        batchSize: 1024,
+        wait: 20,
+      },
     },
     chain,
     transport: http(getProviderUrl(chain.id) || chain.rpcUrls.default.http[0]),
