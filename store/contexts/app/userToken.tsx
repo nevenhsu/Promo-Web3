@@ -1,47 +1,99 @@
 'use client'
 
-import { usePathname } from '@/i18n/routing'
 import React, { createContext, useContext, useEffect } from 'react'
-import { useAsyncFn } from 'react-use'
-import { getUserToken, updateUserToken, type UserTokenData } from '@/services/userTokens'
-import type { UserToken } from '@/models/userToken'
+import { useAsyncFn, useInterval, usePrevious } from 'react-use'
+import { getUserToken, updateUserToken, checkUserToken, mintToken } from '@/services/userTokens'
+import { notifications } from '@mantine/notifications'
+import type { TUserToken } from '@/models/userToken'
 import type { Token } from '@/models/token'
+import type { UserTokenData } from '@/services/userTokens'
 
 interface UserTokenContextType {
-  data?: { userToken?: UserToken; tokens: Token[] }
+  data?: { userToken?: TUserToken; tokens: Token[] }
   loading: boolean
   error?: Error
   updateToken: (data: UserTokenData) => Promise<void>
+  mint: (chainId: number) => Promise<void>
 }
 
 const UserTokenContext = createContext<UserTokenContextType | undefined>(undefined)
 
 export const UserTokenProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const pathname = usePathname()
-  const isOnPage = pathname.startsWith(`/u`) || pathname.startsWith(`/profile`)
-
   const [state, fetchUserToken] = useAsyncFn(async () => {
     const data = await getUserToken()
     return data
   }, [])
 
+  // for notifications
+  const prevState = usePrevious(state)
+  const processing = state.value?.tokens?.some(t => t.minted === false)
+  const prevProcessing = prevState?.value?.tokens?.some(t => t.minted === false)
+
+  useInterval(
+    () => {
+      fetchUserToken()
+    },
+    processing ? 60_000 : null
+  )
+
   const [updateState, updateToken] = useAsyncFn(async (data: UserTokenData) => {
+    await checkUserToken(data.name, data.symbol)
+
     await updateUserToken(data)
+    fetchUserToken()
+
+    notifications.show({
+      title: 'Token updated',
+      message: 'Your token has been updated successfully',
+      color: 'green',
+    })
+  }, [])
+
+  const [mintState, mint] = useAsyncFn(async (chainId: number) => {
+    await mintToken(chainId)
+    fetchUserToken()
+
+    notifications.show({
+      title: 'Token minting',
+      message: 'It may take a few hours to mint your token',
+      color: 'blue',
+    })
+  })
+
+  const loading = state.loading || updateState.loading || mintState.loading
+  const error = state.error || updateState.error
+
+  useEffect(() => {
     fetchUserToken()
   }, [])
 
-  const loading = state.loading || updateState.loading
-
+  // Show mint error
   useEffect(() => {
-    if (isOnPage) {
-      fetchUserToken()
+    if (mintState.error) {
+      notifications.show({
+        title: 'Mint error',
+        message:
+          mintState.error.response?.data.error ||
+          mintState.error.message ||
+          'An error occurred while minting token',
+        color: 'red',
+      })
     }
-  }, [isOnPage])
+  }, [mintState.error])
+
+  // Show notification when token is minted
+  useEffect(() => {
+    if (!processing && prevProcessing) {
+      notifications.show({
+        title: 'Token minted',
+        message: 'Your token has been minted successfully',
+        color: 'green',
+      })
+    }
+  }, [processing, prevProcessing])
 
   return (
-    <UserTokenContext.Provider
-      value={{ data: state.value, loading, error: updateState.error, updateToken }}
-    >
+    <UserTokenContext.Provider value={{ data: state.value, loading, error, updateToken, mint }}>
       {children}
     </UserTokenContext.Provider>
   )

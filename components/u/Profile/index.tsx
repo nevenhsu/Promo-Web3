@@ -59,7 +59,15 @@ export default function UserProfile({ data }: { data: TUser }) {
 
       <RwdLayout pt={0}>
         <Box mb={-16}>
-          <Box pos="relative" top={-32}>
+          <Box
+            pos="relative"
+            bg="white"
+            style={{
+              top: -32,
+              width: 64,
+              borderRadius: '50%',
+            }}
+          >
             <Avatar src={avatar} name={name || username} color="initials" size={64} />
           </Box>
         </Box>

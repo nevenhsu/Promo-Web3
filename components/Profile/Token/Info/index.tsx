@@ -1,29 +1,32 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Link } from '@/i18n/routing'
 import { useDisclosure } from '@mantine/hooks'
 import { Title, Stack, Space, Paper, Group, Divider } from '@mantine/core'
-import { Text, Button, TextInput, Box, Modal } from '@mantine/core'
+import { Text, Button, TextInput, Box, Modal, Badge, Progress } from '@mantine/core'
 import { useForm, hasLength } from '@mantine/form'
 import RwdLayout from '@/components/share/RwdLayout'
 import IconButton from './IconButton'
-import { activityManagers } from '@/contracts'
+import { tokenManagers } from '@/contracts'
 import { useUserToken } from '@/store/contexts/app/userToken'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { cleanSymbol } from '@/utils/helper'
 import { getNetwork, type NetworkInfo } from '@/wallet/utils/network'
 
 export default function TokenInfo() {
+  const networkRef = useRef(0)
+
   const { smartAccountValues } = useWeb3()
   const { smartAccountAddress } = smartAccountValues
 
-  const { data, loading, updateToken } = useUserToken()
+  const { data, error, loading, updateToken, mint } = useUserToken()
   const { userToken, tokens = [] } = data || {}
   const icon = userToken?.icon || ''
   const minted = Boolean(tokens.length)
+  const valid = Boolean(userToken && userToken.name && userToken.symbol)
 
   const [opened, { open, close }] = useDisclosure(false)
 
@@ -54,30 +57,74 @@ export default function TokenInfo() {
     }
   }
 
+  const handleMint = async () => {
+    const chainId = networkRef.current
+    if (chainId) {
+      await mint(chainId)
+      close()
+    }
+  }
+
   const { name, symbol } = form.getValues()
   const alreadyUpdated =
     userToken?.name === name && userToken?.symbol === symbol && icon === iconImg
 
+  const errorMsg = alreadyUpdated ? '' : iconError
+
   const renderNetwork = (network: NetworkInfo) => {
-    const minted = Boolean(_.find(tokens, { chainId: network.chainId }))
+    const token = _.find(tokens, { chainId: network.chainId })
+    const { minted } = token || {}
+    const updated = Boolean(token)
+    const loading = updated && !minted
     return (
-      <Paper p="md" shadow="xs" radius="sm">
-        <Group justify="space-between">
-          <Group>
+      <Paper
+        p="md"
+        shadow="xs"
+        radius="sm"
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <Group justify="space-between" wrap="nowrap">
+          <Group wrap="nowrap">
             <Image src={network.icon} width={40} height={40} alt={network.name} />
             <Stack gap={4}>
               <Text fz="lg" fw={500} lh={1}>
                 {network.name}
               </Text>
               <Text fz="xs" c="dimmed" lh={1}>
-                {network.subtitle}
+                {loading ? 'It takes a couple of hours to be minted' : `${network.subtitle}`}
               </Text>
             </Stack>
           </Group>
-          <Button onClick={open} disabled={minted}>
-            {minted ? 'Minted' : 'Mint'}
-          </Button>
+          {loading ? null : (
+            <Button
+              size="sm"
+              onClick={() => {
+                networkRef.current = network.chainId || 0
+                open()
+              }}
+              disabled={!valid || updated}
+            >
+              {updated ? 'Minted' : 'Mint'}
+            </Button>
+          )}
         </Group>
+
+        {loading ? (
+          <Progress
+            value={100}
+            size="sm"
+            animated
+            style={{
+              position: 'absolute',
+              width: '100%',
+              bottom: 0,
+              left: 0,
+            }}
+          />
+        ) : null}
       </Paper>
     )
   }
@@ -100,6 +147,18 @@ export default function TokenInfo() {
     }
   }, [symbol])
 
+  // Set form error
+  useEffect(() => {
+    const msg = error?.response?.data?.error
+    if (msg && msg.includes('Name is')) {
+      form.setFieldError('name', 'Choose another name')
+    }
+
+    if (msg && msg.includes('Symbol is')) {
+      form.setFieldError('symbol', 'Choose another symbol')
+    }
+  }, [error])
+
   return (
     <>
       <RwdLayout>
@@ -121,9 +180,11 @@ export default function TokenInfo() {
               }}
             />
 
-            <Text fz="xs" ta="center" c="red">
-              {iconError || ''}
-            </Text>
+            {errorMsg ? (
+              <Badge size="sm" color="red">
+                {errorMsg}
+              </Badge>
+            ) : null}
           </Stack>
 
           <form
@@ -173,11 +234,19 @@ export default function TokenInfo() {
 
           <Divider my="md" />
 
-          <Title order={4}>Network</Title>
+          <Group justify="space-between">
+            <Title order={4}>Network</Title>
+
+            {valid ? null : (
+              <Badge size="sm" color="red">
+                Update info to mint token
+              </Badge>
+            )}
+          </Group>
 
           <Stack>
             {/* Network */}
-            {_.map(activityManagers, o => {
+            {_.map(tokenManagers, o => {
               const network = getNetwork(o.chainId)
               return <Box key={o.chainId}>{renderNetwork(network)}</Box>
             })}
@@ -202,7 +271,7 @@ export default function TokenInfo() {
             <Button variant="outline" color="dark" onClick={close}>
               Cancel
             </Button>
-            <Button>Confirm</Button>
+            <Button onClick={handleMint}>Confirm</Button>
           </Group>
         </Stack>
       </Modal>

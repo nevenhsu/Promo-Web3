@@ -1,9 +1,16 @@
 import UserTokenModel from '@/models/userToken'
 import { getUserWallet } from '@/lib/db/userWallet'
 import { getTokens } from '@/lib/db/token'
+import type { UserWallet } from '@/models/userWallet'
 
 export async function getUserToken(userId: string) {
-  return UserTokenModel.findOne({ _user: userId })
+  const doc = await UserTokenModel.findOne({ _user: userId })
+    .populate<{
+      _wallet: UserWallet
+    }>('_wallet')
+    .lean()
+
+  return doc
 }
 
 export async function updateUserToken(
@@ -19,7 +26,7 @@ export async function updateUserToken(
 
   // Check if data exists
   const userToken = await getUserToken(userId)
-  _data._wallet = userToken?._wallet.toString() || ''
+  _data._wallet = userToken?._wallet._id.toString() || ''
 
   if (userToken) {
     const token = await getTokens(userToken._id.toString())
@@ -37,6 +44,8 @@ export async function updateUserToken(
     _data._wallet = wallet._id.toString()
   }
 
+  console.log({ _data })
+
   const doc = await UserTokenModel.findOneAndUpdate(
     { _user: userId },
     { _user: userId, ..._data },
@@ -44,4 +53,9 @@ export async function updateUserToken(
   )
 
   return doc
+}
+
+export async function getExistingTokens(name: string, symbol: string) {
+  const tokens = await UserTokenModel.find({ $or: [{ name }, { symbol }] }).lean()
+  return tokens
 }

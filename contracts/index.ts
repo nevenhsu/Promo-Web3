@@ -15,7 +15,7 @@ export type Manager = {
   address: Address
 }
 
-const tokenManagers: { [id: string]: Manager } = {
+export const tokenManagers: { [id: string]: Manager } = {
   [arbitrumSepolia.id]: {
     chainId: arbitrumSepolia.id,
     address: '0x1431061a22a96E407bA64558dc3751cce1093711',

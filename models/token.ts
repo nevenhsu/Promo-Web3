@@ -11,8 +11,9 @@ export const schema = new Schema({
     index: true,
   },
   chainId: { type: Number, required: true },
-  contractAddr: { type: String, required: true },
+  contractAddr: String,
   minted: { type: Boolean, default: false, index: true },
+  createdAt: { type: Date, default: Date.now, index: true },
 })
 
 export type Token = InferSchemaType<typeof schema> & { _id: string }

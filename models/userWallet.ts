@@ -16,7 +16,7 @@ export const schema = new Schema({
   supported: { type: Boolean, index: true }, // If this wallet is used by our service
 })
 
-export type UserWallet = InferSchemaType<typeof schema>
+export type UserWallet = InferSchemaType<typeof schema> & { _id: string }
 export type TUserWallet = UserWallet & { _user: User }
 
 // Middleware before saving

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Link } from '@/i18n/routing'
-import { Stack, Box, Space, Group, Divider, Text, Textarea } from '@mantine/core'
+import { Stack, Box, Space, Group, Divider, Badge, Textarea } from '@mantine/core'
 import { TextInput, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { updateProfile } from '@/store/slices/user'
@@ -32,6 +32,7 @@ export default function ProfileInfo() {
   const [coverImg, setCoverImg] = useState<string>(cover)
   const [coverError, setCoverError] = useState<string>()
   const coverURI = coverError ? '' : coverImg
+  const error = imageError || coverError
 
   const form = useForm({
     mode: 'controlled',
@@ -144,9 +145,11 @@ export default function ProfileInfo() {
               </Box>
             </Box>
 
-            <Text fz="xs" ta="center" c="red">
-              {imageError || coverError || ''}
-            </Text>
+            {error ? (
+              <Badge size="sm" color="red">
+                {error}
+              </Badge>
+            ) : null}
           </Stack>
 
           <Divider />

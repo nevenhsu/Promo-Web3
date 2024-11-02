@@ -18,7 +18,8 @@ export function useOAuth() {
 
   useEffect(() => {
     if (nextAuth) {
-      refreshToken().catch(console.error)
+      // Do nothing
+      refreshToken().catch(() => {})
     }
   }, [nextAuth])
 

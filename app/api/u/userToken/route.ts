@@ -3,8 +3,9 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { isImageURI, uploadImage } from '@/lib/gcp'
-import { getUserToken, updateUserToken } from '@/lib/db/userToken'
+import { getUserToken, updateUserToken, getExistingTokens } from '@/lib/db/userToken'
 import { getTokens } from '@/lib/db/token'
+import { banNames, banSymbols } from '@/contracts/variables'
 
 export async function GET(req: NextRequest) {
   try {
@@ -34,6 +35,30 @@ export async function POST(req: NextRequest) {
       icon,
     }
 
+    // check if name or symbol is banned
+    if (banNames.includes(name)) {
+      return NextResponse.json({ error: 'Name is banned' }, { status: 400 })
+    }
+
+    if (banSymbols.includes(symbol)) {
+      return NextResponse.json({ error: 'Symbol is banned' }, { status: 400 })
+    }
+
+    await dbConnect()
+
+    // check if token is not minted or owned by the user
+    const tokens = await getExistingTokens(name, symbol)
+    for (const token of tokens) {
+      if (token._user.toString() !== userId) {
+        if (token.name === name) {
+          return NextResponse.json({ error: 'Name is taken' }, { status: 400 })
+        }
+        if (token.symbol === symbol) {
+          return NextResponse.json({ error: 'Symbol is taken' }, { status: 400 })
+        }
+      }
+    }
+
     // upload image to GCP
     if (isImageURI(iconURI)) {
       const path = `images/${userId}`
@@ -45,7 +70,6 @@ export async function POST(req: NextRequest) {
       data.icon = url
     }
 
-    await dbConnect()
     const userToken = await updateUserToken(userId, _.omitBy(data, _.isEmpty), walletAddr)
 
     return NextResponse.json({ userToken })
