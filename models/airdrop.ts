@@ -14,6 +14,7 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: UserTokenModel,
   },
+  chainId: { type: Number, required: true, index: true },
   symbol: { type: String, required: true, index: true },
   receivedAmount: {
     // Base unit, not wei, ex: 10 USDC
@@ -28,7 +29,7 @@ const schema = new Schema({
   },
 })
 
-schema.index({ _user: 1, symbol: 1 }, { unique: true }) // unique index for user and symbol
+schema.index({ _user: 1, symbol: 1, chainId: 1 }, { unique: true }) // unique index for user, symbol and chainId
 
 export type Airdrop = InferSchemaType<typeof schema> & { _id: string }
 export type TAirdrop = Airdrop & {

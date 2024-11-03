@@ -2,6 +2,8 @@ import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import UserModel from './user'
 import UserTokenModel from '@/models/userToken'
 
+// For receiving airdrop event
+
 const schema = new Schema({
   _user: {
     type: Schema.Types.ObjectId,

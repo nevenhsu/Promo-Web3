@@ -30,6 +30,8 @@ export const schema = new Schema({
   updatedAt: { type: Date, default: Date.now, index: true },
 })
 
+schema.index({ _user: 1, symbol: 1, chainId: 1 }, { unique: true })
+
 export type TokenBalance = InferSchemaType<typeof schema> & { _id: string }
 export type TTokenBalance = TokenBalance & {
   balance: string

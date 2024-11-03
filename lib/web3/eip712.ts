@@ -1,9 +1,9 @@
-import _ from 'lodash'
+import * as _ from 'lodash-es'
 import { getContract, parseSignature } from 'viem'
-import clubTokenJson from '@/artifacts/contracts/ClubToken.sol/ClubToken.json'
-import { ClubToken$Type } from '@/artifacts/contracts/ClubToken.sol/ClubToken'
-import type { GetContractReturnType, WalletClient } from '@nomicfoundation/hardhat-viem/types'
-import type { Hash } from 'viem'
+import clubTokenJson from '@/contracts/ClubToken.sol/ClubToken.json'
+import { ClubToken$Type } from '@/contracts/ClubToken.sol/ClubToken'
+import type { GetContractReturnType, Hash } from 'viem'
+import type { WalletClient } from '@/types/wallet'
 
 const fieldNames = ['name', 'version', 'chainId', 'verifyingContract', 'salt'] as const
 
@@ -17,7 +17,13 @@ const types = {
   ],
 } as const
 
-export async function permitToken(wallet: WalletClient, token: Hash, spender: Hash, value: bigint, deadline: bigint) {
+export async function permitToken(
+  wallet: WalletClient,
+  token: Hash,
+  spender: Hash,
+  value: bigint,
+  deadline: bigint
+) {
   const { domain, nonce } = await getPermitData(wallet, token)
 
   const message = {
@@ -47,7 +53,8 @@ export async function permitToken(wallet: WalletClient, token: Hash, spender: Ha
 async function getPermitData(client: WalletClient, token: Hash) {
   const contract = getTokenContract(client, token)
 
-  const [fieldsString, name, version, chainId, verifyingContract, salt, extensions] = await contract.read.eip712Domain()
+  const [fieldsString, name, version, chainId, verifyingContract, salt, extensions] =
+    await contract.read.eip712Domain()
   const nonce = await contract.read.nonces([client.account.address])
 
   if (extensions.length > 0) {
@@ -57,16 +64,19 @@ async function getPermitData(client: WalletClient, token: Hash) {
   const fields = Number(fieldsString)
   const domain = { name, version, chainId: Number(chainId), verifyingContract, salt }
 
-  for (const [i, field] of fieldNames.entries()) {
+  _.forEach(fieldNames, (field, i) => {
     if (!(fields & (1 << i))) {
-      delete domain[field]
+      _.unset(domain, field)
     }
-  }
+  })
 
   return { domain, nonce }
 }
 
-function getTokenContract(client: WalletClient, address: Hash): GetContractReturnType<ClubToken$Type['abi']> {
+function getTokenContract(
+  client: WalletClient,
+  address: Hash
+): GetContractReturnType<ClubToken$Type['abi'], WalletClient> {
   const contract = getContract({
     address,
     abi: clubTokenJson.abi,
