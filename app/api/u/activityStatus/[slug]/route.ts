@@ -12,7 +12,7 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
     const token = await getToken({ req })
     const userId = token?.user?.id!
 
-    const { slug } = params
+    const { slug } = await params
 
     if (!slug) {
       return NextResponse.json({ error: 'Slug is required' }, { status: 400 })
@@ -39,7 +39,7 @@ export async function PUT(req: NextRequest, { params }: { params: { slug: string
   try {
     const token = await getToken({ req })
     const userId = token?.user?.id!
-    const { slug } = params
+    const { slug } = await params
 
     await dbConnect()
 

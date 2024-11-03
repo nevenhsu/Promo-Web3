@@ -2,14 +2,14 @@ import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import { ActivityStatus, ActivityErrorCode } from '@/types/db'
 import ActivityModel, { type Activity } from '@/models/activity'
 import UserModel from '@/models/user'
-import TokenModel from '@/models/token'
+import UserTokenModel from '@/models/userToken'
 import { SocialMedia } from '@/types/db'
 
 const airdropSchema = new Schema({
-  _token: {
+  _userToken: {
     // Only for Club token
     type: Schema.Types.ObjectId,
-    ref: TokenModel,
+    ref: UserTokenModel,
   },
   symbol: { type: String, default: '', index: true }, // Token symbol, ex: USDC
   amount: { type: String, default: '' }, // Base unit, not wei, ex: 10 USDC

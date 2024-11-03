@@ -4,6 +4,7 @@ import { createFormContext } from '@mantine/form'
 
 // Definition of form values is required
 export interface FormValues {
+  chainId: number
   title: string
   slug: string
   startTime: null | Date
@@ -18,6 +19,7 @@ export interface FormValues {
   details: {
     link: string
     fullLink: string
+    externalLink: string
     coverUrl?: string | null
     thumbnailUrl?: string | null
   }

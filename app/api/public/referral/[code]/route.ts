@@ -6,7 +6,7 @@ import { getRefererByCode } from '@/lib/db/referralCode'
 
 export async function GET(req: NextRequest, { params }: { params: { code: string } }) {
   try {
-    const { code } = params
+    const { code } = await params
 
     await dbConnect()
 

@@ -1,18 +1,13 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef } from 'react'
 import { useAsyncFn } from 'react-use'
 import { useDisclosure } from '@mantine/hooks'
-import { Title, Stack, Space, Paper, Group, ActionIcon } from '@mantine/core'
-import { Text, Button, ThemeIcon, Box, Divider } from '@mantine/core'
+import { Title, Stack, Space } from '@mantine/core'
+import { Text, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import Form, { type FormRef } from '../Form'
 import UpdateFields from '../Form/UpdateFields'
-import { formatDate } from '@/utils/date'
-import { formatNumber } from '@/utils/math'
-import { getOwnedActivity, updateOwnedActivity } from '@/services/activity'
-import { PiCoinVertical, PiCaretRight } from 'react-icons/pi'
-import { isTypeA } from '@/types/activitySetting'
 import type { ActivityData } from '@/models/activity'
 
 export default function UpdateActivity({ slug }: { slug: string }) {
@@ -46,12 +41,12 @@ export default function UpdateActivity({ slug }: { slug: string }) {
                 values => {
                   const { startTime, endTime, activityType, ...rest } = values
                   if (startTime && endTime) {
-                    handleSubmit({
-                      ...rest,
-                      startTime,
-                      endTime,
-                      activityType: Number(activityType),
-                    })
+                    // handleSubmit({
+                    //   ...rest,
+                    //   startTime,
+                    //   endTime,
+                    //   activityType: Number(activityType),
+                    // })
                   }
                 },
                 (validationErrors, values, event) => {

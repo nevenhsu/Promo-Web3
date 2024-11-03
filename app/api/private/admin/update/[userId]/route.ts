@@ -4,7 +4,7 @@ import { updateAdmin } from '@/lib/db/admin'
 
 export async function PUT(req: NextRequest, { params }: { params: { userId: string } }) {
   try {
-    const { userId } = params
+    const { userId } = await params
     const data = await req.json()
 
     await dbConnect()

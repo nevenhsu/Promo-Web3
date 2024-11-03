@@ -1,6 +1,6 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import UserModel from '@/models/user'
-import TokenModel from '@/models/token'
+import UserTokenModel from '@/models/userToken'
 import { ActivityType, SocialMedia, ActivitySettingType } from '@/types/db'
 
 const detailSchema = new Schema({
@@ -14,24 +14,29 @@ const detailSchema = new Schema({
 })
 
 const airdropSchema = new Schema({
-  _token: {
+  _userToken: {
     // Only for Club token
     type: Schema.Types.ObjectId,
-    ref: TokenModel,
+    ref: UserTokenModel,
   },
   symbol: { type: String, required: true },
-  amount: { type: String, required: true }, // Base unit, not wei, ex: 10 USDC
   finalized: { type: Boolean, default: false, index: true }, // airdrop share finalized
+  // base unit, not wei
+  amount: { type: String, required: true }, // only by admin
 })
 
 const settingSchema = new Schema({
-  data: { type: Object, default: { _: '' } }, // custom settings
+  data: { type: Object, default: { minFollowers: 100 } }, // custom settings
   type: { type: String, enum: ActivitySettingType, default: ActivitySettingType.None, index: true },
 })
 
 const nftSchema = new Schema({
-  chainId: { type: Number, required: true, index: true },
   nftId: { type: Number, required: true, index: true },
+  // base unit, not wei
+  totalAmount: String,
+  distributedAmount: String,
+  refundedAmount: String,
+  feeAmount: String,
 })
 
 export const schema = new Schema({
@@ -40,6 +45,7 @@ export const schema = new Schema({
     ref: UserModel,
     index: true,
   },
+  chainId: { type: Number, required: true, index: true },
   startTime: { type: Date, required: true, index: true },
   endTime: { type: Date, required: true, index: true },
   slug: { type: String, unique: true, index: true, default: '' },
@@ -47,7 +53,13 @@ export const schema = new Schema({
   description: { type: String, default: '' },
   activityType: { type: Number, enum: ActivityType, required: true },
   socialMedia: { type: String, enum: SocialMedia, required: true },
-  setting: { type: settingSchema, default: {} }, // custom settings
+  setting: {
+    type: settingSchema,
+    default: {
+      data: { minFollowers: 100 },
+      type: ActivitySettingType.None,
+    },
+  }, // custom settings
   details: { type: detailSchema, required: true },
   airdrop: { type: airdropSchema, required: true },
   nft: { type: nftSchema },
@@ -59,7 +71,7 @@ export type ActivityDetail = InferSchemaType<typeof detailSchema>
 export type ActivityAirdrop = InferSchemaType<typeof airdropSchema>
 export type ActivityData = Omit<Activity, '_user' | 'nft' | 'details' | 'airdrop'> & {
   details: Omit<ActivityDetail, 'participants' | 'totalScore'>
-  airdrop: Omit<ActivityAirdrop, '_token' | 'finalized'>
+  airdrop: Omit<ActivityAirdrop, '_userToken' | 'finalized'>
 }
 export type TActivity = Omit<Activity, 'startTime' | 'endTime'> & {
   _id: string

@@ -8,7 +8,7 @@ import type { ActivityData } from '@/models/activity'
 // body: { data, details }
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { id } = params
+    const { id } = await params
 
     await dbConnect()
 
@@ -34,7 +34,7 @@ function filterData(data: Partial<ActivityData>) {
     'nft',
     'details.participants',
     'details.totalScore',
-    'airdrop._token',
+    'airdrop._userToken',
     'airdrop.finalized',
   ])
 }

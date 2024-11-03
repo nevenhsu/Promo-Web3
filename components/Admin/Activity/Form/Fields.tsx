@@ -2,7 +2,7 @@
 
 import * as _ from 'lodash-es'
 import { useMemo, useEffect } from 'react'
-import { isBefore } from 'date-fns'
+import { isBefore, min } from 'date-fns'
 import { TextInput, NumberInput, Textarea, Select, Switch, Button, Space } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
 import { symbols } from '@/contracts/tokens'
@@ -39,13 +39,16 @@ export default function FormFields() {
 
   useEffect(() => {
     if (settingType === ActivitySettingType.None) {
-      form.setFieldValue('setting.data', {})
+      form.setFieldValue('setting.data', {
+        minFollowers: 100,
+      })
     }
     if (settingType === ActivitySettingType.A) {
       const amount = Number(form.values.airdrop.amount)
       form.setFieldValue('setting.data', {
         maxTotalScore: amount ? amount * 1000 : 0,
         maxSelfScore: 10000,
+        minFollowers: 100,
       })
     }
   }, [settingType])
@@ -188,6 +191,13 @@ export default function FormFields() {
           />
         </>
       ) : null}
+
+      <NumberInput
+        label="Min Followers"
+        min={0}
+        key={form.key('setting.data.minFollowers')}
+        {...form.getInputProps('setting.data.minFollowers')}
+      />
 
       <Space />
 

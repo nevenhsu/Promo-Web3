@@ -11,7 +11,7 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
     const token = await getToken({ req })
     const userId = token?.user?.id!
 
-    const { slug } = params
+    const { slug } = await params
 
     if (!slug) {
       return NextResponse.json({ error: 'Slug is required' }, { status: 400 })
@@ -38,7 +38,9 @@ export async function PUT(req: NextRequest, { params }: { params: { slug: string
     const userId = token?.user?.id!
 
     const { data } = await req.json()
-    const { slug } = params
+    const { slug } = await params
+
+    // TODO: add userToken
 
     await dbConnect()
     const doc = await getActivityBySlug(slug)

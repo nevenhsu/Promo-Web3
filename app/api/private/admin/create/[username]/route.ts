@@ -7,7 +7,7 @@ export async function POST(req: NextRequest, { params }: { params: { username: s
   try {
     await dbConnect()
 
-    const { username } = params
+    const { username } = await params
     const user = await getUserByUsername(username)
 
     if (!user) {

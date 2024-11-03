@@ -1,7 +1,7 @@
 import { models, model, Model, Schema } from 'mongoose'
 import { unifyAddress } from '@/wallet/utils/helper'
-import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
 import UserModel, { type User } from '@/models/user'
+import type { InferSchemaType, CallbackWithoutResultAndOptionalError } from 'mongoose'
 
 export const schema = new Schema({
   _user: {

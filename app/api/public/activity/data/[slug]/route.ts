@@ -5,7 +5,7 @@ import { getPublicActivityDetails } from '@/lib/db/activity'
 
 export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
   try {
-    const { slug } = params
+    const { slug } = await params
 
     if (!slug) {
       return NextResponse.json({ error: 'Slug is required' }, { status: 400 })

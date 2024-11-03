@@ -4,7 +4,7 @@ import { getUserByUsername } from '@/lib/db/user'
 
 export async function GET(req: NextRequest, { params }: { params: { username: string } }) {
   try {
-    const { username } = params
+    const { username } = await params
 
     await dbConnect()
 

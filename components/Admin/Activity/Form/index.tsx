@@ -7,6 +7,7 @@ import { isBefore } from 'date-fns'
 import { FormProvider, useForm } from './Context'
 import { formatZonedDate } from '@/utils/helper'
 import { ActivityType, SocialMedia, ActivitySettingType } from '@/types/db'
+import { defaultChain } from '@/wallet/variables'
 
 export type FormRef = {
   getForm: () => ReturnType<typeof useForm>
@@ -20,6 +21,7 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
   const form = useForm({
     mode: 'controlled',
     initialValues: {
+      chainId: defaultChain.id,
       title: '',
       slug: '',
       startTime: null,
@@ -36,6 +38,7 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
         fullLink: '',
         coverUrl: '',
         thumbnailUrl: '',
+        externalLink: '',
       },
       setting: {
         type: ActivitySettingType.None,
@@ -73,6 +76,11 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
       details: {
         link: value => (value ? null : 'Should not be empty'),
         fullLink: value => (value ? null : 'Should not be empty'),
+      },
+      setting: {
+        data: value => {
+          return Number(value?.minFollowers) <= 0 ? 'Should be greater than 0' : null
+        },
       },
     },
   })

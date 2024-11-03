@@ -4,7 +4,7 @@ import { deleteAdmin } from '@/lib/db/admin'
 
 export async function DELETE(req: NextRequest, { params }: { params: { userId: string } }) {
   try {
-    const { userId } = params
+    const { userId } = await params
 
     await dbConnect()
 

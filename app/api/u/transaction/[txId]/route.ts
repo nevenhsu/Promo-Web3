@@ -8,7 +8,7 @@ export async function GET(req: NextRequest, { params }: { params: { txId: string
     const token = await getToken({ req })
     const userId = token?.user?.id!
 
-    const { txId } = params
+    const { txId } = await params
 
     if (!txId) {
       return NextResponse.json({ error: 'TxId is required' }, { status: 400 })

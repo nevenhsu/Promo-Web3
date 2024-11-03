@@ -2,8 +2,9 @@
 
 import React, { createContext, useContext, useEffect } from 'react'
 import { useAsyncFn, useInterval, usePrevious } from 'react-use'
-import { getUserToken, updateUserToken, checkUserToken, mintToken } from '@/services/userTokens'
 import { notifications } from '@mantine/notifications'
+import { useLoginStatus } from '@/hooks/useLoginStatus'
+import { getUserToken, updateUserToken, checkUserToken, mintToken } from '@/services/userTokens'
 import type { TUserToken } from '@/models/userToken'
 import type { Token } from '@/models/token'
 import type { UserTokenData } from '@/services/userTokens'
@@ -19,6 +20,8 @@ interface UserTokenContextType {
 const UserTokenContext = createContext<UserTokenContextType | undefined>(undefined)
 
 export const UserTokenProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { bothAuth } = useLoginStatus() // Check if user is logged in
+
   const [state, fetchUserToken] = useAsyncFn(async () => {
     const data = await getUserToken()
     return data
@@ -64,8 +67,10 @@ export const UserTokenProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const error = state.error || updateState.error
 
   useEffect(() => {
-    fetchUserToken()
-  }, [])
+    if (bothAuth) {
+      fetchUserToken()
+    }
+  }, [bothAuth])
 
   // Show mint error
   useEffect(() => {
