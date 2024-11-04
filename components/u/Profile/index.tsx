@@ -9,7 +9,7 @@ import { Tabs, Avatar, Text, ThemeIcon, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import RwdModal from '@/components/share/RwdModal'
 import { PiCrownSimple, PiHandHeart, PiRocket, PiGlobe, PiArrowSquareOut } from 'react-icons/pi'
-import { PiCoinVertical, PiImageSquare } from 'react-icons/pi'
+import { PiCoinVertical, PiImageSquare, PiGearFill } from 'react-icons/pi'
 import { FaXTwitter, FaInstagram } from 'react-icons/fa6'
 import { LinkAccountPlatform } from '@/types/db'
 import type { TUser } from '@/models/user'
@@ -76,14 +76,14 @@ export default function UserProfile(props: UserProfileProps) {
           <Link href="/profile">
             <Button
               variant="outline"
-              size="compact-xs"
+              size="compact-sm"
               bg="white"
-              px="sm"
               style={{
                 position: 'absolute',
                 top: 8,
                 right: 16,
               }}
+              leftSection={<PiGearFill size={16} />}
             >
               Setting
             </Button>

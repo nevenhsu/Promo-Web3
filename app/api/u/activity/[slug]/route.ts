@@ -6,7 +6,7 @@ import { getActivityBySlug, updateActivity } from '@/lib/db/activity'
 import { parseData } from '@/lib/db/common'
 import type { ActivityData } from '@/types/activitySetting'
 
-export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const token = await getToken({ req })
     const userId = token?.user?.id!
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
 }
 
 // update own activity
-export async function PUT(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const token = await getToken({ req })
     const userId = token?.user?.id!

@@ -4,7 +4,7 @@ import dbConnect from '@/lib/dbConnect'
 import { filterUserData } from '@/lib/db/user'
 import { getRefererByCode } from '@/lib/db/referralCode'
 
-export async function GET(req: NextRequest, { params }: { params: { code: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   try {
     const { code } = await params
 

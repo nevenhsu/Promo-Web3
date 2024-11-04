@@ -7,7 +7,7 @@ import { getUserActivityStatus, updateUserActivityStatus } from '@/lib/db/userAc
 import { getActivityBySlug } from '@/lib/db/activity'
 import { ActivityStatus } from '@/types/db'
 
-export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const token = await getToken({ req })
     const userId = token?.user?.id!
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
 }
 
 // Set userActivityStatus to initial
-export async function PUT(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const token = await getToken({ req })
     const userId = token?.user?.id!
@@ -64,9 +64,11 @@ export async function PUT(req: NextRequest, { params }: { params: { slug: string
 
     // Update status to initial
     const status = await updateUserActivityStatus(userId, activityId, {
+      chainId: activity.chainId,
       status: ActivityStatus.Initial,
       socialMedia: activity.socialMedia,
     })
+
     return NextResponse.json({ status })
   } catch (error) {
     console.error(error)

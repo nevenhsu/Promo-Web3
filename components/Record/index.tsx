@@ -151,10 +151,10 @@ function ScoreItem({ data }: { data: TUserActivityStatusData }) {
 
 function AirdropItem({ data }: { data: TUserActivityStatusData }) {
   const { _activity, finalized } = data
-  const { airdrop, setting, details } = _activity
+  const { airdrop } = _activity
   const { airdropped, amount } = data.airdrop || {}
 
-  const { shareRatio, airdropAmount } = calculateShare(setting, details, airdrop, data)
+  const { shareRatio, airdropAmount } = calculateShare(_activity, data)
   const finalAmount = airdropped ? amount : airdropAmount.toFixed(6)
 
   return (

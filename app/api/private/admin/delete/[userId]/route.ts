@@ -2,7 +2,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 import dbConnect from '@/lib/dbConnect'
 import { deleteAdmin } from '@/lib/db/admin'
 
-export async function DELETE(req: NextRequest, { params }: { params: { userId: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
+) {
   try {
     const { userId } = await params
 

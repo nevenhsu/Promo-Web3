@@ -95,12 +95,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   const isTypeASetting = isTypeA(setting)
   const remainingScore = _.max([setting.data?.maxTotalScore - details.totalScore, 0]) || 0
 
-  const { shareRatio, airdropAmount, maxScore } = calculateShare(
-    setting,
-    details,
-    airdrop,
-    statusData
-  )
+  const { shareRatio, airdropAmount, maxScore } = calculateShare(data, statusData)
 
   // Login to join activity
   const { login } = useLogin({

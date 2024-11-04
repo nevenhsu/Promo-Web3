@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import dbConnect from '@/lib/dbConnect'
 import { updateAdmin } from '@/lib/db/admin'
 
-export async function PUT(req: NextRequest, { params }: { params: { userId: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   try {
     const { userId } = await params
     const data = await req.json()

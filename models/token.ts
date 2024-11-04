@@ -14,6 +14,7 @@ export const schema = new Schema({
   contractAddr: String,
   minted: { type: Boolean, default: false, index: true },
   createdAt: { type: Date, default: Date.now, index: true },
+  verified: { type: Boolean, default: false, index: true }, // for etherscan
 })
 
 export type Token = InferSchemaType<typeof schema> & { _id: string }

@@ -16,6 +16,7 @@ export async function updateUserActivityStatus(
   userId: string,
   activityId: string,
   data: {
+    chainId: number
     status: ActivityStatus
     socialMedia: string
   }
@@ -64,7 +65,6 @@ export async function getUserActivityStatuses(userId: string, options?: GetOptio
 }
 
 export async function getOngoingActivityStatuses(userId: string) {
-  // TODO: return each status for social platforms
   const data = await UserActivityStatusModel.find({
     _user: userId,
     finalized: { $in: [null, false] },

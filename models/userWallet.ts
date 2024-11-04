@@ -18,6 +18,7 @@ export const schema = new Schema({
 
 export type UserWallet = InferSchemaType<typeof schema> & { _id: string }
 export type TUserWallet = UserWallet & { _user: User }
+export type WalletData = Omit<UserWallet, '_id' | '_user'>
 
 // Middleware before saving
 schema.pre<UserWallet>('save', async function (next) {

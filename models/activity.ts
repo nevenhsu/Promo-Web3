@@ -32,6 +32,7 @@ const settingSchema = new Schema({
 
 const nftSchema = new Schema({
   nftId: { type: Number, required: true, index: true },
+  distributed: { type: Boolean, default: false, index: true },
   // base unit, not wei
   totalAmount: String,
   distributedAmount: String,

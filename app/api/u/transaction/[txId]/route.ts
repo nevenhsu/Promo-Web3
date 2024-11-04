@@ -3,7 +3,7 @@ import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { getUserTransaction } from '@/lib/db/transaction'
 
-export async function GET(req: NextRequest, { params }: { params: { txId: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ txId: string }> }) {
   try {
     const token = await getToken({ req })
     const userId = token?.user?.id!

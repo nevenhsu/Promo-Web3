@@ -29,6 +29,7 @@ export const schema = new Schema({
     required: true,
     index: true,
   },
+  chainId: { type: Number, required: true, index: true },
   socialMedia: { type: String, enum: SocialMedia, required: true, index: true }, // social media type for activity
   status: {
     type: Number,

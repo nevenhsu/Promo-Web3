@@ -5,7 +5,7 @@ export default function UserLayout({
   params,
 }: {
   children: React.ReactNode
-  params: { lang: string }
+  params: Promise<{ lang: string }>
 }) {
   return (
     <>

@@ -1,19 +1,20 @@
 import * as _ from 'lodash-es'
 import Decimal from 'decimal.js'
+import { calcAirdropAmount } from './activityAirdrop'
 import { isTypeA } from '@/types/activitySetting'
-import type { ActivityDetail, ActivityAirdrop } from '@/models/activity'
+import type { TPublicActivity, Activity } from '@/models/activity'
 
 export function calculateShare(
-  setting: { type?: any; data?: any },
-  details: ActivityDetail,
-  airdrop: ActivityAirdrop,
+  activity: TPublicActivity | Activity,
   userStatus?: { totalScore: number }
 ): {
   shareRatio: Decimal
   airdropAmount: Decimal
   maxScore: number
 } {
-  const { amount } = airdrop
+  const { details, setting } = activity
+
+  const amount = calcAirdropAmount(activity)
   const { totalScore } = details
   const { totalScore: userScore = 0 } = userStatus || {}
 

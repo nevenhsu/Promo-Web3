@@ -3,7 +3,10 @@ import dbConnect from '@/lib/dbConnect'
 import { createAdmin } from '@/lib/db/admin'
 import { getUserByUsername } from '@/lib/db/user'
 
-export async function POST(req: NextRequest, { params }: { params: { username: string } }) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ username: string }> }
+) {
   try {
     await dbConnect()
 

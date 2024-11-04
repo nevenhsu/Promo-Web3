@@ -6,7 +6,7 @@ import { updateActivity } from '@/lib/db/activity'
 import type { ActivityData } from '@/models/activity'
 
 // body: { data, details }
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
 

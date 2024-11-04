@@ -3,13 +3,14 @@ import { NextResponse, type NextRequest } from 'next/server'
 import dbConnect from '@/lib/dbConnect'
 import { updateEpoch, getEpoch } from '@/lib/db/epoch'
 
-export async function PUT(req: NextRequest, { params }: { params: { index: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ index: string }> }) {
   try {
-    const index = parseInt(params.index)
+    const { index } = await params
+    const i = parseInt(index)
 
     await dbConnect()
 
-    const epoch = await getEpoch(index)
+    const epoch = await getEpoch(i)
 
     if (epoch && isAfter(new Date(), epoch.endTime)) {
       return NextResponse.json({ error: 'You can not update the past epoch' }, { status: 400 })
@@ -17,7 +18,7 @@ export async function PUT(req: NextRequest, { params }: { params: { index: strin
 
     const data = await req.json()
 
-    const updated = await updateEpoch(index, data)
+    const updated = await updateEpoch(i, data)
 
     if (!updated) {
       return NextResponse.json({ error: 'Epoch not found' }, { status: 404 })

@@ -14,7 +14,7 @@ import IconButton from './IconButton'
 import { tokenManagers } from '@/contracts'
 import { useUserToken } from '@/store/contexts/app/userToken'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { cleanSymbol } from '@/utils/helper'
+import { cleanSymbol, cleanName } from '@/utils/helper'
 import { getNetwork, type NetworkInfo } from '@/wallet/utils/network'
 import { PiCheck } from 'react-icons/pi'
 
@@ -180,6 +180,13 @@ export default function TokenInfo() {
     }
   }, [symbol])
 
+  // Clean name
+  useEffect(() => {
+    if (name) {
+      form.setValues({ name: cleanName(name.trim()) })
+    }
+  }, [name])
+
   // Set form error
   useEffect(() => {
     const msg = error?.response?.data?.error
@@ -235,6 +242,9 @@ export default function TokenInfo() {
             <Stack>
               <TextInput
                 label="Name"
+                description={
+                  minted ? 'Name cannot be changed' : '3-12 characters (English letters or numbers)'
+                }
                 key={form.key('name')}
                 {...form.getInputProps('name')}
                 disabled={minted}
@@ -242,6 +252,9 @@ export default function TokenInfo() {
 
               <TextInput
                 label="Symbol"
+                description={
+                  minted ? 'Symbol cannot be changed' : '2-8 characters (English letters)'
+                }
                 key={form.key('symbol')}
                 {...form.getInputProps('symbol')}
                 disabled={minted}

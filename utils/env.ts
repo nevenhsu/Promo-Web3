@@ -33,6 +33,7 @@ export const publicEnv = {
   baseUrl: getBaseUrl(),
   defaultColorScheme: process.env.NEXT_PUBLIC_COLOR_SCHEME,
   chainTestnet: toBool(process.env.NEXT_PUBLIC_CHAIN_TESTNET),
+  activityFee: Number(process.env.NEXT_PUBLIC_ACTIVITY_FEE) / 10000,
   sanity: {
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,

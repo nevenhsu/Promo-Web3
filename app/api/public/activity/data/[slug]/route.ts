@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import dbConnect from '@/lib/dbConnect'
 import { getPublicActivityDetails } from '@/lib/db/activity'
 
-export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params
 

@@ -4,8 +4,8 @@ import type { PageMetadataQuery } from '@/sanity/types/page'
 import type { Metadata, ResolvingMetadata } from 'next'
 
 type Props = {
-  params: { lang: string; slug: string }
-  searchParams: { [key: string]: string | string[] | undefined }
+  params: Promise<{ lang: string; slug: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateMetadata(

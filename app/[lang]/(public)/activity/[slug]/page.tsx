@@ -17,7 +17,7 @@ const getTweet = unstable_cache(async (id: string) => _getTweet(id), ['tweet'], 
 export default async function ActivityDetailPage({
   params,
 }: {
-  params: { lang: string; slug: string }
+  params: Promise<{ lang: string; slug: string }>
 }) {
   const { slug: _slug } = await params
   const slug = decodeURIComponent(_slug)

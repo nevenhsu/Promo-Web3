@@ -9,7 +9,7 @@ export const revalidate = 3600 // revalidate at most every hour
 export default async function UserProfilePage({
   params,
 }: {
-  params: { lang: string; username: string }
+  params: Promise<{ lang: string; username: string }>
 }) {
   const { username } = await params
 

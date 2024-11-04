@@ -1,5 +1,6 @@
-import UserWalletModel, { type UserWallet } from '@/models/userWallet'
+import UserWalletModel from '@/models/userWallet'
 import { unifyAddress } from '@/wallet/utils/helper'
+import type { WalletData } from '@/models/userWallet'
 
 export async function getUserWallets(userId: string, supported = true) {
   const wallets = await UserWalletModel.find({ _user: userId, supported }).lean()
@@ -11,7 +12,7 @@ export async function getUserWallet(address: string, supported = true) {
   return wallet
 }
 
-export async function updateUserWallet(userId: string, values: Omit<UserWallet, '_user'>) {
+export async function updateUserWallet(userId: string, values: WalletData) {
   values.address = unifyAddress(values.address)
   const doc = await UserWalletModel.findOneAndUpdate(
     {

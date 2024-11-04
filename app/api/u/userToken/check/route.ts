@@ -4,6 +4,7 @@ import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { getExistingTokens } from '@/lib/db/userToken'
 import { banNames, banSymbols } from '@/contracts/variables'
+import { cleanSymbol, cleanName } from '@/utils/helper'
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,11 +12,11 @@ export async function GET(req: NextRequest) {
     const userId = jwt?.user?.id!
 
     const { searchParams } = new URL(req.url)
-    const name = searchParams.get('name')
-    const symbol = searchParams.get('symbol')
+    const name = cleanName(searchParams.get('name') || '')
+    const symbol = cleanSymbol(searchParams.get('symbol') || '')
 
     if (!name || !symbol) {
-      return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+      return NextResponse.json({ error: 'Name and symbol are required' }, { status: 400 })
     }
 
     // check if name or symbol is banned

@@ -6,7 +6,7 @@ import Page from '@/components/Page'
 export * from './metadata'
 
 type PageProps = {
-  params: { lang: string; slug: string }
+  params: Promise<{ lang: string; slug: string }>
 }
 
 export default async function PagePage({ params }: PageProps) {

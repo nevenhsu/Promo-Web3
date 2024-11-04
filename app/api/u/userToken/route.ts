@@ -5,6 +5,7 @@ import dbConnect from '@/lib/dbConnect'
 import { isImageURI, uploadImage } from '@/lib/gcp'
 import { getUserToken, updateUserToken, getExistingTokens } from '@/lib/db/userToken'
 import { getTokens } from '@/lib/db/token'
+import { cleanSymbol, cleanName } from '@/utils/helper'
 import { banNames, banSymbols } from '@/contracts/variables'
 
 export async function GET(req: NextRequest) {
@@ -26,8 +27,17 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const jwt = await getToken({ req })
+    const json = await req.json()
     const userId = jwt?.user?.id!
-    const { walletAddr, name, symbol, icon, iconURI } = await req.json()
+    const { walletAddr, icon, iconURI } = json
+
+    const name = cleanName(json.name || '')
+    const symbol = cleanSymbol(json.symbol || '')
+
+    // check if name or symbol is empty
+    if (!name || !symbol) {
+      return NextResponse.json({ error: 'Name and symbol are required' }, { status: 400 })
+    }
 
     const data = {
       name,

@@ -38,6 +38,7 @@ declare global {
       NEXT_PUBLIC_PRIVY_APP_ID: string
       NEXT_PUBLIC_GOOGLE_ANALYTICS: string
       NEXT_PUBLIC_CHAIN_TESTNET: 'true' | 'false'
+      NEXT_PUBLIC_ACTIVITY_FEE: string
 
       /// sanity
       NEXT_PUBLIC_SANITY_PROJECT_ID: string

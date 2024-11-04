@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import dbConnect from '@/lib/dbConnect'
 import { getUserByUsername } from '@/lib/db/user'
 
-export async function GET(req: NextRequest, { params }: { params: { username: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ username: string }> }) {
   try {
     const { username } = await params
 

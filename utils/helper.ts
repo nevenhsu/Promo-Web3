@@ -10,6 +10,10 @@ export function cleanup(val: string, toLowerCase = true) {
   return str.replace(/[^a-zA-Z0-9._-]/g, '')
 }
 
+export function cleanName(val: string) {
+  return val.replace(/[^a-zA-Z0-9 ]/g, '')
+}
+
 export function cleanSymbol(val: string) {
   // only keep A-Z
   return val.toUpperCase().replace(/[^A-Z]/g, '')
