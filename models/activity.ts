@@ -64,14 +64,14 @@ export const schema = new Schema({
   airdrop: { type: airdropSchema, required: true },
   nft: { type: nftSchema },
   published: { type: Boolean, default: false, index: true },
-  ended: { type: Boolean, default: false, index: true }, // for setting activity
+  ended: { type: Boolean, default: false, index: true }, // for settling activity
 })
 
 export type Activity = InferSchemaType<typeof schema>
 export type ActivityDetail = InferSchemaType<typeof detailSchema>
 export type ActivityAirdrop = InferSchemaType<typeof airdropSchema>
 export type ActivityNFT = InferSchemaType<typeof nftSchema>
-export type ActivityData = Omit<Activity, '_user' | 'nft' | 'details' | 'airdrop'> & {
+export type ActivityData = Omit<Activity, '_user' | 'nft' | 'details' | 'airdrop' | 'ended'> & {
   details: Omit<ActivityDetail, 'participants' | 'totalScore'>
   airdrop: Omit<ActivityAirdrop, '_userToken' | 'finalized'>
 }
