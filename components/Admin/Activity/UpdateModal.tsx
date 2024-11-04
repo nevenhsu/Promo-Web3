@@ -25,8 +25,9 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
     const form = formRef.current?.getForm()
 
     if (opened && selectedActivity && form) {
-      const { startTime, endTime, activityType, setting, ...rest } = selectedActivity
+      const { chainId, startTime, endTime, activityType, setting, ...rest } = selectedActivity
       form.setValues({
+        chainId: `${chainId}`,
         startTime: new Date(startTime),
         endTime: new Date(endTime),
         activityType: `${activityType}`,
@@ -76,13 +77,14 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
             <form
               onSubmit={formRef.current?.getForm().onSubmit(
                 values => {
-                  const { startTime, endTime, activityType } = values
+                  const { chainId, startTime, endTime, activityType } = values
                   if (startTime && endTime) {
                     handleSubmit({
                       ...values,
                       startTime,
                       endTime,
-                      activityType: parseInt(activityType),
+                      chainId: Number(chainId),
+                      activityType: Number(activityType),
                     })
                   }
                 },

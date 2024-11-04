@@ -58,12 +58,13 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
             <form
               onSubmit={formRef.current?.getForm().onSubmit(
                 values => {
-                  const { startTime, endTime, activityType, ...rest } = values
+                  const { chainId, startTime, endTime, activityType, ...rest } = values
                   if (startTime && endTime) {
                     handleSubmit({
                       ...rest,
                       startTime,
                       endTime,
+                      chainId: Number(chainId),
                       activityType: Number(activityType),
                     })
                   }

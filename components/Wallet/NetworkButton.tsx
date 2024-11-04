@@ -1,17 +1,33 @@
 'use client'
 
 import Image from 'next/image'
+import { useState } from 'react'
+import { useSession } from 'next-auth/react'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { Menu, Group, Button, Text } from '@mantine/core'
 import { getNetwork } from '@/wallet/utils/network'
 import { supportedChains } from '@/wallet/variables'
 
 export default function NetworkButton() {
+  const [opened, setOpened] = useState(false)
+
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.isAdmin
+
   const { chainId, switchChain } = useWeb3()
   const network = getNetwork(chainId)
 
+  if (!chainId) return null
+
   return (
-    <Menu shadow="md" width={200}>
+    <Menu
+      shadow="md"
+      width={200}
+      opened={opened}
+      onChange={opened => {
+        setOpened(isAdmin ? opened : false)
+      }}
+    >
       <Menu.Target>
         <Button
           pl={6}

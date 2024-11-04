@@ -8,6 +8,7 @@ import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { useGoBack } from '@/hooks/useGoBack'
 import { useClickLogin } from '@/hooks/useLogin'
 import { Group, Box, ActionIcon, Avatar, Button } from '@mantine/core'
+import NetworkButton from '@/components/Wallet/NetworkButton'
 import { PiCaretLeft } from 'react-icons/pi'
 import classes from './index.module.css'
 
@@ -23,7 +24,7 @@ export default function Header() {
   const { name, username, details } = data
 
   // for back button
-  const mobileBack = !matches && ['/refer'].includes(pathname)
+  const mobileBack = !matches && ['/refer', '/profile'].includes(pathname)
   const hasPreviousPage = pathname.split('/').length > 2 || mobileBack
   const showBack = canGoBack && hasPreviousPage
 
@@ -52,8 +53,15 @@ export default function Header() {
         </Group>
 
         <Group>
-          {bothAuth ? (
-            <Link href="/profile">
+          <NetworkButton />
+
+          {bothAuth && username ? (
+            <Link
+              href={{
+                pathname: '/u/[username]',
+                params: { username },
+              }}
+            >
               <Avatar src={details?.avatar} name={name || username} color="initials" />
             </Link>
           ) : null}

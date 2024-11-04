@@ -2,9 +2,10 @@
 
 import { useDisclosure } from '@mantine/hooks'
 import { useAppSelector } from '@/hooks/redux'
+import { useWeb3 } from '@/wallet/Web3Context'
 import { Link } from '@/i18n/routing'
 import { Space, Group, Stack, Box, AspectRatio, Paper } from '@mantine/core'
-import { Tabs, Avatar, Text, ThemeIcon } from '@mantine/core'
+import { Tabs, Avatar, Text, ThemeIcon, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import RwdModal from '@/components/share/RwdModal'
 import { PiCrownSimple, PiHandHeart, PiRocket, PiGlobe, PiArrowSquareOut } from 'react-icons/pi'
@@ -12,6 +13,8 @@ import { PiCoinVertical, PiImageSquare } from 'react-icons/pi'
 import { FaXTwitter, FaInstagram } from 'react-icons/fa6'
 import { LinkAccountPlatform } from '@/types/db'
 import type { TUser } from '@/models/user'
+import type { TUserToken } from '@/models/userToken'
+import type { Token } from '@/models/token'
 import classes from './index.module.css'
 
 enum Tab {
@@ -29,13 +32,27 @@ const ThemeAction = ThemeIcon.withProps({
   bg: 'rgba(255,255,255,0.1)',
 })
 
-export default function UserProfile({ data }: { data: TUser }) {
-  const [opened, { open, close }] = useDisclosure(false)
-  const { fetched, data: userState } = useAppSelector(state => state.user)
+type UserProfileProps = {
+  data: TUser
+  userToken: TUserToken | null
+  tokens: Token[]
+}
 
+export default function UserProfile(props: UserProfileProps) {
+  const { data, userToken, tokens } = props
+
+  // profile data
   const { name, username, details, linkedAccounts } = data
   const { bio, cover, avatar, link } = details || {}
-  const isSelf = fetched && userState?._id === data._id
+  const profileId = data._id
+
+  // auth data
+  const [opened, { open, close }] = useDisclosure(false)
+  const { fetched, data: userState } = useAppSelector(state => state.user)
+  const isSelf = fetched && userState?._id === profileId
+
+  const { chainId } = useWeb3()
+  const hasToken = Boolean(chainId) && tokens.some(token => token.chainId === chainId)
 
   // Get linked accounts
   const x = linkedAccounts?.find(account => account.platform === LinkAccountPlatform.X)
@@ -45,7 +62,7 @@ export default function UserProfile({ data }: { data: TUser }) {
 
   return (
     <>
-      <AspectRatio ratio={4 / 1}>
+      <AspectRatio pos="relative" ratio={4 / 1}>
         {cover ? (
           <img
             src={cover}
@@ -55,6 +72,23 @@ export default function UserProfile({ data }: { data: TUser }) {
         ) : (
           <Box bg="gray.1" />
         )}
+        {isSelf ? (
+          <Link href="/profile">
+            <Button
+              variant="outline"
+              size="compact-xs"
+              bg="white"
+              px="sm"
+              style={{
+                position: 'absolute',
+                top: 8,
+                right: 16,
+              }}
+            >
+              Setting
+            </Button>
+          </Link>
+        ) : null}
       </AspectRatio>
 
       <RwdLayout pt={0}>
@@ -96,48 +130,52 @@ export default function UserProfile({ data }: { data: TUser }) {
             </Text>
           </Stack>
 
-          <Paper p="sm" c="white" shadow="xs" bg="var(--mantine-primary-color-5)">
-            <Group className={classes.actions} grow>
-              <Link href="/profile/token">
-                <ThemeAction>
-                  <PiCoinVertical size={24} />
-                </ThemeAction>
-                <Text fz="sm">Token</Text>
-              </Link>
-              <Link href="/profile/nft">
-                <ThemeAction>
-                  <PiImageSquare size={24} />
-                </ThemeAction>
-                <Text fz="sm">NFT</Text>
-              </Link>
-              <Link href="/profile/activity">
-                <ThemeAction>
-                  <PiRocket size={24} />
-                </ThemeAction>
-                <Text fz="sm">Activity</Text>
-              </Link>
-              <Link href="/profile/donation">
-                <ThemeAction>
-                  <PiHandHeart size={24} />
-                </ThemeAction>
-                <Text fz="sm">Donation</Text>
-              </Link>
-            </Group>
-          </Paper>
+          {isSelf ? (
+            <Paper p="sm" c="white" shadow="xs" bg="var(--mantine-primary-color-5)">
+              <Group className={classes.actions} grow>
+                <Link href="/profile/token">
+                  <ThemeAction>
+                    <PiCoinVertical size={24} />
+                  </ThemeAction>
+                  <Text fz="sm">Token</Text>
+                </Link>
+                <Link href="/profile/nft">
+                  <ThemeAction>
+                    <PiImageSquare size={24} />
+                  </ThemeAction>
+                  <Text fz="sm">NFT</Text>
+                </Link>
+                <Link href="/profile/activity">
+                  <ThemeAction>
+                    <PiRocket size={24} />
+                  </ThemeAction>
+                  <Text fz="sm">Activity</Text>
+                </Link>
+                <Link href="/profile/donation">
+                  <ThemeAction>
+                    <PiHandHeart size={24} />
+                  </ThemeAction>
+                  <Text fz="sm">Donation</Text>
+                </Link>
+              </Group>
+            </Paper>
+          ) : null}
 
-          <Tabs defaultValue={Tab.Ranking}>
-            <Tabs.List grow>
-              <Tabs.Tab value={Tab.Ranking} leftSection={<PiCrownSimple size={16} />}>
-                Ranking
-              </Tabs.Tab>
-              <Tabs.Tab value={Tab.Activity} leftSection={<PiRocket size={16} />}>
-                Activity
-              </Tabs.Tab>
-              <Tabs.Tab value={Tab.Donate} leftSection={<PiHandHeart size={16} />}>
-                Donate
-              </Tabs.Tab>
-            </Tabs.List>
-          </Tabs>
+          {hasToken ? (
+            <Tabs defaultValue={Tab.Ranking}>
+              <Tabs.List grow>
+                <Tabs.Tab value={Tab.Ranking} leftSection={<PiCrownSimple size={16} />}>
+                  Ranking
+                </Tabs.Tab>
+                <Tabs.Tab value={Tab.Activity} leftSection={<PiRocket size={16} />}>
+                  Activity
+                </Tabs.Tab>
+                <Tabs.Tab value={Tab.Donate} leftSection={<PiHandHeart size={16} />}>
+                  Donate
+                </Tabs.Tab>
+              </Tabs.List>
+            </Tabs>
+          ) : null}
         </Stack>
       </RwdLayout>
 

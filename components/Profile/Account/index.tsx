@@ -1,5 +1,6 @@
 'use client'
 
+import * as _ from 'lodash-es'
 import { useState, useEffect, useMemo } from 'react'
 import { useAsyncFn } from 'react-use'
 import { usePrivy } from '@privy-io/react-auth'
@@ -38,8 +39,9 @@ export default function ProfileAccount() {
   // for modal
   const [opened, { open, close }] = useDisclosure(false)
   const [type, setType] = useState<AccountType>()
+
   // lock social accounts while ongoing
-  const showLocked = locked && type && [AccountType.X, AccountType.Instagram].includes(type)
+  const showLocked = locked && type && _.includes(statusData?.progress.ongoingSocial, type)
 
   const [unlinkState, unlink] = useAsyncFn(
     async (type: AccountType) => {
@@ -228,7 +230,7 @@ export default function ProfileAccount() {
         <Box c="dimmed">
           {showLocked ? (
             <>
-              <Text fz="xs">
+              <Text fz="sm">
                 You cannot unlink your account while there is an ongoing activity.
               </Text>
             </>

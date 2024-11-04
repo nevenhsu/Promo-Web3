@@ -4,7 +4,7 @@ import { createFormContext } from '@mantine/form'
 
 // Definition of form values is required
 export interface FormValues {
-  chainId: number
+  chainId: string // convert to number
   title: string
   slug: string
   startTime: null | Date

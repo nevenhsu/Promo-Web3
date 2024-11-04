@@ -1,16 +1,20 @@
 'use client'
 
+import { usePathname as _usePathname } from 'next/navigation'
 import { usePathname } from '@/i18n/routing'
 import { Link } from '@/i18n/routing'
+import { useAppSelector } from '@/hooks/redux'
 import { Group, Stack, Text, Button } from '@mantine/core'
 import { PiHouse, PiRocket, PiTrophy, PiCardholder } from 'react-icons/pi'
-import { PiUserCircle, PiRocketLaunch } from 'react-icons/pi'
+import { PiUserCircle, PiRocketLaunch, PiGear } from 'react-icons/pi'
 import classes from './index.module.css'
 
 const NavStack = Stack.withProps({ align: 'center', gap: 4 })
 
 export function MobileMenu() {
-  const currentIndex = useCurrentPage()
+  const { data } = useAppSelector(state => state.user)
+  const { username } = data
+  const currentIndex = useCurrentPage(username)
 
   const getProps = (index: number) => {
     const isCurrentPage = currentIndex === index
@@ -59,7 +63,10 @@ const NavButton = Button.withProps({
 })
 
 export function NavMenu() {
-  const currentIndex = useCurrentPage()
+  const { data } = useAppSelector(state => state.user)
+  const { username } = data
+
+  const currentIndex = useCurrentPage(username)
 
   const getProps = (index: number) => {
     const isCurrentPage = currentIndex === index
@@ -93,15 +100,24 @@ export function NavMenu() {
             Wallet
           </NavButton>
         </Link>
-        <Link href="/profile">
-          <NavButton
-            variant="transparent"
-            leftSection={<PiUserCircle size={18} />}
-            {...getProps(4)}
+
+        {username ? (
+          <Link
+            href={{
+              pathname: '/u/[username]',
+              params: { username },
+            }}
           >
-            Profile
-          </NavButton>
-        </Link>
+            <NavButton
+              variant="transparent"
+              leftSection={<PiUserCircle size={18} />}
+              {...getProps(4)}
+            >
+              Profile
+            </NavButton>
+          </Link>
+        ) : null}
+
         <Link href="/refer">
           <NavButton
             variant="transparent"
@@ -111,18 +127,26 @@ export function NavMenu() {
             Referral
           </NavButton>
         </Link>
+
+        <Link href="/profile">
+          <NavButton variant="transparent" leftSection={<PiGear size={18} />} {...getProps(6)}>
+            Setting
+          </NavButton>
+        </Link>
       </Stack>
     </>
   )
 }
 
-function useCurrentPage() {
+function useCurrentPage(username?: string) {
   const pathname = usePathname()
+  const _pathname = _usePathname()
   if (pathname.startsWith('/home')) return 0
   if (pathname.startsWith('/activity')) return 1
   if (pathname.startsWith('/record')) return 2
   if (pathname.startsWith('/wallet')) return 3
-  if (pathname.startsWith('/profile')) return 4
+  if (_pathname.includes(`/u/${username}`)) return 4
   if (pathname.startsWith('/refer')) return 5
+  if (pathname.startsWith('/profile')) return 6
   return -1
 }

@@ -21,7 +21,7 @@ export async function getUserById(_id: string) {
 }
 
 export async function getUserByUsername(username: string) {
-  const user = await UserModel.findOne({ username })
+  const user = await UserModel.findOne({ username }).lean()
 
   if (!user) {
     console.log('No user found with the specified username.')

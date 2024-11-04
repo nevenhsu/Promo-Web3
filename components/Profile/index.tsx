@@ -15,7 +15,7 @@ export default function Profile() {
   const { data: session } = useSession()
   const isAdmin = session?.user?.isAdmin
 
-  const { _id, fetched, data } = useAppSelector(state => state.user)
+  const { data } = useAppSelector(state => state.user)
   const { username, name, details } = data
 
   return (
@@ -23,7 +23,7 @@ export default function Profile() {
       <RwdLayout>
         <Stack>
           <Group justify="space-between" mb="md">
-            <Title order={3}>Profile </Title>
+            <Title order={3}>Setting </Title>
 
             {/* Hide from users */}
             {isAdmin ? (

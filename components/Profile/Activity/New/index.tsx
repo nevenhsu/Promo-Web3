@@ -9,9 +9,12 @@ import RwdLayout from '@/components/share/RwdLayout'
 import Form, { type FormRef } from '../Form'
 import CreateFields from '../Form/CreateFields'
 import { formatDate } from '@/utils/date'
+import { useWeb3 } from '@/wallet/Web3Context'
+import { defaultChain } from '@/wallet/variables'
 import type { ActivityData } from '@/models/activity'
 
 export default function ProfileActivityNew() {
+  const { chainId } = useWeb3()
   const formRef = useRef<FormRef>(null)
 
   const [opened, { open, close }] = useDisclosure(false)
@@ -75,6 +78,7 @@ export default function ProfileActivityNew() {
                       if (startTime && endTime) {
                         handleSubmit({
                           ...rest,
+                          chainId: chainId || defaultChain.id,
                           startTime,
                           endTime,
                           activityType: Number(activityType),

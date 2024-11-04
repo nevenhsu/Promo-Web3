@@ -12,6 +12,7 @@ import { PiCheckCircle, PiXCircle, PiPencil } from 'react-icons/pi'
 import { PiPauseFill, PiPlayFill, PiStopFill } from 'react-icons/pi'
 import { formatZonedDate } from '@/utils/helper'
 import { formatNumber } from '@/utils/math'
+import { getNetwork } from '@/wallet/utils/network'
 import classes from './index.module.css'
 
 export default function AdminEpoch() {
@@ -28,17 +29,20 @@ export default function AdminEpoch() {
           <ThemeIcon variant="white" color={o.published ? (ended ? 'black' : 'green') : 'red'}>
             {o.published ? (
               ended ? (
-                <PiStopFill size={20} />
+                <PiStopFill size={16} />
               ) : (
-                <PiPlayFill size={20} />
+                <PiPlayFill size={16} />
               )
             ) : (
-              <PiPauseFill size={20} />
+              <PiPauseFill size={16} />
             )}
           </ThemeIcon>
         </Table.Td>
         <Table.Td>
           <Text style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{o.title}</Text>
+          <Text fz={12} c="dimmed">
+            {getNetwork(o.chainId).name}
+          </Text>
         </Table.Td>
         <Table.Td>
           <Text>{`${formatNumber(o.airdrop.amount)} ${o.airdrop.symbol}`}</Text>

@@ -18,7 +18,8 @@ export async function GET(req: NextRequest) {
     const onGoingStatuses = await getOngoingActivityStatuses(userId)
     const ongoing = onGoingStatuses.length // count
     const total = finalized + ongoing
-    const progress = { total, finalized, ongoing }
+    const ongoingSocial = _.uniq(onGoingStatuses.map(o => o.socialMedia))
+    const progress = { total, finalized, ongoing, ongoingSocial }
 
     return NextResponse.json({ status, progress })
   } catch (error) {

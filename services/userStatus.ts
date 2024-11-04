@@ -7,6 +7,7 @@ export type TUserStatus = {
     total: number
     finalized: number
     ongoing: number
+    ongoingSocial: string[]
   }
 }
 

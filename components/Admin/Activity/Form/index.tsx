@@ -21,7 +21,7 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
   const form = useForm({
     mode: 'controlled',
     initialValues: {
-      chainId: defaultChain.id,
+      chainId: `${defaultChain.id}`,
       title: '',
       slug: '',
       startTime: null,

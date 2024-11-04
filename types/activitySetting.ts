@@ -1,5 +1,20 @@
 import { ActivitySettingType } from './db'
 
+export type ActivityData = {
+  title: string
+  description: string
+  details: {
+    externalLink: string
+  }
+  setting: {
+    data: {
+      maxTotalScore: number
+      minFollowers: number
+    }
+  }
+  published: boolean
+}
+
 export type ActivitySettingTypeNone = {
   type?: ActivitySettingType.None
   data?: {

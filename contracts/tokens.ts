@@ -76,7 +76,7 @@ export const tokens: { [id: string]: Erc20[] } = {
       decimal: 18,
       address: unifyAddress('0xfd39d0bC79F1bdf8E14604f5287F0f4216Db25BB'),
       version: '1',
-      icon: '/icons/sharx-token.svg',
+      icon: '/logo-orange.svg',
       abi: ERC20.abi,
     },
   ],
@@ -110,8 +110,8 @@ export function getTokenInfo(symbol: string) {
     case 'USDC':
       return { name: 'USD Coin', icon: '/icons/usdc-token.svg' }
     case 'SHX':
-      return { name: 'SharX', icon: '/icons/sharx-token.svg' }
+      return { name: 'SharX', icon: '/logo-orange.svg' }
     default:
-      return { name: '', icon: '/icons/token.svg' }
+      return { name: 'Not Found', icon: '/icons/token.svg' }
   }
 }

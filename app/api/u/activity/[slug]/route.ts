@@ -4,7 +4,7 @@ import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { getActivityBySlug, updateActivity } from '@/lib/db/activity'
 import { parseData } from '@/lib/db/common'
-import type { ActivityData } from '@/models/activity'
+import type { ActivityData } from '@/types/activitySetting'
 
 export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
   try {

@@ -7,7 +7,6 @@ import { Link } from '@/i18n/routing'
 import { useAppSelector } from '@/hooks/redux'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { Space, Group, Stack, Paper, Button, Text, Title, ThemeIcon } from '@mantine/core'
-import NetworkButton from '@/components/Wallet/NetworkButton'
 import RwdLayout from '@/components/share/RwdLayout'
 import Token from './Token'
 import { eth } from '@/contracts/tokens'
@@ -103,7 +102,9 @@ export default function Wallet() {
         <Space h={40} />
 
         <Group justify="space-between">
-          <NetworkButton />
+          <Text fz="xl" fw={500}>
+            Assets
+          </Text>
           <Button
             size="xs"
             variant="outline"

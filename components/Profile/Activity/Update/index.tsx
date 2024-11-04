@@ -8,7 +8,7 @@ import { Text, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import Form, { type FormRef } from '../Form'
 import UpdateFields from '../Form/UpdateFields'
-import type { ActivityData } from '@/models/activity'
+import type { ActivityData } from '@/types/activitySetting'
 
 export default function UpdateActivity({ slug }: { slug: string }) {
   const formRef = useRef<FormRef>(null)
@@ -39,15 +39,7 @@ export default function UpdateActivity({ slug }: { slug: string }) {
             <form
               onSubmit={formRef.current?.getForm().onSubmit(
                 values => {
-                  const { startTime, endTime, activityType, ...rest } = values
-                  if (startTime && endTime) {
-                    // handleSubmit({
-                    //   ...rest,
-                    //   startTime,
-                    //   endTime,
-                    //   activityType: Number(activityType),
-                    // })
-                  }
+                  const { title, description, details, setting, published } = values
                 },
                 (validationErrors, values, event) => {
                   console.log(

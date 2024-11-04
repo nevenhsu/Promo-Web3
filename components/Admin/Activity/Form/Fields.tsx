@@ -2,13 +2,14 @@
 
 import * as _ from 'lodash-es'
 import { useMemo, useEffect } from 'react'
-import { isBefore, min } from 'date-fns'
+import { isBefore } from 'date-fns'
 import { TextInput, NumberInput, Textarea, Select, Switch, Button, Space } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
 import { symbols } from '@/contracts/tokens'
 import { useFormContext } from './Context'
 import { ActivityType, SocialMedia, ActivitySettingType } from '@/types/db'
 import { createSlug } from '../variables'
+import { supportedChains } from '@/wallet/variables'
 import { isTypeA } from '@/types/activitySetting'
 
 export default function FormFields() {
@@ -55,6 +56,15 @@ export default function FormFields() {
 
   return (
     <>
+      <Select
+        label="Chain"
+        placeholder="Pick one"
+        withCheckIcon={false}
+        data={supportedChains.map(o => ({ value: `${o.id}`, label: o.name }))}
+        key={form.key('chainId')}
+        {...form.getInputProps('chainId')}
+      />
+
       <DateTimePicker
         valueFormat="DD MMM YYYY hh:mm A"
         label="Start Time"

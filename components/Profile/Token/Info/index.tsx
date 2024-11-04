@@ -5,8 +5,9 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Link } from '@/i18n/routing'
 import { useDisclosure } from '@mantine/hooks'
-import { Title, Stack, Space, Paper, Group, Divider } from '@mantine/core'
-import { Text, Button, TextInput, Box, Modal, Badge, Progress } from '@mantine/core'
+import { modals } from '@mantine/modals'
+import { Title, Stack, Space, Paper, Group, Divider, Box, Modal } from '@mantine/core'
+import { Text, Button, TextInput, Badge, Progress, ActionIcon } from '@mantine/core'
 import { useForm, hasLength } from '@mantine/form'
 import RwdLayout from '@/components/share/RwdLayout'
 import IconButton from './IconButton'
@@ -15,6 +16,7 @@ import { useUserToken } from '@/store/contexts/app/userToken'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { cleanSymbol } from '@/utils/helper'
 import { getNetwork, type NetworkInfo } from '@/wallet/utils/network'
+import { PiCheck } from 'react-icons/pi'
 
 export default function TokenInfo() {
   const networkRef = useRef(0)
@@ -71,6 +73,25 @@ export default function TokenInfo() {
 
   const errorMsg = alreadyUpdated ? '' : iconError
 
+  const openModal = (networkName: string) => {
+    modals.open({
+      title: (
+        <Text fz="lg" fw={500}>
+          Congrats! 🎉
+        </Text>
+      ),
+      children: (
+        <Stack gap="xl">
+          <Text fz="sm" c="dimmed">
+            Start to create campaigns and airdrop tokens for your community
+          </Text>
+
+          <Button onClick={() => modals.closeAll()}>Close</Button>
+        </Stack>
+      ),
+    })
+  }
+
   const renderNetwork = (network: NetworkInfo) => {
     const token = _.find(tokens, { chainId: network.chainId })
     const { minted } = token || {}
@@ -99,16 +120,28 @@ export default function TokenInfo() {
             </Stack>
           </Group>
           {loading ? null : (
-            <Button
-              size="sm"
-              onClick={() => {
-                networkRef.current = network.chainId || 0
-                open()
-              }}
-              disabled={!valid || updated}
-            >
-              {updated ? 'Minted' : 'Mint'}
-            </Button>
+            <>
+              {minted ? (
+                <ActionIcon
+                  variant="transparent"
+                  color="green"
+                  onClick={() => openModal(network.name)}
+                >
+                  <PiCheck size={24} />
+                </ActionIcon>
+              ) : (
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    networkRef.current = network.chainId || 0
+                    open()
+                  }}
+                  disabled={!valid}
+                >
+                  Mint
+                </Button>
+              )}
+            </>
           )}
         </Group>
 

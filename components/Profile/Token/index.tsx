@@ -52,7 +52,7 @@ export default function Token() {
               </ThemeIcon>
               <Box>
                 <Title order={4} fw={500}>
-                  Reward participants
+                  Reward community
                 </Title>
                 <Text size="sm" c="dimmed">
                   Airdrop tokens to participants joining your activities
