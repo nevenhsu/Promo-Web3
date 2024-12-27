@@ -18,14 +18,14 @@ export type Manager = {
 export const tokenManagers: { [id: string]: Manager } = {
   [arbitrumSepolia.id]: {
     chainId: arbitrumSepolia.id,
-    address: '0x1431061a22a96E407bA64558dc3751cce1093711',
+    address: '0xd8f490482caeb6fa7c8acd12e5b1ca556167c643',
   },
 }
 
 export const activityManagers: { [id: string]: Manager } = {
   [arbitrumSepolia.id]: {
     chainId: arbitrumSepolia.id,
-    address: '0x1431061a22a96E407bA64558dc3751cce1093711',
+    address: '0x811ae1947816113aa6c47df69a1db9efc242251e',
   },
 }
 

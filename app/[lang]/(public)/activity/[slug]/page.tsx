@@ -8,10 +8,10 @@ import dbConnect from '@/lib/dbConnect'
 import { getPublicActivity } from '@/lib/db/activity'
 import { SocialMedia } from '@/types/db'
 
-export const revalidate = 3600 // revalidate at most every hour
+// TODO: check the cache behavior in next 15
 
 const getTweet = unstable_cache(async (id: string) => _getTweet(id), ['tweet'], {
-  revalidate,
+  revalidate: 3600,
 })
 
 export default async function ActivityDetailPage({

@@ -50,7 +50,7 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   // Current wallet value
   const walletClient = !loading
     ? onSmartAccount
-      ? smartAccountValues.withSponsor?.walletClient
+      ? smartAccountValues.kernel?.walletClient
       : walletValues.walletClient
     : undefined
   const walletAddress = walletClient?.account?.address

@@ -4,8 +4,6 @@ import { getUserByUsername } from '@/lib/db/user'
 import { getUserToken } from '@/lib/db/userToken'
 import { getTokens } from '@/lib/db/token'
 
-export const revalidate = 3600 // revalidate at most every hour
-
 export default async function UserProfilePage({
   params,
 }: {

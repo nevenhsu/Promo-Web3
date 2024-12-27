@@ -1,4 +1,3 @@
-import { ENTRYPOINT_ADDRESS_V07, bundlerActions } from 'permissionless'
 import { encodeFunctionData } from 'viem'
 import { getPublicClient } from '@/wallet/lib/publicClients'
 import { wait } from '@/wallet/utils/helper'
@@ -7,7 +6,7 @@ import type { SimulateContractParameters, SendTransactionParameters } from 'viem
 import type { KernelClient, WalletClient } from '@/types/wallet'
 
 type Data = { to: Hash; value: bigint; data: Hash }
-export type CalldataArgs = Data | Data[]
+export type CalldataArgs = Data[]
 export type Calldata = SendTransactionParameters<Chain, Account> & Data
 
 export async function simulateTx(
@@ -57,9 +56,9 @@ export async function getReceipt(chainId: number, hash: Hash, retry = 5) {
 }
 
 export async function sendUserOp(client: KernelClient, data: CalldataArgs) {
-  const callData = await client.account.encodeCallData(data)
+  const callData = await client.account.encodeCalls(data)
   const userOpHash = await client.sendUserOperation({
-    userOperation: { callData },
+    callData,
   })
 
   const wait = getOpReceipt(client, userOpHash)
@@ -68,10 +67,7 @@ export async function sendUserOp(client: KernelClient, data: CalldataArgs) {
 
 // View UserOp: https://jiffyscan.xyz/
 async function getOpReceipt(client: KernelClient, userOpHash: Hash) {
-  const bundlerClient = client.extend(bundlerActions(ENTRYPOINT_ADDRESS_V07))
-  const result = await bundlerClient.waitForUserOperationReceipt({
-    hash: userOpHash,
-  })
+  const result = await client.waitForUserOperationReceipt({ hash: userOpHash })
 
   const { success, reason, receipt, sender } = result
   const { transactionHash } = receipt

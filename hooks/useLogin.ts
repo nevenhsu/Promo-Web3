@@ -48,7 +48,7 @@ export function useClickLogin() {
   const { login } = useLogin({
     onComplete: (user, isNewUser, wasAlreadyAuthenticated) => {
       // If the user is new and has a promo code, redirect to the referral code page
-      if (isNewUser && promo) {
+      if (isNewUser) {
         promo ? setNextPage('/refer/code') : setNextPage('/activity')
         return
       }

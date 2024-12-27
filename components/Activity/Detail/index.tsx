@@ -100,13 +100,13 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   // Login to join activity
   const { login } = useLogin({
     onComplete: (user, isNewUser, wasAlreadyAuthenticated) => {
-      // If the user was already authenticated, do nothing
-      if (wasAlreadyAuthenticated) return
-
       // If the user is new and has a promo code, redirect to the referral code page
       if (isNewUser && promo) {
-        // @ts-ignore
-        router.push(`/refer/code?callbackUrl=/activity/${slug}`)
+        //TODO: check function
+        router.push({
+          pathname: '/refer/code',
+          query: { callbackUrl: `/activity/${slug}` },
+        })
         return
       }
     },

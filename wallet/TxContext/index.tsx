@@ -89,7 +89,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     callback?: TxCallback
   ) => {
     try {
-      const client = onSmartAccount ? smartAccountValues.withSponsor?.kernelClient : walletClient
+      const client = onSmartAccount ? smartAccountValues.kernel?.kernelClient : walletClient
       const chainId = client?.chain.id
       if (!chainId || !client) {
         throw new Error('Wallet not found')
@@ -107,7 +107,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   const sendTx = async (timestamp: number, data: Calldata, callback?: TxCallback) => {
     try {
-      const client = onSmartAccount ? smartAccountValues.withSponsor?.kernelClient : walletClient
+      const client = onSmartAccount ? smartAccountValues.kernel?.kernelClient : walletClient
       const chainId = client?.chain.id
       if (!chainId || !client) {
         throw new Error('Wallet not found')
@@ -150,7 +150,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
     if (isKernelClient(client)) {
       // Send transaction by smart account
-      const { userOpHash, wait } = await sendTxBySmartAccount(client, calldata)
+      const { userOpHash, wait } = await sendTxBySmartAccount(client, [calldata])
       opHash = userOpHash // for callback
       const result = await wait
       hash = result.transactionHash

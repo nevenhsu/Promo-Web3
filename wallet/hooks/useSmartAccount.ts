@@ -1,27 +1,27 @@
 'use client'
 
+// Get current wallet values from Web3Context
+// instead of using this hook directly
+
 import { useState, useEffect } from 'react'
 import { useWallets } from '@privy-io/react-auth'
-import { providerToSmartAccountSigner, ENTRYPOINT_ADDRESS_V07 } from 'permissionless'
 import {
-  createZeroDevPaymasterClient,
   createKernelAccount,
   createKernelAccountClient,
+  createZeroDevPaymasterClient,
+  getUserOperationGasPrice,
 } from '@zerodev/sdk'
 import { signerToEcdsaValidator } from '@zerodev/ecdsa-validator'
 import { KernelEIP1193Provider } from '@zerodev/sdk/providers'
-import { KERNEL_V3_1 } from '@zerodev/sdk/constants'
+import { KERNEL_V3_1, getEntryPoint } from '@zerodev/sdk/constants'
 import { http } from 'viem'
-import { getZeroDev, type ZeroDev } from '@/wallet/lib/zeroDev'
+import { getZeroDev } from '@/wallet/lib/zeroDev'
 import { getPublicClient } from '@/wallet/lib/publicClients'
 import { getWalletClient } from '@/wallet/lib/getWalletClient'
 import { toChainId } from '@/wallet/utils/network'
 import type { ConnectedWallet } from '@privy-io/react-auth'
-import type { Hash, Chain, EIP1193Provider } from 'viem'
-import type { KernelAccount, KernelProvider, KernelClient, WalletClient } from '@/types/wallet'
-
-// Get current wallet values from Web3Context
-// instead of using this hook directly
+import type { Hash, EIP1193Provider } from 'viem'
+import type { KernelProvider, KernelClient, WalletClient } from '@/types/wallet'
 
 export type Kernel = {
   provider: KernelProvider
@@ -29,6 +29,7 @@ export type Kernel = {
   walletClient: WalletClient
 }
 
+const entryPoint = getEntryPoint('0.7')
 const kernelVersion = KERNEL_V3_1
 
 export function useSmartAccount() {
@@ -37,20 +38,16 @@ export function useSmartAccount() {
   const chainId = toChainId(wallet?.chainId)
 
   // Smart account values
-  const [smartAccount, setSmartAccount] = useState<KernelAccount>()
   const [smartAccountAddress, setSmartAccountAddress] = useState<Hash>()
-  const [withSponsor, setWithSponsor] = useState<Kernel>()
-  const [noSponsor, setNoSponsor] = useState<Kernel>()
+  const [kernel, setKernel] = useState<Kernel>()
   const [loading, setLoading] = useState(true)
 
   const setupSmartAccount = async (privyWallet: ConnectedWallet, chainId: number) => {
     try {
       setLoading(true)
       // Reset smart account values
-      setSmartAccount(undefined)
       setSmartAccountAddress(undefined)
-      setWithSponsor(undefined)
-      setNoSponsor(undefined)
+      setKernel(undefined)
 
       const res = await getAccountClient(privyWallet, chainId)
 
@@ -60,11 +57,13 @@ export function useSmartAccount() {
 
       console.log('Smart account:', res.smartAccountAddress)
 
-      const { smartAccount, smartAccountAddress, withSponsor, noSponsor } = res
-      setSmartAccount(smartAccount)
+      const { smartAccountAddress } = res
       setSmartAccountAddress(smartAccountAddress)
-      setWithSponsor(withSponsor)
-      setNoSponsor(noSponsor)
+      setKernel({
+        provider: res.kernelProvider,
+        walletClient: res.walletClient,
+        kernelClient: res.kernelClient,
+      })
     } catch (err) {
       console.error(err)
     } finally {
@@ -80,10 +79,8 @@ export function useSmartAccount() {
   }, [wallet, chainId])
 
   return {
-    smartAccount,
     smartAccountAddress,
-    withSponsor,
-    noSponsor,
+    kernel,
     loading,
   }
 }
@@ -98,83 +95,61 @@ async function getAccountClient(wallet: ConnectedWallet, chainId: number | undef
   // Get the EIP1193 provider from Privy
   const provider = (await wallet.getEthereumProvider()) as EIP1193Provider
 
-  // Use the EIP1193 `provider` from Privy to create a `SmartAccountSigner`
-  const smartAccountSigner = await providerToSmartAccountSigner(provider)
-
   // Initialize a viem public client on your app's desired network
   const { chain } = publicClient
 
   // Create a ZeroDev ECDSA validator from the `smartAccountSigner` from above and your `publicClient`
   const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
-    signer: smartAccountSigner,
-    entryPoint: ENTRYPOINT_ADDRESS_V07,
+    signer: provider,
+    entryPoint,
     kernelVersion,
   })
 
   // Create a Kernel account from the ECDSA validator
-  const smartAccount = (await createKernelAccount(publicClient, {
+  const account = await createKernelAccount(publicClient, {
     plugins: {
       sudo: ecdsaValidator,
     },
-    entryPoint: ENTRYPOINT_ADDRESS_V07,
+    entryPoint,
     kernelVersion,
-  })) as KernelAccount
+  })
 
-  // Create a Kernel account client to send user operations from the smart account
-  const smartAccountAddress = smartAccount.address
-  // kernel client
-  const withSponsor = createAccountClient(smartAccount, chain, zeroDev, true)
-  const noSponsor = createAccountClient(smartAccount, chain, zeroDev, false)
+  const zerodevPaymaster = createZeroDevPaymasterClient({
+    chain,
+    transport: http(zeroDev.paymasterRpc),
+  })
 
-  // provider
-  const providerWithSponsor = new KernelEIP1193Provider(withSponsor as any)
-  const providerNoSponsor = new KernelEIP1193Provider(noSponsor as any)
-
-  // wallet client
-  const walletClientWithSponsor = getWalletClient(chainId, providerWithSponsor, smartAccountAddress)
-  const walletClientNoSponsor = getWalletClient(chainId, providerNoSponsor, smartAccountAddress)
-
-  return {
-    smartAccount,
-    smartAccountAddress,
-    withSponsor: {
-      provider: providerWithSponsor,
-      kernelClient: withSponsor,
-      walletClient: walletClientWithSponsor,
-    },
-    noSponsor: {
-      provider: providerNoSponsor,
-      kernelClient: noSponsor,
-      walletClient: walletClientNoSponsor,
-    },
-  }
-}
-
-function createAccountClient(
-  account: KernelAccount,
-  chain: Chain,
-  zeroDev: ZeroDev,
-  withSponsorship: boolean
-) {
-  return createKernelAccountClient({
+  // Construct a Kernel account client
+  const kernelClient = createKernelAccountClient({
     account,
     chain,
-    entryPoint: ENTRYPOINT_ADDRESS_V07,
     bundlerTransport: http(zeroDev.bundlerRpc),
-    middleware: withSponsorship
-      ? {
-          sponsorUserOperation: async ({ userOperation }) => {
-            const zerodevPaymaster = createZeroDevPaymasterClient({
-              chain,
-              entryPoint: ENTRYPOINT_ADDRESS_V07,
-              transport: http(zeroDev.paymasterRpc),
-            })
-            return zerodevPaymaster.sponsorUserOperation({
-              userOperation,
-              entryPoint: ENTRYPOINT_ADDRESS_V07,
-            })
-          },
-        }
-      : undefined,
+    // Required - the public client
+    client: publicClient,
+    paymaster: {
+      getPaymasterData(userOperation) {
+        return zerodevPaymaster.sponsorUserOperation({ userOperation })
+      },
+    },
+
+    // Required - the default gas prices might be too high
+    userOperation: {
+      estimateFeesPerGas: async ({ bundlerClient }) => {
+        return getUserOperationGasPrice(bundlerClient)
+      },
+    },
   })
+
+  const smartAccountAddress = kernelClient.account.address
+
+  const kernelProvider = new KernelEIP1193Provider(kernelClient)
+
+  const walletClient = getWalletClient(chainId, kernelProvider, smartAccountAddress)
+
+  return {
+    smartAccountAddress,
+    kernelProvider,
+    kernelClient,
+    walletClient,
+  }
 }
