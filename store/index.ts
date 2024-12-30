@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { persistStore, persistReducer } from 'redux-persist'
 import { userReducer } from './slices/user'
+import { walletReducer } from './slices/wallet'
 import { userActivityStatusReducer } from './slices/userActivityStatus'
 import storage from './customStorage'
 import { logger } from './logger'
@@ -19,9 +20,16 @@ const userActivityStatusPersistConfig = {
   blacklist: ['fetched', 'loading'],
 }
 
+const walletReducerConfig = {
+  key: 'wallet',
+  storage,
+  version: 1,
+}
+
 const rootReducer = combineReducers({
   user: persistReducer(userPersistConfig, userReducer),
   userActivityStatus: persistReducer(userActivityStatusPersistConfig, userActivityStatusReducer),
+  wallet: persistReducer(walletReducerConfig, walletReducer),
 })
 
 const store = configureStore({

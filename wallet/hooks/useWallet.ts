@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useWallets } from '@privy-io/react-auth'
 import { getWalletClient } from '@/wallet/lib/getWalletClient'
 import { toChainId } from '@/wallet/utils/network'
+import { useAppSelector, useAppDispatch } from '@/hooks/redux'
+import { setWalletLoading } from '@/store/slices/wallet'
 import type { Hash } from 'viem'
 import type { ConnectedWallet } from '@privy-io/react-auth'
 import type { WalletClient } from '@/types/wallet'
@@ -12,33 +14,27 @@ import type { WalletClient } from '@/types/wallet'
 // instead of using this hook directly
 
 export function useWallet() {
+  const dispatch = useAppDispatch()
+
+  const { walletClientType } = useAppSelector(state => state.wallet)
   const { wallets } = useWallets()
-  const [walletClientType, _setWalletClientType] = useState('privy')
   const [walletClient, setWalletClient] = useState<WalletClient>()
-  const [loading, setLoading] = useState(true)
 
   // Find the wallet by the walletClientType
   const wallet = wallets.find(wallet => wallet.walletClientType === walletClientType)
   const chainId = toChainId(wallet?.chainId)
-  const walletClientTypes = wallets.map(wallet => wallet.walletClientType)
   const walletAddress: Hash | undefined = wallet?.address as any
-
-  const setWalletClientType = (type: string) => {
-    if (walletClientTypes.includes(type)) {
-      _setWalletClientType(type)
-    }
-  }
 
   const setupWalletClient = async (wallet: ConnectedWallet, chainId: number) => {
     try {
-      setLoading(true)
+      dispatch(setWalletLoading(true))
       const provider = await wallet.getEthereumProvider()
       setWalletClient(getWalletClient(chainId, provider, walletAddress!))
     } catch (err) {
       console.error(err)
       setWalletClient(undefined)
     } finally {
-      setLoading(false)
+      dispatch(setWalletLoading(false))
     }
   }
 
@@ -51,11 +47,6 @@ export function useWallet() {
 
   return {
     wallet,
-    walletAddress,
     walletClient,
-    walletClientType,
-    walletClientTypes,
-    loading,
-    setWalletClientType,
   }
 }

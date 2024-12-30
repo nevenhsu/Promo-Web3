@@ -1,18 +1,18 @@
 'use client'
 
-import Image from 'next/image'
-import { AspectRatio, Paper, Stack, Group, Box, Title, Text, Space } from '@mantine/core'
+import * as _ from 'lodash-es'
+import { AspectRatio, Paper, Stack, Group, Title, Text, Space } from '@mantine/core'
 import { CopyButton, Button, Pill } from '@mantine/core'
 import { modals } from '@mantine/modals'
 import QRCode from 'react-qr-code'
 import RwdLayout from '@/components/share/RwdLayout'
+import { useAppSelector } from '@/hooks/redux'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { getNetwork } from '@/wallet/utils/network'
 import classes from './index.module.css'
 
 export default function Receive() {
-  const { chainId, onSmartAccount, walletAddress = '' } = useWeb3()
-  const network = getNetwork(chainId)
+  const { walletClientType } = useAppSelector(state => state.wallet)
+  const { walletAddress = '' } = useWeb3()
 
   return (
     <>
@@ -20,35 +20,18 @@ export default function Receive() {
         <Stack gap="xl">
           <Title order={3}>Receive</Title>
 
-          <Stack>
-            {/* Network */}
-            <Paper p="md" shadow="xs" radius="sm">
-              <Group>
-                <Image src={network.icon} width={40} height={40} alt={network.name} />
-                <Stack gap={4}>
-                  <Text fz="lg" fw={500} lh={1}>
-                    {network.name}
-                  </Text>
-                  <Text fz="xs" c="dimmed" lh={1}>
-                    {network.subtitle}
-                  </Text>
-                </Stack>
-              </Group>
-            </Paper>
-          </Stack>
-
           <Paper p="md" shadow="xs" radius="sm">
             <Stack>
               <Group justify="space-between">
                 <Text fz="lg" fw={500} lh={1}>
                   My wallet
                 </Text>
-                <Pill>{onSmartAccount ? 'Smart wallet' : 'Embedded wallet'}</Pill>
+                <Pill>{_.upperFirst(walletClientType)}</Pill>
               </Group>
 
               <Text
                 fz="sm"
-                w={200}
+                w={240}
                 style={{
                   wordWrap: 'break-word',
                 }}
@@ -62,7 +45,7 @@ export default function Receive() {
                   variant="outline"
                   onClick={() =>
                     modals.open({
-                      title: onSmartAccount ? 'Smart wallet' : 'Embedded wallet',
+                      title: 'QR Code',
                       children: (
                         <>
                           <AspectRatio className={classes.qrcode} ratio={1}>

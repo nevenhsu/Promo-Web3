@@ -15,7 +15,6 @@ import { ThemeIcon, Modal, FocusTrap } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { getTokens, isErc20, isETH, eth, type Token } from '@/contracts/tokens'
 import { formatBalance, formatAmount } from '@/utils/math'
-import { getNetwork } from '@/wallet/utils/network'
 import { TxStatus, TxType } from '@/types/db'
 import { PiArrowDown } from 'react-icons/pi'
 import { isAddressEqual, isAddress } from '@/wallet/utils/helper'
@@ -32,11 +31,12 @@ export default function Send() {
   const router = useRouter()
 
   const [opened, { open, close }] = useDisclosure(false)
-  const [txTimestamp, setTxTimestamp] = useState(0)
-  const { chainId, walletAddress, balancesValues, pricesValues, onSmartAccount } = useWeb3()
+  const { chainId, walletAddress, balancesValues, pricesValues } = useWeb3()
   const { balances, updateBalances } = balancesValues
   const { prices } = pricesValues
   const { txs, addTx } = useTx()
+
+  const [txTimestamp, setTxTimestamp] = useState(0)
 
   const tx = useMemo(() => {
     return txTimestamp ? _.find(txs, { timestamp: txTimestamp }) : undefined
@@ -44,7 +44,6 @@ export default function Send() {
 
   // Get tokens and network info
   const tokens = useMemo(() => [eth, ...getTokens(chainId)], [chainId])
-  const network = useMemo(() => getNetwork(chainId), [chainId])
 
   const form = useForm<FormData>({
     mode: 'controlled',
@@ -234,26 +233,11 @@ export default function Send() {
 
             <FocusTrap active>
               <Stack>
-                {/* Network */}
-                <Paper p="md" shadow="xs" radius="sm">
-                  <Group>
-                    <Image src={network.icon} width={32} height={32} alt={network.name} />
-                    <Stack gap={4}>
-                      <Title order={4} fw={500} lh={1}>
-                        {network.name}
-                      </Title>
-                      <Text fz="xs" c="dimmed" lh={1}>
-                        {network.subtitle}
-                      </Text>
-                    </Stack>
-                  </Group>
-                </Paper>
-
                 {/* Address */}
                 <Stack pos="relative" gap={4}>
                   <Paper p="md" radius="sm" h={96}>
                     <Text fz="sm" fw={500} mb="xs">
-                      {onSmartAccount ? 'My smart wallet' : 'My embedded wallet'}
+                      My wallet
                     </Text>
                     <Text className="nowrap" fz="sm">
                       {walletAddress || 'No wallet address'}
@@ -273,7 +257,7 @@ export default function Send() {
                   <Paper p="md" radius="sm" h={96}>
                     <Group justify="space-between">
                       <Text fz="sm" fw={500}>
-                        Transfer Address
+                        Transfer to
                       </Text>
                       <Button size="compact-xs" variant="outline" onClick={handlePaste}>
                         Paste

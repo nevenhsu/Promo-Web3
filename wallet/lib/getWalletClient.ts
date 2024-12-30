@@ -10,12 +10,13 @@ export function getWalletClient(
   chainId: number,
   provider: EIP1193Provider,
   account: Hash
-): WalletClient {
+): WalletClient | undefined {
   // set wallet client
   const chain = supportedChains.find(c => c.id === chainId)
 
   if (!chain) {
-    throw new Error(`Chain with id ${chainId} not supported`)
+    console.error(`Chain with id ${chainId} not supported`)
+    return
   }
 
   // https://viem.sh/docs/clients/wallet#optional-hoist-the-account

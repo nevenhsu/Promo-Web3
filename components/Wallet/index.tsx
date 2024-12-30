@@ -3,15 +3,16 @@
 import * as _ from 'lodash-es'
 import Decimal from 'decimal.js'
 import { useMemo } from 'react'
-import { Link } from '@/i18n/routing'
 import { useAppSelector } from '@/hooks/redux'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { Space, Group, Stack, Paper, Button, Text, Title, ThemeIcon } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
+import { Link } from '@/i18n/routing'
+import { Space, Group, Stack, Modal, Paper, Button, Text, Title, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import Token from './Token'
+import WalletSelector from './WalletSelector'
 import { eth } from '@/contracts/tokens'
-import { formatAddress } from '@/wallet/utils/helper'
-import { PiArrowUpBold, PiArrowDownBold, PiClockBold, PiGiftBold } from 'react-icons/pi'
+import { PiArrowUpBold, PiArrowDownBold, PiClockBold, PiGiftBold, PiGearFill } from 'react-icons/pi'
 import classes from './index.module.css'
 
 const ThemeAction = ThemeIcon.withProps({
@@ -24,11 +25,10 @@ const ThemeAction = ThemeIcon.withProps({
 })
 
 export default function Wallet() {
-  const { data } = useAppSelector(state => state.user)
-  const { name } = data
+  const [opened, { open, close }] = useDisclosure(false)
 
-  const { chainId, tokens, walletAddress, onSmartAccount, balancesValues, pricesValues, loading } =
-    useWeb3()
+  const { walletClientType } = useAppSelector(state => state.wallet)
+  const { chainId, tokens, balancesValues, pricesValues, loading } = useWeb3()
   const { balances, updateBalances, loading: balLoading } = balancesValues
   const { prices } = pricesValues
 
@@ -47,10 +47,6 @@ export default function Wallet() {
   return (
     <>
       <RwdLayout>
-        <Title order={3}>{name ? `Hi, ${name}` : 'Hello!'}</Title>
-
-        <Space h={40} />
-
         <Paper p="sm" c="white" shadow="xs" bg="var(--mantine-primary-color-5)">
           <Group justify="space-between" wrap="nowrap" align="start">
             <Stack gap={4}>
@@ -59,13 +55,17 @@ export default function Wallet() {
                 USD {totalBalance.toFixed(2)}
               </Title>
             </Stack>
-            <Stack gap={4} ta="right">
-              <Text fz="xs">
-                {loading ? 'Connecting' : onSmartAccount ? 'Smart wallet' : 'Embedded wallet'}
-              </Text>
-              <Text fz="xs" className="word-break-all" lh={1.2}>
-                {loading ? ' ' : formatAddress(walletAddress)}
-              </Text>
+            <Stack ta="right">
+              <Button
+                variant="light"
+                size="xs"
+                color="white"
+                loading={loading}
+                onClick={open}
+                rightSection={<PiGearFill size={14} />}
+              >
+                {_.upperFirst(walletClientType)}
+              </Button>
             </Stack>
           </Group>
 
@@ -102,14 +102,14 @@ export default function Wallet() {
         <Space h={40} />
 
         <Group justify="space-between">
-          <Text fz="xl" fw={500}>
+          <Text fz="md" fw={500}>
             Assets
           </Text>
           <Button
             size="xs"
             variant="outline"
             loading={balLoading}
-            disabled={!walletAddress}
+            disabled={!chainId}
             onClick={() => updateBalances()}
           >
             Refresh
@@ -146,6 +146,10 @@ export default function Wallet() {
       </RwdLayout>
 
       <Space h={100} />
+
+      <Modal title="Select wallet" size="sm" padding="sm" opened={opened} onClose={close} centered>
+        <WalletSelector />
+      </Modal>
     </>
   )
 }

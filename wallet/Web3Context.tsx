@@ -1,7 +1,8 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import React, { createContext, useContext, useMemo, useState } from 'react'
+import React, { createContext, useContext, useMemo } from 'react'
+import { useAppSelector } from '@/hooks/redux'
 import { useWallet } from '@/wallet/hooks/useWallet'
 import { useSmartAccount } from '@/wallet/hooks/useSmartAccount'
 import { useBalances } from '@/wallet/hooks/useBalances'
@@ -28,24 +29,21 @@ type Web3ContextType = {
   balancesValues: BalancesValues
   pricesValues: PricesValues
   onSmartAccount: boolean
-  setOnSmartAccount: (newValue: boolean) => void
   switchChain: (chainId: number) => Promise<void>
 }
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined)
 
 export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { walletLoading, onSmartAccount } = useAppSelector(state => state.wallet)
+
   // Get wallet values
   const walletValues = useWallet()
   const { wallet } = walletValues
-  const chainId = toChainId(wallet?.chainId)
-  const tokens = useMemo(() => getTokens(chainId), [chainId])
 
   // Select smart account
   const smartAccountValues = useSmartAccount()
-  const [_onSmartAccount, setOnSmartAccount] = useState(true)
-  const onSmartAccount = _onSmartAccount && wallet?.walletClientType === 'privy' // only for privy
-  const loading = walletValues.loading || smartAccountValues.loading
+  const loading = walletLoading || smartAccountValues.loading
 
   // Current wallet value
   const walletClient = !loading
@@ -54,6 +52,9 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
       : walletValues.walletClient
     : undefined
   const walletAddress = walletClient?.account?.address
+
+  const chainId = toChainId(walletClient?.chain.id)
+  const tokens = useMemo(() => getTokens(chainId), [chainId])
 
   // hooks
   const balancesValues = useBalances({ chainId, walletClient, loading })
@@ -73,6 +74,8 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
+  // TODO: auto switch chain
+
   return (
     <Web3Context.Provider
       value={{
@@ -86,7 +89,6 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
         balancesValues,
         pricesValues,
         onSmartAccount,
-        setOnSmartAccount,
         switchChain,
       }}
     >
