@@ -10,7 +10,7 @@ import useLogout from '@/hooks/useLogout'
 import { PiCaretRight, PiPencilSimpleLine, PiRocketLaunch } from 'react-icons/pi'
 import { PiLinkSimpleHorizontal, PiSignOut } from 'react-icons/pi'
 
-export default function Profile() {
+export default function ProfileSetting() {
   const { openLogoutModal } = useLogout()
   const { data: session } = useSession()
   const isAdmin = session?.user?.isAdmin

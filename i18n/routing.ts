@@ -40,15 +40,13 @@ export const routing = defineRouting({
     '/admin/activity': '/admin/activity',
 
     // profile
-    '/profile': '/profile',
+    '/profile/setting': '/profile/setting',
     '/profile/info': '/profile/info',
     '/profile/account': '/profile/account',
     '/profile/token': '/profile/token',
     '/profile/token/info': '/profile/token/info',
-    '/profile/nft': '/profile/nft',
     '/profile/activity': '/profile/activity',
     '/profile/activity/new': '/profile/activity/new',
-    '/profile/donation': '/profile/donation',
 
     // refer
     '/refer': '/refer',

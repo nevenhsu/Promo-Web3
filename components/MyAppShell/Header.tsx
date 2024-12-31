@@ -24,7 +24,7 @@ export default function Header() {
   const { name, username, details } = data
 
   // for back button
-  const mobileBack = !matches && ['/refer', '/profile'].includes(pathname)
+  const mobileBack = !matches && ['/refer'].includes(pathname)
   const hasPreviousPage = pathname.split('/').length > 2 || mobileBack
   const showBack = canGoBack && hasPreviousPage
 

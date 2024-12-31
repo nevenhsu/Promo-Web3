@@ -21,7 +21,7 @@ export default function useLogin(val?: LoginValue) {
   const { ready, authenticated } = usePrivy()
 
   const { login } = _useLogin({
-    onComplete: (user, isNewUser, wasAlreadyAuthenticated) => {
+    onComplete: ({ user, isNewUser, wasAlreadyAuthenticated }) => {
       // TODO: switch network
       if (onComplete) {
         onComplete(user, isNewUser, wasAlreadyAuthenticated)

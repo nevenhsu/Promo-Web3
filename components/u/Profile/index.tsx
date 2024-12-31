@@ -8,8 +8,8 @@ import { Space, Group, Stack, Box, AspectRatio, Paper } from '@mantine/core'
 import { Tabs, Avatar, Text, ThemeIcon, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import RwdModal from '@/components/share/RwdModal'
-import { PiCrownSimple, PiHandHeart, PiRocket, PiGlobe, PiArrowSquareOut } from 'react-icons/pi'
-import { PiCoinVertical, PiImageSquare, PiGearFill } from 'react-icons/pi'
+import { PiRocket, PiGlobe, PiArrowSquareOut } from 'react-icons/pi'
+import { PiCoinVertical, PiGear } from 'react-icons/pi'
 import { FaXTwitter, FaInstagram } from 'react-icons/fa6'
 import { LinkAccountPlatform } from '@/types/db'
 import type { TUser } from '@/models/user'
@@ -72,23 +72,6 @@ export default function UserProfile(props: UserProfileProps) {
         ) : (
           <Box bg="gray.1" />
         )}
-        {isSelf ? (
-          <Link href="/profile">
-            <Button
-              variant="outline"
-              size="compact-sm"
-              bg="white"
-              style={{
-                position: 'absolute',
-                top: 8,
-                right: 16,
-              }}
-              leftSection={<PiGearFill size={16} />}
-            >
-              Setting
-            </Button>
-          </Link>
-        ) : null}
       </AspectRatio>
 
       <RwdLayout pt={0}>
@@ -139,42 +122,22 @@ export default function UserProfile(props: UserProfileProps) {
                   </ThemeAction>
                   <Text fz="sm">Token</Text>
                 </Link>
-                <Link href="/profile/nft">
-                  <ThemeAction>
-                    <PiImageSquare size={24} />
-                  </ThemeAction>
-                  <Text fz="sm">NFT</Text>
-                </Link>
+
                 <Link href="/profile/activity">
                   <ThemeAction>
                     <PiRocket size={24} />
                   </ThemeAction>
                   <Text fz="sm">Activity</Text>
                 </Link>
-                <Link href="/profile/donation">
+
+                <Link href="/profile/setting">
                   <ThemeAction>
-                    <PiHandHeart size={24} />
+                    <PiGear size={24} />
                   </ThemeAction>
-                  <Text fz="sm">Donation</Text>
+                  <Text fz="sm">Setting</Text>
                 </Link>
               </Group>
             </Paper>
-          ) : null}
-
-          {hasToken ? (
-            <Tabs defaultValue={Tab.Ranking}>
-              <Tabs.List grow>
-                <Tabs.Tab value={Tab.Ranking} leftSection={<PiCrownSimple size={16} />}>
-                  Ranking
-                </Tabs.Tab>
-                <Tabs.Tab value={Tab.Activity} leftSection={<PiRocket size={16} />}>
-                  Activity
-                </Tabs.Tab>
-                <Tabs.Tab value={Tab.Donate} leftSection={<PiHandHeart size={16} />}>
-                  Donate
-                </Tabs.Tab>
-              </Tabs.List>
-            </Tabs>
           ) : null}
         </Stack>
       </RwdLayout>

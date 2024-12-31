@@ -128,7 +128,7 @@ export function NavMenu() {
           </NavButton>
         </Link>
 
-        <Link href="/profile">
+        <Link href="/profile/setting">
           <NavButton variant="transparent" leftSection={<PiGear size={18} />} {...getProps(6)}>
             Setting
           </NavButton>

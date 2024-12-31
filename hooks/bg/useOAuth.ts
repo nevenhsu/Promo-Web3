@@ -9,7 +9,7 @@ export function useOAuth() {
   const { nextAuth } = useLoginStatus()
 
   const { reauthorize } = useOAuthTokens({
-    onOAuthTokenGrant(oAuthTokens, o) {
+    onOAuthTokenGrant({ oAuthTokens, user }) {
       if (oAuthTokens.provider === 'instagram') {
         getToken(oAuthTokens.accessToken).catch(console.error)
       }

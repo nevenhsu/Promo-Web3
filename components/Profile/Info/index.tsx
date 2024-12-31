@@ -192,7 +192,7 @@ export default function ProfileInfo() {
               <span />
 
               <Group justify="right">
-                <Link href="/profile">
+                <Link href="/profile/setting">
                   <Button variant="outline" color="dark">
                     Back
                   </Button>
