@@ -3,10 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { isImageURI, uploadImage } from '@/lib/gcp'
-import { getUserToken, updateUserToken, getExistingTokens } from '@/lib/db/userToken'
-import { getTokens } from '@/lib/db/token'
-import { cleanSymbol, cleanName } from '@/utils/helper'
-import { banNames, banSymbols } from '@/contracts/variables'
+import { getUserTokens, updateUserToken } from '@/lib/db/userToken'
 
 export async function GET(req: NextRequest) {
   try {
@@ -14,10 +11,9 @@ export async function GET(req: NextRequest) {
     const userId = jwt?.user?.id!
 
     await dbConnect()
-    const userToken = await getUserToken(userId)
-    const tokens = userToken ? await getTokens(userToken._id.toString()) : []
+    const tokens = await getUserTokens(userId)
 
-    return NextResponse.json({ userToken, tokens })
+    return NextResponse.json({ tokens })
   } catch (error) {
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -29,45 +25,13 @@ export async function POST(req: NextRequest) {
     const jwt = await getToken({ req })
     const json = await req.json()
     const userId = jwt?.user?.id!
-    const { walletAddr, icon, iconURI } = json
-
-    const name = cleanName(json.name || '')
-    const symbol = cleanSymbol(json.symbol || '')
-
-    // check if name or symbol is empty
-    if (!name || !symbol) {
-      return NextResponse.json({ error: 'Name and symbol are required' }, { status: 400 })
-    }
+    const { docId, icon, iconURI } = json
 
     const data = {
-      name,
-      symbol,
       icon,
     }
 
-    // check if name or symbol is banned
-    if ([...banNames, ...banSymbols].includes(name.toLowerCase())) {
-      return NextResponse.json({ error: 'Name is banned' }, { status: 400 })
-    }
-
-    if (banSymbols.includes(symbol.toLowerCase())) {
-      return NextResponse.json({ error: 'Symbol is banned' }, { status: 400 })
-    }
-
     await dbConnect()
-
-    // check if token is not minted or owned by the user
-    const tokens = await getExistingTokens(name, symbol)
-    for (const token of tokens) {
-      if (token._user.toString() !== userId) {
-        if (token.name === name) {
-          return NextResponse.json({ error: 'Name is taken' }, { status: 400 })
-        }
-        if (token.symbol === symbol) {
-          return NextResponse.json({ error: 'Symbol is taken' }, { status: 400 })
-        }
-      }
-    }
 
     // upload image to GCP
     if (isImageURI(iconURI)) {
@@ -80,7 +44,7 @@ export async function POST(req: NextRequest) {
       data.icon = url
     }
 
-    const userToken = await updateUserToken(userId, _.omitBy(data, _.isEmpty), walletAddr)
+    const userToken = await updateUserToken(docId, _.omitBy(data, _.isEmpty))
 
     return NextResponse.json({ userToken })
   } catch (error) {

@@ -13,36 +13,12 @@ export default function Token() {
   const icon = userToken?.icon || ''
   const name = userToken?.name || ''
   const symbol = userToken?.symbol || ''
-  const minted = Boolean(tokens.length)
 
   return (
     <>
       <RwdLayout>
         <Stack gap="xl">
           <Title order={3}>Token</Title>
-
-          <Paper radius="md" p="md" shadow="xs" mb="md">
-            <Group justify="space-between">
-              <Group>
-                <Avatar src={icon} name={''} color="initials" size={40}>
-                  {' '}
-                </Avatar>
-
-                <Stack gap={4}>
-                  <Text fw={500} lh={1}>
-                    {name || 'Token Name'}
-                  </Text>
-                  <Text fz="xs" c="dimmed" lh={1}>
-                    {symbol || 'Token Symbol'}
-                  </Text>
-                </Stack>
-              </Group>
-
-              <Link href="/profile/token/info">
-                <Button loading={loading}>{minted ? 'Update' : 'Create'}</Button>
-              </Link>
-            </Group>
-          </Paper>
 
           {/* Contents */}
           <Stack gap={24}>
@@ -73,6 +49,14 @@ export default function Token() {
                 </Text>
               </Box>
             </Group>
+
+            <Box ta="center">
+              <Link href="/profile/token/info">
+                <Button size="md" loading={loading}>
+                  Create new token
+                </Button>
+              </Link>
+            </Box>
 
             <Divider />
           </Stack>

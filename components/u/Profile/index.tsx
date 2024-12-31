@@ -14,7 +14,6 @@ import { FaXTwitter, FaInstagram } from 'react-icons/fa6'
 import { LinkAccountPlatform } from '@/types/db'
 import type { TUser } from '@/models/user'
 import type { TUserToken } from '@/models/userToken'
-import type { Token } from '@/models/token'
 import classes from './index.module.css'
 
 enum Tab {
@@ -34,12 +33,11 @@ const ThemeAction = ThemeIcon.withProps({
 
 type UserProfileProps = {
   data: TUser
-  userToken: TUserToken | null
-  tokens: Token[]
+  tokens: TUserToken[]
 }
 
 export default function UserProfile(props: UserProfileProps) {
-  const { data, userToken, tokens } = props
+  const { data, tokens } = props
 
   // profile data
   const { name, username, details, linkedAccounts } = data

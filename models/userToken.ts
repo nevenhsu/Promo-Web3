@@ -8,18 +8,21 @@ export const schema = new Schema({
     ref: UserModel,
     required: true,
     index: true,
-    unique: true,
   },
   _wallet: {
     type: Schema.Types.ObjectId,
     ref: UserWalletModel,
     required: true,
+    index: true,
   },
+  chainId: { type: Number, required: true },
   name: { type: String, required: true, index: true },
   symbol: { type: String, required: true, index: true },
   icon: String,
-  minted: { type: Boolean, default: false },
+  verified: { type: Boolean, default: false, index: true }, // for etherscan
 })
+
+schema.index({ _user: 1, _wallet: 1, chainId: 1 }, { unique: true })
 
 export type UserToken = InferSchemaType<typeof schema> & { _id: string }
 export type TUserToken = Omit<UserToken, '_wallet'> & { _wallet: UserWallet }

@@ -1,16 +1,13 @@
 import axios from 'axios'
 import type { UserToken, TUserToken } from '@/models/userToken'
-import type { Token } from '@/models/token'
 
-export async function getUserToken() {
-  const { data } = await axios.get<{ userToken?: TUserToken; tokens: Token[] }>('/api/u/userToken')
+export async function getUserTokens() {
+  const { data } = await axios.get<{ tokens: TUserToken[] }>('/api/u/userToken')
   return data
 }
 
 export type UserTokenData = {
-  walletAddr: string
-  name: string
-  symbol: string
+  docId: string
   icon: string
   iconURI: string
 }

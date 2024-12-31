@@ -6,11 +6,10 @@ import { notifications } from '@mantine/notifications'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { getUserToken, updateUserToken, checkUserToken, mintToken } from '@/services/userTokens'
 import type { TUserToken } from '@/models/userToken'
-import type { Token } from '@/models/token'
 import type { UserTokenData } from '@/services/userTokens'
 
 interface UserTokenContextType {
-  data?: { userToken?: TUserToken; tokens: Token[] }
+  data?: { tokens: TUserToken[] }
   loading: boolean
   error?: Error
   updateToken: (data: UserTokenData) => Promise<void>
