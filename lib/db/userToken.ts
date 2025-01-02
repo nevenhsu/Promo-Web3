@@ -1,4 +1,5 @@
 import UserTokenModel from '@/models/userToken'
+import { isImageURI, uploadImage } from '@/lib/gcp'
 import type { UserWallet } from '@/models/userWallet'
 
 export async function getUserTokens(userId: string) {
@@ -9,6 +10,25 @@ export async function getUserTokens(userId: string) {
     .lean()
 
   return docs
+}
+
+export async function uploadTokenIcon(userId: string, walletId: string, iconURI: string) {
+  // upload image to GCP
+  if (isImageURI(iconURI)) {
+    const path = `images/${userId}`
+    const fileName = `token-cover-${walletId}`
+    const url = await uploadImage(iconURI, path, fileName, { width: 80, height: 80 })
+    if (!url) {
+      throw new Error('Failed to upload token cover')
+    }
+    return url
+  }
+}
+
+export async function getUserToken(docId: string) {
+  const doc = await UserTokenModel.findOne({ _id: docId }).lean()
+
+  return doc
 }
 
 export async function updateUserToken(
@@ -22,7 +42,8 @@ export async function updateUserToken(
   return doc
 }
 
-export async function getExistingTokens(name: string, symbol: string) {
-  const tokens = await UserTokenModel.find({ $or: [{ name }, { symbol }] }).lean()
+export async function getExistingTokens(value: { name: string; symbol: string; chainId: number }) {
+  const { name, symbol, chainId } = value
+  const tokens = await UserTokenModel.find({ chainId, $or: [{ name }, { symbol }] }).lean()
   return tokens
 }

@@ -1,10 +1,10 @@
 'use client'
 
 import React, { createContext, useContext, useEffect } from 'react'
-import { useAsyncFn, useInterval, usePrevious } from 'react-use'
+import { useAsyncFn } from 'react-use'
 import { notifications } from '@mantine/notifications'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
-import { getUserToken, updateUserToken, checkUserToken, mintToken } from '@/services/userTokens'
+import { getUserTokens, updateUserToken, checkUserToken, mintToken } from '@/services/userTokens'
 import type { TUserToken } from '@/models/userToken'
 import type { UserTokenData } from '@/services/userTokens'
 
@@ -22,21 +22,9 @@ export const UserTokenProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const { bothAuth } = useLoginStatus() // Check if user is logged in
 
   const [state, fetchUserToken] = useAsyncFn(async () => {
-    const data = await getUserToken()
+    const data = await getUserTokens()
     return data
   }, [])
-
-  // for notifications
-  const prevState = usePrevious(state)
-  const processing = state.value?.tokens?.some(t => t.minted === false)
-  const prevProcessing = prevState?.value?.tokens?.some(t => t.minted === false)
-
-  useInterval(
-    () => {
-      fetchUserToken()
-    },
-    processing ? 60_000 : null
-  )
 
   const [updateState, updateToken] = useAsyncFn(async (data: UserTokenData) => {
     await checkUserToken(data.name, data.symbol)

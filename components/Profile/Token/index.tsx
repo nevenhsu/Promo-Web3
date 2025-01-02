@@ -9,10 +9,7 @@ import { PiRocketLaunch, PiHandHeart } from 'react-icons/pi'
 
 export default function Token() {
   const { data, loading } = useUserToken()
-  const { userToken, tokens = [] } = data || {}
-  const icon = userToken?.icon || ''
-  const name = userToken?.name || ''
-  const symbol = userToken?.symbol || ''
+  const { tokens = [] } = data || {}
 
   return (
     <>

@@ -2,8 +2,7 @@ import * as _ from 'lodash-es'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
-import { isImageURI, uploadImage } from '@/lib/gcp'
-import { getUserTokens, updateUserToken } from '@/lib/db/userToken'
+import { getUserTokens, updateUserToken, getUserToken, uploadTokenIcon } from '@/lib/db/userToken'
 
 export async function GET(req: NextRequest) {
   try {
@@ -31,22 +30,27 @@ export async function POST(req: NextRequest) {
       icon,
     }
 
+    if (!docId) {
+      return NextResponse.json({ error: 'Token ID is required' }, { status: 400 })
+    }
+
     await dbConnect()
 
+    const doc = await getUserToken(docId)
+    if (!doc || doc._user.toString() !== userId) {
+      return NextResponse.json({ error: 'Token not found' }, { status: 404 })
+    }
+
     // upload image to GCP
-    if (isImageURI(iconURI)) {
-      const path = `images/${userId}`
-      const fileName = 'token-cover'
-      const url = await uploadImage(iconURI, path, fileName, { width: 80, height: 80 })
-      if (!url) {
-        return NextResponse.json({ error: 'Failed to upload token cover' }, { status: 500 })
-      }
+    const walletId = doc._wallet.toString()
+    const url = await uploadTokenIcon(userId, walletId, iconURI)
+    if (url) {
       data.icon = url
     }
 
-    const userToken = await updateUserToken(docId, _.omitBy(data, _.isEmpty))
+    const token = await updateUserToken(docId, _.omitBy(data, _.isEmpty))
 
-    return NextResponse.json({ userToken })
+    return NextResponse.json({ token })
   } catch (error) {
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

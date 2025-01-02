@@ -4,11 +4,13 @@ import { computeTokenAddress } from '@/lib/web3/computeTokenAddress'
 import TokenManagerJson from './TokenManager.sol/TokenManager.json'
 import ActivityManagerJson from './NonfungibleActivityManager.sol/NonfungibleActivityManager.json'
 import clubTokenJson from '@/contracts/ClubToken.sol/ClubToken.json'
-import type { Address, GetContractReturnType } from 'viem'
+import type { Address } from 'viem'
 import type { TokenManager$Type } from './TokenManager.sol/TokenManager'
 import type { ClubToken$Type } from './ClubToken.sol/ClubToken'
 import type { NonfungibleActivityManager$Type } from './NonfungibleActivityManager.sol/NonfungibleActivityManager'
-import type { WalletClient } from '@/types/wallet'
+import type { WalletClient, GetContractReturnType } from '@/types/wallet'
+
+// import type { GetContractReturnType, WalletClient, PublicClient } from '@nomicfoundation/hardhat-viem/types'
 
 export type Manager = {
   chainId: number
@@ -40,8 +42,8 @@ export const getTokenManager = (
   const contract = getContract({
     client,
     address: manager.address,
-    abi: TokenManagerJson.abi as any,
-  })
+    abi: TokenManagerJson.abi,
+  }) as any
 
   return contract
 }
@@ -57,8 +59,8 @@ export const getActivityManager = (
   const contract = getContract({
     client,
     address: manager.address,
-    abi: ActivityManagerJson.abi as any,
-  })
+    abi: ActivityManagerJson.abi,
+  }) as any
 
   return contract
 }
@@ -80,8 +82,8 @@ export const getTokenContract = (
   const contract = getContract({
     client,
     address: tokenAddress,
-    abi: clubTokenJson.abi as any,
-  })
+    abi: clubTokenJson.abi,
+  }) as any
 
   return contract
 }

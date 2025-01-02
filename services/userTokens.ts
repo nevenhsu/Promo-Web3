@@ -6,25 +6,29 @@ export async function getUserTokens() {
   return data
 }
 
-export type UserTokenData = {
+export type NewUserTokenValue = {
   docId: string
   icon: string
   iconURI: string
 }
 
-export async function updateUserToken(data: UserTokenData) {
-  const { data: userToken } = await axios.post<{ userToken: UserToken }>('/api/u/userToken', data)
-  return userToken
+export async function updateUserToken(value: NewUserTokenValue) {
+  const { data } = await axios.post<{ token: UserToken }>('/api/u/userToken', value)
+  return data
 }
 
-export async function checkUserToken(name: string, symbol: string) {
+export async function checkUserToken(name: string, symbol: string, chainId: number) {
   const { data } = await axios.get<{ valid: true }>('/api/u/userToken/check', {
-    params: { name, symbol },
+    params: { name, symbol, chainId },
   })
   return data.valid
 }
 
-export async function mintToken(chainId: number) {
-  const { data } = await axios.post<{ token: Token }>('/api/u/userToken/mint', { chainId })
+export async function mintToken(chainId: number, walletId: string, iconURI: string) {
+  const { data } = await axios.post<{ token: UserToken }>('/api/u/userToken/mint', {
+    chainId,
+    walletId,
+    iconURI,
+  })
   return data
 }

@@ -15,7 +15,7 @@ export const schema = new Schema({
     required: true,
     index: true,
   },
-  chainId: { type: Number, required: true },
+  chainId: { type: Number, required: true, index: true },
   name: { type: String, required: true, index: true },
   symbol: { type: String, required: true, index: true },
   icon: String,
