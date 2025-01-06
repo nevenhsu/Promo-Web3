@@ -1,36 +1,31 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
-import { Link } from '@/i18n/routing'
-import { useDisclosure } from '@mantine/hooks'
-import { modals } from '@mantine/modals'
-import { Title, Stack, Space, Paper, Group, Divider, Box, Modal } from '@mantine/core'
-import { Text, Button, TextInput, Badge, Progress, ActionIcon } from '@mantine/core'
+import { useState, useEffect } from 'react'
+import { Title, Stack, Group } from '@mantine/core'
+import { Button, TextInput, Badge } from '@mantine/core'
 import { useForm, hasLength } from '@mantine/form'
-import RwdLayout from '@/components/share/RwdLayout'
 import IconButton from './IconButton'
 import { tokenManagers } from '@/contracts'
 import { useUserToken } from '@/store/contexts/app/userToken'
 import { useWeb3 } from '@/wallet/Web3Context'
+import { checkToken } from '@/services/userTokens'
 import { cleanSymbol, cleanName } from '@/utils/helper'
-import { getNetwork, type NetworkInfo } from '@/wallet/utils/network'
-import { PiCheck } from 'react-icons/pi'
+import type { TUserToken } from '@/models/userToken'
 
-export default function TokenInfo() {
-  const networkRef = useRef(0)
+type TokenInfoProps = {
+  token?: TUserToken
+  onClose: () => void
+}
 
-  const { smartAccountValues } = useWeb3()
+export default function TokenInfo(props: TokenInfoProps) {
+  const { token, onClose } = props
+
+  const { smartAccountValues, chainId } = useWeb3()
   const { smartAccountAddress } = smartAccountValues
 
-  const { data, error, loading, updateToken, mint } = useUserToken()
-  const { userToken, tokens = [] } = data || {}
-  const icon = userToken?.icon || ''
-  const minted = Boolean(tokens.length)
-  const valid = Boolean(userToken && userToken.name && userToken.symbol)
-
-  const [opened, { open, close }] = useDisclosure(false)
+  const { fetchState, updateState, updateTokenDoc, mintState, mint } = useUserToken()
+  const minted = !!token
 
   // avatar
   const [iconImg, setIconImg] = useState('')
@@ -51,127 +46,61 @@ export default function TokenInfo() {
     },
   })
 
-  const handleSubmit = (values: typeof form.values) => {
-    const name = values.name.trim()
-    const symbol = cleanSymbol(values.symbol)
-    if (name && symbol && smartAccountAddress) {
-      updateToken({ name, symbol, icon, iconURI, walletAddr: smartAccountAddress })
+  const handleMint = async () => {
+    try {
+      if (!chainId) {
+        return
+      }
+
+      const valid = await checkToken({
+        name: form.values.name,
+        symbol: form.values.symbol,
+        chainId,
+      })
+
+      // TODO: send transaction
+
+      if (valid && smartAccountAddress) {
+        await mint({ chainId, walletAddress: smartAccountAddress, iconURI })
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        const msg = error?.response?.data?.error
+        if (msg && msg.includes('Name is')) {
+          form.setFieldError('name', 'Choose another name')
+        }
+
+        if (msg && msg.includes('Symbol is')) {
+          form.setFieldError('symbol', 'Choose another symbol')
+        }
+      }
     }
   }
 
-  const handleMint = async () => {
-    const chainId = networkRef.current
-    if (chainId) {
-      await mint(chainId)
-      close()
+  const handleSubmit = async (values: typeof form.values) => {
+    const docId = token?._id || ''
+    if (minted && docId && iconURI) {
+      await updateTokenDoc({ docId, icon: iconImg, iconURI })
+    } else {
+      await handleMint()
     }
   }
 
   const { name, symbol } = form.getValues()
-  const alreadyUpdated =
-    userToken?.name === name && userToken?.symbol === symbol && icon === iconImg
-
+  const alreadyUpdated = token?.icon === iconImg && token?.name === name && token?.symbol === symbol
+  const loading = updateState.loading || mintState.loading || fetchState.loading
   const errorMsg = alreadyUpdated ? '' : iconError
-
-  const openModal = (networkName: string) => {
-    modals.open({
-      title: (
-        <Text fz="lg" fw={500}>
-          Congrats! 🎉
-        </Text>
-      ),
-      children: (
-        <Stack gap="xl">
-          <Text fz="sm" c="dimmed">
-            Start to create campaigns and airdrop tokens for your community
-          </Text>
-
-          <Button onClick={() => modals.closeAll()}>Close</Button>
-        </Stack>
-      ),
-    })
-  }
-
-  const renderNetwork = (network: NetworkInfo) => {
-    const token = _.find(tokens, { chainId: network.chainId })
-    const { minted } = token || {}
-    const updated = Boolean(token)
-    const loading = updated && !minted
-    return (
-      <Paper
-        p="md"
-        shadow="xs"
-        radius="sm"
-        style={{
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <Group justify="space-between" wrap="nowrap">
-          <Group wrap="nowrap">
-            <Image src={network.icon} width={40} height={40} alt={network.name} />
-            <Stack gap={4}>
-              <Text fz="lg" fw={500} lh={1}>
-                {network.name}
-              </Text>
-              <Text fz="xs" c="dimmed" lh={1}>
-                {loading ? 'It takes a couple of hours to be minted' : `${network.subtitle}`}
-              </Text>
-            </Stack>
-          </Group>
-          {loading ? null : (
-            <>
-              {minted ? (
-                <ActionIcon
-                  variant="transparent"
-                  color="green"
-                  onClick={() => openModal(network.name)}
-                >
-                  <PiCheck size={24} />
-                </ActionIcon>
-              ) : (
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    networkRef.current = network.chainId || 0
-                    open()
-                  }}
-                  disabled={!valid}
-                >
-                  Mint
-                </Button>
-              )}
-            </>
-          )}
-        </Group>
-
-        {loading ? (
-          <Progress
-            value={100}
-            size="sm"
-            animated
-            style={{
-              position: 'absolute',
-              width: '100%',
-              bottom: 0,
-              left: 0,
-            }}
-          />
-        ) : null}
-      </Paper>
-    )
-  }
 
   // Set initial values if userToken exists
   useEffect(() => {
-    if (userToken) {
+    if (token) {
       form.setValues({
-        name: userToken.name,
-        symbol: userToken.symbol,
+        name: token.name,
+        symbol: token.symbol,
       })
-      setIconImg(userToken.icon || '')
+      setIconImg(token.icon || '')
     }
-  }, [userToken])
+  }, [token])
 
   // Clean symbol
   useEffect(() => {
@@ -187,142 +116,80 @@ export default function TokenInfo() {
     }
   }, [name])
 
-  // Set form error
-  useEffect(() => {
-    const msg = error?.response?.data?.error
-    if (msg && msg.includes('Name is')) {
-      form.setFieldError('name', 'Choose another name')
-    }
-
-    if (msg && msg.includes('Symbol is')) {
-      form.setFieldError('symbol', 'Choose another symbol')
-    }
-  }, [error])
-
   return (
     <>
-      <RwdLayout>
-        <Stack gap="lg">
-          <Title order={3}>Token info</Title>
+      <Stack gap="lg">
+        <Title order={3}>Token info</Title>
 
-          <Stack align="center" gap="xs">
-            <IconButton
-              url={icon}
-              onChange={file => {
-                if (file && file.size >= 1024 * 1024 * 10) {
-                  setIconError('Image size cannot exceed 10mb')
-                } else {
-                  setIconError(undefined)
-                }
-              }}
-              onDataURLChange={dataURI => {
-                setIconImg(dataURI || '')
-              }}
+        <Stack align="center" gap="xs">
+          <IconButton
+            url={token?.icon || ''}
+            onChange={file => {
+              if (file && file.size >= 1024 * 1024 * 10) {
+                setIconError('Image size cannot exceed 10mb')
+              } else {
+                setIconError(undefined)
+              }
+            }}
+            onDataURLChange={dataURI => {
+              setIconImg(dataURI || '')
+            }}
+          />
+
+          {errorMsg ? (
+            <Badge size="sm" color="red">
+              {errorMsg}
+            </Badge>
+          ) : null}
+        </Stack>
+
+        <form
+          onSubmit={form.onSubmit(
+            values => handleSubmit(values),
+            (validationErrors, values, event) => {
+              console.log(
+                validationErrors, // <- form.errors at the moment of submit
+                values, // <- form.getValues() at the moment of submit
+                event // <- form element submit event
+              )
+            }
+          )}
+        >
+          <Stack>
+            <TextInput
+              label="Name"
+              description={
+                minted ? 'Name cannot be changed' : '3-12 characters (English letters or numbers)'
+              }
+              key={form.key('name')}
+              {...form.getInputProps('name')}
+              disabled={minted}
             />
 
-            {errorMsg ? (
-              <Badge size="sm" color="red">
-                {errorMsg}
-              </Badge>
-            ) : null}
+            <TextInput
+              label="Symbol"
+              description={minted ? 'Symbol cannot be changed' : '2-8 characters (English letters)'}
+              key={form.key('symbol')}
+              {...form.getInputProps('symbol')}
+              disabled={minted}
+            />
+
+            <Group justify="right" mt="sm">
+              <Button variant="outline" color="dark" onClick={onClose}>
+                Back
+              </Button>
+
+              <Button
+                type="submit"
+                loading={loading}
+                disabled={!smartAccountAddress || alreadyUpdated}
+              >
+                {minted ? (alreadyUpdated ? 'Updated' : 'Update') : 'Mint'}
+              </Button>
+            </Group>
           </Stack>
-
-          <form
-            onSubmit={form.onSubmit(
-              values => handleSubmit(values),
-              (validationErrors, values, event) => {
-                console.log(
-                  validationErrors, // <- form.errors at the moment of submit
-                  values, // <- form.getValues() at the moment of submit
-                  event // <- form element submit event
-                )
-              }
-            )}
-          >
-            <Stack>
-              <TextInput
-                label="Name"
-                description={
-                  minted ? 'Name cannot be changed' : '3-12 characters (English letters or numbers)'
-                }
-                key={form.key('name')}
-                {...form.getInputProps('name')}
-                disabled={minted}
-              />
-
-              <TextInput
-                label="Symbol"
-                description={
-                  minted ? 'Symbol cannot be changed' : '2-8 characters (English letters)'
-                }
-                key={form.key('symbol')}
-                {...form.getInputProps('symbol')}
-                disabled={minted}
-              />
-
-              <Group justify="right" mt="sm">
-                <Link href="/profile/token">
-                  <Button variant="outline" color="dark">
-                    Back
-                  </Button>
-                </Link>
-
-                <Button
-                  type="submit"
-                  loading={loading}
-                  disabled={!smartAccountAddress || alreadyUpdated}
-                >
-                  {alreadyUpdated ? 'Updated' : 'Update'}
-                </Button>
-              </Group>
-            </Stack>
-          </form>
-
-          <Divider my="md" />
-
-          <Group justify="space-between">
-            <Title order={4}>Network</Title>
-
-            {valid ? null : (
-              <Badge size="sm" color="red">
-                Update info to mint token
-              </Badge>
-            )}
-          </Group>
-
-          <Stack>
-            {/* Network */}
-            {_.map(tokenManagers, o => {
-              const network = getNetwork(o.chainId)
-              return <Box key={o.chainId}>{renderNetwork(network)}</Box>
-            })}
-          </Stack>
-        </Stack>
-      </RwdLayout>
-
-      <Modal
-        centered
-        opened={opened}
-        onClose={close}
-        title={
-          <Text fz="lg" fw={500}>
-            Confirm to mint token
-          </Text>
-        }
-      >
-        <Stack>
-          <Text fz="sm">Name and symbol cannot be changed after minting</Text>
-
-          <Group justify="right" mt="md">
-            <Button variant="outline" color="dark" onClick={close}>
-              Cancel
-            </Button>
-            <Button onClick={handleMint}>Confirm</Button>
-          </Group>
-        </Stack>
-      </Modal>
-
-      <Space h={100} />
+        </form>
+      </Stack>
     </>
   )
 }

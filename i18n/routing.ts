@@ -44,7 +44,6 @@ export const routing = defineRouting({
     '/profile/info': '/profile/info',
     '/profile/account': '/profile/account',
     '/profile/token': '/profile/token',
-    '/profile/token/info': '/profile/token/info',
     '/profile/activity': '/profile/activity',
     '/profile/activity/new': '/profile/activity/new',
 

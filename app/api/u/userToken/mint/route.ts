@@ -6,22 +6,23 @@ import UserTokenModel from '@/models/userToken'
 import { getUserWallets } from '@/lib/db/userWallet'
 import { getTokenContract } from '@/contracts'
 import { getPublicClient } from '@/wallet/lib/publicClients'
-import { isAddress } from '@/wallet/utils/helper'
+import { isAddress, isAddressEqual } from '@/wallet/utils/helper'
 import { uploadTokenIcon } from '@/lib/db/userToken'
 
 export async function POST(req: NextRequest) {
   try {
     const jwt = await getToken({ req })
     const userId = jwt?.user?.id!
-    const { chainId, walletId, iconURI } = await req.json()
+    const { chainId, walletAddress, iconURI } = await req.json()
 
     await dbConnect()
 
     const wallets = await getUserWallets(userId)
-    const wallet = wallets.find(w => w._id.toString() === walletId)
+    const wallet = wallets.find(w => isAddressEqual(w.address, walletAddress))
+    const walletId = wallet?._id.toString() || ''
     const owner = wallet?.address || ''
 
-    if (!isAddress(owner)) {
+    if (!walletId || !isAddress(owner)) {
       return NextResponse.json({ error: 'Wallet not found' }, { status: 404 })
     }
 

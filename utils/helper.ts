@@ -16,7 +16,7 @@ export function cleanName(val: string) {
 
 export function cleanSymbol(val: string) {
   // only keep A-Z
-  return val.toUpperCase().replace(/[^A-Z]/g, '')
+  return val.toUpperCase().replace(/[^A-Z0-9]/g, '')
 }
 
 export function cleanCode(val: string) {

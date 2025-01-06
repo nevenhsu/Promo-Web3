@@ -1,21 +1,33 @@
 'use client'
 
-import { Link } from '@/i18n/routing'
+import * as _ from 'lodash-es'
 import { Title, Stack, Space, Paper, Group, Divider } from '@mantine/core'
 import { Text, Avatar, Button, ThemeIcon, Box } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
+import TokenInfo from './Info'
+import { useWeb3 } from '@/wallet/Web3Context'
+import { isAddressEqual } from '@/wallet/utils/helper'
 import { useUserToken } from '@/store/contexts/app/userToken'
 import { PiRocketLaunch, PiHandHeart } from 'react-icons/pi'
 
 export default function Token() {
-  const { data, loading } = useUserToken()
-  const { tokens = [] } = data || {}
+  const { chainId, smartAccountValues } = useWeb3()
+  const { smartAccountAddress = '' } = smartAccountValues
+
+  const { fetchState } = useUserToken()
+  const { tokens = [] } = fetchState.value || {}
+
+  const token = _.find(
+    tokens,
+    o => o.chainId === chainId && isAddressEqual(o._wallet.address, smartAccountAddress)
+  )
+  const minted = !!token
 
   return (
     <>
       <RwdLayout>
         <Stack gap="xl">
-          <Title order={3}>Token</Title>
+          <Title order={3}>Creator token</Title>
 
           {/* Contents */}
           <Stack gap={24}>
@@ -39,20 +51,20 @@ export default function Token() {
               </ThemeIcon>
               <Box>
                 <Title order={4} fw={500}>
-                  Reward donors
+                  Create engaging fan interactions
                 </Title>
                 <Text size="sm" c="dimmed">
-                  Airdrop tokens to donors supporting your donation campaigns
+                  Reward your fans with unique tokens for their support
                 </Text>
               </Box>
             </Group>
 
+            <span />
+
             <Box ta="center">
-              <Link href="/profile/token/info">
-                <Button size="md" loading={loading}>
-                  Create new token
-                </Button>
-              </Link>
+              <Button size="md" loading={fetchState.loading}>
+                {minted ? 'Manage token' : 'Mint token'}
+              </Button>
             </Box>
 
             <Divider />
