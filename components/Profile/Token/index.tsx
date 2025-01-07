@@ -1,8 +1,9 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import { Title, Stack, Space, Paper, Group, Divider } from '@mantine/core'
-import { Text, Avatar, Button, ThemeIcon, Box } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
+import { Title, Stack, Space, Modal, Group, Divider } from '@mantine/core'
+import { Text, Button, ThemeIcon, Box } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import TokenInfo from './Info'
 import { useWeb3 } from '@/wallet/Web3Context'
@@ -11,6 +12,8 @@ import { useUserToken } from '@/store/contexts/app/userToken'
 import { PiRocketLaunch, PiHandHeart } from 'react-icons/pi'
 
 export default function Token() {
+  const [opened, { open, close }] = useDisclosure(false)
+
   const { chainId, smartAccountValues } = useWeb3()
   const { smartAccountAddress = '' } = smartAccountValues
 
@@ -62,7 +65,7 @@ export default function Token() {
             <span />
 
             <Box ta="center">
-              <Button size="md" loading={fetchState.loading}>
+              <Button onClick={open} size="md" loading={fetchState.loading}>
                 {minted ? 'Manage token' : 'Mint token'}
               </Button>
             </Box>
@@ -71,6 +74,10 @@ export default function Token() {
           </Stack>
         </Stack>
       </RwdLayout>
+
+      <Modal opened={opened} onClose={close} title="Creator token" centered>
+        <TokenInfo token={token} />
+      </Modal>
 
       <Space h={100} />
     </>

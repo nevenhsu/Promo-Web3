@@ -7,3 +7,12 @@
     color: var(--tabs-color);
   }
 }
+
+.mantine-Modal-title {
+  font-weight: 500;
+  font-size: var(--mantine-font-size-lg);
+}
+
+.mantine-Stepper-content {
+  padding-top: 32px;
+}
