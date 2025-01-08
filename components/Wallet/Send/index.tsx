@@ -409,12 +409,12 @@ function Transaction({
             <Stack gap="sm" align="center">
               <Title order={3}>
                 {tx.status === TxStatus.Success
-                  ? 'Successful!'
+                  ? 'Success!'
                   : tx.status === TxStatus.Failed
                     ? 'Failed!'
                     : tx.status === TxStatus.Confirming
-                      ? 'Confirming'
-                      : 'Sending'}
+                      ? 'Confirming...'
+                      : 'Pending...'}
               </Title>
               <Box ta="center">
                 <Text className="nowrap" fz="sm" c="dimmed" mb="xs">

@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Stepper, Stack, Group, Badge } from '@mantine/core'
-import { Button, TextInput } from '@mantine/core'
+import { Stepper, Stack, Group, Badge, Button, TextInput, Text, Progress } from '@mantine/core'
 import { useForm, hasLength } from '@mantine/form'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { useUserToken } from '@/store/contexts/app/userToken'
 import IconButton from './IconButton'
+import TokenPaper from './TokenPaper'
 import { cleanSymbol, cleanName } from '@/utils/helper'
 import { checkToken } from '@/services/userTokens'
 
@@ -94,8 +94,9 @@ export default function MintFlow() {
         active={active}
         onStepClick={setActive}
         allowNextStepsSelect={false}
+        mih={420}
       >
-        <Stepper.Step label="First step" description="Fill out this form">
+        <Stepper.Step label="First step" description="Fill out this form" allowStepSelect={false}>
           <Stack align="center" gap="xs" mb="xl">
             <IconButton
               url=""
@@ -152,9 +153,31 @@ export default function MintFlow() {
             </Stack>
           </form>
         </Stepper.Step>
-        <Stepper.Step label="Second step" description="Mint your token"></Stepper.Step>
+        <Stepper.Step label="Second step" description="Mint your token" allowStepSelect={false}>
+          <TokenPaper name={name} symbol={symbol} icon={iconURI} />
 
-        <Stepper.Completed>Completed, click back button to get to previous step</Stepper.Completed>
+          <Text fz="sm" c="dimmed" mb="xl">
+            Be sure to double-check the information before minting. Once minted, the token cannot be
+            changed.
+          </Text>
+
+          <Group justify="right">
+            <Button variant="outline" color="dark" onClick={() => setActive(0)}>
+              Back
+            </Button>
+            <Button onClick={() => setActive(active + 1)}>Mint</Button>
+          </Group>
+        </Stepper.Step>
+
+        <Stepper.Completed>
+          <Stack align="center" justify="center">
+            <Progress value={100} w="100%" animated />
+            <Text fz="sm" c="dimmed" mb="xl">
+              Wait for the transaction to be confirmed, this may take a few minutes. Don't close
+              this window.
+            </Text>
+          </Stack>
+        </Stepper.Completed>
       </Stepper>
     </>
   )
