@@ -1,4 +1,4 @@
-import { mainnet, base, baseSepolia, arbitrum, arbitrumSepolia } from 'viem/chains'
+import { mainnet, arbitrum, arbitrumSepolia } from 'viem/chains'
 
 export type NetworkInfo = {
   chainId?: number
@@ -17,20 +17,6 @@ export const networks: NetworkInfo[] = [
     blockExplorerUrl: mainnet.blockExplorers.default.url,
   },
   {
-    chainId: base.id,
-    name: base.name,
-    icon: '/icons/base.svg',
-    subtitle: 'Ethereum L2 Network',
-    blockExplorerUrl: base.blockExplorers.default.url,
-  },
-  {
-    chainId: baseSepolia.id,
-    name: baseSepolia.name,
-    icon: '/icons/base-testnet.svg',
-    subtitle: 'Ethereum L2 Testnet',
-    blockExplorerUrl: baseSepolia.blockExplorers.default.url,
-  },
-  {
     chainId: arbitrum.id,
     name: arbitrum.name,
     icon: '/icons/arbitrum.svg',
@@ -47,7 +33,7 @@ export const networks: NetworkInfo[] = [
 ] as const
 
 export function getNetwork(chainId?: string | number) {
-  const chainIdNum = toChainId(chainId || '0')
+  const chainIdNum = toChainId(chainId)
   const network = networks.find(o => o.chainId === chainIdNum)
   const fallback = {
     chainId: chainIdNum,
@@ -68,7 +54,7 @@ export function toChainId(chainId?: string | number) {
     return parseInt(chainId, 10)
   }
 
-  return chainId
+  return chainId || 0
 }
 
 export function toHex(num: number) {

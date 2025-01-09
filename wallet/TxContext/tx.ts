@@ -37,7 +37,7 @@ export async function simulateTx(
 export async function getReceipt(chainId: number, hash: Hash, retry = 5) {
   try {
     const publicClient = getPublicClient(chainId)
-    const receipt = await publicClient!.getTransactionReceipt({ hash })
+    const receipt = await publicClient!.waitForTransactionReceipt({ hash })
 
     const { status, from, transactionHash } = receipt
     const success = status === 'success'

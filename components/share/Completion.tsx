@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Stack, Title } from '@mantine/core'
+import { Button, Stack, Title } from '@mantine/core'
 
 export enum Status {
   Init = 'init',
@@ -10,7 +10,6 @@ export enum Status {
 type Text = {
   // button text
   okay?: string
-  back?: string
   // status text
   init?: string
   pending?: string
@@ -21,28 +20,22 @@ type Text = {
 type CompletionProps = {
   header: React.ReactNode
   description?: React.ReactNode
+  action?: React.ReactNode
   status: Status
   text?: Text
   onOk: () => void
-  onBack: () => void
 }
 
 export default function Completion(props: CompletionProps) {
-  const { header, description, status, text, onOk, onBack } = props
+  const { header, description, action, status, text, onOk } = props
 
+  const init = status === Status.Init
   const pending = status === Status.Pending
-  const finished = status === Status.Success || status === Status.Failed
 
   return (
     <>
-      <Stack gap="lg" py="md">
-        {header && (
-          <>
-            {header}
-
-            <Divider />
-          </>
-        )}
+      <Stack gap="lg" w="100%">
+        {header && <>{header}</>}
 
         <Stack gap="sm" align="center">
           <Title order={3}>
@@ -55,19 +48,17 @@ export default function Completion(props: CompletionProps) {
                   : text?.init || ''}
           </Title>
 
-          {description && <Box ta="center">{description}</Box>}
+          {description && <>{description}</>}
         </Stack>
 
         <Stack>
-          <Button onClick={onOk} loading={pending}>
-            {text?.okay || 'Okay, done'}
-          </Button>
-
-          {finished && (
-            <Button onClick={onBack} variant="outline">
-              {text?.back || 'Back'}
+          {!init && (
+            <Button onClick={onOk} loading={pending}>
+              {text?.okay || 'Okay, done'}
             </Button>
           )}
+
+          {action && <>{action}</>}
         </Stack>
       </Stack>
     </>

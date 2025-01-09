@@ -3,13 +3,13 @@ import { Avatar, Group, Paper, Stack, Text } from '@mantine/core'
 type TokenPaperProps = {
   name: string
   symbol: string
-  icon: string
+  icon?: string | null
 }
 
 export default function TokenPaper(props: TokenPaperProps) {
   const { name, symbol, icon } = props
   return (
-    <Paper radius="md" p="md" shadow="xs" mb="md">
+    <Paper radius="md" p="md" shadow="xs">
       <Group justify="space-between">
         <Group>
           <Avatar src={icon} name={''} color="initials" size={40}>

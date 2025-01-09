@@ -6,6 +6,7 @@ import { Title, Stack, Space, Modal, Group, Divider } from '@mantine/core'
 import { Text, Button, ThemeIcon, Box } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import TokenInfo from './Info'
+import TokenPaper from './Info/TokenPaper'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { isAddressEqual } from '@/wallet/utils/helper'
 import { useUserToken } from '@/store/contexts/app/userToken'
@@ -64,19 +65,21 @@ export default function Token() {
 
             <span />
 
+            <Divider />
+
             <Box ta="center">
               <Button onClick={open} size="md" loading={fetchState.loading}>
                 {minted ? 'Manage token' : 'Mint token'}
               </Button>
             </Box>
 
-            <Divider />
+            {token && <TokenPaper name={token.name} symbol={token.symbol} icon={token.icon} />}
           </Stack>
         </Stack>
       </RwdLayout>
 
       <Modal opened={opened} onClose={close} title="Creator token" centered>
-        <TokenInfo token={token} />
+        <TokenInfo token={token} onClose={close} />
       </Modal>
 
       <Space h={100} />
