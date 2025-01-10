@@ -1,31 +1,61 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import { useDisclosure } from '@mantine/hooks'
-import { Title, Stack, Space, Modal, Group, Divider } from '@mantine/core'
-import { Text, Button, ThemeIcon, Box } from '@mantine/core'
+import { useWallets } from '@privy-io/react-auth'
+import { modals } from '@mantine/modals'
+import { Title, Text, Stack, Space, Group, Divider } from '@mantine/core'
+import { Button, ThemeIcon, Box, Paper } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import TokenInfo from './Info'
 import TokenPaper from './Info/TokenPaper'
+import MintFlow from './Info/MintFlow'
 import { useWeb3 } from '@/wallet/Web3Context'
+import { useSelectWallet } from '@/wallet/hooks/useSelectWallet'
 import { isAddressEqual } from '@/wallet/utils/helper'
 import { useUserToken } from '@/store/contexts/app/userToken'
 import { PiRocketLaunch, PiHandHeart } from 'react-icons/pi'
 
+const PaperDiv = Paper.withProps({
+  p: 'md',
+  withBorder: true,
+  bg: 'transparent',
+})
+
+enum ModalIds {
+  MintFlow = 'mint-flow',
+}
+
 export default function Token() {
-  const [opened, { open, close }] = useDisclosure(false)
+  const { setClientType } = useSelectWallet()
+  const { tokens, fetchState } = useUserToken()
 
-  const { chainId, smartAccountValues } = useWeb3()
-  const { smartAccountAddress = '' } = smartAccountValues
+  // zerodev
+  const { smartAccountValues, loading } = useWeb3()
+  const zerodevAddress = smartAccountValues.smartAccountAddress || ''
 
-  const { fetchState } = useUserToken()
-  const { tokens = [] } = fetchState.value || {}
+  // privy
+  const { wallets } = useWallets()
+  const privyWallet = wallets.find(wallet => wallet.walletClientType === 'privy')
+  const privyAddress = privyWallet?.address || ''
 
-  const token = _.find(
-    tokens,
-    o => o.chainId === chainId && isAddressEqual(o._wallet.address, smartAccountAddress)
-  )
-  const minted = !!token
+  // minted token
+  const privyToken = _.find(tokens, o => isAddressEqual(o._wallet.address, privyAddress))
+  const zerodevToken = _.find(tokens, o => isAddressEqual(o._wallet.address, zerodevAddress))
+
+  const openMintFlow = (type: string) => {
+    setClientType(type as any)
+
+    modals.open({
+      id: ModalIds.MintFlow,
+      title: 'Creator token',
+      withCloseButton: false,
+      closeOnClickOutside: false,
+      children: (
+        <>
+          <MintFlow />
+        </>
+      ),
+    })
+  }
 
   return (
     <>
@@ -63,24 +93,92 @@ export default function Token() {
               </Box>
             </Group>
 
-            <span />
-
             <Divider />
 
-            <Box ta="center">
-              <Button onClick={open} size="md" loading={fetchState.loading}>
-                {minted ? 'Manage token' : 'Mint token'}
-              </Button>
-            </Box>
+            <PaperDiv>
+              <Stack>
+                <Group justify="space-between">
+                  <Title order={4} fw={500}>
+                    ZeroDev wallet
+                  </Title>
 
-            {token && <TokenPaper name={token.name} symbol={token.symbol} icon={token.icon} />}
+                  {zerodevToken ? (
+                    <Button
+                      onClick={() => {
+                        // TODO: show modal to edit token
+                      }}
+                      size="sm"
+                      variant="outline"
+                      loading={fetchState.loading}
+                    >
+                      Manage
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => {
+                        openMintFlow('zerodev')
+                      }}
+                      size="sm"
+                      loading={fetchState.loading || loading}
+                    >
+                      Mint token
+                    </Button>
+                  )}
+                </Group>
+
+                {zerodevToken && (
+                  <TokenPaper
+                    name={zerodevToken.name}
+                    symbol={zerodevToken.symbol}
+                    icon={zerodevToken.icon}
+                  />
+                )}
+              </Stack>
+            </PaperDiv>
+
+            <PaperDiv>
+              <Stack>
+                <Group justify="space-between">
+                  <Title order={4} fw={500}>
+                    Privy wallet
+                  </Title>
+
+                  {privyToken ? (
+                    <Button
+                      onClick={() => {
+                        // TODO: show modal to edit token
+                      }}
+                      size="sm"
+                      variant="outline"
+                      loading={fetchState.loading}
+                    >
+                      Manage
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => {
+                        openMintFlow('privy')
+                      }}
+                      size="sm"
+                      loading={fetchState.loading || loading}
+                    >
+                      Mint token
+                    </Button>
+                  )}
+                </Group>
+
+                {privyToken && (
+                  <TokenPaper
+                    name={privyToken.name}
+                    symbol={privyToken.symbol}
+                    icon={privyToken.icon}
+                  />
+                )}
+              </Stack>
+            </PaperDiv>
           </Stack>
         </Stack>
       </RwdLayout>
-
-      <Modal opened={opened} onClose={close} title="Creator token" centered>
-        <TokenInfo token={token} onClose={close} />
-      </Modal>
 
       <Space h={100} />
     </>

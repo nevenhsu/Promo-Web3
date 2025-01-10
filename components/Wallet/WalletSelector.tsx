@@ -2,9 +2,9 @@
 
 import * as _ from 'lodash-es'
 import { useWallets } from '@privy-io/react-auth'
-import { useAppSelector, useAppDispatch } from '@/hooks/redux'
+import { useAppSelector } from '@/hooks/redux'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { setWalletClientType } from '@/store/slices/wallet'
+import { useSelectWallet } from '@/wallet/hooks/useSelectWallet'
 import { ThemeIcon, Stack, Group, Text, Paper } from '@mantine/core'
 import { PiCheck } from 'react-icons/pi'
 
@@ -15,16 +15,12 @@ const PaperAction = Paper.withProps({
 })
 
 export default function WalletSelector() {
-  const dispatch = useAppDispatch()
-
   const { walletClientType } = useAppSelector(state => state.wallet)
   const { wallets } = useWallets()
   const { smartAccountValues } = useWeb3()
   const { kernel } = smartAccountValues
 
-  const setClientType = (type: string) => {
-    dispatch(setWalletClientType(type))
-  }
+  const { setClientType } = useSelectWallet()
 
   return (
     <Stack gap={8}>

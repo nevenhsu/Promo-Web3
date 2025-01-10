@@ -2,9 +2,10 @@
 
 import * as _ from 'lodash-es'
 import { useState, useMemo } from 'react'
-import { useTx, type TxCallback } from '@/wallet/TxContext'
+import { useTx } from '@/wallet/TxContext'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { getTokenManager } from '@/contracts'
+import type { TxCallback, TxErrorHandle } from '@/wallet/TxContext'
 
 export function useMint() {
   const { walletClient } = useWeb3()
@@ -16,7 +17,12 @@ export function useMint() {
     return txTimestamp ? _.find(txs, { timestamp: txTimestamp }) : undefined
   }, [txs, txTimestamp])
 
-  const callMint = async (name: string, symbol: string, callback?: TxCallback) => {
+  const callMint = async (
+    name: string,
+    symbol: string,
+    callback?: TxCallback,
+    errorHandle?: TxErrorHandle
+  ) => {
     if (!walletClient) {
       throw new Error('No wallet connected')
     }
@@ -35,7 +41,8 @@ export function useMint() {
       {
         description,
       },
-      callback
+      callback,
+      errorHandle
     )
 
     if (result) {

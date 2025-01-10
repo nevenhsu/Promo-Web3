@@ -147,7 +147,7 @@ export default function Wallet() {
 
       <Space h={100} />
 
-      <Modal title="Select wallet" size="sm" padding="sm" opened={opened} onClose={close} centered>
+      <Modal title="Active wallet" size="sm" padding="sm" opened={opened} onClose={close} centered>
         <WalletSelector />
       </Modal>
     </>

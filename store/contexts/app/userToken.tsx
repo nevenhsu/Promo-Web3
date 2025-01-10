@@ -1,6 +1,8 @@
 'use client'
 
-import React, { createContext, useContext, useEffect } from 'react'
+import * as _ from 'lodash-es'
+import React, { createContext, useContext, useEffect, useMemo } from 'react'
+import { useWeb3 } from '@/wallet/Web3Context'
 import { useAsyncFn } from 'react-use'
 import { notifications } from '@mantine/notifications'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
@@ -10,6 +12,7 @@ import type { NewTokenValue, MintTokenValue } from '@/services/userTokens'
 import type { AsyncState } from 'react-use/lib/useAsyncFn'
 
 interface UserTokenContextType {
+  tokens?: TUserToken[] // related to current chainId
   fetchTokens: () => Promise<{ tokens: TUserToken[] }>
   fetchState: AsyncState<{ tokens: TUserToken[] }>
   updateTokenDoc: (data: NewTokenValue) => Promise<void>
@@ -22,11 +25,17 @@ const UserTokenContext = createContext<UserTokenContextType | undefined>(undefin
 
 export const UserTokenProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { bothAuth } = useLoginStatus() // Check if user is logged in
+  const { chainId } = useWeb3()
 
   const [fetchState, fetchTokens] = useAsyncFn(async () => {
     const data = await getTokens()
     return data
   }, [])
+
+  const tokens = useMemo(() => {
+    if (!fetchState.value) return []
+    return fetchState.value.tokens.filter(token => token.chainId === chainId)
+  }, [fetchState.value, chainId])
 
   const [updateState, updateTokenDoc] = useAsyncFn(async (data: NewTokenValue) => {
     await updateToken(data)
@@ -58,7 +67,15 @@ export const UserTokenProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   return (
     <UserTokenContext.Provider
-      value={{ fetchTokens, fetchState, updateTokenDoc, updateState, mint, mintState }}
+      value={{
+        tokens,
+        fetchTokens,
+        fetchState,
+        updateTokenDoc,
+        updateState,
+        mint,
+        mintState,
+      }}
     >
       {children}
     </UserTokenContext.Provider>

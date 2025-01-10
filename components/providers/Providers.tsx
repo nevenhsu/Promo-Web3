@@ -2,6 +2,7 @@
 
 import '@/utils/console'
 
+import { ModalsProvider } from '@mantine/modals'
 import ReduxProvider from '@/store/ReduxProvider'
 import ThemeProvider from './ThemeProvider'
 import PrivyProvider from '@/wallet/PrivyProvider'
@@ -22,10 +23,12 @@ export default function Providers({ children }: React.PropsWithChildren) {
           <ThemeProvider>
             <PrivyProvider>
               <DataProviders>
-                <>
-                  {children}
-                  <BackgroundTask />
-                </>
+                <ModalsProvider modalProps={{ centered: true }}>
+                  <>
+                    {children}
+                    <BackgroundTask />
+                  </>
+                </ModalsProvider>
               </DataProviders>
             </PrivyProvider>
           </ThemeProvider>

@@ -3,6 +3,7 @@
 import * as _ from 'lodash-es'
 import React, { createContext, useContext, useState } from 'react'
 import { useWeb3 } from '@/wallet/Web3Context'
+import { useErrorHandler } from './useErrorHandler'
 import { TxStatus } from '@/types/db'
 import { getReceipt, sendUserOp, isKernelClient, simulateTx } from './tx'
 import type { Hash, SimulateContractParameters } from 'viem'
@@ -35,9 +36,16 @@ export type TxCallback = (values: {
   account: Hash
 }) => Promise<void>
 
+export type TxErrorHandle = (error: unknown) => void
+
 export type AddTxReturn = { timestamp: number } | undefined
 
-type AddTxFunc<T> = (data: T, others: OtherValues, callback?: TxCallback) => AddTxReturn
+type AddTxFunc<T> = (
+  data: T,
+  others: OtherValues,
+  callback?: TxCallback,
+  errorHandle?: TxErrorHandle
+) => AddTxReturn
 
 interface TxContextType {
   txs: Tx[]
@@ -47,6 +55,7 @@ interface TxContextType {
 const TxContext = createContext<TxContextType | undefined>(undefined)
 
 export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { handleError, handleFundError } = useErrorHandler()
   const { walletAddress, walletClient, onSmartAccount, smartAccountValues } = useWeb3()
   const [txs, setTxs] = useState<Tx[]>([])
 
@@ -54,7 +63,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setTxs(prev => prev.map(o => (o.timestamp === timestamp ? { ...o, ...newValue } : o)))
   }
 
-  const addTx: AddTxFunc<DataParams> = (data, others, callback) => {
+  const addTx: AddTxFunc<DataParams> = (data, others, callback, errorHandle) => {
     const chainId = walletClient?.chain.id
     if (!walletAddress || !chainId) return
 
@@ -74,10 +83,10 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
     if (isNativeData(data)) {
       // send tx
-      sendTx(timestamp, { to: data.to, value: data.value, data: '0x' }, callback)
+      sendTx(timestamp, { to: data.to, value: data.value, data: '0x' }, callback, errorHandle)
     } else {
       // simulate tx
-      sendContractTx(timestamp, data, callback)
+      sendContractTx(timestamp, data, callback, errorHandle)
     }
 
     return { timestamp }
@@ -86,7 +95,8 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const sendContractTx = async (
     timestamp: number,
     data: SimulateContractParameters,
-    callback?: TxCallback
+    callback?: TxCallback,
+    errorHandle?: TxErrorHandle
   ) => {
     try {
       const client = onSmartAccount ? smartAccountValues.kernel?.kernelClient : walletClient
@@ -97,15 +107,29 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
       updateTx(timestamp, { status: TxStatus.Pending })
       const { calldata } = await simulateTx(client, data)
-      await sendTx(timestamp, calldata, callback)
+
+      await sendTx(timestamp, calldata, callback, errorHandle)
     } catch (err) {
-      console.error(err)
       const error = _.get(err, 'details') || _.get(err, 'message', 'Unknown error')
       updateTx(timestamp, { status: TxStatus.Failed, error })
+
+      handleFundError(err)
+
+      if (errorHandle) {
+        errorHandle(err)
+      } else {
+        handleError(err)
+        console.error(err)
+      }
     }
   }
 
-  const sendTx = async (timestamp: number, data: Calldata, callback?: TxCallback) => {
+  const sendTx = async (
+    timestamp: number,
+    data: Calldata,
+    callback?: TxCallback,
+    errorHandle?: TxErrorHandle
+  ) => {
     try {
       const client = onSmartAccount ? smartAccountValues.kernel?.kernelClient : walletClient
       const chainId = client?.chain.id
@@ -114,6 +138,8 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       }
 
       updateTx(timestamp, { status: TxStatus.Pending })
+
+      console.info('sendAndWait')
 
       const { success, hash, opHash } = await sendAndWait(client, data)
       console.log('Transaction', { hash, success })
@@ -136,10 +162,18 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         })
       }
     } catch (err) {
-      console.error(err)
       const msg = _.get(err, 'details') || _.get(err, 'message', 'Unknown error')
       const error = msg.includes('gas') ? 'Exceed gas limit. Please try again later.' : msg
       updateTx(timestamp, { status: TxStatus.Failed, error })
+
+      handleFundError(err)
+
+      if (errorHandle) {
+        errorHandle(err)
+      } else {
+        handleError(err)
+        console.error(err)
+      }
     }
   }
 

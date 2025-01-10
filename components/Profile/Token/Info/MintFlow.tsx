@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Stepper, Stack, Group, Badge, Button, TextInput, Text, Progress } from '@mantine/core'
+import { modals } from '@mantine/modals'
+import { Stepper, Stack, Group, Badge, Space } from '@mantine/core'
+import { Button, TextInput, Text, Progress } from '@mantine/core'
 import { useForm, hasLength } from '@mantine/form'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { useUserToken } from '@/store/contexts/app/userToken'
@@ -12,16 +14,9 @@ import Completion, { Status } from '@/components/share/Completion'
 import { cleanSymbol, cleanName } from '@/utils/helper'
 import { checkToken } from '@/services/userTokens'
 
-type MintFlowProps = {
-  onClose: () => void
-}
-
-export default function MintFlow({ onClose }: MintFlowProps) {
+export default function MintFlow() {
   const { mintState, mint } = useUserToken()
-
-  const { smartAccountValues, chainId } = useWeb3()
-  const walletAddress = smartAccountValues.smartAccountAddress
-
+  const { chainId, walletAddress } = useWeb3()
   const { callMint } = useMint()
 
   // state
@@ -95,12 +90,16 @@ export default function MintFlow({ onClose }: MintFlowProps) {
     setActive(active + 1)
 
     // send transaction
-    callMint(name, symbol, async values => {
-      tryUpload()
-    }).catch(error => {
-      console.error(error)
-      tryUpload()
-    })
+    callMint(
+      name,
+      symbol,
+      async values => {
+        tryUpload()
+      },
+      error => {
+        tryUpload()
+      }
+    )
   }
 
   const form = useForm({
@@ -140,7 +139,7 @@ export default function MintFlow({ onClose }: MintFlowProps) {
     } else if (!chainId || !walletAddress) {
       setError('No wallet connected')
     }
-  }, [error, name, symbol])
+  }, [error, chainId, walletAddress])
 
   // Sync mint state
   useEffect(() => {
@@ -157,63 +156,71 @@ export default function MintFlow({ onClose }: MintFlowProps) {
         active={active}
         onStepClick={setActive}
         allowNextStepsSelect={false}
-        mih={420}
       >
         <Stepper.Step label="First step" description="Fill out this form" allowStepSelect={false}>
-          <Stack align="center" gap="xs" mb="xl">
-            <IconButton
-              url={iconURI}
-              onChange={file => {
-                if (file && file.size >= 1024 * 1024 * 10) {
-                  setIconError('Image size cannot exceed 10mb')
-                } else {
-                  setIconError(undefined)
-                }
-              }}
-              onDataURLChange={dataURI => {
-                setIconImg(dataURI || '')
-              }}
-            />
-
-            {errorMsg ? (
-              <Badge size="sm" color="red">
-                {errorMsg}
-              </Badge>
-            ) : null}
-          </Stack>
-
-          <form
-            onSubmit={form.onSubmit(
-              values => handleSubmit(values),
-              (validationErrors, values, event) => {
-                console.log(
-                  validationErrors, // <- form.errors at the moment of submit
-                  values, // <- form.getValues() at the moment of submit
-                  event // <- form element submit event
-                )
-              }
-            )}
-          >
-            <Stack>
-              <TextInput
-                label="Name"
-                description="3-12 characters (English letters or numbers)"
-                key={form.key('name')}
-                {...form.getInputProps('name')}
+          <Stack>
+            <Stack align="center" gap="xs">
+              <IconButton
+                url={iconURI}
+                onChange={file => {
+                  if (file && file.size >= 1024 * 1024 * 10) {
+                    setIconError('Image size cannot exceed 10mb')
+                  } else {
+                    setIconError(undefined)
+                  }
+                }}
+                onDataURLChange={dataURI => {
+                  setIconImg(dataURI || '')
+                }}
               />
 
-              <TextInput
-                label="Symbol"
-                description="2-8 characters (English letters or numbers)"
-                key={form.key('symbol')}
-                {...form.getInputProps('symbol')}
-              />
-
-              <Group justify="right" mt="sm">
-                <Button type="submit">Next</Button>
-              </Group>
+              {errorMsg ? (
+                <Badge size="sm" color="red">
+                  {errorMsg}
+                </Badge>
+              ) : null}
             </Stack>
-          </form>
+
+            <form
+              onSubmit={form.onSubmit(
+                values => handleSubmit(values),
+                (validationErrors, values, event) => {
+                  console.log(
+                    validationErrors, // <- form.errors at the moment of submit
+                    values, // <- form.getValues() at the moment of submit
+                    event // <- form element submit event
+                  )
+                }
+              )}
+            >
+              <Stack>
+                <TextInput
+                  label="Name"
+                  description="3-12 characters (English letters or numbers)"
+                  key={form.key('name')}
+                  {...form.getInputProps('name')}
+                />
+
+                <TextInput
+                  label="Symbol"
+                  description="2-8 characters (English letters or numbers)"
+                  key={form.key('symbol')}
+                  {...form.getInputProps('symbol')}
+                />
+
+                <Space h={24} />
+
+                <Group justify="space-between">
+                  <Button color="dark" variant="outline" onClick={() => modals.closeAll()}>
+                    Close
+                  </Button>
+                  <Button type="submit" disabled={name.length < 3 || symbol.length < 2}>
+                    Next
+                  </Button>
+                </Group>
+              </Stack>
+            </form>
+          </Stack>
         </Stepper.Step>
         <Stepper.Step label="Second step" description="Mint your token" allowStepSelect={false}>
           <Stack>
@@ -225,16 +232,23 @@ export default function MintFlow({ onClose }: MintFlowProps) {
             </Text>
 
             {errorMsg ? (
-              <Badge size="sm" color="red">
+              <Badge size="sm" color="red" mx="auto">
                 {errorMsg}
               </Badge>
             ) : null}
 
-            <Group justify="right" mt="lg">
-              <Button variant="outline" color="dark" onClick={() => setActive(0)}>
-                Back
+            <Space h={144} />
+
+            <Group justify="space-between">
+              <Button color="dark" variant="outline" onClick={() => modals.closeAll()}>
+                Close
               </Button>
-              <Button onClick={handleMint}>Mint</Button>
+              <Group>
+                <Button variant="outline" color="dark" onClick={() => setActive(0)}>
+                  Back
+                </Button>
+                <Button onClick={handleMint}>Mint</Button>
+              </Group>
             </Group>
           </Stack>
         </Stepper.Step>
@@ -242,7 +256,7 @@ export default function MintFlow({ onClose }: MintFlowProps) {
         <Stepper.Completed>
           <Stack align="center" justify="center">
             <Completion
-              onOk={onClose}
+              onOk={() => modals.closeAll()}
               status={status}
               text={{
                 pending: 'Minting...',
@@ -256,6 +270,7 @@ export default function MintFlow({ onClose }: MintFlowProps) {
               description={
                 <Stack>
                   {status === Status.Pending && <Progress w="100%" value={100} animated />}
+
                   <Text fz="sm" c="dimmed" mb="xl">
                     {status === Status.Pending
                       ? `Don't close this window. Wait for the transaction to be confirmed, this may take
@@ -266,6 +281,8 @@ export default function MintFlow({ onClose }: MintFlowProps) {
                           ? 'Failed to mint your token. Please try again later.'
                           : ''}
                   </Text>
+
+                  <Space h={40} />
                 </Stack>
               }
             />
