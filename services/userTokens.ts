@@ -8,7 +8,6 @@ export async function getTokens() {
 
 export type NewTokenValue = {
   docId: string
-  icon: string
   iconURI: string
 }
 

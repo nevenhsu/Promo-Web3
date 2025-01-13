@@ -32,8 +32,8 @@ export default function Header() {
     <>
       <Box className={classes['header-bg']} />
 
-      <Group h="100%" px={16} justify="space-between" pos="relative">
-        <Group gap="md">
+      <Group h="100%" px={16} justify="space-between" pos="relative" wrap="nowrap">
+        <Group gap="md" wrap="nowrap">
           {showBack ? (
             <ActionIcon
               onClick={() => goBack()}
@@ -52,7 +52,7 @@ export default function Header() {
           </Link>
         </Group>
 
-        <Group>
+        <Group wrap="nowrap">
           <NetworkButton />
 
           {bothAuth && username ? (

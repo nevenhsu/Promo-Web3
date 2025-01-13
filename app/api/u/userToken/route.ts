@@ -24,11 +24,7 @@ export async function POST(req: NextRequest) {
     const jwt = await getToken({ req })
     const json = await req.json()
     const userId = jwt?.user?.id!
-    const { docId, icon, iconURI } = json
-
-    const data = {
-      icon,
-    }
+    const { docId, iconURI } = json
 
     if (!docId) {
       return NextResponse.json({ error: 'Token ID is required' }, { status: 400 })
@@ -44,11 +40,12 @@ export async function POST(req: NextRequest) {
     // upload image to GCP
     const walletId = doc._wallet.toString()
     const url = await uploadTokenIcon(userId, walletId, iconURI)
-    if (url) {
-      data.icon = url
+
+    if (!url) {
+      return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 })
     }
 
-    const token = await updateUserToken(docId, _.omitBy(data, _.isEmpty))
+    const token = await updateUserToken(docId, { icon: url })
 
     return NextResponse.json({ token })
   } catch (error) {

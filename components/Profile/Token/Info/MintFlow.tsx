@@ -30,6 +30,8 @@ export default function MintFlow() {
   const iconURI = iconError ? '' : iconImg
   const errorMsg = error || iconError
 
+  const notConnected = !chainId || !walletAddress
+
   const handleSubmit = async (values: typeof form.values) => {
     const name = values.name.trim()
     const symbol = values.symbol.trim()
@@ -70,7 +72,7 @@ export default function MintFlow() {
   }
 
   const handleMint = async () => {
-    if (!chainId || !walletAddress) {
+    if (notConnected) {
       setStatus(Status.Failed)
       return
     }
@@ -247,7 +249,9 @@ export default function MintFlow() {
                 <Button variant="outline" color="dark" onClick={() => setActive(0)}>
                   Back
                 </Button>
-                <Button onClick={handleMint}>Mint</Button>
+                <Button onClick={handleMint} disabled={notConnected}>
+                  Mint
+                </Button>
               </Group>
             </Group>
           </Stack>

@@ -7,7 +7,7 @@ import { useAsyncFn } from 'react-use'
 import { notifications } from '@mantine/notifications'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
 import { getTokens, mintToken, updateToken } from '@/services/userTokens'
-import type { TUserToken } from '@/models/userToken'
+import type { TUserToken, UserToken } from '@/models/userToken'
 import type { NewTokenValue, MintTokenValue } from '@/services/userTokens'
 import type { AsyncState } from 'react-use/lib/useAsyncFn'
 
@@ -15,8 +15,8 @@ interface UserTokenContextType {
   tokens?: TUserToken[] // related to current chainId
   fetchTokens: () => Promise<{ tokens: TUserToken[] }>
   fetchState: AsyncState<{ tokens: TUserToken[] }>
-  updateTokenDoc: (data: NewTokenValue) => Promise<void>
-  updateState: AsyncState<void>
+  updateTokenDoc: (data: NewTokenValue) => Promise<UserToken>
+  updateState: AsyncState<UserToken>
   mint: (value: MintTokenValue) => Promise<void>
   mintState: AsyncState<void>
 }
@@ -38,7 +38,7 @@ export const UserTokenProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [fetchState.value, chainId])
 
   const [updateState, updateTokenDoc] = useAsyncFn(async (data: NewTokenValue) => {
-    await updateToken(data)
+    const { token } = await updateToken(data)
     fetchTokens()
 
     notifications.show({
@@ -46,6 +46,8 @@ export const UserTokenProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       message: 'Your token has been updated successfully',
       color: 'green',
     })
+
+    return token
   }, [])
 
   const [mintState, mint] = useAsyncFn(async (value: MintTokenValue) => {

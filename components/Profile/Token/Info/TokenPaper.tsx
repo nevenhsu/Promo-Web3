@@ -4,10 +4,11 @@ type TokenPaperProps = {
   name: string
   symbol: string
   icon?: string | null
+  leftSection?: React.ReactNode
 }
 
 export default function TokenPaper(props: TokenPaperProps) {
-  const { name, symbol, icon } = props
+  const { name, symbol, icon, leftSection } = props
   return (
     <Paper radius="md" p="md" shadow="xs">
       <Group justify="space-between">
@@ -25,6 +26,8 @@ export default function TokenPaper(props: TokenPaperProps) {
             </Text>
           </Stack>
         </Group>
+
+        {leftSection ? <>{leftSection}</> : null}
       </Group>
     </Paper>
   )
