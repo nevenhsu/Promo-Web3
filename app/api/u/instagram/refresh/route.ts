@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     const doc = await InstagramModel.findOne({ _user: userId }).lean()
     const userDoc = await UserModel.findById(userId).lean()
 
-    if (!doc || !userDoc) {
+    if (!doc || !userDoc || !doc.accessToken) {
       return NextResponse.json({ error: 'Data not found' }, { status: 400 })
     }
 

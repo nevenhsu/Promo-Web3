@@ -3,3 +3,7 @@
   background: var(--mantine-color-white);
   border-radius: var(--mantine-radius-sm);
 }
+
+.selected {
+  border-color: var(--mantine-primary-color-6);
+}

@@ -1,9 +1,10 @@
 'use client'
 
 import * as _ from 'lodash-es'
+import { Link } from '@/i18n/routing'
 import { BaseError } from 'viem'
 import { modals } from '@mantine/modals'
-import { Box, Text } from '@mantine/core'
+import { Box, Text, Button } from '@mantine/core'
 
 export function useErrorHandler() {
   const handleError = (error: unknown) => {
@@ -44,11 +45,11 @@ export function useErrorHandler() {
           title: 'Insufficient funds',
           children: (
             <Box pb="xl">
-              <Text fz="sm">Please deposit ETH to your active wallet.</Text>
+              <Text fz="sm">Please deposit ETH to your selected wallet.</Text>
               <Text fz="sm">You don't have enough funds to complete this transaction.</Text>
             </Box>
           ),
-          labels: { confirm: 'Okay', cancel: 'Close' },
+          labels: { confirm: <Link href="/wallet/receive">Deposit ETH</Link>, cancel: 'Close' },
           onCancel: () => console.log('Close'),
           onConfirm: () => console.log('Confirmed'),
         })

@@ -6,13 +6,9 @@ import { useAppSelector } from '@/hooks/redux'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { useSelectWallet } from '@/wallet/hooks/useSelectWallet'
 import { ThemeIcon, Stack, Group, Text, Paper } from '@mantine/core'
-import { PiCheck } from 'react-icons/pi'
+import { PiLightningFill } from 'react-icons/pi'
 
-const PaperAction = Paper.withProps({
-  className: 'c-pointer',
-  withBorder: true,
-  p: 'sm',
-})
+const PaperAction = Paper.withProps({ className: 'c-pointer', withBorder: true, p: 'sm' })
 
 export default function WalletSelector() {
   const { walletClientType } = useAppSelector(state => state.wallet)
@@ -30,8 +26,8 @@ export default function WalletSelector() {
             <Group gap="xs">
               <Text>ZeroDev</Text>
               {walletClientType === 'zerodev' && (
-                <ThemeIcon size="xs" color="green">
-                  <PiCheck />
+                <ThemeIcon size="xs" variant="white">
+                  <PiLightningFill />
                 </ThemeIcon>
               )}
             </Group>
@@ -40,12 +36,6 @@ export default function WalletSelector() {
               {kernel.walletClient.account.address}
             </Text>
           </Stack>
-
-          {walletClientType === 'smartAccount' && (
-            <ThemeIcon color="green" size="xl">
-              <PiCheck />
-            </ThemeIcon>
-          )}
         </PaperAction>
       )}
 
@@ -55,8 +45,8 @@ export default function WalletSelector() {
             <Group gap="xs">
               <Text>{_.upperFirst(o.walletClientType)}</Text>
               {walletClientType === o.walletClientType && (
-                <ThemeIcon size="xs" color="green">
-                  <PiCheck />
+                <ThemeIcon size="xs" variant="white">
+                  <PiLightningFill />
                 </ThemeIcon>
               )}
             </Group>

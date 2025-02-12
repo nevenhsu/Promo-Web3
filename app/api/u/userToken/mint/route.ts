@@ -4,6 +4,7 @@ import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import UserTokenModel from '@/models/userToken'
 import { getUserWallets } from '@/lib/db/userWallet'
+import { addTokenDoc } from '@/lib/db/token'
 import { getTokenContract } from '@/contracts'
 import { getPublicClient } from '@/wallet/lib/publicClients'
 import { isAddress, isAddressEqual } from '@/wallet/utils/helper'
@@ -39,14 +40,7 @@ export async function POST(req: NextRequest) {
       tokenContract.read.symbol(),
     ])
 
-    const data = {
-      name,
-      symbol,
-      chainId,
-      _user: userId,
-      _wallet: walletId,
-      icon: '',
-    }
+    const data = { name, symbol, chainId, _user: userId, _wallet: walletId, icon: '' }
 
     const url = await uploadTokenIcon(userId, walletId, iconURI)
     if (url) {
@@ -58,6 +52,8 @@ export async function POST(req: NextRequest) {
       data,
       { upsert: true, new: true }
     )
+
+    await addTokenDoc(userId, token._id)
 
     return NextResponse.json({ token })
   } catch (error) {
