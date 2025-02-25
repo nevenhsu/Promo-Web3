@@ -10,22 +10,30 @@ import Form, { type FormRef } from '../Form'
 import CreateFields from '../Form/CreateFields'
 import { formatDate } from '@/utils/date'
 import { useWeb3 } from '@/wallet/Web3Context'
+import { useActivityTx } from './useActivityTx'
 import { defaultChain } from '@/wallet/variables'
 import type { ActivityData } from '@/models/activity'
 
 export default function ProfileActivityNew() {
   const { chainId } = useWeb3()
+  const { createAndDepositWithPermit } = useActivityTx()
+
   const formRef = useRef<FormRef>(null)
 
   const [opened, { open, close }] = useDisclosure(false)
   const [checked, setChecked] = useState(false)
+  const [data, setData] = useState<ActivityData>()
 
-  const [createActivityState, createActivity] = useAsyncFn(async (data: ActivityData) => {}, [])
+  const [createActivityState, createActivity] = useAsyncFn(async (data: ActivityData) => {
+    // TODO: add callback
+    await createAndDepositWithPermit(data)
+    // send transaction
+  }, [])
   const { loading, value, error } = createActivityState
   const submitted = Boolean(value)
 
   const handleSubmit = async (data: ActivityData) => {
-    console.log(data)
+    setData(data)
     open()
   }
 
@@ -112,7 +120,7 @@ export default function ProfileActivityNew() {
 
       {/* Modal content */}
       <Modal
-        opened={opened}
+        opened={opened && !!data}
         onClose={close}
         title={
           <Text fz="xl" fw={500}>
@@ -128,33 +136,35 @@ export default function ProfileActivityNew() {
             You cannot edit the date and post after submitting
           </Text>
 
-          <Stack gap="sm">
-            <Group justify="space-between" gap="xs">
-              <Text fz="sm" fw={500}>
-                Date
-              </Text>
-              <Text
-                fz="sm"
-                c="dimmed"
-              >{`${formatDate(new Date())} - ${formatDate(new Date())}`}</Text>
-            </Group>
-            <Group justify="space-between" gap={4}>
-              <Text fz="sm" fw={500}>
-                Post
-              </Text>
-              <Text fz="sm" c="dimmed">
-                Instagram - 123123
-              </Text>
-            </Group>
-            <Group justify="space-between" gap="xs">
-              <Text fz="sm" fw={500}>
-                Prize
-              </Text>
-              <Text fz="sm" c="dimmed">
-                USDT 234234
-              </Text>
-            </Group>
-          </Stack>
+          {data ? (
+            <Stack gap="sm">
+              <Group justify="space-between" gap="xs">
+                <Text fz="sm" fw={500}>
+                  Date
+                </Text>
+                <Text
+                  fz="sm"
+                  c="dimmed"
+                >{`${formatDate(data.startTime)} - ${formatDate(data.endTime)}`}</Text>
+              </Group>
+              <Group justify="space-between" gap={4}>
+                <Text fz="sm" fw={500}>
+                  Post
+                </Text>
+                <Text fz="sm" c="dimmed">
+                  {`${data.socialMedia} - ${data.details.link}`}
+                </Text>
+              </Group>
+              <Group justify="space-between" gap="xs">
+                <Text fz="sm" fw={500}>
+                  Prize
+                </Text>
+                <Text fz="sm" c="dimmed">
+                  {`${data.airdrop.amount} ${data.airdrop.symbol}`}
+                </Text>
+              </Group>
+            </Stack>
+          ) : null}
 
           <Checkbox
             checked={checked}
@@ -163,7 +173,7 @@ export default function ProfileActivityNew() {
           />
 
           <Text fz="xs" c="dimmed">
-            After ended, the prize will be distributed to the supporters <br />
+            The prize will be distributed to the supporters <br />
             Remaining tokens will be returned to your wallet
           </Text>
 
@@ -171,7 +181,9 @@ export default function ProfileActivityNew() {
             <Button onClick={close} variant="outline" color="dark">
               Cancel
             </Button>
-            <Button disabled={!checked}>Submit</Button>
+            <Button disabled={!checked || !data} onClick={() => createActivity(data!)}>
+              Submit
+            </Button>
           </Group>
         </Stack>
       </Modal>

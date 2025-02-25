@@ -20,7 +20,9 @@ export default function ProfileActivity() {
           <Group justify="space-between">
             <Title order={3}>Activity</Title>
             <Link href="/profile/activity/new">
-              <Button size="sm">New Activity</Button>
+              <Button size="sm" disabled={!fetchState.value?.tokens.length}>
+                New Activity
+              </Button>
             </Link>
           </Group>
 

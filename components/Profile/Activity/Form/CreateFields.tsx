@@ -5,13 +5,30 @@ import { useMemo, useEffect } from 'react'
 import { isBefore } from 'date-fns'
 import { Paper, TextInput, Select, Stack, Group, Text, ThemeIcon } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
-import { symbols } from '@/contracts/tokens'
+import { getTokens } from '@/contracts/tokens'
 import { useFormContext } from './Context'
+import { useWeb3 } from '@/wallet/Web3Context'
+import { useUserToken } from '@/store/contexts/app/userToken'
 import { getXPostId, getInstagramPostId } from '@/utils/socialMedia'
 import { PiNumberOneBold, PiNumberTwoBold, PiNumberThreeBold } from 'react-icons/pi'
 import { ActivityType, SocialMedia } from '@/types/db'
 
+type Token = {
+  symbol: string
+  name: string
+}
+
 export default function FormFields() {
+  const { chainId } = useWeb3()
+  const { tokens } = useUserToken()
+
+  const symbols = useMemo(() => {
+    const defaultTokens = getTokens(chainId)
+    const userTokens = _.filter(tokens, { chainId })
+    const list = _.concat<Token>(defaultTokens, userTokens)
+    return list || []
+  }, [chainId, tokens])
+
   const form = useFormContext()
   const { socialMedia, activityType, details, airdrop } = form.values
   const { symbol, amount } = airdrop
@@ -43,11 +60,11 @@ export default function FormFields() {
     const amountNum = Number(amount) || 0
 
     form.setFieldValue('setting.data', {
-      maxTotalScore: symbol === 'USDC' ? amountNum * 1000 : amountNum,
+      maxTotalScore: amountNum * 1000,
       maxSelfScore: 10000,
       minFollowers: 100,
     })
-  }, [symbol, amount])
+  }, [amount])
 
   // Extract post id from full link
   useEffect(() => {
@@ -64,6 +81,13 @@ export default function FormFields() {
       form.setFieldValue('details.link', postId)
     }
   }, [socialMedia, fullLink])
+
+  // Reset symbol if not found in the list
+  useEffect(() => {
+    if (airdrop.symbol && !symbols.find(o => o.symbol === airdrop.symbol)) {
+      form.setFieldValue('airdrop.symbol', '')
+    }
+  }, [airdrop.symbol, symbols])
 
   return (
     <>
@@ -148,7 +172,7 @@ export default function FormFields() {
             label="Token"
             placeholder="Pick one"
             withCheckIcon={false}
-            data={symbols.map(o => ({ value: o, label: o }))}
+            data={symbols.map(o => ({ value: o.symbol, label: `${o.name} (${o.symbol})` }))}
             key={form.key('airdrop.symbol')}
             {...form.getInputProps('airdrop.symbol')}
           />

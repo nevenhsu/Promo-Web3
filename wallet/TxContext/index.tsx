@@ -42,7 +42,7 @@ export type AddTxReturn = { timestamp: number } | undefined
 
 type AddTxFunc<T> = (
   data: T,
-  others: OtherValues,
+  others?: OtherValues,
   callback?: TxCallback,
   errorHandle?: TxErrorHandle
 ) => AddTxReturn
@@ -56,7 +56,7 @@ const TxContext = createContext<TxContextType | undefined>(undefined)
 
 export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { handleError, handleFundError } = useErrorHandler()
-  const { walletAddress, walletClient, onSmartAccount, smartAccountValues } = useWeb3()
+  const { walletAddress, walletClient } = useWeb3()
   const [txs, setTxs] = useState<Tx[]>([])
 
   const updateTx = (timestamp: number, newValue: Partial<Tx>) => {
@@ -99,14 +99,13 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     errorHandle?: TxErrorHandle
   ) => {
     try {
-      const client = onSmartAccount ? smartAccountValues.kernel?.kernelClient : walletClient
-      const chainId = client?.chain.id
-      if (!chainId || !client) {
+      const chainId = walletClient?.chain.id
+      if (!chainId || !walletClient) {
         throw new Error('Wallet not found')
       }
 
       updateTx(timestamp, { status: TxStatus.Pending })
-      const { calldata } = await simulateTx(client, data)
+      const { calldata } = await simulateTx(walletClient, data)
 
       await sendTx(timestamp, calldata, callback, errorHandle)
     } catch (err) {
@@ -131,9 +130,8 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     errorHandle?: TxErrorHandle
   ) => {
     try {
-      const client = onSmartAccount ? smartAccountValues.kernel?.kernelClient : walletClient
-      const chainId = client?.chain.id
-      if (!chainId || !client) {
+      const chainId = walletClient?.chain.id
+      if (!chainId || !walletClient) {
         throw new Error('Wallet not found')
       }
 
@@ -141,7 +139,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
       console.info('sendAndWait')
 
-      const { success, hash, opHash } = await sendAndWait(client, data)
+      const { success, hash, opHash } = await sendAndWait(walletClient, data)
       console.log('Transaction', { hash, success })
 
       // update tx hash
@@ -158,7 +156,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
           success,
           timestamp,
           chainId,
-          account: client.account.address,
+          account: walletClient.account.address,
         })
       }
     } catch (err) {

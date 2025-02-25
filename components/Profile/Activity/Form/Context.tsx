@@ -12,6 +12,7 @@ export interface FormValues {
   activityType: string
   socialMedia: string
   airdrop: {
+    _userToken?: string
     symbol: string
     amount: string // Base unit, not wei, ex: 10 USDC
   }
