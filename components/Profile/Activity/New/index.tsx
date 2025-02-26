@@ -3,16 +3,19 @@
 import { useRef, useState } from 'react'
 import { useAsyncFn } from 'react-use'
 import { useDisclosure } from '@mantine/hooks'
-import { Stack, Space, Group, Modal, Loader } from '@mantine/core'
+import { Stepper, Stack, Space, Group, Modal, Loader } from '@mantine/core'
 import { Title, Text, Button, Checkbox } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import Form, { type FormRef } from '../Form'
 import CreateFields from '../Form/CreateFields'
+import Completion, { Status } from '@/components/share/Completion'
 import { formatDate } from '@/utils/date'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { useActivityTx } from './useActivityTx'
 import { defaultChain } from '@/wallet/variables'
 import type { ActivityData } from '@/models/activity'
+
+// TODO: stepper UI
 
 export default function ProfileActivityNew() {
   const { chainId } = useWeb3()
@@ -20,16 +23,44 @@ export default function ProfileActivityNew() {
 
   const formRef = useRef<FormRef>(null)
 
+  // state
+  const [active, setActive] = useState(0)
+  const [status, setStatus] = useState(Status.Init)
+  const [error, setError] = useState<string>()
+
   const [opened, { open, close }] = useDisclosure(false)
   const [checked, setChecked] = useState(false)
   const [data, setData] = useState<ActivityData>()
 
   const [createActivityState, createActivity] = useAsyncFn(async (data: ActivityData) => {
-    // TODO: add callback
-    await createAndDepositWithPermit(data)
-    // send transaction
+    if (status === Status.Pending) return
+    setStatus(Status.Pending)
+
+    try {
+      // send transaction
+      const result = await createAndDepositWithPermit(data, async values => {
+        const { hash, success, chainId } = values
+
+        if (!success) {
+          setStatus(Status.Failed)
+          setError('Transaction failed')
+          return
+        }
+
+        // upload to db
+        setStatus(Status.Success)
+      })
+    } catch (error) {
+      console.error(error)
+      setStatus(Status.Failed)
+      if (error instanceof Error) {
+        setError(error.message)
+      }
+    }
   }, [])
-  const { loading, value, error } = createActivityState
+
+  // TODO: refactor this
+  const { loading, value } = createActivityState
   const submitted = Boolean(value)
 
   const handleSubmit = async (data: ActivityData) => {
