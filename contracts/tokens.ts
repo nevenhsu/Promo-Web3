@@ -7,7 +7,7 @@ import type { Hash } from 'viem'
 export type ETH = {
   name: 'Ethereum'
   symbol: 'ETH'
-  decimal: 18
+  decimals: 18
   icon: '/icons/eth.svg'
   isNative: true
 }
@@ -16,7 +16,7 @@ export type Erc20 = {
   chainId: number
   name: string
   symbol: string
-  decimal: number
+  decimals: number
   address: Hash
   version: string
   icon: string
@@ -28,7 +28,7 @@ export type Token = ETH | Erc20
 export const eth: ETH = {
   name: 'Ethereum',
   symbol: 'ETH',
-  decimal: 18,
+  decimals: 18,
   icon: '/icons/eth.svg',
   isNative: true,
 }
@@ -39,7 +39,7 @@ export const tokens: { [id: string]: Erc20[] } = {
       chainId: arbitrum.id,
       name: 'USD Coin',
       symbol: 'USDC',
-      decimal: 6,
+      decimals: 6,
       address: unifyAddress('0xaf88d065e77c8cc2239327c5edb3a432268e5831'),
       version: '2',
       icon: '/icons/usdc-token.svg',
@@ -51,7 +51,7 @@ export const tokens: { [id: string]: Erc20[] } = {
       chainId: arbitrumSepolia.id,
       name: 'USD Coin',
       symbol: 'USDC',
-      decimal: 6,
+      decimals: 6,
       address: unifyAddress('0x43660fBE273F7107C3f6Ce448a85f3C96a78367D'),
       version: '2',
       icon: '/icons/usdc-token.svg',

@@ -9,6 +9,8 @@ import { createContract } from '@/wallet/lib/createContract'
 import { publicClients } from '@/wallet/lib/publicClients'
 import type { WalletClient } from 'viem'
 
+// TODO: get user's token list
+
 // Get current wallet values from Web3Context
 // instead of using this hook directly
 
@@ -58,8 +60,8 @@ export function useBalances({ chainId, walletClient, loading }: UseBalanceParams
           if (contract) {
             const balance = await contract.read.balanceOf([walletAddress])
             if (typeof balance === 'bigint') {
-              const { symbol, decimal } = o
-              return { symbol, decimal, balance }
+              const { symbol, decimals } = o
+              return { symbol, decimals, balance }
             }
           }
         } catch (err) {
@@ -70,9 +72,9 @@ export function useBalances({ chainId, walletClient, loading }: UseBalanceParams
 
     const newBalances = [...results, eth].reduce((acc, result) => {
       if (result) {
-        const { symbol, decimal, balance } = result
+        const { symbol, decimals, balance } = result
         acc[symbol] = balance
-        console.log(`${symbol} balance:`, formatBalance(balance, decimal).toFixed(2))
+        console.log(`${symbol} balance:`, formatBalance(balance, decimals).toFixed(2))
       }
       return acc
     }, {} as Balances)

@@ -9,7 +9,7 @@ export async function getUserTokens(userId: string) {
     }>('_wallet')
     .lean()
 
-  return docs
+  return docs.map(o => ({ ...o, decimals: 6 }))
 }
 
 export async function uploadTokenIcon(userId: string, walletId: string, iconURI: string) {

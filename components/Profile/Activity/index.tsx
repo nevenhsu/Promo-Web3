@@ -17,14 +17,20 @@ export default function ProfileActivity() {
     <>
       <RwdLayout>
         <Stack gap="xl">
-          <Group justify="space-between">
-            <Title order={3}>Activity</Title>
-            <Link href="/profile/activity/new">
-              <Button size="sm" disabled={!fetchState.value?.tokens.length}>
-                New Activity
-              </Button>
-            </Link>
-          </Group>
+          <Stack gap="xs">
+            <Group justify="space-between">
+              <Title order={3}>Activity</Title>
+              <Link href="/profile/activity/new">
+                <Button size="sm" disabled={!fetchState.value?.tokens.length}>
+                  New Activity
+                </Button>
+              </Link>
+            </Group>
+
+            <Text fz="sm" c="dimmed">
+              Create an activity to engage with your supporters
+            </Text>
+          </Stack>
 
           {noToken ? (
             <Link href="/profile/token">

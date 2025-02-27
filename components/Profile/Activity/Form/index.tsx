@@ -9,6 +9,8 @@ import { FormProvider, useForm } from './Context'
 import { formatZonedDate } from '@/utils/helper'
 import { isValidXPostLink, isValidInstagramPostLink } from '@/utils/socialMedia'
 import { getXPostId, getInstagramPostId } from '@/utils/socialMedia'
+import { useTokenList } from './useTokenList'
+import { formatAmount } from '@/utils/math'
 import { ActivityType, SocialMedia, ActivitySettingType } from '@/types/db'
 
 export type FormRef = {
@@ -20,7 +22,9 @@ type FormProps = {
 }
 
 export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
+  const list = useTokenList()
   const { balancesValues } = useWeb3()
+  const { balances } = balancesValues
 
   const form = useForm({
     mode: 'controlled',
@@ -68,6 +72,9 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
         if (!value) {
           return 'Should not be empty'
         }
+        if (isBefore(value, new Date())) {
+          return 'Should be in the future'
+        }
         if (values.startTime && isBefore(value, values.startTime)) {
           return `Should after ${formatZonedDate(values.startTime, 'MMM dd yyyy h:mm aa')}`
         }
@@ -77,9 +84,20 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
       socialMedia: value => (value ? null : 'Should not be empty'),
       airdrop: {
         symbol: value => (value ? null : 'Should not be empty'),
-        amount: value => {
+        amount: (value, values) => {
+          const token = list.find(o => o.symbol === values.airdrop.symbol)
+          if (!token) {
+            return 'Token not found'
+          }
+
           if (Number(value) > 0) {
-            // TODO: Check balance
+            const amount = formatAmount(value, token.decimals)
+            const bal = balances[token.symbol]
+
+            if (!bal || amount.gt(bal.toString())) {
+              return 'Insufficient balance'
+            }
+
             return null
           }
           return 'Should be greater than 0'

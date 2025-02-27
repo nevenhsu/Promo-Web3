@@ -5,34 +5,28 @@ import { useMemo, useEffect } from 'react'
 import { isBefore } from 'date-fns'
 import { Paper, TextInput, Select, Stack, Group, Text, ThemeIcon } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
-import { getTokens } from '@/contracts/tokens'
-import { useFormContext } from './Context'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { useUserToken } from '@/store/contexts/app/userToken'
+import { useFormContext } from './Context'
+import { useTokenList } from './useTokenList'
 import { getXPostId, getInstagramPostId } from '@/utils/socialMedia'
+import { formatBalance } from '@/utils/math'
 import { PiNumberOneBold, PiNumberTwoBold, PiNumberThreeBold } from 'react-icons/pi'
 import { ActivityType, SocialMedia } from '@/types/db'
 
-type Token = {
-  symbol: string
-  name: string
-}
-
 export default function FormFields() {
-  const { chainId } = useWeb3()
-  const { tokens } = useUserToken()
+  const list = useTokenList()
+  const { balancesValues } = useWeb3()
+  const { balances } = balancesValues
 
-  const symbols = useMemo(() => {
-    const defaultTokens = getTokens(chainId)
-    const userTokens = _.filter(tokens, { chainId })
-    const list = _.concat<Token>(defaultTokens, userTokens)
-    return list || []
-  }, [chainId, tokens])
+  console.log({ balances })
 
   const form = useFormContext()
   const { socialMedia, activityType, details, airdrop } = form.values
   const { symbol, amount } = airdrop
   const { fullLink } = details
+
+  const token = list.find(o => o.symbol === symbol)
+  const tokenBal = balances[symbol]
 
   // Activity types based on social media
   const activityTypes = useMemo(() => {
@@ -84,10 +78,10 @@ export default function FormFields() {
 
   // Reset symbol if not found in the list
   useEffect(() => {
-    if (airdrop.symbol && !symbols.find(o => o.symbol === airdrop.symbol)) {
+    if (airdrop.symbol && !list.find(o => o.symbol === symbol)) {
       form.setFieldValue('airdrop.symbol', '')
     }
-  }, [airdrop.symbol, symbols])
+  }, [airdrop.symbol, list])
 
   return (
     <>
@@ -112,6 +106,7 @@ export default function FormFields() {
             key={form.key('endTime')}
             {...form.getInputProps('endTime')}
             excludeDate={date =>
+              isBefore(date, new Date()) ||
               Boolean(form.getValues().startTime && isBefore(date, form.getValues().startTime!))
             }
           />
@@ -172,7 +167,7 @@ export default function FormFields() {
             label="Token"
             placeholder="Pick one"
             withCheckIcon={false}
-            data={symbols.map(o => ({ value: o.symbol, label: `${o.name} (${o.symbol})` }))}
+            data={list.map(o => ({ value: o.symbol, label: `${o.name} (${o.symbol})` }))}
             key={form.key('airdrop.symbol')}
             {...form.getInputProps('airdrop.symbol')}
           />
@@ -180,7 +175,7 @@ export default function FormFields() {
           <TextInput
             label="Prize"
             key={form.key('airdrop.amount')}
-            placeholder="Balance available: 4,936.25"
+            description={`Balance available: ${formatBalance(tokenBal?.toString() || 0, token?.decimals || 0)}`}
             {...form.getInputProps('airdrop.amount')}
           />
         </Stack>

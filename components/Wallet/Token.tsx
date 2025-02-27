@@ -6,15 +6,15 @@ type TokenProps = {
   symbol: string
   name: string
   icon: string
-  decimal: number
+  decimals: number
   balance?: bigint // in smallest unit
   price?: Decimal
 }
 
 export default function Token(props: TokenProps) {
-  const { symbol, name, icon, balance, price, decimal } = props
+  const { symbol, name, icon, balance, price, decimals } = props
 
-  const bal = Decimal.div(balance?.toString() || 0, 10 ** decimal)
+  const bal = Decimal.div(balance?.toString() || 0, 10 ** decimals)
   const p = price ? price.mul(bal) : undefined
 
   return (
