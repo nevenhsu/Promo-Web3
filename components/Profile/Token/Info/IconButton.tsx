@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, forwardRef } from 'react'
 import { FileButton, Box, Text, Avatar } from '@mantine/core'
 
 type IconButtonProps = {
@@ -9,7 +9,10 @@ type IconButtonProps = {
   onDataURLChange?: (dataURI: string | undefined) => void
 }
 
-export default function IconButton(props: IconButtonProps) {
+export default forwardRef<HTMLDivElement, IconButtonProps>(function IconButton(
+  props: IconButtonProps,
+  ref
+) {
   const { url, onChange, onDataURLChange } = props
   const [file, setFile] = useState<File | null>(null)
   const [dataURI, setDataURI] = useState<string>()
@@ -49,7 +52,7 @@ export default function IconButton(props: IconButtonProps) {
       >
         {props => (
           <>
-            <Box {...props} className="c-pointer" pos="relative" w={80}>
+            <Box {...props} ref={ref} className="c-pointer" pos="relative" w={80}>
               <Avatar src={imgSrc || null} name={''} color="initials" size={80}>
                 {' '}
               </Avatar>
@@ -63,4 +66,4 @@ export default function IconButton(props: IconButtonProps) {
       </FileButton>
     </Box>
   )
-}
+})

@@ -4,7 +4,8 @@ import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import UserTokenModel from '@/models/userToken'
 import { getUserWallets } from '@/lib/db/userWallet'
-import { addTokenDoc } from '@/lib/db/token'
+import { updateBalance } from '@/lib/balance'
+import { addTokenBalance } from '@/lib/db/tokenBalance'
 import { getTokenContract } from '@/contracts'
 import { getPublicClient } from '@/wallet/lib/publicClients'
 import { isAddress, isAddressEqual } from '@/wallet/utils/helper'
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     await dbConnect()
 
-    const wallets = await getUserWallets(userId)
+    const wallets = await getUserWallets(userId, true)
     const wallet = wallets.find(w => isAddressEqual(w.address, walletAddress))
     const walletId = wallet?._id.toString() || ''
     const owner = wallet?.address || ''
@@ -47,13 +48,18 @@ export async function POST(req: NextRequest) {
       data.icon = url
     }
 
+    // create userToken doc
     const token = await UserTokenModel.findOneAndUpdate(
       { _user: data._user, _wallet: data._wallet, chainId },
       data,
       { upsert: true, new: true }
     )
 
-    await addTokenDoc(userId, token._id)
+    // create tokenBalance docs
+    await Promise.all(
+      wallets.map(wallet => addTokenBalance(userId, wallet._id, token._id, chainId, symbol))
+    )
+    await updateBalance(userId, token._id)
 
     return NextResponse.json({ token })
   } catch (error) {

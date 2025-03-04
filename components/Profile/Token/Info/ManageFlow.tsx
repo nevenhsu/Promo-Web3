@@ -1,7 +1,7 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { modals } from '@mantine/modals'
 import { Stack, Badge, Group, Button, ThemeIcon, Box } from '@mantine/core'
 import { useUserToken } from '@/store/contexts/app/userToken'
@@ -14,6 +14,7 @@ type ManageFlowProps = {
 }
 
 export default function ManageFlow({ docId }: ManageFlowProps) {
+  const btnRef = useRef<HTMLDivElement>(null)
   const { tokens, updateTokenDoc, updateState } = useUserToken()
   const token = _.find(tokens, t => t._id === docId)
 
@@ -56,6 +57,7 @@ export default function ManageFlow({ docId }: ManageFlowProps) {
       <Stack align="center" gap="xs">
         <Box pos="relative">
           <IconButton
+            ref={btnRef}
             url={iconURI}
             onChange={file => {
               if (file && file.size >= 1024 * 1024 * 10) {
@@ -89,7 +91,27 @@ export default function ManageFlow({ docId }: ManageFlowProps) {
         ) : null}
       </Stack>
 
-      {token && <TokenPaper name={token.name} symbol={token.symbol} icon={iconURI} />}
+      {token && (
+        <TokenPaper
+          name={token.name}
+          symbol={token.symbol}
+          icon={iconURI}
+          leftSection={
+            <Badge
+              className="c-pointer"
+              color="dark"
+              variant="outline"
+              onClick={() => {
+                if (btnRef.current) {
+                  btnRef.current.click()
+                }
+              }}
+            >
+              Upload
+            </Badge>
+          }
+        />
+      )}
 
       <Group justify="right">
         <Button color="dark" variant="outline" onClick={() => modals.closeAll()}>

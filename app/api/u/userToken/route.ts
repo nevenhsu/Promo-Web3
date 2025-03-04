@@ -3,6 +3,9 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { getUserTokens, updateUserToken, getUserToken, uploadTokenIcon } from '@/lib/db/userToken'
+import { updateBalance } from '@/lib/balance'
+import { getUserWallets } from '@/lib/db/userWallet'
+import { addTokenBalance } from '@/lib/db/tokenBalance'
 
 export async function GET(req: NextRequest) {
   try {
@@ -46,6 +49,19 @@ export async function POST(req: NextRequest) {
     }
 
     const token = await updateUserToken(docId, { icon: url })
+
+    if (!token) {
+      return NextResponse.json({ error: 'Failed to update token' }, { status: 500 })
+    }
+
+    // create tokenBalance docs
+    const wallets = await getUserWallets(userId, true)
+    await Promise.all(
+      wallets.map(wallet =>
+        addTokenBalance(userId, wallet._id, token._id, token.chainId, token.symbol)
+      )
+    )
+    await updateBalance(userId, token._id)
 
     return NextResponse.json({ token })
   } catch (error) {

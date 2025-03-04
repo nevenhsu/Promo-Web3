@@ -47,3 +47,9 @@ export async function getExistingTokens(value: { name: string; symbol: string; c
   const tokens = await UserTokenModel.find({ chainId, $or: [{ name }, { symbol }] }).lean()
   return tokens
 }
+
+export async function getTokenBySymbol(value: { symbol: string; chainId: number }) {
+  const { symbol, chainId } = value
+  const token = await UserTokenModel.findOne({ chainId, symbol }).lean()
+  return token
+}
