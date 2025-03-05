@@ -22,28 +22,8 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// Update balances of all tokens
+// Update tokenBalance docs
 export async function POST(req: NextRequest) {
-  try {
-    const jwt = await getToken({ req })
-    const userId = jwt?.user?.id!
-
-    await dbConnect()
-    const docs = await getBalancesOfAll(userId)
-    const tokenIds = _.uniq(docs.map(o => o._userToken._id))
-
-    const newDocs = await Promise.all(tokenIds.map(o => updateBalance(userId, o)))
-    const tokens = _.flatten(newDocs)
-
-    return NextResponse.json({ tokens: _.flatten(tokens) })
-  } catch (error) {
-    console.error(error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
-}
-
-// Add tokenBalance docs
-export async function PUT(req: NextRequest) {
   try {
     const jwt = await getToken({ req })
     const json = await req.json()

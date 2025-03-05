@@ -1,12 +1,15 @@
 import * as _ from 'lodash-es'
+import { fromUnixTime } from 'date-fns'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
-import { saveTransaction, getTransaction, getTransactions } from '@/lib/db/transaction'
+import { saveTransaction, getTransactions } from '@/lib/db/transaction'
+import { getTransferLog } from '@/lib/web3/erc20'
+import { getEthTxLog } from '@/lib/web3/eth'
 import { getUserWallets } from '@/lib/db/userWallet'
-import { TxStatus } from '@/types/db'
+import { getTokenBySymbol } from '@/lib/db/userToken'
+import { TxStatus, TxType } from '@/types/db'
 import { isAddressEqual } from '@/wallet/utils/helper'
-import { isEnumMember } from '@/utils/helper'
 
 // Save a transaction for the current user
 export async function PUT(req: NextRequest) {
@@ -18,6 +21,36 @@ export async function PUT(req: NextRequest) {
 
     const data = await req.json()
     const value = pickData(data)
+
+    // fetch onchain data
+    if (value.type === TxType.ERC20) {
+      const log = await getTransferLog(value)
+
+      // check if token is UserToken
+      const userToken = await getTokenBySymbol({ symbol: log.symbol, chainId: value.chainId })
+
+      // override value with onchain data
+      value.status = log.success ? TxStatus.Success : TxStatus.Failed
+      value.token.amount = log.amount.toString()
+      value.token.symbol = log.symbol
+      value.token._userToken = userToken?._id
+      value.createdAt = fromUnixTime(log.timestamp)
+      value.from = log.from
+      value.to = log.to
+    }
+
+    if (value.type === TxType.Native) {
+      const log = await getEthTxLog(value)
+
+      // override value with onchain data
+      value.status = log.success ? TxStatus.Success : TxStatus.Failed
+      value.token.amount = log.amount.toString()
+      value.token.symbol = 'ETH'
+      value.createdAt = fromUnixTime(log.timestamp)
+      value.from = log.from
+      value.to = log.to
+      value.token._userToken = null
+    }
 
     // Check if the user has the wallet
     const wallets = await getUserWallets(userId)
@@ -31,45 +64,6 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({
       tx,
     })
-  } catch (error) {
-    console.error(error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
-}
-
-// Update the status of a transaction
-export async function POST(req: NextRequest) {
-  try {
-    const jwt = await getToken({ req })
-    const userId = jwt?.user?.id!
-
-    await dbConnect()
-
-    const data = await req.json()
-    const { chainId, hash, status } = data
-
-    const tx = await getTransaction(chainId, hash)
-
-    if (!tx) {
-      return NextResponse.json({ error: 'Transaction not found' }, { status: 404 })
-    }
-
-    // Check if the user has the wallet
-    const wallets = await getUserWallets(userId)
-    const fromWallet = wallets.find(w => isAddressEqual(w.address, tx.from))
-    if (!fromWallet) {
-      return NextResponse.json({ error: 'Invalid user wallet' }, { status: 400 })
-    }
-
-    // Check if the status is valid
-    if (isEnumMember(status, TxStatus)) {
-      tx.status = status as any
-      await tx.save()
-    } else {
-      return NextResponse.json({ error: 'Invalid transaction status' }, { status: 400 })
-    }
-
-    return NextResponse.json({ tx })
   } catch (error) {
     console.error(error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

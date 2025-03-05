@@ -9,16 +9,6 @@ export async function createTransaction(value: TransactionData & { status: TxSta
   return data.tx
 }
 
-// Update the status of a transaction
-export async function updateTransactionStatus(values: {
-  chainId: number
-  hash: string
-  status: TxStatus
-}) {
-  const { data } = await axios.post<{ tx: Transaction }>('/api/u/transaction', values)
-  return data.tx
-}
-
 // Get the transactions of the current user
 export async function getTransactions(values: { page: number; limit: number; isAirdrop: boolean }) {
   const { page, limit } = values

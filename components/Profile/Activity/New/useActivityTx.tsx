@@ -37,11 +37,11 @@ export function useActivityTx() {
     const defaultToken = defaultTokens.find(token => token.symbol === symbol)
 
     let tokenAddress = '' as any
-    let decimal = 0
+    let decimals = 0
 
     if (defaultToken) {
       tokenAddress = defaultToken.address
-      decimal = defaultToken.decimal
+      decimals = defaultToken.decimals
     } else {
       const token = tokens?.find(token => token.symbol === symbol)
       if (!token) throw new Error('Token not found')
@@ -50,7 +50,7 @@ export function useActivityTx() {
         contract: tokenManager.address,
         owner: token._wallet.address,
       })
-      decimal = 6
+      decimals = 6
     }
 
     if (!tokenAddress) throw new Error('Token address not found')
@@ -67,7 +67,7 @@ export function useActivityTx() {
     )
 
     const owner = walletClient.account.address
-    const rawAmount = formatAmount(amount, decimal)
+    const rawAmount = formatAmount(amount, decimals)
 
     const result = addTx(
       {

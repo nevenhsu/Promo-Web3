@@ -2,6 +2,8 @@ import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
 import UserModel from '@/models/user'
 import UserTokenModel from '@/models/userToken'
 import UserWalletModel from '@/models/userWallet'
+import type { UserWallet } from '@/models/userWallet'
+import type { TUserToken } from '@/models/userToken'
 
 // make sure to user with only one token balance on one chain
 // find symbol and chainId to update balance
@@ -38,8 +40,10 @@ export const schema = new Schema({
 schema.index({ _user: 1, _wallet: 1, symbol: 1, chainId: 1 }, { unique: true })
 
 export type TokenBalance = InferSchemaType<typeof schema> & { _id: string }
-export type TTokenBalance = TokenBalance & {
+export type TTokenBalance = Omit<TokenBalance, '_userToken' | '_wallet' | 'balance'> & {
   balance: string
+  _wallet: UserWallet
+  _userToken: TUserToken
 }
 
 const name = 'TokenBalance'

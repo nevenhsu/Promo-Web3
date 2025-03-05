@@ -26,7 +26,10 @@ schema.index({ _user: 1, _wallet: 1, chainId: 1 }, { unique: true })
 schema.index({ symbol: 1, chainId: 1 }, { unique: true })
 
 export type UserToken = InferSchemaType<typeof schema> & { _id: string }
-export type TUserToken = Omit<UserToken, '_wallet'> & { _wallet: UserWallet; decimals: number }
+export type TUserToken = Omit<UserToken, '_wallet'> & {
+  _wallet: UserWallet
+  decimals: number // manually added
+}
 
 const name = 'UserToken'
 const UserTokenModel = (models[name] as Model<UserToken>) || model(name, schema)

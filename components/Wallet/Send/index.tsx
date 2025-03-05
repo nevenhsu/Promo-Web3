@@ -100,7 +100,7 @@ export default function Send() {
 
   const handleMax = () => {
     if (token && balance) {
-      form.setFieldValue('amount', formatBalance(balance, token.decimal).toString())
+      form.setFieldValue('amount', formatBalance(balance, token.decimals).toString())
     }
   }
 
@@ -117,14 +117,14 @@ export default function Send() {
       return
     }
 
-    const rawAmount = formatAmount(values.amount, token.decimal) // raw value
+    const rawAmount = formatAmount(values.amount, token.decimals) // raw value
     if (rawAmount.gt(balance.toString())) {
       form.setFieldError('amount', 'Insufficient balance')
       return
     }
 
     // Set final display value
-    const correctedAmount = formatBalance(rawAmount, token.decimal).toString()
+    const correctedAmount = formatBalance(rawAmount, token.decimals).toString()
     form.setFieldValue('amount', correctedAmount)
 
     modals.openConfirmModal({
@@ -167,7 +167,7 @@ export default function Send() {
 
     let result: AddTxReturn
 
-    const displayAmount = formatBalance(rawAmount, token.decimal).toString() // display value
+    const displayAmount = formatBalance(rawAmount, token.decimals).toString() // display value
     const description = `Transfer ${displayAmount} ${token.symbol} to ${to}`
 
     if (isETH(token)) {
@@ -331,7 +331,7 @@ export default function Send() {
                     }}
                   >
                     {token
-                      ? `Available Balance: ${formatBalance(balance || 0, token.decimal).toDP(6)}`
+                      ? `Available Balance: ${formatBalance(balance || 0, token.decimals).toDP(6)}`
                       : ''}
                   </Text>
 

@@ -3,6 +3,7 @@ import TransactionModel, { type Transaction } from '@/models/transaction'
 import { getUserWallet } from '@/lib/db/userWallet'
 import { unifyAddress } from '@/wallet/utils/helper'
 import { TxStatus, TxType } from '@/types/db'
+import { updateBalance } from '@/lib/balance'
 import type { User } from '@/models/user'
 
 export async function saveTransaction(
@@ -36,6 +37,20 @@ export async function saveTransaction(
       new: true,
     }
   )
+
+  // update token balance
+  const _userToken = values.token?._userToken?.toString()
+  if (_userToken) {
+    const fromId = fromWallet?._user?.toString()
+    if (fromId) {
+      await updateBalance(fromId, _userToken)
+    }
+    const toId = toWallet?._user?.toString()
+    if (toId) {
+      await updateBalance(toId, _userToken)
+    }
+  }
+
   return tx
 }
 
