@@ -20,13 +20,20 @@ type UseBalanceParams = {
   walletClient?: WalletClient
 }
 
-type Balances = { [symbol: string]: bigint | undefined } // smallest unit
+type BalanceList = {
+  [symbol: string]:
+    | {
+        balance: bigint // smallest unit
+        decimals: number
+      }
+    | undefined
+}
 
 export function useBalances({ chainId, walletClient, loading }: UseBalanceParams) {
   const walletAddress = walletClient?.account?.address
   const notReady = !chainId || !walletAddress || loading
 
-  const [balances, setBalances] = useState<Balances>({})
+  const [balances, setBalances] = useState<BalanceList>({})
 
   const fetchEthBalance = async (chainId: number, address: `0x${string}`) => {
     const client = publicClients[chainId]
@@ -73,11 +80,11 @@ export function useBalances({ chainId, walletClient, loading }: UseBalanceParams
     const newBalances = [...results, eth].reduce((acc, result) => {
       if (result) {
         const { symbol, decimals, balance } = result
-        acc[symbol] = balance
+        acc[symbol] = { balance, decimals }
         console.log(`${symbol} balance:`, formatBalance(balance, decimals).toFixed(2))
       }
       return acc
-    }, {} as Balances)
+    }, {} as BalanceList)
 
     setBalances(newBalances)
   }, [notReady, chainId, walletAddress])

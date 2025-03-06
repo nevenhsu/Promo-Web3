@@ -12,7 +12,7 @@ import { AirdropProvider } from '@/store/contexts/app/airdropContext'
 import { ActivityProvider } from '@/store/contexts/app/activityContext'
 import { TransactionProvider } from '@/store/contexts/app/transactionContext'
 import { ActivityStatusProvider } from '@/store/contexts/app/activityStatusContext'
-import { UserTokenProvider } from '@/store/contexts/app/userToken'
+import { UserTokenProvider } from '@/store/contexts/app/userTokenContext'
 import { TokenBalanceProvider } from '@/store/contexts/app/tokenBalanceContext'
 import BackgroundTask from './BackgroundTask'
 

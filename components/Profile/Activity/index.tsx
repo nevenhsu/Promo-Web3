@@ -6,7 +6,7 @@ import { Text, Button, ThemeIcon, Box } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { ActivityCard } from './ActivityCard'
 import { PiCoinVertical, PiCaretRight } from 'react-icons/pi'
-import { useUserToken } from '@/store/contexts/app/userToken'
+import { useUserToken } from '@/store/contexts/app/userTokenContext'
 
 export default function ProfileActivity() {
   const { fetchState } = useUserToken()

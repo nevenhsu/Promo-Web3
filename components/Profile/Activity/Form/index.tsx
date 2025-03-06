@@ -94,7 +94,7 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
             const amount = formatAmount(value, token.decimals)
             const bal = balances[token.symbol]
 
-            if (!bal || amount.gt(bal.toString())) {
+            if (!bal || amount.gt(bal.balance.toString())) {
               return 'Insufficient balance'
             }
 

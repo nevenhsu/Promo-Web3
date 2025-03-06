@@ -33,11 +33,11 @@ export default function Wallet() {
   const { prices } = pricesValues
 
   const totalBalance = useMemo(() => {
-    const ethValue = calcTokenValue(eth.decimals, prices[eth.symbol], balances[eth.symbol])
+    const ethValue = calcTokenValue(eth.decimals, prices[eth.symbol], balances[eth.symbol]?.balance)
     return _.reduce(
       tokens,
       (acc, o) => {
-        const val = calcTokenValue(o.decimals, prices[o.symbol], balances[o.symbol])
+        const val = calcTokenValue(o.decimals, prices[o.symbol], balances[o.symbol]?.balance)
         return acc.add(val)
       },
       ethValue
@@ -124,7 +124,7 @@ export default function Wallet() {
             icon="/icons/eth.svg"
             name="Ethereum"
             decimals={18}
-            balance={balances.ETH}
+            balance={balances.ETH?.balance}
             price={prices['ETH']}
           />
           {/* ERC20 */}
@@ -137,7 +137,7 @@ export default function Wallet() {
                   icon={o.icon}
                   name={o.name}
                   decimals={o.decimals}
-                  balance={balances[o.symbol]}
+                  balance={balances[o.symbol]?.balance}
                   price={prices[o.symbol]}
                 />
               )

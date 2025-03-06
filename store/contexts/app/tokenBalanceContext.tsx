@@ -3,28 +3,21 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react'
 import { useAsyncFn } from 'react-use'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
-import { getBalancesOfAll, updateTokenBalance } from '@/services/tokenBalance'
+import { getBalancesOfAll } from '@/services/tokenBalance'
 import type { AsyncState } from 'react-use/lib/useAsyncFn'
 import type { TTokenBalance } from '@/models/tokenBalance'
 
-type OverwriteValue = {
+export type OverwriteValue = {
   symbol: string
   chainId: number
   balance: string // base unit, not wei
 }
 
-type UpdateValue = {
-  symbol: string
-  chainId: number
-}
-
 interface TokenBalanceContextType {
   tokenBalances: TTokenBalance[]
-  overwriteTokenBal: (value: OverwriteValue) => void
+  overwriteTokenBal: (values: OverwriteValue[]) => void
   fetchState: AsyncState<{ tokens: TTokenBalance[] }>
   fetchTokenBal: () => Promise<{ tokens: TTokenBalance[] }>
-  updateState: AsyncState<{ tokens: TTokenBalance[] }>
-  updateTokenBal: (value: UpdateValue) => Promise<{ tokens: TTokenBalance[] }>
 }
 
 const TokenBalanceContext = createContext<TokenBalanceContextType | undefined>(undefined)
@@ -33,14 +26,20 @@ export const TokenBalanceProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const { bothAuth } = useLoginStatus() // Check if user is logged in
   const [overwrites, setOverwrites] = useState<OverwriteValue[]>([])
 
-  const overwriteTokenBal = (value: OverwriteValue) => {
+  const overwriteTokenBal = (values: OverwriteValue[]) => {
     setOverwrites(prev => {
-      const index = prev.findIndex(o => o.symbol === value.symbol && o.chainId === value.chainId)
-      if (index === -1) {
-        return [...prev, value]
-      }
+      // Merge overwrites with fetched data
       const newOverwrites = [...prev]
-      newOverwrites[index] = value
+
+      values.forEach(v => {
+        const index = newOverwrites.findIndex(o => o.symbol === v.symbol && o.chainId === v.chainId)
+        if (index === -1) {
+          newOverwrites.push(v)
+        } else {
+          newOverwrites[index] = v
+        }
+      })
+
       return newOverwrites
     })
   }
@@ -64,11 +63,6 @@ export const TokenBalanceProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return []
   }, [fetchState.value, overwrites])
 
-  const [updateState, updateTokenBal] = useAsyncFn(async (value: UpdateValue) => {
-    const { tokens } = await updateTokenBalance(value)
-    return { tokens }
-  }, [])
-
   useEffect(() => {
     if (bothAuth) {
       fetchTokenBal()
@@ -82,8 +76,6 @@ export const TokenBalanceProvider: React.FC<{ children: React.ReactNode }> = ({ 
         overwriteTokenBal,
         fetchState,
         fetchTokenBal,
-        updateState,
-        updateTokenBal,
       }}
     >
       {children}

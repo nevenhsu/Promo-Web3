@@ -16,3 +16,11 @@ export async function updateTokenDoc(_user: string, _userToken: string, totalBal
     { upsert: true, new: true }
   )
 }
+
+export async function clearTokenUpdatedAt(_user: string, userTokenIds: string[]) {
+  return TokenModel.updateMany(
+    { _user, _userToken: { $in: userTokenIds } },
+    { updatedAt: null },
+    { new: true }
+  )
+}

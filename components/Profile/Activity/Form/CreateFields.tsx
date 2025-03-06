@@ -25,7 +25,6 @@ export default function FormFields() {
   const { symbol, amount } = airdrop
   const { fullLink } = details
 
-  const token = list.find(o => o.symbol === symbol)
   const tokenBal = balances[symbol]
 
   // Activity types based on social media
@@ -175,7 +174,7 @@ export default function FormFields() {
           <TextInput
             label="Prize"
             key={form.key('airdrop.amount')}
-            description={`Balance available: ${formatBalance(tokenBal?.toString() || 0, token?.decimals || 0)}`}
+            description={`Balance available: ${formatBalance(tokenBal?.balance?.toString() || 0, tokenBal?.decimals || 0)}`}
             {...form.getInputProps('airdrop.amount')}
           />
         </Stack>

@@ -2,7 +2,7 @@
 
 import { getUnixTime } from 'date-fns'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { useUserToken } from '@/store/contexts/app/userToken'
+import { useUserToken } from '@/store/contexts/app/userTokenContext'
 import { useTx } from '@/wallet/TxContext'
 import { getTokenManager, getActivityManager } from '@/contracts'
 import { getTokens } from '@/contracts/tokens'

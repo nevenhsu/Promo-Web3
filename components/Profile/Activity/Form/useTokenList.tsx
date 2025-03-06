@@ -4,7 +4,7 @@ import * as _ from 'lodash-es'
 import { useMemo } from 'react'
 import { getTokens } from '@/contracts/tokens'
 import { useWeb3 } from '@/wallet/Web3Context'
-import { useUserToken } from '@/store/contexts/app/userToken'
+import { useUserToken } from '@/store/contexts/app/userTokenContext'
 
 type Token = {
   symbol: string

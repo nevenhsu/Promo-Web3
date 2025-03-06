@@ -12,7 +12,7 @@ import ManageFlow from './Info/ManageFlow'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { useSelectWallet } from '@/wallet/hooks/useSelectWallet'
 import { isAddressEqual } from '@/wallet/utils/helper'
-import { useUserToken } from '@/store/contexts/app/userToken'
+import { useUserToken } from '@/store/contexts/app/userTokenContext'
 import { PiRocketLaunch, PiHandHeart } from 'react-icons/pi'
 import type { TUserToken } from '@/models/userToken'
 

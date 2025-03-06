@@ -99,8 +99,8 @@ export default function Send() {
   }
 
   const handleMax = () => {
-    if (token && balance) {
-      form.setFieldValue('amount', formatBalance(balance, token.decimals).toString())
+    if (balance) {
+      form.setFieldValue('amount', formatBalance(balance.balance, balance.decimals).toString())
     }
   }
 
@@ -117,14 +117,14 @@ export default function Send() {
       return
     }
 
-    const rawAmount = formatAmount(values.amount, token.decimals) // raw value
-    if (rawAmount.gt(balance.toString())) {
+    const rawAmount = formatAmount(values.amount, balance.decimals) // raw value
+    if (rawAmount.gt(balance.balance.toString())) {
       form.setFieldError('amount', 'Insufficient balance')
       return
     }
 
     // Set final display value
-    const correctedAmount = formatBalance(rawAmount, token.decimals).toString()
+    const correctedAmount = formatBalance(rawAmount, balance.decimals).toString()
     form.setFieldValue('amount', correctedAmount)
 
     modals.openConfirmModal({
@@ -331,7 +331,7 @@ export default function Send() {
                     }}
                   >
                     {token
-                      ? `Available Balance: ${formatBalance(balance || 0, token.decimals).toDP(6)}`
+                      ? `Available Balance: ${formatBalance(balance?.balance || 0, balance?.decimals || 0).toDP(6)}`
                       : ''}
                   </Text>
 
