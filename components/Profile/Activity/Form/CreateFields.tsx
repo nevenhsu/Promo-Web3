@@ -7,16 +7,17 @@ import { Paper, TextInput, Select, Stack, Group, Text, ThemeIcon } from '@mantin
 import { DateTimePicker } from '@mantine/dates'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { useFormContext } from './Context'
-import { useTokenList } from './useTokenList'
+// import { useTokenList } from '@/hooks/useTokenList'
 import { getXPostId, getInstagramPostId } from '@/utils/socialMedia'
-import { formatBalance } from '@/utils/math'
+import { formatBalance, formatFixedNumber } from '@/utils/math'
 import { PiNumberOneBold, PiNumberTwoBold, PiNumberThreeBold } from 'react-icons/pi'
 import { ActivityType, SocialMedia } from '@/types/db'
 
 export default function FormFields() {
-  const list = useTokenList()
-  const { balancesValues } = useWeb3()
+  // const { userTokens } = useTokenList()
+  const { balancesValues, tokenListValues } = useWeb3()
   const { balances } = balancesValues
+  const { userTokens } = tokenListValues
 
   console.log({ balances })
 
@@ -77,10 +78,10 @@ export default function FormFields() {
 
   // Reset symbol if not found in the list
   useEffect(() => {
-    if (airdrop.symbol && !list.find(o => o.symbol === symbol)) {
+    if (airdrop.symbol && !userTokens.find(o => o.symbol === symbol)) {
       form.setFieldValue('airdrop.symbol', '')
     }
-  }, [airdrop.symbol, list])
+  }, [airdrop.symbol, userTokens])
 
   return (
     <>
@@ -166,7 +167,7 @@ export default function FormFields() {
             label="Token"
             placeholder="Pick one"
             withCheckIcon={false}
-            data={list.map(o => ({ value: o.symbol, label: `${o.name} (${o.symbol})` }))}
+            data={userTokens.map(o => ({ value: o.symbol, label: `${o.name} (${o.symbol})` }))}
             key={form.key('airdrop.symbol')}
             {...form.getInputProps('airdrop.symbol')}
           />
@@ -174,7 +175,7 @@ export default function FormFields() {
           <TextInput
             label="Prize"
             key={form.key('airdrop.amount')}
-            description={`Balance available: ${formatBalance(tokenBal?.balance?.toString() || 0, tokenBal?.decimals || 0)}`}
+            description={`Balance available: ${formatFixedNumber(formatBalance(tokenBal?.balance?.toString() || 0, tokenBal?.decimals || 0), tokenBal?.decimals || 0)}`}
             {...form.getInputProps('airdrop.amount')}
           />
         </Stack>

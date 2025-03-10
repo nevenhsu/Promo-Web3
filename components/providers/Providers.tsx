@@ -22,16 +22,16 @@ export default function Providers({ children }: React.PropsWithChildren) {
       <AuthProvider>
         <ReduxProvider>
           <ThemeProvider>
-            <PrivyProvider>
-              <DataProviders>
+            <DataProviders>
+              <PrivyProvider>
                 <ModalsProvider modalProps={{ centered: true }}>
                   <>
                     {children}
                     <BackgroundTask />
                   </>
                 </ModalsProvider>
-              </DataProviders>
-            </PrivyProvider>
+              </PrivyProvider>
+            </DataProviders>
           </ThemeProvider>
         </ReduxProvider>
       </AuthProvider>

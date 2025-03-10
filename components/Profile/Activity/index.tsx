@@ -11,7 +11,7 @@ import { useUserToken } from '@/store/contexts/app/userTokenContext'
 export default function ProfileActivity() {
   const { fetchState } = useUserToken()
 
-  const noToken = !fetchState.loading && !fetchState.value?.tokens.length
+  const noToken = !fetchState.loading && !fetchState.value?.length
 
   return (
     <>
@@ -21,7 +21,7 @@ export default function ProfileActivity() {
             <Group justify="space-between">
               <Title order={3}>Activity</Title>
               <Link href="/profile/activity/new">
-                <Button size="sm" disabled={!fetchState.value?.tokens.length}>
+                <Button size="sm" disabled={!fetchState.value?.length}>
                   New Activity
                 </Button>
               </Link>

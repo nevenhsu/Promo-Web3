@@ -3,20 +3,19 @@
 import * as _ from 'lodash-es'
 import { useState, useEffect } from 'react'
 import { useAsyncFn } from 'react-use'
-import { getTokens, eth } from '@/contracts/tokens'
+import { eth, type Erc20 } from '@/contracts/tokens'
 import { formatBalance } from '@/utils/math'
 import { createContract } from '@/wallet/lib/createContract'
-import { publicClients } from '@/wallet/lib/publicClients'
+import { getPublicClient } from '@/wallet/lib/publicClients'
 import type { WalletClient } from 'viem'
-
-// TODO: get user's token list
 
 // Get current wallet values from Web3Context
 // instead of using this hook directly
 
 type UseBalanceParams = {
-  chainId?: number
+  tokens: Erc20[]
   loading: boolean
+  chainId?: number
   walletClient?: WalletClient
 }
 
@@ -25,18 +24,20 @@ type BalanceList = {
     | {
         balance: bigint // smallest unit
         decimals: number
+        wallet: string
       }
     | undefined
 }
 
-export function useBalances({ chainId, walletClient, loading }: UseBalanceParams) {
+export function useBalances({ tokens, chainId, walletClient, loading }: UseBalanceParams) {
   const walletAddress = walletClient?.account?.address
   const notReady = !chainId || !walletAddress || loading
+  const symbols = tokens.map(o => o.symbol).join('')
 
   const [balances, setBalances] = useState<BalanceList>({})
 
   const fetchEthBalance = async (chainId: number, address: `0x${string}`) => {
-    const client = publicClients[chainId]
+    const client = getPublicClient(chainId)
     if (client) {
       try {
         const balance = await client.getBalance({ address })
@@ -53,34 +54,33 @@ export function useBalances({ chainId, walletClient, loading }: UseBalanceParams
   }
 
   const [updateState, updateBalances] = useAsyncFn(async () => {
-    const tokens = getTokens(chainId)
-    if (notReady) return
+    const client = getPublicClient(chainId)
+    if (notReady || !client) return
 
-    // eth balance
-    const eth = await fetchEthBalance(chainId, walletAddress)
+    const contracts = tokens.map(o => ({
+      contract: createContract(o, client as any),
+      ...o,
+    }))
 
-    // erc20 balance
-    const results = await Promise.all(
-      tokens.map(async o => {
+    const [eth, ...results] = await Promise.all([
+      fetchEthBalance(chainId, walletAddress),
+      ...contracts.map(async o => {
         try {
-          const contract = createContract(o, walletClient)
-          if (contract) {
-            const balance = await contract.read.balanceOf([walletAddress])
-            if (typeof balance === 'bigint') {
-              const { symbol, decimals } = o
-              return { symbol, decimals, balance }
-            }
+          const balance = await o.contract?.read.balanceOf([walletAddress])
+          if (typeof balance === 'bigint') {
+            const { symbol, decimals } = o
+            return { symbol, decimals, balance }
           }
         } catch (err) {
           console.error(err)
         }
-      })
-    )
+      }),
+    ])
 
     const newBalances = [...results, eth].reduce((acc, result) => {
       if (result) {
         const { symbol, decimals, balance } = result
-        acc[symbol] = { balance, decimals }
+        acc[symbol] = { balance, decimals, wallet: walletAddress }
         console.log(`${symbol} balance:`, formatBalance(balance, decimals).toFixed(2))
       }
       return acc
@@ -97,11 +97,10 @@ export function useBalances({ chainId, walletClient, loading }: UseBalanceParams
   }, [loading])
 
   useEffect(() => {
-    if (notReady) return
-
-    // auto update balances
-    updateBalances()
-  }, [notReady, chainId, walletAddress])
+    if (!notReady && walletAddress) {
+      updateBalances()
+    }
+  }, [symbols, walletAddress, chainId, notReady])
 
   return { notReady, balances, loading: loading || updateState.loading, updateBalances }
 }

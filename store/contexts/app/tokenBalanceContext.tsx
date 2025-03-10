@@ -11,22 +11,36 @@ export type OverwriteValue = {
   symbol: string
   chainId: number
   balance: string // base unit, not wei
+  wallet: string
 }
 
 interface TokenBalanceContextType {
   tokenBalances: TTokenBalance[]
   overwriteTokenBal: (values: OverwriteValue[]) => void
-  fetchState: AsyncState<{ tokens: TTokenBalance[] }>
-  fetchTokenBal: () => Promise<{ tokens: TTokenBalance[] }>
+  fetchState: AsyncState<TTokenBalance[]>
+  fetchTokenBal: () => Promise<TTokenBalance[]>
 }
 
 const TokenBalanceContext = createContext<TokenBalanceContextType | undefined>(undefined)
 
 export const TokenBalanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { bothAuth } = useLoginStatus() // Check if user is logged in
+  const { nextAuth } = useLoginStatus() // Check if user is logged in
   const [overwrites, setOverwrites] = useState<OverwriteValue[]>([])
 
   const overwriteTokenBal = (values: OverwriteValue[]) => {
+    if (!values.length) return
+
+    const isSame = values.every(v => {
+      const prev = overwrites.find(
+        o => o.symbol === v.symbol && o.chainId === v.chainId && o.wallet === v.wallet
+      )
+      return prev && prev.balance === v.balance
+    })
+
+    console.log('isSame', isSame)
+
+    if (isSame) return
+
     setOverwrites(prev => {
       // Merge overwrites with fetched data
       const newOverwrites = [...prev]
@@ -45,14 +59,14 @@ export const TokenBalanceProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }
 
   const [fetchState, fetchTokenBal] = useAsyncFn(async () => {
-    const data = await getBalancesOfAll()
-    return data
+    const { tokens } = await getBalancesOfAll()
+    return tokens
   }, [])
 
   const tokenBalances = useMemo(() => {
     // merge overwrites with fetched data
     if (fetchState.value) {
-      return fetchState.value.tokens.map(token => {
+      return fetchState.value.map(token => {
         const overwrite = overwrites.find(
           o => o.symbol === token.symbol && o.chainId === token.chainId
         )
@@ -64,10 +78,10 @@ export const TokenBalanceProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [fetchState.value, overwrites])
 
   useEffect(() => {
-    if (bothAuth) {
+    if (nextAuth) {
       fetchTokenBal()
     }
-  }, [bothAuth])
+  }, [nextAuth])
 
   return (
     <TokenBalanceContext.Provider

@@ -23,5 +23,6 @@ export function formatPercent(num: number | string) {
 
 export function formatFixedNumber(val: Decimal.Value | bigint, fixed?: number) {
   const str = new Decimal(val.toString()).toFixed(fixed)
-  return str.replace(/(\.\d*?[1-9])0+$/g, '$1').replace(/\.0+$/, '')
+  const num = str.replace(/(\.\d*?[1-9])0+$/g, '$1').replace(/\.0+$/, '')
+  return numeral(num).format(`0,0.[${'0'.repeat(fixed || 0)}]`)
 }

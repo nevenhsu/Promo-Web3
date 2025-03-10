@@ -1,33 +1,34 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import React, { createContext, useContext, useMemo } from 'react'
+import React, { createContext, useContext } from 'react'
 import { useAppSelector } from '@/hooks/redux'
 import { useWallet } from '@/wallet/hooks/useWallet'
 import { useSmartAccount } from '@/wallet/hooks/useSmartAccount'
 import { useBalances } from '@/wallet/hooks/useBalances'
 import { usePrices } from '@/wallet/hooks/usePrices'
+import { useTokenList } from '@/wallet/hooks/useTokenList'
 import { supportedChains } from './variables'
 import { toChainId } from '@/wallet/utils/network'
-import { getTokens, type Erc20 } from '@/contracts/tokens'
-import type { WalletClient } from '@/types/wallet'
 import type { Hash } from 'viem'
+import type { WalletClient } from '@/types/wallet'
 
 type WalletValues = ReturnType<typeof useWallet>
 type SmartAccountValues = ReturnType<typeof useSmartAccount>
 type BalancesValues = ReturnType<typeof useBalances>
 type PricesValues = ReturnType<typeof usePrices>
+type tokenListValues = ReturnType<typeof useTokenList>
 
 type Web3ContextType = {
   loading: boolean
   chainId?: number
-  tokens: Erc20[]
   walletAddress?: Hash
   walletClient?: WalletClient
   walletValues: WalletValues
   smartAccountValues: SmartAccountValues
   balancesValues: BalancesValues
   pricesValues: PricesValues
+  tokenListValues: tokenListValues
   onSmartAccount: boolean
   switchChain: (chainId: number) => Promise<void>
 }
@@ -54,10 +55,15 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   const walletAddress = walletClient?.account?.address
 
   const chainId = toChainId(walletClient?.chain.id)
-  const tokens = useMemo(() => getTokens(chainId), [chainId])
 
   // hooks
-  const balancesValues = useBalances({ chainId, walletClient, loading })
+  const tokenListValues = useTokenList({ chainId, walletAddress })
+  const balancesValues = useBalances({
+    chainId,
+    walletClient,
+    tokens: tokenListValues.allTokens,
+    loading: loading || tokenListValues.loading,
+  })
   const pricesValues = usePrices()
 
   const switchChain = async (chainId: number) => {
@@ -81,13 +87,13 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         loading,
         chainId,
-        tokens,
         walletAddress,
         walletClient,
         walletValues,
         smartAccountValues,
         balancesValues,
         pricesValues,
+        tokenListValues,
         onSmartAccount,
         switchChain,
       }}

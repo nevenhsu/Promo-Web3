@@ -35,10 +35,10 @@ export function useSyncTokenBal() {
 
     // compare balances and tokenBalances
     const values = tokenBalances
-      .filter(o => isAddressEqual(o._wallet.address, walletAddress) && o.chainId === chainId)
+      .filter(o => o.chainId === chainId)
       .filter(o => {
         const bal = balances[o.symbol]
-        if (!bal) return false
+        if (!bal || !isAddressEqual(o._wallet.address, bal.wallet)) return false
 
         const docBal = formatAmount(o.balance, o._userToken.decimals)
         return !docBal.eq(bal.balance.toString())
@@ -47,14 +47,17 @@ export function useSyncTokenBal() {
         userTokenId: o._userToken._id,
         symbol: o.symbol,
         chainId: o.chainId,
+        wallet: o._wallet.address,
         balance: formatBalance(
           balances[o.symbol]!.balance,
           balances[o.symbol]!.decimals
         ).toString(),
       }))
 
-    overwriteTokenBal(values) // update tokenBalances
-    clear(values.map(o => o.userTokenId)) // clear updatedAt
+    if (values.length) {
+      overwriteTokenBal(values) // update tokenBalances
+      clear(values.map(o => o.userTokenId)) // clear updatedAt
+    }
   }, [bothAuth, walletAddress, chainId, balances, tokenBalances])
 
   return null

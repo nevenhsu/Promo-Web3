@@ -28,21 +28,22 @@ export default function Wallet() {
   const [opened, { open, close }] = useDisclosure(false)
 
   const { walletClientType } = useAppSelector(state => state.wallet)
-  const { chainId, tokens, balancesValues, pricesValues, loading } = useWeb3()
+  const { chainId, tokenListValues, balancesValues, pricesValues, loading } = useWeb3()
   const { balances, updateBalances, loading: balLoading } = balancesValues
   const { prices } = pricesValues
+  const { allTokens } = tokenListValues
 
   const totalBalance = useMemo(() => {
     const ethValue = calcTokenValue(eth.decimals, prices[eth.symbol], balances[eth.symbol]?.balance)
     return _.reduce(
-      tokens,
+      allTokens,
       (acc, o) => {
         const val = calcTokenValue(o.decimals, prices[o.symbol], balances[o.symbol]?.balance)
         return acc.add(val)
       },
       ethValue
     )
-  }, [balances, prices, tokens])
+  }, [balances, prices, allTokens])
 
   return (
     <>
@@ -129,7 +130,7 @@ export default function Wallet() {
           />
           {/* ERC20 */}
           {Boolean(chainId) &&
-            tokens.map(o => {
+            allTokens.map(o => {
               return (
                 <Token
                   key={o.symbol}

@@ -13,7 +13,7 @@ import { Paper, Stack, Group, Title, Text, Space, Divider, Box } from '@mantine/
 import { Button, TextInput, NumberInput, Select } from '@mantine/core'
 import { ThemeIcon, Modal, FocusTrap } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { getTokens, isErc20, isETH, eth, type Token } from '@/contracts/tokens'
+import { isErc20, isETH, eth, type Token } from '@/contracts/tokens'
 import { formatBalance, formatAmount } from '@/utils/math'
 import { TxStatus, TxType } from '@/types/db'
 import { PiArrowDown } from 'react-icons/pi'
@@ -31,19 +31,18 @@ export default function Send() {
   const router = useRouter()
 
   const [opened, { open, close }] = useDisclosure(false)
-  const { chainId, walletAddress, balancesValues, pricesValues } = useWeb3()
+  const { txs, addTx } = useTx()
+  const { walletAddress, balancesValues, pricesValues, tokenListValues } = useWeb3()
   const { balances, updateBalances } = balancesValues
   const { prices } = pricesValues
-  const { txs, addTx } = useTx()
+  const { allTokens } = tokenListValues
+  const tokens = [eth, ...allTokens]
 
   const [txTimestamp, setTxTimestamp] = useState(0)
 
   const tx = useMemo(() => {
     return txTimestamp ? _.find(txs, { timestamp: txTimestamp }) : undefined
   }, [txs, txTimestamp])
-
-  // Get tokens and network info
-  const tokens = useMemo(() => [eth, ...getTokens(chainId)], [chainId])
 
   const form = useForm<FormData>({
     mode: 'controlled',

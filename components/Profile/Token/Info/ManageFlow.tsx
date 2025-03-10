@@ -15,8 +15,8 @@ type ManageFlowProps = {
 
 export default function ManageFlow({ docId }: ManageFlowProps) {
   const btnRef = useRef<HTMLDivElement>(null)
-  const { tokens, updateTokenDoc, updateState } = useUserToken()
-  const token = _.find(tokens, t => t._id === docId)
+  const { fetchState, updateTokenDoc, updateState } = useUserToken()
+  const token = _.find(fetchState.value, t => t._id === docId)
 
   // avatar
   const [iconImg, setIconImg] = useState('')

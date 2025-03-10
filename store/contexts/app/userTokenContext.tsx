@@ -1,8 +1,7 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import React, { createContext, useContext, useEffect, useMemo } from 'react'
-import { useWeb3 } from '@/wallet/Web3Context'
+import React, { createContext, useContext, useEffect } from 'react'
 import { useAsyncFn } from 'react-use'
 import { notifications } from '@mantine/notifications'
 import { useLoginStatus } from '@/hooks/useLoginStatus'
@@ -12,9 +11,8 @@ import type { NewTokenValue, MintTokenValue } from '@/services/userTokens'
 import type { AsyncState } from 'react-use/lib/useAsyncFn'
 
 interface UserTokenContextType {
-  tokens?: TUserToken[] // related to current chainId
-  fetchTokens: () => Promise<{ tokens: TUserToken[] }>
-  fetchState: AsyncState<{ tokens: TUserToken[] }>
+  fetchTokens: () => Promise<TUserToken[]>
+  fetchState: AsyncState<TUserToken[]>
   updateTokenDoc: (data: NewTokenValue) => Promise<UserToken>
   updateState: AsyncState<UserToken>
   mint: (value: MintTokenValue) => Promise<void>
@@ -24,18 +22,14 @@ interface UserTokenContextType {
 const UserTokenContext = createContext<UserTokenContextType | undefined>(undefined)
 
 export const UserTokenProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { bothAuth } = useLoginStatus() // Check if user is logged in
-  const { chainId } = useWeb3()
+  const { nextAuth } = useLoginStatus() // Check if user is logged in
 
   const [fetchState, fetchTokens] = useAsyncFn(async () => {
-    const data = await getTokens()
-    return data
-  }, [])
+    const { tokens } = await getTokens()
 
-  const tokens = useMemo(() => {
-    if (!fetchState.value) return []
-    return fetchState.value.tokens.filter(token => token.chainId === chainId)
-  }, [fetchState.value, chainId])
+    console.log('Tokens fetched:', tokens)
+    return tokens
+  }, [])
 
   const [updateState, updateTokenDoc] = useAsyncFn(async (data: NewTokenValue) => {
     const { token } = await updateToken(data)
@@ -62,15 +56,14 @@ export const UserTokenProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   })
 
   useEffect(() => {
-    if (bothAuth) {
+    if (nextAuth) {
       fetchTokens()
     }
-  }, [bothAuth])
+  }, [nextAuth])
 
   return (
     <UserTokenContext.Provider
       value={{
-        tokens,
         fetchTokens,
         fetchState,
         updateTokenDoc,

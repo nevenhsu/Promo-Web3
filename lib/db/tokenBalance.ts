@@ -11,7 +11,11 @@ export async function getBalancesOfAll(userId: string) {
       { path: '_userToken', populate: { path: '_wallet' } },
     ])
 
-  return tokens.map(o => ({ ...o, _userToken: { ...o._userToken, decimals: 6 } }))
+  return tokens.map(o => ({
+    ...o,
+    balance: o.balance.toString(),
+    _userToken: { ...o._userToken, decimals: 6 },
+  }))
 }
 
 export async function getBalancesOfToken(userId: string, userTokenId: string) {
@@ -22,7 +26,11 @@ export async function getBalancesOfToken(userId: string, userTokenId: string) {
       { path: '_userToken', populate: { path: '_wallet' } },
     ])
 
-  return tokens.map(o => ({ ...o, _userToken: { ...o._userToken, decimals: 6 } }))
+  return tokens.map(o => ({
+    ...o,
+    balance: o.balance.toString(),
+    _userToken: { ...o._userToken, decimals: 6 },
+  }))
 }
 
 export function updateTokenBalance(

@@ -14,7 +14,6 @@ import { useSelectWallet } from '@/wallet/hooks/useSelectWallet'
 import { isAddressEqual } from '@/wallet/utils/helper'
 import { useUserToken } from '@/store/contexts/app/userTokenContext'
 import { PiRocketLaunch, PiHandHeart } from 'react-icons/pi'
-import type { TUserToken } from '@/models/userToken'
 
 const PaperDiv = Paper.withProps({
   p: 'md',
@@ -24,10 +23,10 @@ const PaperDiv = Paper.withProps({
 
 export default function Token() {
   const { setClientType } = useSelectWallet()
-  const { tokens, fetchState } = useUserToken()
+  const { fetchState } = useUserToken()
 
   // zerodev
-  const { smartAccountValues, loading } = useWeb3()
+  const { smartAccountValues, chainId, loading } = useWeb3()
   const { kernel, smartAccountAddress = '' } = smartAccountValues
 
   // privy
@@ -36,8 +35,14 @@ export default function Token() {
   const privyAddress = privyWallet?.address || ''
 
   // minted token
-  const privyToken = _.find(tokens, o => isAddressEqual(o._wallet.address, privyAddress))
-  const zerodevToken = _.find(tokens, o => isAddressEqual(o._wallet.address, smartAccountAddress))
+  const privyToken = _.find(
+    fetchState.value,
+    o => o.chainId === chainId && isAddressEqual(o._wallet.address, privyAddress)
+  )
+  const zerodevToken = _.find(
+    fetchState.value,
+    o => o.chainId === chainId && isAddressEqual(o._wallet.address, smartAccountAddress)
+  )
 
   const openMintFlow = (type: string) => {
     setClientType(type as any)

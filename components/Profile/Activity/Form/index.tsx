@@ -9,7 +9,6 @@ import { FormProvider, useForm } from './Context'
 import { formatZonedDate } from '@/utils/helper'
 import { isValidXPostLink, isValidInstagramPostLink } from '@/utils/socialMedia'
 import { getXPostId, getInstagramPostId } from '@/utils/socialMedia'
-import { useTokenList } from './useTokenList'
 import { formatAmount } from '@/utils/math'
 import { ActivityType, SocialMedia, ActivitySettingType } from '@/types/db'
 
@@ -22,9 +21,10 @@ type FormProps = {
 }
 
 export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
-  const list = useTokenList()
-  const { balancesValues } = useWeb3()
+  // const { userTokens } = useTokenList()
+  const { balancesValues, tokenListValues } = useWeb3()
   const { balances } = balancesValues
+  const { userTokens } = tokenListValues
 
   const form = useForm({
     mode: 'controlled',
@@ -85,7 +85,7 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
       airdrop: {
         symbol: value => (value ? null : 'Should not be empty'),
         amount: (value, values) => {
-          const token = list.find(o => o.symbol === values.airdrop.symbol)
+          const token = userTokens.find(o => o.symbol === values.airdrop.symbol)
           if (!token) {
             return 'Token not found'
           }

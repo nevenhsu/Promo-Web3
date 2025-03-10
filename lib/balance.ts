@@ -33,11 +33,11 @@ export async function updateBalance(userId: string, userTokenId: string) {
 
   // compare onchain balances with offchain balances
   const isSame = tokens.every(
-    (o, i) => formatAmount(o.balance.toString(), 6).toString() === balances[i].toString()
+    (o, i) => formatAmount(o.balance, 6).toString() === balances[i].toString()
   )
 
   if (isSame) {
-    return tokens.map(o => ({ ...o, balance: o.balance.toString() }))
+    return tokens
   }
 
   const newTokens = tokens.map((o, i) => {
@@ -56,7 +56,7 @@ export async function updateBalance(userId: string, userTokenId: string) {
         o._userToken._id,
         chainId,
         o.symbol,
-        o.balance.toString()
+        o.balance
       )
     )
   )
