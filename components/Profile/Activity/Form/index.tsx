@@ -21,7 +21,6 @@ type FormProps = {
 }
 
 export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
-  // const { userTokens } = useTokenList()
   const { balancesValues, tokenListValues } = useWeb3()
   const { balances } = balancesValues
   const { userTokens } = tokenListValues

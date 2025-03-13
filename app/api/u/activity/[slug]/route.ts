@@ -4,7 +4,7 @@ import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { getActivityBySlug, updateActivity } from '@/lib/db/activity'
 import { parseData } from '@/lib/db/common'
-import type { ActivityData } from '@/types/activitySetting'
+import type { ActivityData } from '@/models/activity'
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
@@ -32,15 +32,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
 }
 
 // update own activity
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const token = await getToken({ req })
     const userId = token?.user?.id!
 
     const { data } = await req.json()
     const { slug } = await params
-
-    // TODO: add userToken
 
     await dbConnect()
     const doc = await getActivityBySlug(slug)

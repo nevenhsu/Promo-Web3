@@ -34,6 +34,13 @@ export interface FormValues {
   published: boolean
 }
 
+export type ActivityData = Omit<FormValues, 'activityType'> & {
+  activityType: number
+  chainId: number
+  startTime: Date
+  endTime: Date
+}
+
 // createFormContext returns a tuple with 3 items:
 // FormProvider is a component that sets form context
 // useFormContext hook return form object that was previously set in FormProvider

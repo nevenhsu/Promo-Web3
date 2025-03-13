@@ -1,5 +1,6 @@
 import axios from 'axios'
 import type { TPublicActivity, ActivityDetail, TActivity } from '@/models/activity'
+import type { ActivityData } from '@/components/Profile/Activity/Form/Context'
 
 // ====================
 // Public Activity
@@ -33,6 +34,18 @@ export async function getPublicActivities(values: {
   return data
 }
 
+export async function updateActivityNFT(slug: string, hash: string) {
+  const { data } = await axios.post<{ success: boolean; activity: TActivity }>(
+    `/api/public/activity`,
+    {
+      hash,
+      slug,
+    }
+  )
+
+  return data
+}
+
 // ====================
 // Owned Activity
 // ====================
@@ -61,9 +74,17 @@ export type UpdateData = {
 }
 
 export async function updateOwnedActivity(slug: string, data: Partial<UpdateData>) {
-  const { data: updated } = await axios.put<{ activity: TActivity }>(`/api/u/activity/${slug}`, {
+  const { data: updated } = await axios.post<{ activity: TActivity }>(`/api/u/activity/${slug}`, {
     data,
   })
 
   return updated.activity
+}
+
+export async function createOwnedActivity(data: ActivityData) {
+  const { data: created } = await axios.put<{ activity: TActivity }>('/api/u/activity', {
+    data,
+  })
+
+  return created.activity
 }

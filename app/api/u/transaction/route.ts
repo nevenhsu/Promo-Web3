@@ -1,5 +1,4 @@
 import * as _ from 'lodash-es'
-import { fromUnixTime } from 'date-fns'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
@@ -31,10 +30,10 @@ export async function PUT(req: NextRequest) {
 
       // override value with onchain data
       value.status = log.success ? TxStatus.Success : TxStatus.Failed
-      value.token.amount = log.amount.toString()
+      value.token.amount = log.amount
       value.token.symbol = log.symbol
       value.token._userToken = userToken?._id
-      value.createdAt = fromUnixTime(log.timestamp)
+      value.createdAt = log.timestamp
       value.from = log.from
       value.to = log.to
     }
@@ -44,9 +43,9 @@ export async function PUT(req: NextRequest) {
 
       // override value with onchain data
       value.status = log.success ? TxStatus.Success : TxStatus.Failed
-      value.token.amount = log.amount.toString()
+      value.token.amount = log.amount
       value.token.symbol = 'ETH'
-      value.createdAt = fromUnixTime(log.timestamp)
+      value.createdAt = log.timestamp
       value.from = log.from
       value.to = log.to
       value.token._userToken = null

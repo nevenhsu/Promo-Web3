@@ -17,7 +17,7 @@ export function useActivityTx() {
   const activityManager = walletClient ? getActivityManager(walletClient) : undefined
 
   const createAndDepositWithPermit = async (
-    data: ActivityData,
+    data: Pick<ActivityData, 'airdrop' | 'startTime' | 'endTime'>,
     callback?: TxCallback,
     errorHandle?: TxErrorHandle
   ) => {

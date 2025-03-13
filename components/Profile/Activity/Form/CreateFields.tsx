@@ -7,19 +7,15 @@ import { Paper, TextInput, Select, Stack, Group, Text, ThemeIcon } from '@mantin
 import { DateTimePicker } from '@mantine/dates'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { useFormContext } from './Context'
-// import { useTokenList } from '@/hooks/useTokenList'
 import { getXPostId, getInstagramPostId } from '@/utils/socialMedia'
 import { formatBalance, formatFixedNumber } from '@/utils/math'
 import { PiNumberOneBold, PiNumberTwoBold, PiNumberThreeBold } from 'react-icons/pi'
 import { ActivityType, SocialMedia } from '@/types/db'
 
 export default function FormFields() {
-  // const { userTokens } = useTokenList()
   const { balancesValues, tokenListValues } = useWeb3()
   const { balances } = balancesValues
   const { userTokens } = tokenListValues
-
-  console.log({ balances })
 
   const form = useFormContext()
   const { socialMedia, activityType, details, airdrop } = form.values

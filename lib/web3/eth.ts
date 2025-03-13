@@ -1,3 +1,4 @@
+import { fromUnixTime } from 'date-fns'
 import { getPublicClient } from '@/wallet/lib/publicClients'
 import { formatBalance } from '@/utils/math'
 import type { Hash } from 'viem'
@@ -18,9 +19,9 @@ export async function getEthTxLog(values: { chainId: number; hash: Hash }) {
   const { timestamp } = await publicClient.getBlock({ blockNumber })
   return {
     success: status === 'success',
-    timestamp: Number(timestamp.toString()),
+    timestamp: fromUnixTime(Number(timestamp.toString())),
     from,
     to,
-    amount: formatBalance(value, 18),
+    amount: formatBalance(value, 18).toString(),
   }
 }

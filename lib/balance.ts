@@ -2,7 +2,7 @@ import Decimal from 'decimal.js'
 import { getPublicClient } from '@/wallet/lib/publicClients'
 import { getBalancesOfToken, updateTokenBalance } from './db/tokenBalance'
 import { updateTokenDoc } from './db/token'
-import { getTokenContractByPublic } from '@/contracts'
+import { getTokenContract } from '@/contracts'
 import { formatAmount, formatBalance } from '@/utils/math'
 
 export async function updateBalance(userId: string, userTokenId: string) {
@@ -23,7 +23,7 @@ export async function updateBalance(userId: string, userTokenId: string) {
     throw new Error(`No wallet found for userToken: ${userTokenId}`)
   }
 
-  const tokenManager = getTokenContractByPublic(publicClient, owner.address as any)
+  const tokenManager = getTokenContract(publicClient, owner.address as any)
 
   // get onchain balances
   const balances = await Promise.all(

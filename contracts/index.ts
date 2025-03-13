@@ -10,8 +10,6 @@ import type { ClubToken$Type } from './ClubToken.sol/ClubToken'
 import type { NonfungibleActivityManager$Type } from './NonfungibleActivityManager.sol/NonfungibleActivityManager'
 import type { WalletClient, PublicClient, GetContractReturnType } from '@/types/wallet'
 
-// import type { GetContractReturnType, WalletClient, PublicClient } from '@nomicfoundation/hardhat-viem/types'
-
 export type Manager = {
   chainId: number
   address: Address
@@ -49,7 +47,7 @@ export const getTokenManager = (
 }
 
 export const getActivityManager = (
-  client: WalletClient
+  client: WalletClient | PublicClient
 ): GetContractReturnType<NonfungibleActivityManager$Type['abi']> => {
   const manager = activityManagers[client.chain!.id]
   if (!manager) {
@@ -66,7 +64,7 @@ export const getActivityManager = (
 }
 
 export const getTokenContract = (
-  client: WalletClient,
+  client: WalletClient | PublicClient,
   owner: Address
 ): GetContractReturnType<ClubToken$Type['abi']> => {
   const manager = tokenManagers[client.chain!.id]
@@ -88,23 +86,18 @@ export const getTokenContract = (
   return contract
 }
 
-export const getTokenContractByPublic = (
-  client: PublicClient,
-  owner: Address
+export const getTokenContractByAddress = (
+  client: WalletClient | PublicClient,
+  address: Address
 ): GetContractReturnType<ClubToken$Type['abi']> => {
   const manager = tokenManagers[client.chain!.id]
   if (!manager) {
     throw new Error(`Token manager not found for chain ${client.chain?.id}`)
   }
 
-  const tokenAddress = computeTokenAddress({
-    contract: manager.address,
-    owner,
-  })
-
   const contract = getContract({
     client,
-    address: tokenAddress,
+    address,
     abi: clubTokenJson.abi,
   }) as any
 

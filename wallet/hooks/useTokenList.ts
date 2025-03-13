@@ -10,7 +10,7 @@ import { useUserToken } from '@/store/contexts/app/userTokenContext'
 import { useTokenBalances } from '@/store/contexts/app/tokenBalanceContext'
 import clubTokenJson from '@/contracts/ClubToken.sol/ClubToken.json'
 
-// Get token list from Web3Context
+// Get current state from Web3Context
 // instead of using this hook directly
 
 type TokenList = {

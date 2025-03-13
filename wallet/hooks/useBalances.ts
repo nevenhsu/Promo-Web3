@@ -3,13 +3,12 @@
 import * as _ from 'lodash-es'
 import { useState, useEffect } from 'react'
 import { useAsyncFn } from 'react-use'
-import { eth, type Erc20 } from '@/contracts/tokens'
-import { formatBalance } from '@/utils/math'
 import { createContract } from '@/wallet/lib/createContract'
 import { getPublicClient } from '@/wallet/lib/publicClients'
+import { eth, type Erc20 } from '@/contracts/tokens'
 import type { WalletClient } from 'viem'
 
-// Get current wallet values from Web3Context
+// Get current state from Web3Context
 // instead of using this hook directly
 
 type UseBalanceParams = {
@@ -41,12 +40,7 @@ export function useBalances({ tokens, chainId, walletClient, loading }: UseBalan
     if (client) {
       try {
         const balance = await client.getBalance({ address })
-        if (typeof balance === 'bigint') {
-          return {
-            balance,
-            ...eth,
-          }
-        }
+        return balance
       } catch (err) {
         console.error(err)
       }
@@ -62,29 +56,28 @@ export function useBalances({ tokens, chainId, walletClient, loading }: UseBalan
       ...o,
     }))
 
-    const [eth, ...results] = await Promise.all([
-      fetchEthBalance(chainId, walletAddress),
-      ...contracts.map(async o => {
-        try {
-          const balance = await o.contract?.read.balanceOf([walletAddress])
-          if (typeof balance === 'bigint') {
-            const { symbol, decimals } = o
-            return { symbol, decimals, balance }
-          }
-        } catch (err) {
-          console.error(err)
-        }
-      }),
-    ])
+    const newBalances: BalanceList = {}
+    const balance = await fetchEthBalance(chainId, walletAddress)
+    if (balance) {
+      newBalances[eth.symbol] = { balance, decimals: eth.decimals, wallet: walletAddress }
+    }
 
-    const newBalances = [...results, eth].reduce((acc, result) => {
-      if (result) {
-        const { symbol, decimals, balance } = result
-        acc[symbol] = { balance, decimals, wallet: walletAddress }
-        console.log(`${symbol} balance:`, formatBalance(balance, decimals).toFixed(2))
-      }
-      return acc
-    }, {} as BalanceList)
+    const chunks = _.chunk(contracts, 100)
+    for (const chunk of chunks) {
+      await Promise.all(
+        chunk.map(async o => {
+          try {
+            const balance = await o.contract?.read.balanceOf([walletAddress])
+            if (typeof balance === 'bigint') {
+              const { symbol, decimals } = o
+              newBalances[symbol] = { balance, decimals, wallet: walletAddress }
+            }
+          } catch (err) {
+            console.error(err)
+          }
+        })
+      )
+    }
 
     setBalances(newBalances)
   }, [notReady, chainId, walletAddress])

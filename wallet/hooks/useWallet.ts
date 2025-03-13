@@ -10,7 +10,7 @@ import type { Hash } from 'viem'
 import type { ConnectedWallet } from '@privy-io/react-auth'
 import type { WalletClient } from '@/types/wallet'
 
-// Get current wallet values from Web3Context
+// Get current state from Web3Context
 // instead of using this hook directly
 
 export function useWallet() {

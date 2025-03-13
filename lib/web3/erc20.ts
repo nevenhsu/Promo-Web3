@@ -1,6 +1,7 @@
+import { fromUnixTime } from 'date-fns'
 import { parseEventLogs, isAddressEqual } from 'viem'
 import { getPublicClient } from '@/wallet/lib/publicClients'
-import { getTokenContractByPublic } from '@/contracts'
+import { getTokenContractByAddress } from '@/contracts'
 import { formatBalance } from '@/utils/math'
 import type { Hash } from 'viem'
 
@@ -9,20 +10,16 @@ export async function getTransferLog(values: { chainId: number; contract: Hash; 
   const publicClient = getPublicClient(chainId)
   if (!publicClient) throw new Error(`No public client found for chainId: ${chainId}`)
 
-  const token = getTokenContractByPublic(publicClient, contract)
+  const token = getTokenContractByAddress(publicClient, contract)
   const receipt = await publicClient.getTransactionReceipt({ hash })
-  const events = parseEventLogs({
+  const [transferEvent] = parseEventLogs({
     abi: token.abi,
     logs: receipt.logs,
     eventName: 'Transfer',
   })
 
-  if (!events.length) {
-    throw new Error('No Transfer event found')
-  }
-
   const { status, blockNumber } = receipt
-  const { address, args } = events[0]
+  const { address, args } = transferEvent
 
   if (!isAddressEqual(address, contract)) {
     throw new Error('Contract address mismatch')
@@ -38,11 +35,11 @@ export async function getTransferLog(values: { chainId: number; contract: Hash; 
 
   return {
     success: status === 'success',
-    timestamp: Number(timestamp.toString()),
+    timestamp: fromUnixTime(Number(timestamp.toString())),
     symbol,
     decimals,
     from: args.from,
     to: args.to,
-    amount: formatBalance(args.value, decimals),
+    amount: formatBalance(args.value, decimals).toString(),
   }
 }

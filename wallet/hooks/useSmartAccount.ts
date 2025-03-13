@@ -1,6 +1,6 @@
 'use client'
 
-// Get current wallet values from Web3Context
+// Get current state from Web3Context
 // instead of using this hook directly
 
 import { useState, useEffect } from 'react'
@@ -51,7 +51,7 @@ export function useSmartAccount() {
 
       const res = await getAccountClient(privyWallet, chainId)
 
-      if (!res?.smartAccountAddress) {
+      if (!res || !res.walletClient) {
         throw new Error('Smart account not created')
       }
 

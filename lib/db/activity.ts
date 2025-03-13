@@ -1,9 +1,10 @@
 import * as _ from 'lodash-es'
+import { Types } from 'mongoose'
 import { setMilliseconds } from 'date-fns'
 import ActivityModel from '@/models/activity'
 import UserActivityStatusModel from '@/models/userActivityStatus'
 import { parseData } from './common'
-import type { ActivityData } from '@/models/activity'
+import type { ActivityData, Activity } from '@/models/activity'
 
 export type GetOptions = {
   page?: number
@@ -92,8 +93,6 @@ export async function getPublicActivity(slug: string) {
     published: true,
   }).lean()
 
-  console.log('Activity found:', { slug, activity })
-
   return activity
 }
 
@@ -120,12 +119,10 @@ export async function getActivityBySlug(slug: string) {
   return data
 }
 
-export async function createActivity(data: ActivityData) {
-  const activity = new ActivityModel({
-    ...data,
-    startTime: setMilliseconds(data.startTime, 0),
-    endTime: setMilliseconds(data.endTime, 0),
-  })
+export async function createActivity(data: ActivityData & { _user?: Types.ObjectId | string }) {
+  unifyData(data)
+
+  const activity = new ActivityModel(data)
 
   if (!activity.slug) {
     activity.slug = activity._id.toString()
@@ -142,13 +139,8 @@ export async function createActivity(data: ActivityData) {
   return activity
 }
 
-export async function updateActivity(_id: string, updateData: Partial<ActivityData>) {
-  if (updateData.startTime) {
-    updateData.startTime = setMilliseconds(updateData.startTime, 0)
-  }
-  if (updateData.endTime) {
-    updateData.endTime = setMilliseconds(updateData.endTime, 0)
-  }
+export async function updateActivity(_id: string, updateData: Partial<ActivityData | Activity>) {
+  unifyData(updateData)
 
   const { setting, ...rest } = updateData
   const parsedData = parseData(rest)
@@ -187,4 +179,27 @@ export async function getActivities(options?: GetOptions) {
   }
 
   return { activities, limit }
+}
+
+function unifyData(data: any) {
+  // Set milliseconds to 0
+  if (data.startTime) {
+    data.startTime = setMilliseconds(data.startTime, 0)
+  }
+
+  if (data.endTime) {
+    data.endTime = setMilliseconds(data.endTime, 0)
+  }
+
+  // Convert _user to ObjectId
+  const userId = _.get(data, '_user')
+  if (userId) {
+    _.set(data, '_user', Types.ObjectId.createFromHexString(userId.toString()))
+  }
+
+  // Convert userTokenId to ObjectId
+  const userTokenId = _.get(data, 'airdrop._userToken')
+  if (userTokenId) {
+    _.set(data, 'airdrop._userToken', Types.ObjectId.createFromHexString(userTokenId.toString()))
+  }
 }

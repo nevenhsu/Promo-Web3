@@ -1,9 +1,11 @@
 'use client'
 
+import * as _ from 'lodash-es'
+import { useRouter } from '@/i18n/routing'
 import { useRef, useState } from 'react'
 import { useAsyncFn } from 'react-use'
-import { Stepper, Stack, Space, Group, Progress } from '@mantine/core'
-import { Title, Text, Button, Checkbox } from '@mantine/core'
+import { Stepper, Stack, Space, Group, Progress, Badge } from '@mantine/core'
+import { Text, Button, Checkbox } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import Form, { type FormRef } from '../Form'
 import CreateFields from '../Form/CreateFields'
@@ -12,9 +14,11 @@ import { formatDate } from '@/utils/date'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { useActivityTx } from './useActivityTx'
 import { defaultChain } from '@/wallet/variables'
-import type { ActivityData } from '@/models/activity'
+import { createOwnedActivity, updateActivityNFT } from '@/services/activity'
+import type { ActivityData } from '@/components/Profile/Activity/Form/Context'
 
 export default function ProfileActivityNew() {
+  const router = useRouter()
   const { createAndDepositWithPermit } = useActivityTx()
   const { chainId, walletAddress } = useWeb3()
   const notConnected = !chainId || !walletAddress
@@ -25,6 +29,8 @@ export default function ProfileActivityNew() {
   const [active, setActive] = useState(0)
   const [status, setStatus] = useState(Status.Init)
   const [error, setError] = useState<string>()
+  const [slug, setSlug] = useState<string>() // new activity slug
+  const created = status === Status.Success && !!slug
 
   const [checked, setChecked] = useState(false)
   const [data, setData] = useState<ActivityData>()
@@ -32,6 +38,7 @@ export default function ProfileActivityNew() {
   const [createActivityState, createActivity] = useAsyncFn(async (data: ActivityData) => {
     if (status === Status.Pending) return
     setStatus(Status.Pending)
+    setActive(active + 1)
 
     try {
       // send transaction
@@ -45,6 +52,10 @@ export default function ProfileActivityNew() {
         }
 
         // upload to db
+        const newActivity = await createOwnedActivity(data)
+        const updated = await updateActivityNFT(newActivity.slug, hash)
+
+        setSlug(newActivity.slug)
         setStatus(Status.Success)
       })
     } catch (error) {
@@ -147,7 +158,7 @@ export default function ProfileActivityNew() {
                         Post
                       </Text>
                       <Text fz="sm" c="dimmed">
-                        {`${data.socialMedia} - ${data.details.link}`}
+                        {`${_.upperFirst(data.socialMedia)} - ${data.details.link}`}
                       </Text>
                     </Group>
                     <Group justify="space-between" gap="xs">
@@ -185,25 +196,35 @@ export default function ProfileActivityNew() {
 
             <Stepper.Completed>
               <Completion
-                onOk={() => {}}
+                onOk={() => {
+                  if (created) {
+                    router.push({
+                      pathname: '/activity/[slug]',
+                      params: { slug },
+                    })
+                  } else {
+                    router.push('/profile/activity')
+                  }
+                }}
                 status={status}
                 text={{
                   pending: 'Processing...',
-                  okay: status === Status.Success ? 'Go to edit details' : 'Close',
+                  okay: created ? 'Go to update details' : 'Close',
                 }}
-                header={
-                  <>
-                    <Title order={3}>{loading ? 'Creating activity' : 'Congrats!'}</Title>
-                  </>
-                }
+                header={<></>}
                 description={
                   <Stack>
                     {status === Status.Pending && <Progress w="100%" value={100} animated />}
 
+                    {error ? (
+                      <Badge size="sm" color="red" mx="auto">
+                        {error}
+                      </Badge>
+                    ) : null}
+
                     <Text fz="sm" c="dimmed" mb="xl">
                       {status === Status.Pending
-                        ? `Don't close this window. Wait for the transaction to be confirmed, this may take
-                                         a few minutes.`
+                        ? `Don't close this window. Wait for the transaction to be confirmed, this may take a few minutes.`
                         : status === Status.Success
                           ? 'Your activity has been created successfully!'
                           : status === Status.Failed
