@@ -59,8 +59,8 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   const [joinOpened, joinActions] = useDisclosure(false)
 
   // Platform linked account from Privy
-  const { user, linkTwitter, linkInstagram } = usePrivy()
-  const { twitter, instagram } = user || {}
+  const { user, linkTwitter } = usePrivy()
+  const { twitter } = user || {}
 
   // User data
   const { data: userData, referralData } = useAppSelector(state => state.user)
@@ -139,11 +139,6 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
       case SocialMedia.X: {
         if (twitter) return
         isMobileDevice ? open() : linkTwitter()
-        break
-      }
-      case SocialMedia.Instagram: {
-        if (instagram) return
-        isMobileDevice ? open() : linkInstagram()
         break
       }
     }

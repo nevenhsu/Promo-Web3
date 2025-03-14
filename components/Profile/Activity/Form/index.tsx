@@ -7,8 +7,8 @@ import { isBefore } from 'date-fns'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { FormProvider, useForm } from './Context'
 import { formatZonedDate } from '@/utils/helper'
-import { isValidXPostLink, isValidInstagramPostLink } from '@/utils/socialMedia'
-import { getXPostId, getInstagramPostId } from '@/utils/socialMedia'
+import { isValidXPostLink } from '@/utils/socialMedia'
+import { getXPostId } from '@/utils/socialMedia'
 import { formatAmount } from '@/utils/math'
 import { ActivityType, SocialMedia, ActivitySettingType } from '@/types/db'
 
@@ -114,12 +114,6 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
           if (values.socialMedia === SocialMedia.X) {
             if (!isValidXPostLink(trimmed) || !getXPostId(trimmed)) {
               return 'Should be a valid link: https://x.com/username/status/123'
-            }
-          }
-
-          if (values.socialMedia === SocialMedia.Instagram) {
-            if (!isValidInstagramPostLink(trimmed) || !getInstagramPostId(trimmed)) {
-              return 'Should be a valid link: https://www.instagram.com/p/123'
             }
           }
 

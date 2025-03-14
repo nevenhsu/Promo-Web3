@@ -13,18 +13,14 @@ type LinkModalProps = {
 }
 
 export default function LinkModal({ platform, opened, onClose }: LinkModalProps) {
-  const { user, linkTwitter, linkInstagram } = usePrivy()
-  const { twitter, instagram } = user || {}
+  const { user, linkTwitter } = usePrivy()
+  const { twitter } = user || {}
   const platformUpper = toUpper(platform)
 
   const handleLink = () => {
     switch (platform) {
       case SocialMedia.X: {
         twitter ? onClose() : linkTwitter()
-        break
-      }
-      case SocialMedia.Instagram: {
-        instagram ? onClose() : linkInstagram()
         break
       }
     }

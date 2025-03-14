@@ -10,7 +10,7 @@ import RwdLayout from '@/components/share/RwdLayout'
 import RwdModal from '@/components/share/RwdModal'
 import { PiRocket, PiGlobe, PiArrowSquareOut } from 'react-icons/pi'
 import { PiCoinVertical, PiGear } from 'react-icons/pi'
-import { FaXTwitter, FaInstagram } from 'react-icons/fa6'
+import { FaXTwitter } from 'react-icons/fa6'
 import { LinkAccountPlatform } from '@/types/db'
 import type { TUser } from '@/models/user'
 import type { TUserToken } from '@/models/userToken'
@@ -54,9 +54,6 @@ export default function UserProfile(props: UserProfileProps) {
 
   // Get linked accounts
   const x = linkedAccounts?.find(account => account.platform === LinkAccountPlatform.X)
-  const instagram = linkedAccounts?.find(
-    account => account.platform === LinkAccountPlatform.Instagram
-  )
 
   return (
     <>
@@ -101,7 +98,7 @@ export default function UserProfile(props: UserProfileProps) {
 
               <Group className="c-pointer" onClick={open} wrap="nowrap">
                 {x ? <FaXTwitter size={20} /> : null}
-                {instagram ? <FaInstagram size={20} /> : null}
+
                 {link ? <PiGlobe size={20} /> : null}
               </Group>
             </Group>
@@ -164,21 +161,7 @@ export default function UserProfile(props: UserProfileProps) {
               </Group>
             </a>
           ) : null}
-          {instagram?.username ? (
-            <a
-              target="_blank"
-              href={`https://www.instagram.com/${instagram.username}/`}
-              rel="noopener noreferrer"
-            >
-              <Group justify="space-between" wrap="nowrap">
-                <Group wrap="nowrap">
-                  <FaInstagram size={20} />
-                  <Text>{instagram.username}</Text>
-                </Group>
-                <PiArrowSquareOut size={16} />
-              </Group>
-            </a>
-          ) : null}
+
           {link?.startsWith('http') ? (
             <a target="_blank" href={link} rel="noopener noreferrer">
               <Group justify="space-between" wrap="nowrap">

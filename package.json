@@ -48,6 +48,7 @@
     "nanoid": "^5.1.2",
     "next": "15.2.0",
     "next-auth": "^4.24.11",
+    "next-cloudinary": "^6.16.0",
     "next-intl": "^3.26.5",
     "next-sanity": "^9.8.60",
     "numeral": "^2.0.6",

@@ -2,7 +2,6 @@ import { Suspense } from 'react'
 import { unstable_cache } from 'next/cache'
 import { getTweet as _getTweet } from 'react-tweet/api'
 import { TweetSkeleton, EmbeddedTweet, TweetNotFound } from 'react-tweet'
-import InstagramMedia from './InstagramMedia'
 import ActivityDetail from '@/components/Activity/Detail'
 import dbConnect from '@/lib/dbConnect'
 import { getPublicActivity } from '@/lib/db/activity'
@@ -33,7 +32,6 @@ export default async function ActivityDetailPage({
   const { details, socialMedia } = activity
   const postLink = details.link
   const isX = socialMedia === SocialMedia.X
-  const isIg = socialMedia === SocialMedia.Instagram
 
   //  Warning: Only plain objects can be passed to Client Components
   return (
@@ -45,7 +43,6 @@ export default async function ActivityDetailPage({
             <TweetPage id={postLink} />
           </Suspense>
         )}
-        {isIg && <InstagramMedia postLink={postLink} />}
       </ActivityDetail>
     </>
   )

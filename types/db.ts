@@ -21,9 +21,6 @@ export enum ActivityType {
 
   // X
   Repost = 4,
-
-  // Instagram
-  Story = 11,
 }
 
 export enum ActivitySettingType {
@@ -34,12 +31,10 @@ export enum ActivitySettingType {
 export enum LinkAccountPlatform {
   Google = 'google',
   X = 'x',
-  Instagram = 'instagram',
 }
 
 export enum SocialMedia {
   X = 'x',
-  Instagram = 'instagram',
 }
 
 export enum ReferralLevel {

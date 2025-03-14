@@ -7,7 +7,7 @@ import { Paper, TextInput, Select, Stack, Group, Text, ThemeIcon } from '@mantin
 import { DateTimePicker } from '@mantine/dates'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { useFormContext } from './Context'
-import { getXPostId, getInstagramPostId } from '@/utils/socialMedia'
+import { getXPostId } from '@/utils/socialMedia'
 import { formatBalance, formatFixedNumber } from '@/utils/math'
 import { PiNumberOneBold, PiNumberTwoBold, PiNumberThreeBold } from 'react-icons/pi'
 import { ActivityType, SocialMedia } from '@/types/db'
@@ -29,9 +29,6 @@ export default function FormFields() {
     if (socialMedia === SocialMedia.X) {
       return [{ label: 'Repost', value: `${ActivityType.Repost}` }]
     }
-    if (socialMedia === SocialMedia.Instagram) {
-      return [{ label: 'Add to story', value: `${ActivityType.Story}` }]
-    }
     return []
   }, [socialMedia])
 
@@ -39,9 +36,6 @@ export default function FormFields() {
   useEffect(() => {
     if (socialMedia === SocialMedia.X && activityType !== `${ActivityType.Repost}`) {
       form.setFieldValue('activityType', `${ActivityType.Repost}`)
-    }
-    if (socialMedia === SocialMedia.Instagram && activityType !== `${ActivityType.Story}`) {
-      form.setFieldValue('activityType', `${ActivityType.Story}`)
     }
   }, [socialMedia, activityType])
 
@@ -64,10 +58,6 @@ export default function FormFields() {
     }
     if (socialMedia === SocialMedia.X) {
       const postId = getXPostId(trimmed)
-      form.setFieldValue('details.link', postId)
-    }
-    if (socialMedia === SocialMedia.Instagram) {
-      const postId = getInstagramPostId(trimmed)
       form.setFieldValue('details.link', postId)
     }
   }, [socialMedia, fullLink])
@@ -138,13 +128,7 @@ export default function FormFields() {
 
           <TextInput
             label="Post Link"
-            placeholder={
-              socialMedia === SocialMedia.X
-                ? 'https://x.com/user/status/post_id'
-                : socialMedia === SocialMedia.Instagram
-                  ? 'https://www.instagram.com/p/post_id'
-                  : ''
-            }
+            placeholder={socialMedia === SocialMedia.X ? 'https://x.com/user/status/post_id' : ''}
             key={form.key('details.fullLink')}
             {...form.getInputProps('details.fullLink')}
           />

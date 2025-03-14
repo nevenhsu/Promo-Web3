@@ -10,31 +10,23 @@ import { notifications } from '@mantine/notifications'
 import { Stack, Paper, Space, Group, Modal, Box } from '@mantine/core'
 import { Title, Text, Button, ActionIcon, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { LinkAccountPlatform } from '@/types/db'
 import { PiLinkBreak, PiLink, PiEnvelope } from 'react-icons/pi'
 import { FcGoogle } from 'react-icons/fc'
-import { FaXTwitter, FaInstagram } from 'react-icons/fa6'
+import { FaXTwitter } from 'react-icons/fa6'
 
 enum AccountType {
   Email = 'Email',
   Google = 'Google',
   X = 'X',
-  Instagram = 'Instagram',
 }
 
 export default function ProfileAccount() {
-  const { user, linkEmail, linkGoogle, linkTwitter, linkInstagram } = usePrivy()
-  const { unlinkEmail, unlinkGoogle, unlinkTwitter, unlinkInstagram } = usePrivy()
+  const { user, linkEmail, linkGoogle, linkTwitter } = usePrivy()
+  const { unlinkEmail, unlinkGoogle, unlinkTwitter } = usePrivy()
 
-  const { email, google, twitter, instagram } = user || {}
+  const { email, google, twitter } = user || {}
   const { statusData, data } = useAppSelector(state => state.user)
   const locked = !statusData || statusData.progress.ongoing > 0 // prevent unlinking while ongoing
-
-  // auto update username by accessToken
-  const linkedInstagram = useMemo(
-    () => data.linkedAccounts?.find(account => account.platform === LinkAccountPlatform.Instagram),
-    [data]
-  )
 
   // for modal
   const [opened, { open, close }] = useDisclosure(false)
@@ -59,11 +51,6 @@ export default function ProfileAccount() {
         case AccountType.X: {
           if (!twitter || showLocked) return
           const result = await unlinkTwitter(twitter.subject)
-          return result
-        }
-        case AccountType.Instagram: {
-          if (!instagram) return
-          const result = await unlinkInstagram(instagram.subject)
           return result
         }
       }
@@ -109,9 +96,6 @@ export default function ProfileAccount() {
         break
       case AccountType.X:
         linkTwitter()
-        break
-      case AccountType.Instagram:
-        linkInstagram()
         break
     }
   }
@@ -194,23 +178,6 @@ export default function ProfileAccount() {
                 AccountType.X,
                 Boolean(twitter),
                 twitter?.username ? `@${twitter.username}` : undefined
-              )}
-            </Group>
-          </Paper>
-
-          <Paper p="md" radius="sm" shadow="xs">
-            <Group justify="space-between" wrap="nowrap">
-              <Group gap="sm" wrap="nowrap">
-                <FaInstagram size={20} />
-                <Title order={5} fw={500}>
-                  Instagram
-                </Title>
-              </Group>
-
-              {renderLink(
-                AccountType.Instagram,
-                Boolean(instagram),
-                linkedInstagram?.username ? `@${linkedInstagram.username}` : undefined
               )}
             </Group>
           </Paper>

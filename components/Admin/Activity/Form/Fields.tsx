@@ -22,9 +22,6 @@ export default function FormFields() {
     if (socialMedia === SocialMedia.X) {
       return [{ label: 'Repost', value: `${ActivityType.Repost}` }]
     }
-    if (socialMedia === SocialMedia.Instagram) {
-      return [{ label: 'Add to story', value: `${ActivityType.Story}` }]
-    }
     return []
   }, [socialMedia])
 
@@ -32,9 +29,6 @@ export default function FormFields() {
   useEffect(() => {
     if (socialMedia === SocialMedia.X && activityType !== `${ActivityType.Repost}`) {
       form.setFieldValue('activityType', `${ActivityType.Repost}`)
-    }
-    if (socialMedia === SocialMedia.Instagram && activityType !== `${ActivityType.Story}`) {
-      form.setFieldValue('activityType', `${ActivityType.Story}`)
     }
   }, [socialMedia, activityType])
 
@@ -159,13 +153,7 @@ export default function FormFields() {
 
       <TextInput
         label="Full Link"
-        placeholder={
-          socialMedia === SocialMedia.X
-            ? 'https://x.com/user/status/post_id'
-            : socialMedia === SocialMedia.Instagram
-              ? 'https://www.instagram.com/p/post_id'
-              : ''
-        }
+        placeholder={socialMedia === SocialMedia.X ? 'https://x.com/user/status/post_id' : ''}
         key={form.key('details.fullLink')}
         {...form.getInputProps('details.fullLink')}
       />

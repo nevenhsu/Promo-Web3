@@ -14,7 +14,7 @@ export function useSyncAccounts() {
   const { data, fetched } = useAppSelector(state => state.user)
   const { bothAuth } = useLoginStatus()
   const { user } = usePrivy()
-  const { google, twitter, email, instagram } = user || {}
+  const { google, twitter, email } = user || {}
 
   const ready = fetched && bothAuth && user
 
@@ -25,10 +25,6 @@ export function useSyncAccounts() {
   )
   const linkedX = useMemo(
     () => linkedAccounts.find(account => account.platform === LinkAccountPlatform.X),
-    [linkedAccounts]
-  )
-  const linkedInstagram = useMemo(
-    () => linkedAccounts.find(account => account.platform === LinkAccountPlatform.Instagram),
     [linkedAccounts]
   )
 
@@ -88,26 +84,6 @@ export function useSyncAccounts() {
       )
     }
   }, [ready, linkedEmail, email])
-
-  // auto update instagram account
-  useEffect(() => {
-    if (!ready) return
-
-    const notLinked = instagram && !linkedInstagram
-    const outDated = instagram && linkedInstagram && instagram.subject !== linkedInstagram.subject
-
-    if (notLinked || outDated) {
-      dispatch(
-        updateLinkAccount({
-          subject: instagram.subject,
-          platform: LinkAccountPlatform.Instagram,
-          username: instagram.username || '',
-        })
-      )
-    } else if (!instagram && linkedInstagram) {
-      dispatch(deleteLinkAccount(LinkAccountPlatform.Instagram))
-    }
-  }, [ready, linkedInstagram, instagram])
 
   return null
 }
