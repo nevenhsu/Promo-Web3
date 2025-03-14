@@ -62,3 +62,10 @@ export function isEnumMember<T extends Record<string, unknown>>(
 ): value is T {
   return Object.values(enumType).includes(value)
 }
+
+export function isImageURI(str?: string) {
+  if (!str) return false
+
+  const regex = /^data:image\/[a-zA-Z0-9.+-]+;base64,[a-zA-Z0-9+/]+={0,2}$/
+  return regex.test(str)
+}

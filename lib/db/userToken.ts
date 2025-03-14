@@ -1,5 +1,6 @@
 import UserTokenModel from '@/models/userToken'
-import { isImageURI, uploadImage } from '@/lib/gcp'
+import { uploadImage } from '@/lib/cloudinary'
+import { isImageURI } from '@/utils/helper'
 import type { UserWallet } from '@/models/userWallet'
 
 export async function getUserTokens(userId: string) {

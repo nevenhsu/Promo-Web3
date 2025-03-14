@@ -2,8 +2,9 @@ import * as _ from 'lodash-es'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
-import { isImageURI, uploadImage } from '@/lib/gcp'
+import { uploadImage } from '@/lib/cloudinary'
 import { updateUserById, getUserByUsername } from '@/lib/db/user'
+import { isImageURI } from '@/utils/helper'
 
 export async function PUT(req: NextRequest) {
   try {

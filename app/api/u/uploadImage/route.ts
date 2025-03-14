@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
-import { uploadImage } from '@/lib/gcp'
+import { uploadImage } from '@/lib/cloudinary'
 
 export async function PUT(req: NextRequest) {
   try {

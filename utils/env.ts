@@ -4,8 +4,6 @@ const isProd = process.env.NODE_ENV === 'production'
 // public
 export const locales = ['en', 'zhTW'] as const // next-intl
 
-const gcpKey = getGCPKey()
-
 export const env = {
   isProd,
   locales,
@@ -17,11 +15,10 @@ export const env = {
         isAdmin: true,
         adminRole: process.env.DEV_ADMIN_ROLE ? Number(process.env.DEV_ADMIN_ROLE) : undefined,
       },
-  gcp: {
-    bucketName: process.env.GCP_BUCKET_NAME,
-    projectId: gcpKey.project_id,
-    clientEmail: gcpKey.client_email,
-    privateKey: gcpKey.private_key,
+  cloudinary: {
+    cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET,
   },
 }
 
@@ -44,6 +41,10 @@ export const publicEnv = {
     infuraKey: process.env.NEXT_PUBLIC_INFURA_KEY,
     alchemyKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
   },
+  cloudinary: {
+    cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  },
 }
 
 // methods
@@ -65,22 +66,4 @@ function getBaseUrl() {
   if (!url) throw new Error('invalid NEXT_PUBLIC_BASE_URL')
   const hasSlash = url.slice(-1) === '/'
   return hasSlash ? url.slice(0, -1) : url
-}
-
-function getGCPKey(): { project_id?: string; client_email?: string; private_key?: string } {
-  try {
-    const key = JSON.parse(
-      Buffer.from(process.env.GCP_KEY || 'e30=', 'base64')
-        .toString()
-        .replace(/\n/g, '')
-    )
-
-    if (!key.project_id || !key.client_email || !key.private_key) {
-      throw new Error('Invalid GCP_KEY')
-    }
-
-    return key
-  } catch (error) {
-    return {}
-  }
 }

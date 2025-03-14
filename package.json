@@ -14,7 +14,6 @@
     "user": "git config user.name 'XeraTeam' && git config user.email devteam@xera.vip"
   },
   "dependencies": {
-    "@google-cloud/storage": "^7.15.2",
     "@gsap/react": "^2.1.2",
     "@headlessui/react": "^2.2.0",
     "@mantine/core": "^7.17.0",
@@ -36,6 +35,7 @@
     "@zerodev/ecdsa-validator": "^5.4.4",
     "@zerodev/sdk": "^5.4.24",
     "axios": "^1.8.1",
+    "cloudinary": "^2.6.0",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "decimal.js": "^10.5.0",
