@@ -3,15 +3,12 @@ import { ActivityType, ActivityErrorCode } from '@/types/db'
 export const chips = [
   { label: 'All', value: `${ActivityType.None}` },
   { label: 'Repost', value: `${ActivityType.Repost}` },
-  { label: 'Add to story', value: `${ActivityType.Story}` },
 ]
 
 export const getActionLabel = (type: number) => {
   switch (type) {
     case ActivityType.Repost:
       return 'Repost'
-    case ActivityType.Story:
-      return 'Add to story'
     default:
       return ''
   }

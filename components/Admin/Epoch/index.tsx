@@ -46,7 +46,7 @@ export default function AdminEpoch() {
               setSelectedIndex(o.index)
               updateRef.current?.open()
             }}
-            disabled={isAfter(new Date(), o.endTime)}
+            disabled={isAfter(new Date(), new Date())}
             color="blue"
           >
             <PiPencil />
@@ -58,7 +58,7 @@ export default function AdminEpoch() {
               setSelectedIndex(o.index)
               deleteRef.current?.open()
             }}
-            disabled={o.index !== lastEpoch?.index || isAfter(new Date(), o.startTime)}
+            disabled={o.index !== lastEpoch?.index || isAfter(new Date(), new Date(o.startTime))}
           >
             <PiTrash />
           </ActionIcon>

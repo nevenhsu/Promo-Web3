@@ -38,7 +38,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
         if (!value) {
           return 'Should not be empty'
         }
-        if (prevEpoch && isBefore(value, prevEpoch.endTime)) {
+        if (prevEpoch && isBefore(value, new Date(prevEpoch.endTime))) {
           return `Should not before ${formatZonedDate(prevEpoch.endTime, 'MMM dd yyyy h:mm aa')}`
         }
         if (values.endTime && !isBefore(value, values.endTime)) {
@@ -50,7 +50,7 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
         if (!value) {
           return 'Should not be empty'
         }
-        if (nextEpoch && isAfter(value, nextEpoch.startTime)) {
+        if (nextEpoch && isAfter(value, new Date(nextEpoch.startTime))) {
           return `Should not after ${formatZonedDate(nextEpoch.startTime, 'MMM dd yyyy h:mm aa')}`
         }
         if (values.startTime && isBefore(value, values.startTime)) {

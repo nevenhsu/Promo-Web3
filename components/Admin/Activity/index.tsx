@@ -22,7 +22,7 @@ export default function AdminEpoch() {
   const { data, total, current, loading, setSelectedId, handlePageChange } = useActivity()
 
   const rows = data.map(o => {
-    const ended = isAfter(new Date(), o.endTime)
+    const ended = isAfter(new Date(), new Date(o.endTime))
     return (
       <Table.Tr key={o._id}>
         <Table.Td>
