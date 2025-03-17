@@ -49,7 +49,10 @@ export const getPublicUser = async (username: string): Promise<PublicUser | unde
     const { user } = data
     return user
   } catch (err) {
-    console.error(err)
+    if (err instanceof Error && err.response?.status !== 404) {
+      console.error(err)
+    }
+
     return undefined
   }
 }

@@ -53,10 +53,6 @@ declare global {
       NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: string
       NEXT_PUBLIC_CLOUDINARY_API_KEY: string
       CLOUDINARY_API_SECRET: string
-
-      /// gcp
-      GCP_BUCKET_NAME: string
-      GCP_KEY: string
     }
   }
 }

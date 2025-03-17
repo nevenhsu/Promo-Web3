@@ -10,7 +10,6 @@ import {
 } from '@/services/user'
 import { getUserStatus, type TUserStatus } from '@/services/userStatus'
 import { notifications } from '@mantine/notifications'
-import type { PayloadAction } from '@reduxjs/toolkit'
 import type { TUser, LinkedAccount } from '@/models/user'
 import type { ReferralCode } from '@/models/referralCode'
 
@@ -84,9 +83,6 @@ export const slice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setFetched: (state, action: PayloadAction<boolean>) => {
-      state.fetched = action.payload
-    },
     clearData: state => {
       // for logout
       _.forEach(initialState, (value, key) => {
@@ -109,6 +105,7 @@ export const slice = createSlice({
     builder.addCase(updateUser.fulfilled, (state, action) => {
       const newData = action.payload
       state.updating = false
+      state.fetched = true
       if (newData) {
         state.data.linkedAccounts = [] // prevent duplicate
         _.merge(state.data, newData)
@@ -137,6 +134,7 @@ export const slice = createSlice({
     builder.addCase(updateProfile.fulfilled, (state, action) => {
       const newData = action.payload
       state.updating = false
+      state.fetched = true
       if (newData) {
         state.data.linkedAccounts = [] // prevent duplicate
         _.merge(state.data, newData)
@@ -184,5 +182,5 @@ export const slice = createSlice({
   },
 })
 
-export const { setFetched, clearData } = slice.actions
+export const { clearData } = slice.actions
 export const userReducer = slice.reducer

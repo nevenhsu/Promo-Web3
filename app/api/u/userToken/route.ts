@@ -39,10 +39,10 @@ export async function POST(req: NextRequest) {
     if (!doc || doc._user.toString() !== userId) {
       return NextResponse.json({ error: 'Token not found' }, { status: 404 })
     }
-
     // upload image to GCP
-    const walletId = doc._wallet.toString()
-    const url = await uploadTokenIcon(userId, walletId, iconURI)
+    const { chainId, _wallet } = doc
+    const walletId = _wallet.toString()
+    const url = await uploadTokenIcon(userId, `${walletId}-${chainId}`, iconURI)
 
     if (!url) {
       return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 })

@@ -1,4 +1,4 @@
-import { mainnet, arbitrum, arbitrumSepolia } from 'viem/chains'
+import { mainnet, arbitrum, arbitrumSepolia, base, baseSepolia } from 'viem/chains'
 
 export type NetworkInfo = {
   chainId?: number
@@ -12,7 +12,7 @@ export const networks: NetworkInfo[] = [
   {
     chainId: mainnet.id,
     name: mainnet.name,
-    icon: '/icons/base.svg',
+    icon: '/icons/eth.svg',
     subtitle: 'Ethereum Mainnet',
     blockExplorerUrl: mainnet.blockExplorers.default.url,
   },
@@ -29,6 +29,20 @@ export const networks: NetworkInfo[] = [
     icon: '/icons/arbitrum-testnet.svg',
     subtitle: 'Ethereum L2 Testnet',
     blockExplorerUrl: arbitrumSepolia.blockExplorers.default.url,
+  },
+  {
+    chainId: base.id,
+    name: base.name,
+    icon: '/icons/base.svg',
+    subtitle: 'Base Network',
+    blockExplorerUrl: base.blockExplorers.default.url,
+  },
+  {
+    chainId: baseSepolia.id,
+    name: baseSepolia.name,
+    icon: '/icons/base-testnet.svg',
+    subtitle: 'Base Sepolia Network',
+    blockExplorerUrl: baseSepolia.blockExplorers.default.url,
   },
 ] as const
 

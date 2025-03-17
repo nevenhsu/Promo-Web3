@@ -1,4 +1,4 @@
-import { arbitrum, arbitrumSepolia, baseSepolia } from 'viem/chains'
+import { base, baseSepolia } from 'viem/chains'
 
 export type ZeroDev = {
   projectId: string
@@ -6,24 +6,16 @@ export type ZeroDev = {
   paymasterRpc: string
 }
 
-const baSepolia: ZeroDev = {
-  projectId: 'da03ad68-fdc7-4de6-a4c6-f309d4f67329',
-  bundlerRpc: 'https://rpc.zerodev.app/api/v2/bundler/da03ad68-fdc7-4de6-a4c6-f309d4f67329',
-  paymasterRpc: 'https://rpc.zerodev.app/api/v2/paymaster/da03ad68-fdc7-4de6-a4c6-f309d4f67329',
-}
-
-const arbSepolia: ZeroDev = {
-  projectId: '0f3dc238-6992-4c6a-a7dd-7e9fec9b58bd',
-  bundlerRpc: 'https://rpc.zerodev.app/api/v2/bundler/0f3dc238-6992-4c6a-a7dd-7e9fec9b58bd',
-  paymasterRpc: 'https://rpc.zerodev.app/api/v2/paymaster/0f3dc238-6992-4c6a-a7dd-7e9fec9b58bd',
+const baseSepoliaData: ZeroDev = {
+  projectId: 'e319936b-ab7d-4afc-9319-1421336b0c4c',
+  bundlerRpc: 'https://rpc.zerodev.app/api/v2/bundler/e319936b-ab7d-4afc-9319-1421336b0c4c',
+  paymasterRpc: 'https://rpc.zerodev.app/api/v2/paymaster/e319936b-ab7d-4afc-9319-1421336b0c4c',
 }
 
 export function getZeroDev(chainId: number | undefined) {
   switch (chainId) {
     case baseSepolia.id:
-      return baSepolia
-    case arbitrumSepolia.id:
-      return arbSepolia
+      return baseSepoliaData
     default:
       return undefined
   }

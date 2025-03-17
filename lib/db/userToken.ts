@@ -13,11 +13,11 @@ export async function getUserTokens(userId: string) {
   return docs.map(o => ({ ...o, decimals: 6 }))
 }
 
-export async function uploadTokenIcon(userId: string, walletId: string, iconURI: string) {
+export async function uploadTokenIcon(userId: string, name: string, iconURI: string) {
   // upload image to GCP
   if (isImageURI(iconURI)) {
     const path = `images/${userId}`
-    const fileName = `token-cover-${walletId}`
+    const fileName = `token-${name}`
     const url = await uploadImage(iconURI, path, fileName, { width: 80, height: 80 })
     if (!url) {
       throw new Error('Failed to upload token cover')

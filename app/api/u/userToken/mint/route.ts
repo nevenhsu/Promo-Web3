@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unsupported chain' }, { status: 400 })
     }
 
-    const tokenContract = getTokenContract(client as any, owner)
+    const tokenContract = getTokenContract(client, owner)
 
     const [name, symbol] = await Promise.all([
       tokenContract.read.name(),
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     const data = { name, symbol, chainId, _user: userId, _wallet: walletId, icon: '' }
 
-    const url = await uploadTokenIcon(userId, walletId, iconURI)
+    const url = await uploadTokenIcon(userId, `${walletId}-${chainId}`, iconURI)
     if (url) {
       data.icon = url
     }

@@ -1,5 +1,5 @@
 import * as _ from 'lodash-es'
-import { arbitrum, arbitrumSepolia } from 'viem/chains'
+import { base, baseSepolia } from 'viem/chains'
 import ERC20 from './abi/ERC20.json'
 import { unifyAddress } from '@/wallet/utils/helper'
 import type { Hash } from 'viem'
@@ -34,9 +34,9 @@ export const eth: ETH = {
 }
 
 export const tokens: { [id: string]: Erc20[] } = {
-  [arbitrum.id]: [
+  [base.id]: [
     {
-      chainId: arbitrum.id,
+      chainId: base.id,
       name: 'USD Coin',
       symbol: 'USDC',
       decimals: 6,
@@ -46,9 +46,9 @@ export const tokens: { [id: string]: Erc20[] } = {
       abi: ERC20.abi,
     },
   ],
-  [arbitrumSepolia.id]: [
+  [baseSepolia.id]: [
     {
-      chainId: arbitrumSepolia.id,
+      chainId: baseSepolia.id,
       name: 'USD Coin',
       symbol: 'USDC',
       decimals: 6,

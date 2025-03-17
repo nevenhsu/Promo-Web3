@@ -1,8 +1,9 @@
-import { arbitrum, arbitrumSepolia, baseSepolia } from 'viem/chains'
+import { base, baseSepolia } from 'viem/chains'
 import { publicEnv } from '@/utils/env'
+import type { Chain } from 'viem'
 
-const defaultChain = publicEnv.chainTestnet ? arbitrumSepolia : arbitrumSepolia
-const supportedChains = [arbitrum, arbitrumSepolia]
+const defaultChain = publicEnv.chainTestnet ? baseSepolia : base
+const supportedChains: Chain[] = [base, baseSepolia]
 
 export { defaultChain, supportedChains }
 
@@ -10,12 +11,9 @@ export type SupportedChainIds = (typeof supportedChains)[number]['id']
 
 export function getProviderUrl(chainId: number) {
   switch (chainId) {
-    case arbitrum.id:
-      return getInfuraUrl('arbitrum-mainnet') || getAlchemyUrl('arb-mainnet')
-    case arbitrumSepolia.id:
-      return getInfuraUrl('arbitrum-sepolia') || getAlchemyUrl('arb-sepolia')
+    case base.id:
+      return getAlchemyUrl('base-mainnet') || getInfuraUrl('base-mainnet')
     case baseSepolia.id:
-      // infura may not support this network
       return getAlchemyUrl('base-sepolia') || getInfuraUrl('base-sepolia')
     default:
       return undefined

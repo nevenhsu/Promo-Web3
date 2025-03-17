@@ -1,5 +1,5 @@
 import { getContract } from 'viem'
-import { arbitrum, arbitrumSepolia } from 'viem/chains'
+import { base, baseSepolia } from 'viem/chains'
 import { computeTokenAddress } from '@/lib/web3/computeTokenAddress'
 import TokenManagerJson from './TokenManager.sol/TokenManager.json'
 import ActivityManagerJson from './NonfungibleActivityManager.sol/NonfungibleActivityManager.json'
@@ -16,16 +16,16 @@ export type Manager = {
 }
 
 export const tokenManagers: { [id: string]: Manager } = {
-  [arbitrumSepolia.id]: {
-    chainId: arbitrumSepolia.id,
-    address: '0xd8f490482caeb6fa7c8acd12e5b1ca556167c643',
+  [baseSepolia.id]: {
+    chainId: baseSepolia.id,
+    address: '0xB44a6Ccee1D22B3998ea30CA5a373A7C2C12D39e',
   },
 }
 
 export const activityManagers: { [id: string]: Manager } = {
-  [arbitrumSepolia.id]: {
-    chainId: arbitrumSepolia.id,
-    address: '0x811ae1947816113aa6c47df69a1db9efc242251e',
+  [baseSepolia.id]: {
+    chainId: baseSepolia.id,
+    address: '0x3A1Ab23F0ee832961dFD709A517F08563CCd331d',
   },
 }
 

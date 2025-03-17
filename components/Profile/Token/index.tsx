@@ -191,6 +191,11 @@ export default function Token() {
                 )}
               </Stack>
             </PaperDiv>
+
+            <Text fz="xs" c="dimmed">
+              You can mint multiple creator tokens with different wallets. But one wallet can only
+              mint one creator token.
+            </Text>
           </Stack>
         </Stack>
       </RwdLayout>
