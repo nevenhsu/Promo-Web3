@@ -181,6 +181,8 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
     if (isKernelClient(client)) {
       // Send transaction by smart account
+      console.log('Send tx by smart account:', calldata)
+
       const { userOpHash, wait } = await sendTxBySmartAccount(client, [calldata])
       opHash = userOpHash // for callback
       const result = await wait
@@ -188,6 +190,8 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       success = result.success
     } else {
       // Send transaction by wallet
+      console.log('Send tx by wallet:', calldata)
+
       const { transactionHash, wait } = await sendTxByWallet(client, calldata)
       hash = transactionHash // for callback
       const result = await wait

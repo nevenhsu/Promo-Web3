@@ -12,22 +12,15 @@ import {
   getUserOperationGasPrice,
 } from '@zerodev/sdk'
 import { signerToEcdsaValidator } from '@zerodev/ecdsa-validator'
-import { KernelEIP1193Provider } from '@zerodev/sdk/providers'
 import { KERNEL_V3_1, getEntryPoint } from '@zerodev/sdk/constants'
 import { http } from 'viem'
 import { getZeroDev } from '@/wallet/lib/zeroDev'
 import { getPublicClient } from '@/wallet/lib/publicClients'
-import { getWalletClient } from '@/wallet/lib/getWalletClient'
 import { toChainId } from '@/wallet/utils/network'
+import type { Hash } from 'viem'
 import type { ConnectedWallet } from '@privy-io/react-auth'
-import type { Hash, EIP1193Provider } from 'viem'
-import type { KernelProvider, KernelClient, WalletClient } from '@/types/wallet'
-
-export type Kernel = {
-  provider: KernelProvider
-  kernelClient: KernelClient
-  walletClient: WalletClient
-}
+import type { Signer } from '@zerodev/sdk/types'
+import type { KernelClient } from '@/types/wallet'
 
 const entryPoint = getEntryPoint('0.7')
 const kernelVersion = KERNEL_V3_1
@@ -39,31 +32,29 @@ export function useSmartAccount() {
 
   // Smart account values
   const [smartAccountAddress, setSmartAccountAddress] = useState<Hash>()
-  const [kernel, setKernel] = useState<Kernel>()
+  const [kernelClient, setKernelClient] = useState<KernelClient>()
   const [loading, setLoading] = useState(true)
 
-  const setupSmartAccount = async (privyWallet: ConnectedWallet, chainId: number) => {
+  const setupSmartAccount = async (wallet: ConnectedWallet, chainId: number) => {
     try {
       setLoading(true)
       // Reset smart account values
       setSmartAccountAddress(undefined)
-      setKernel(undefined)
+      setKernelClient(undefined)
 
-      const res = await getAccountClient(privyWallet, chainId)
+      const provider = (await wallet.getEthereumProvider()) as any
+      const res = await getAccountClient(provider, chainId)
 
-      if (!res || !res.walletClient) {
+      if (!res || !res.kernelClient) {
         throw new Error('Smart account not created')
       }
 
+      console.log('Privy wallet:', wallet.address)
       console.log('Smart account:', res.smartAccountAddress)
 
       const { smartAccountAddress } = res
       setSmartAccountAddress(smartAccountAddress)
-      setKernel({
-        provider: res.kernelProvider,
-        walletClient: res.walletClient,
-        kernelClient: res.kernelClient,
-      })
+      setKernelClient(res.kernelClient)
     } catch (err) {
       console.error(err)
     } finally {
@@ -80,27 +71,24 @@ export function useSmartAccount() {
 
   return {
     smartAccountAddress,
-    kernel,
+    kernelClient,
     loading,
   }
 }
 
-async function getAccountClient(wallet: ConnectedWallet, chainId: number | undefined) {
+async function getAccountClient(signer: Signer, chainId: number | undefined) {
   const zeroDev = getZeroDev(chainId)
   const publicClient = getPublicClient(chainId)
 
   // Check if the ZeroDev and public client are available
   if (!zeroDev || !chainId || !publicClient) return
 
-  // Get the EIP1193 provider from Privy
-  const provider = (await wallet.getEthereumProvider()) as EIP1193Provider
-
   // Initialize a viem public client on your app's desired network
   const { chain } = publicClient
 
   // Create a ZeroDev ECDSA validator from the `smartAccountSigner` from above and your `publicClient`
   const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
-    signer: provider,
+    signer,
     entryPoint,
     kernelVersion,
   })
@@ -142,14 +130,8 @@ async function getAccountClient(wallet: ConnectedWallet, chainId: number | undef
 
   const smartAccountAddress = kernelClient.account.address
 
-  const kernelProvider = new KernelEIP1193Provider(kernelClient)
-
-  const walletClient = getWalletClient(chainId, kernelProvider, smartAccountAddress)
-
   return {
     smartAccountAddress,
-    kernelProvider,
     kernelClient,
-    walletClient,
   }
 }

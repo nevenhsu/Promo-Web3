@@ -27,7 +27,7 @@ export default function Token() {
 
   // zerodev
   const { smartAccountValues, chainId, loading } = useWeb3()
-  const { kernel, smartAccountAddress = '' } = smartAccountValues
+  const { kernelClient, smartAccountAddress = '' } = smartAccountValues
 
   // privy
   const { wallets } = useWallets()
@@ -108,7 +108,7 @@ export default function Token() {
 
             <Divider />
 
-            {kernel ? (
+            {kernelClient ? (
               <PaperDiv>
                 <Stack>
                   <Group justify="space-between">

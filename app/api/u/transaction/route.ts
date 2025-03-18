@@ -4,7 +4,6 @@ import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
 import { saveTransaction, getTransactions } from '@/lib/db/transaction'
 import { getTransferLog } from '@/lib/web3/erc20'
-import { getEthTxLog } from '@/lib/web3/eth'
 import { getUserWallets } from '@/lib/db/userWallet'
 import { getTokenBySymbol } from '@/lib/db/userToken'
 import { TxStatus, TxType } from '@/types/db'
@@ -38,22 +37,10 @@ export async function PUT(req: NextRequest) {
       value.to = log.to
     }
 
-    if (value.type === TxType.Native) {
-      const log = await getEthTxLog(value)
-
-      // override value with onchain data
-      value.status = log.success ? TxStatus.Success : TxStatus.Failed
-      value.token.amount = log.amount
-      value.token.symbol = 'ETH'
-      value.createdAt = log.timestamp
-      value.from = log.from
-      value.to = log.to
-      value.token._userToken = null
-    }
-
     // Check if the user has the wallet
     const wallets = await getUserWallets(userId)
     const fromWallet = wallets.find(w => isAddressEqual(w.address, value.from))
+
     if (!fromWallet) {
       return NextResponse.json({ error: 'Invalid user wallet' }, { status: 400 })
     }

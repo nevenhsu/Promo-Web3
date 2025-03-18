@@ -3,7 +3,7 @@ import { getContract, parseSignature } from 'viem'
 import clubTokenJson from '@/contracts/ClubToken.sol/ClubToken.json'
 import { ClubToken$Type } from '@/contracts/ClubToken.sol/ClubToken'
 import type { GetContractReturnType, Hash } from 'viem'
-import type { WalletClient } from '@/types/wallet'
+import type { SignerClient } from '@/types/wallet'
 
 const fieldNames = ['name', 'version', 'chainId', 'verifyingContract', 'salt'] as const
 
@@ -18,7 +18,7 @@ const types = {
 } as const
 
 export async function permitToken(
-  wallet: WalletClient,
+  wallet: SignerClient,
   token: Hash,
   spender: Hash,
   value: bigint,
@@ -50,7 +50,7 @@ export async function permitToken(
   return parsed
 }
 
-async function getPermitData(client: WalletClient, token: Hash) {
+async function getPermitData(client: SignerClient, token: Hash) {
   const contract = getTokenContract(client, token)
 
   const [fieldsString, name, version, chainId, verifyingContract, salt, extensions] =
@@ -74,9 +74,9 @@ async function getPermitData(client: WalletClient, token: Hash) {
 }
 
 function getTokenContract(
-  client: WalletClient,
+  client: SignerClient,
   address: Hash
-): GetContractReturnType<ClubToken$Type['abi'], WalletClient> {
+): GetContractReturnType<ClubToken$Type['abi'], SignerClient> {
   const contract = getContract({
     address,
     abi: clubTokenJson.abi,

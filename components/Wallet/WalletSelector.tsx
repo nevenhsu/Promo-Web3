@@ -14,13 +14,13 @@ export default function WalletSelector() {
   const { walletClientType } = useAppSelector(state => state.wallet)
   const { wallets } = useWallets()
   const { smartAccountValues } = useWeb3()
-  const { kernel } = smartAccountValues
+  const { kernelClient, smartAccountAddress } = smartAccountValues
 
   const { setClientType } = useSelectWallet()
 
   return (
     <Stack gap={8}>
-      {kernel && (
+      {kernelClient && (
         <PaperAction onClick={() => setClientType('zerodev')}>
           <Stack gap={4}>
             <Group gap="xs">
@@ -33,7 +33,7 @@ export default function WalletSelector() {
             </Group>
 
             <Text c="gray" fz="xs">
-              {kernel.walletClient.account.address}
+              {smartAccountAddress}
             </Text>
           </Stack>
         </PaperAction>

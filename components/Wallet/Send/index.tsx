@@ -36,7 +36,7 @@ export default function Send() {
   const { balances, updateBalances } = balancesValues
   const { prices } = pricesValues
   const { allTokens } = tokenListValues
-  const tokens = [eth, ...allTokens]
+  const tokens = useMemo(() => [eth, ...allTokens], [allTokens])
 
   const [txTimestamp, setTxTimestamp] = useState(0)
 

@@ -6,7 +6,7 @@ import { useAsyncFn } from 'react-use'
 import { createContract } from '@/wallet/lib/createContract'
 import { getPublicClient } from '@/wallet/lib/publicClients'
 import { eth, type Erc20 } from '@/contracts/tokens'
-import type { WalletClient } from 'viem'
+import type { Hash } from 'viem'
 
 // Get current state from Web3Context
 // instead of using this hook directly
@@ -15,7 +15,7 @@ type UseBalanceParams = {
   tokens: Erc20[]
   loading: boolean
   chainId?: number
-  walletClient?: WalletClient
+  walletAddress?: Hash
 }
 
 type BalanceList = {
@@ -28,8 +28,7 @@ type BalanceList = {
     | undefined
 }
 
-export function useBalances({ tokens, chainId, walletClient, loading }: UseBalanceParams) {
-  const walletAddress = walletClient?.account?.address
+export function useBalances({ tokens, chainId, walletAddress, loading }: UseBalanceParams) {
   const notReady = !chainId || !walletAddress || loading
   const symbols = tokens.map(o => o.symbol).join('')
 

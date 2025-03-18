@@ -41,13 +41,11 @@ export async function getReceipt(chainId: number, hash: Hash, retry = 5) {
 
     const { status, from, transactionHash } = receipt
     const success = status === 'success'
-
     console.log('Receipt:', { success, status, from, transactionHash })
 
     return { success, status, from, transactionHash, receipt }
   } catch (err) {
     if (retry < 0) throw new Error('Transaction not found or not yet mined.')
-
     console.log('Transaction not found or not yet mined.', err)
 
     await wait(1000)
@@ -71,7 +69,6 @@ async function getOpReceipt(client: KernelClient, userOpHash: Hash) {
 
   const { success, reason, receipt, sender } = result
   const { transactionHash } = receipt
-
   console.log('Op Receipt:', { success, sender, userOpHash, reason, transactionHash })
 
   return { success, sender, userOpHash, reason, transactionHash, receipt, result }

@@ -11,7 +11,7 @@ import { useTokenList } from '@/wallet/hooks/useTokenList'
 import { supportedChains } from './variables'
 import { toChainId } from '@/wallet/utils/network'
 import type { Hash } from 'viem'
-import type { WalletClient } from '@/types/wallet'
+import type { SignerClient } from '@/types/wallet'
 
 type WalletValues = ReturnType<typeof useWallet>
 type SmartAccountValues = ReturnType<typeof useSmartAccount>
@@ -23,7 +23,7 @@ type Web3ContextType = {
   loading: boolean
   chainId?: number
   walletAddress?: Hash
-  walletClient?: WalletClient
+  walletClient?: SignerClient
   walletValues: WalletValues
   smartAccountValues: SmartAccountValues
   balancesValues: BalancesValues
@@ -49,7 +49,7 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   // Current wallet value
   const walletClient = !loading
     ? onSmartAccount
-      ? smartAccountValues.kernel?.walletClient
+      ? smartAccountValues.kernelClient
       : walletValues.walletClient
     : undefined
   const walletAddress = walletClient?.account?.address
@@ -60,7 +60,7 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   const tokenListValues = useTokenList({ chainId, walletAddress })
   const balancesValues = useBalances({
     chainId,
-    walletClient,
+    walletAddress,
     tokens: tokenListValues.allTokens,
     loading: loading || tokenListValues.loading,
   })

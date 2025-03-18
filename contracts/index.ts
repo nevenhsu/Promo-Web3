@@ -9,7 +9,7 @@ import type { Address } from 'viem'
 import type { TokenManager$Type } from './TokenManager.sol/TokenManager'
 import type { ClubToken$Type } from './ClubToken.sol/ClubToken'
 import type { NonfungibleActivityManager$Type } from './NonfungibleActivityManager.sol/NonfungibleActivityManager'
-import type { WalletClient, PublicClient, GetContractReturnType } from '@/types/wallet'
+import type { Web3Client, GetContractReturnType } from '@/types/wallet'
 
 export type Manager = {
   chainId: number
@@ -35,7 +35,7 @@ export const activityManagers: { [id: string]: Manager } = {
 }
 
 export const getTokenManager = (
-  client: WalletClient
+  client: Web3Client
 ): GetContractReturnType<TokenManager$Type['abi']> => {
   const manager = tokenManagers[client.chain!.id]
   if (!manager) {
@@ -52,7 +52,7 @@ export const getTokenManager = (
 }
 
 export const getActivityManager = (
-  client: WalletClient | PublicClient
+  client: Web3Client
 ): GetContractReturnType<NonfungibleActivityManager$Type['abi']> => {
   const manager = activityManagers[client.chain!.id]
   if (!manager) {
@@ -69,7 +69,7 @@ export const getActivityManager = (
 }
 
 export const getTokenContract = (
-  client: WalletClient | PublicClient,
+  client: Web3Client,
   owner: Address
 ): GetContractReturnType<ClubToken$Type['abi']> => {
   const manager = tokenManagers[client.chain!.id]
@@ -92,7 +92,7 @@ export const getTokenContract = (
 }
 
 export const getTokenContractByAddress = (
-  client: WalletClient | PublicClient,
+  client: Web3Client,
   address: Address
 ): GetContractReturnType<ClubToken$Type['abi']> => {
   const manager = tokenManagers[client.chain!.id]

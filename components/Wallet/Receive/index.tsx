@@ -19,7 +19,7 @@ export default function Receive() {
 
   // zerodev
   const { smartAccountValues, loading } = useWeb3()
-  const { kernel, smartAccountAddress = '' } = smartAccountValues
+  const { kernelClient, smartAccountAddress = '' } = smartAccountValues
 
   // privy
   const { wallets } = useWallets()
@@ -32,7 +32,7 @@ export default function Receive() {
         <Stack gap="xl">
           <Title order={3}>Receive</Title>
 
-          {Boolean(kernel) ? (
+          {Boolean(kernelClient) ? (
             <WalletInfo
               title="ZeroDev wallet"
               address={smartAccountAddress}

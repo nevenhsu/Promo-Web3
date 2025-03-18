@@ -14,7 +14,7 @@ export default function MyPrivyProvider({ children }: React.PropsWithChildren) {
         supportedChains,
         loginMethods: ['email', 'wallet', 'google', 'twitter'],
         embeddedWallets: {
-          createOnLogin: 'all-users',
+          createOnLogin: 'users-without-wallets',
           showWalletUIs: false,
         },
         appearance: {
