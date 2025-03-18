@@ -7,10 +7,11 @@ type Values = {
   symbol: string
   type: TxType
   displayAmount: string
+  contract?: string
 }
 
 export function saveTxCallback(values: Values) {
-  const { to, symbol, type, displayAmount } = values
+  const { to, symbol, type, displayAmount, contract } = values
   const callback: TxCallback = async ({
     hash,
     userOpHash,
@@ -34,6 +35,7 @@ export function saveTxCallback(values: Values) {
         status: success ? TxStatus.Success : TxStatus.Failed,
         createdAt: new Date(timestamp),
         details,
+        contract,
       })
     } catch (err) {
       console.error(err)

@@ -25,7 +25,7 @@ export default function NetworkButton() {
       width={200}
       opened={opened}
       onChange={opened => {
-        setOpened(isAdmin ? opened : false)
+        setOpened(opened)
       }}
     >
       <Menu.Target>

@@ -32,13 +32,6 @@ export default function Receive() {
         <Stack gap="xl">
           <Title order={3}>Receive</Title>
 
-          <WalletInfo
-            title="Privy wallet"
-            address={privyAddress}
-            loading={loading}
-            selected={walletClientType === 'privy'}
-          />
-
           {Boolean(kernel) ? (
             <WalletInfo
               title="ZeroDev wallet"
@@ -47,6 +40,13 @@ export default function Receive() {
               selected={walletClientType === 'zerodev'}
             />
           ) : null}
+
+          <WalletInfo
+            title="Privy wallet"
+            address={privyAddress}
+            loading={loading}
+            selected={walletClientType === 'privy'}
+          />
         </Stack>
       </RwdLayout>
 
@@ -74,7 +74,15 @@ function WalletInfo({
             {title}
           </Title>
 
-          <Text>{address}</Text>
+          <Text
+            fz="sm"
+            c="dimmed"
+            style={{
+              wordBreak: 'break-all',
+            }}
+          >
+            {address}
+          </Text>
 
           <Group grow>
             <Button

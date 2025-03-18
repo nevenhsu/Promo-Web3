@@ -1,9 +1,10 @@
 import { getContract } from 'viem'
-import { base, baseSepolia } from 'viem/chains'
+import { base, baseSepolia, arbitrumSepolia } from 'viem/chains'
 import { computeTokenAddress } from '@/lib/web3/computeTokenAddress'
 import TokenManagerJson from './TokenManager.sol/TokenManager.json'
 import ActivityManagerJson from './NonfungibleActivityManager.sol/NonfungibleActivityManager.json'
 import clubTokenJson from '@/contracts/ClubToken.sol/ClubToken.json'
+import { unifyAddress } from '@/wallet/utils/helper'
 import type { Address } from 'viem'
 import type { TokenManager$Type } from './TokenManager.sol/TokenManager'
 import type { ClubToken$Type } from './ClubToken.sol/ClubToken'
@@ -18,14 +19,18 @@ export type Manager = {
 export const tokenManagers: { [id: string]: Manager } = {
   [baseSepolia.id]: {
     chainId: baseSepolia.id,
-    address: '0xB44a6Ccee1D22B3998ea30CA5a373A7C2C12D39e',
+    address: unifyAddress('0xB44a6Ccee1D22B3998ea30CA5a373A7C2C12D39e'),
+  },
+  [arbitrumSepolia.id]: {
+    chainId: arbitrumSepolia.id,
+    address: unifyAddress('0xe431b55750440ee42a28f431a8da0ac844f9cb61'),
   },
 }
 
 export const activityManagers: { [id: string]: Manager } = {
   [baseSepolia.id]: {
     chainId: baseSepolia.id,
-    address: '0x3A1Ab23F0ee832961dFD709A517F08563CCd331d',
+    address: unifyAddress('0x3A1Ab23F0ee832961dFD709A517F08563CCd331d'),
   },
 }
 

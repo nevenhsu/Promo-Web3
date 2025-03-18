@@ -9,7 +9,7 @@ const compiler = isProd ? { removeConsole: true } : {}
 const nextConfig = {
   compiler,
   images: {
-    domains: ['cdn.sanity.io'],
+    remotePatterns: [{ hostname: 'cdn.sanity.io' }, { hostname: 'res.cloudinary.com' }],
   },
   experimental: {
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],

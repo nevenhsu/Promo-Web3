@@ -1,7 +1,6 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import Image from 'next/image'
 import { useRouter } from '@/i18n/routing'
 import { useState, useMemo, useEffect } from 'react'
 import { useForm } from '@mantine/form'
@@ -13,6 +12,7 @@ import { Paper, Stack, Group, Title, Text, Space, Divider, Box } from '@mantine/
 import { Button, TextInput, NumberInput, Select } from '@mantine/core'
 import { ThemeIcon, Modal, FocusTrap } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
+import { TokenIcon } from '@/components/share/TokenIcon'
 import { isErc20, isETH, eth, type Token } from '@/contracts/tokens'
 import { formatBalance, formatAmount } from '@/utils/math'
 import { TxStatus, TxType } from '@/types/db'
@@ -64,12 +64,6 @@ export default function Send() {
       amount: value => (Number(value) > 0 ? null : 'Should be greater than 0'),
     },
   })
-
-  useEffect(() => {
-    if (tokens.length) {
-      form.setFieldValue('symbol', tokens[0].symbol)
-    }
-  }, [tokens])
 
   useEffect(() => {
     if (tx && tx.status === TxStatus.Success) {
@@ -194,7 +188,13 @@ export default function Send() {
         {
           description,
         },
-        saveTxCallback({ to, symbol: token.symbol, type: TxType.ERC20, displayAmount })
+        saveTxCallback({
+          to,
+          symbol: token.symbol,
+          type: TxType.ERC20,
+          displayAmount,
+          contract: token.address,
+        })
       )
     }
 
@@ -291,16 +291,7 @@ export default function Send() {
                   }))}
                   allowDeselect={false}
                   checkIconPosition="right"
-                  leftSection={
-                    token ? (
-                      <Image
-                        src={token.icon || ''}
-                        width={20}
-                        height={20}
-                        alt={token.symbol || ''}
-                      />
-                    ) : null
-                  }
+                  leftSection={token ? <TokenIcon token={token} size={20} /> : null}
                   {...form.getInputProps('symbol')}
                 />
 
@@ -392,12 +383,13 @@ function Transaction({
     <>
       <Stack gap="lg" py="md">
         <Stack gap="sm" align="center">
-          <Image src={token?.icon || ''} width={80} height={80} alt={symbol} />
+          {token ? <TokenIcon token={token} size={80} /> : null}
+
           <Title order={4} lh={1}>
-            {symbol || 'No Token'}
+            {symbol || '-'}
           </Title>
           <Text fz="xs" c="dimmed" lh={1}>
-            {token?.name || 'Error'}
+            {token?.name || '-'}
           </Text>
         </Stack>
 

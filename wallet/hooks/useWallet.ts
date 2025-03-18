@@ -21,7 +21,8 @@ export function useWallet() {
   const [walletClient, setWalletClient] = useState<WalletClient>()
 
   // Find the wallet by the walletClientType
-  const wallet = wallets.find(wallet => wallet.walletClientType === walletClientType)
+  const type = walletClientType === 'zerodev' ? 'privy' : walletClientType
+  const wallet = wallets.find(wallet => wallet.walletClientType === type)
   const chainId = toChainId(wallet?.chainId)
   const walletAddress: Hash | undefined = wallet?.address as any
 

@@ -34,6 +34,7 @@ export type TxCallback = (values: {
   timestamp: number // Date.now()
   chainId: number
   account: Hash
+  contract?: Hash
 }) => Promise<void>
 
 export type TxErrorHandle = (error: unknown) => void
@@ -136,8 +137,6 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       }
 
       updateTx(timestamp, { status: TxStatus.Pending })
-
-      console.info('sendAndWait')
 
       const { success, hash, opHash } = await sendAndWait(walletClient, data)
       console.log('Transaction', { hash, success })

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { modals } from '@mantine/modals'
-import { Stepper, Stack, Group, Badge, Space } from '@mantine/core'
+import { Stepper, Stack, Group, Badge, Space, List } from '@mantine/core'
 import { Button, TextInput, Text, Progress } from '@mantine/core'
 import { useForm, hasLength } from '@mantine/form'
 import { useWeb3 } from '@/wallet/Web3Context'
@@ -13,6 +13,7 @@ import TokenPaper from './TokenPaper'
 import Completion, { Status } from '@/components/share/Completion'
 import { cleanSymbol, cleanName } from '@/utils/helper'
 import { checkToken } from '@/services/userTokens'
+import { TransactionExecutionError } from 'viem'
 
 export default function MintFlow() {
   const { mintState, mint } = useUserToken()
@@ -99,7 +100,11 @@ export default function MintFlow() {
         tryUpload()
       },
       error => {
-        tryUpload()
+        if (error instanceof TransactionExecutionError && error.details === 'execution reverted') {
+          setStatus(Status.Failed)
+        } else {
+          tryUpload()
+        }
       }
     )
   }
@@ -228,10 +233,10 @@ export default function MintFlow() {
           <Stack>
             <TokenPaper name={name} symbol={symbol} icon={iconURI} />
 
-            <Text fz="sm" c="dimmed">
-              Be sure to double-check the information before minting. Once minted, the token cannot
-              be changed.
-            </Text>
+            <List type="ordered" size="sm" c="dimmed">
+              <List.Item>Be sure to double-check the information.</List.Item>
+              <List.Item>Once minted, the token cannot be changed.</List.Item>
+            </List>
 
             {errorMsg ? (
               <Badge size="sm" color="red" mx="auto">

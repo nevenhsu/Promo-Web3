@@ -37,8 +37,6 @@ export const TokenBalanceProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return prev && prev.balance === v.balance
     })
 
-    console.log('isSame', isSame)
-
     if (isSame) return
 
     setOverwrites(prev => {
