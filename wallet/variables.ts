@@ -12,11 +12,11 @@ export type SupportedChainIds = (typeof supportedChains)[number]['id']
 export function getProviderUrl(chainId: number) {
   switch (chainId) {
     case arbitrumSepolia.id:
-      return getInfuraUrl('arbitrum-sepolia') || getAlchemyUrl('arb-sepolia')
+      return getAlchemyUrl('arb-sepolia') || getInfuraUrl('arbitrum-sepolia')
     case base.id:
-      return getInfuraUrl('base-mainnet') || getAlchemyUrl('base-mainnet')
+      return getAlchemyUrl('base-mainnet') || getInfuraUrl('base-mainnet')
     case baseSepolia.id:
-      return getInfuraUrl('base-sepolia') || getAlchemyUrl('base-sepolia')
+      return getAlchemyUrl('base-sepolia') || getInfuraUrl('base-sepolia')
     default:
       return undefined
   }

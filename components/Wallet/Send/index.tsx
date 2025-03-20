@@ -19,7 +19,8 @@ import { TxStatus, TxType } from '@/types/db'
 import { PiArrowDown } from 'react-icons/pi'
 import { isAddressEqual, isAddress } from '@/wallet/utils/helper'
 import { saveTxCallback } from './txCallback'
-import type { Tx, AddTxReturn } from '@/wallet/TxContext'
+import type { FeeValuesEIP1559 } from 'viem'
+import type { Tx, AddTxReturn, TransactionParameters } from '@/wallet/TxContext'
 
 type FormData = {
   symbol: string // token
@@ -32,13 +33,20 @@ export default function Send() {
 
   const [opened, { open, close }] = useDisclosure(false)
   const { txs, addTx } = useTx()
-  const { walletAddress, balancesValues, pricesValues, tokenListValues } = useWeb3()
+  const {
+    onSmartAccount,
+    walletAddress,
+    balancesValues,
+    pricesValues,
+    tokenListValues,
+    publicClient,
+  } = useWeb3()
   const { balances, updateBalances } = balancesValues
   const { prices } = pricesValues
   const { allTokens } = tokenListValues
-  const tokens = useMemo(() => [eth, ...allTokens], [allTokens])
 
   const [txTimestamp, setTxTimestamp] = useState(0)
+  const [feeData, setFeeData] = useState<FeeValuesEIP1559>()
 
   const tx = useMemo(() => {
     return txTimestamp ? _.find(txs, { timestamp: txTimestamp }) : undefined
@@ -47,7 +55,7 @@ export default function Send() {
   const form = useForm<FormData>({
     mode: 'controlled',
     initialValues: {
-      symbol: tokens[0]?.symbol || '',
+      symbol: eth.symbol,
       to: '',
       amount: '',
     },
@@ -76,9 +84,9 @@ export default function Send() {
 
   // Get token info
   const { token, balance, price } = useMemo(() => {
-    const token = _.find(tokens, { symbol })
+    const token = _.find([eth, ...allTokens], { symbol })
     return { token, balance: balances[symbol], price: prices[symbol] }
-  }, [tokens, symbol, balances, prices])
+  }, [allTokens, symbol, balances, prices])
 
   const handlePaste = async () => {
     try {
@@ -91,9 +99,46 @@ export default function Send() {
     }
   }
 
-  const handleMax = () => {
+  const handleMaxEth = async () => {
+    try {
+      if (balance && publicClient) {
+        const gas =
+          walletAddress && form.values.to
+            ? await publicClient.estimateGas({
+                to: form.values.to as any,
+                value: BigInt(0),
+              })
+            : BigInt(21000)
+
+        const feeData = await publicClient.estimateFeesPerGas()
+        const totalGasCost = feeData.maxFeePerGas * gas // Total gas cost in wei
+        const maxETH = balance.balance - totalGasCost
+        if (maxETH > 0) {
+          const displayAmount = formatBalance(maxETH, balance.decimals).toString()
+          form.setFieldValue('amount', displayAmount)
+        } else {
+          form.setFieldError('amount', 'Insufficient balance')
+        }
+
+        setFeeData(feeData)
+      } else {
+        form.setFieldValue('amount', '0')
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleMax = async () => {
     if (balance) {
-      form.setFieldValue('amount', formatBalance(balance.balance, balance.decimals).toString())
+      if (symbol !== eth.symbol || onSmartAccount) {
+        form.setFieldValue('amount', formatBalance(balance.balance, balance.decimals).toString())
+      } else {
+        // EOA wallet send ETH
+        handleMaxEth()
+      }
+    } else {
+      form.setFieldValue('amount', '0')
     }
   }
 
@@ -164,12 +209,22 @@ export default function Send() {
     const description = `Transfer ${displayAmount} ${token.symbol} to ${to}`
 
     if (isETH(token)) {
+      const data = {
+        to: to as `0x${string}`,
+        value: BigInt(rawAmount),
+        native: true,
+      }
+      const txData: TransactionParameters = feeData
+        ? {
+            ...data,
+            maxFeePerGas: feeData.maxFeePerGas,
+            maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
+            gas: BigInt(21000),
+          }
+        : data
+
       result = addTx(
-        {
-          to: to as `0x${string}`,
-          value: BigInt(rawAmount),
-          native: true,
-        },
+        txData,
         {
           description,
         },
@@ -285,7 +340,7 @@ export default function Send() {
                 <Select
                   label="Token"
                   placeholder="Pick a token"
-                  data={tokens.map(o => ({
+                  data={[eth, ...allTokens].map(o => ({
                     value: o.symbol,
                     label: `${o.symbol} - ${o.name}`,
                   }))}

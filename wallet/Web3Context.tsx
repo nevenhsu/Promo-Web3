@@ -8,10 +8,11 @@ import { useSmartAccount } from '@/wallet/hooks/useSmartAccount'
 import { useBalances } from '@/wallet/hooks/useBalances'
 import { usePrices } from '@/wallet/hooks/usePrices'
 import { useTokenList } from '@/wallet/hooks/useTokenList'
-import { supportedChains } from './variables'
 import { toChainId } from '@/wallet/utils/network'
+import { getPublicClient } from '@/wallet/lib/publicClients'
+import { supportedChains } from './variables'
 import type { Hash } from 'viem'
-import type { SignerClient } from '@/types/wallet'
+import type { PublicClient, SignerClient } from '@/types/wallet'
 
 type WalletValues = ReturnType<typeof useWallet>
 type SmartAccountValues = ReturnType<typeof useSmartAccount>
@@ -22,8 +23,9 @@ type tokenListValues = ReturnType<typeof useTokenList>
 type Web3ContextType = {
   loading: boolean
   chainId?: number
-  walletAddress?: Hash
+  publicClient?: PublicClient
   walletClient?: SignerClient
+  walletAddress?: Hash
   walletValues: WalletValues
   smartAccountValues: SmartAccountValues
   balancesValues: BalancesValues
@@ -55,6 +57,7 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   const walletAddress = walletClient?.account?.address
 
   const chainId = toChainId(walletClient?.chain.id)
+  const publicClient = getPublicClient(chainId)
 
   // hooks
   const tokenListValues = useTokenList({ chainId, walletAddress })
@@ -87,8 +90,9 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         loading,
         chainId,
-        walletAddress,
+        publicClient,
         walletClient,
+        walletAddress,
         walletValues,
         smartAccountValues,
         balancesValues,

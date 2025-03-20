@@ -5,7 +5,7 @@ import type { Hash, Chain, Account } from 'viem'
 import type { SimulateContractParameters, SendTransactionParameters } from 'viem'
 import type { KernelClient, WalletClient } from '@/types/wallet'
 
-type Data = { to: Hash; value: bigint; data: Hash }
+type Data = { to: Hash; value: bigint; data?: Hash }
 export type CalldataArgs = Data[]
 export type Calldata = SendTransactionParameters<Chain, Account> & Data
 

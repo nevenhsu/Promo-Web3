@@ -10,8 +10,8 @@ import type { Hash, SimulateContractParameters } from 'viem'
 import type { KernelClient, WalletClient } from '@/types/wallet'
 import type { CalldataArgs, Calldata } from './tx'
 
-type NativeData = { to: Hash; value: bigint; native: true }
-type DataParams = NativeData | SimulateContractParameters
+export type TransactionParameters = Calldata & { native: boolean }
+export type DataParams = TransactionParameters | SimulateContractParameters
 
 export type Tx = {
   timestamp: number // unique id
@@ -84,7 +84,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
     if (isNativeData(data)) {
       // send tx
-      sendTx(timestamp, { to: data.to, value: data.value, data: '0x' }, callback, errorHandle)
+      sendTx(timestamp, data, callback, errorHandle)
     } else {
       // simulate tx
       sendContractTx(timestamp, data, callback, errorHandle)
@@ -232,6 +232,6 @@ export const useTx = (): TxContextType => {
   return context
 }
 
-function isNativeData(data: NativeData | SimulateContractParameters): data is NativeData {
-  return (data as NativeData).native === true
+function isNativeData(data: DataParams): data is TransactionParameters {
+  return (data as TransactionParameters).native === true
 }

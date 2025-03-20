@@ -27,7 +27,6 @@ export const UserTokenProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [fetchState, fetchTokens] = useAsyncFn(async () => {
     const { tokens } = await getTokens()
 
-    console.log('Tokens fetched:', tokens)
     return tokens
   }, [])
 
