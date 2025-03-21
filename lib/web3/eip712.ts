@@ -1,7 +1,14 @@
 import * as _ from 'lodash-es'
-import { getContract, parseSignature } from 'viem'
+import {
+  hexToBigInt,
+  getContract,
+  parseSignature,
+  parseCompactSignature,
+  compactSignatureToSignature,
+} from 'viem'
 import clubTokenJson from '@/contracts/ClubToken.sol/ClubToken.json'
 import { ClubToken$Type } from '@/contracts/ClubToken.sol/ClubToken'
+import { isKernelClient } from '@/wallet/utils/helper'
 import type { GetContractReturnType, Hash } from 'viem'
 import type { SignerClient } from '@/types/wallet'
 
@@ -41,13 +48,16 @@ export async function permitToken(
     message,
   })
 
-  const parsed = parseSignature(signature)
-
-  if (parsed.v === undefined) {
-    throw Error('Invalid signature')
+  // FIXME: kernel client should return compact signature
+  if (isKernelClient(wallet)) {
+    const parseCompacted = parseCompactSignature(signature)
+    const yParityAndSBigInt = hexToBigInt(parseCompacted.yParityAndS)
+    const v = yParityAndSBigInt >> BigInt(255) === BigInt(1) ? 28 : 27
+    const result = compactSignatureToSignature(parseCompacted)
+    return { ...result, v }
   }
 
-  return parsed
+  return parseSignature(signature)
 }
 
 async function getPermitData(client: SignerClient, token: Hash) {

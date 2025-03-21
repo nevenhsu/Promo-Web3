@@ -73,11 +73,3 @@ async function getOpReceipt(client: KernelClient, userOpHash: Hash) {
 
   return { success, sender, userOpHash, reason, transactionHash, receipt, result }
 }
-
-export function isKernelClient(client: WalletClient | KernelClient): client is KernelClient {
-  return (client as KernelClient).sendUserOperation !== undefined
-}
-
-export function isWalletClient(client: WalletClient | KernelClient): client is WalletClient {
-  return (client as WalletClient).sendTransaction !== undefined
-}

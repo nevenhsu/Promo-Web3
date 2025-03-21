@@ -1,7 +1,7 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { forwardRef, useImperativeHandle } from 'react'
 import { isBefore } from 'date-fns'
 import { useWeb3 } from '@/wallet/Web3Context'
@@ -12,18 +12,19 @@ import { getXPostId } from '@/utils/socialMedia'
 import { formatAmount } from '@/utils/math'
 import { ActivityType, SocialMedia, ActivitySettingType } from '@/types/db'
 
+export type FormType = ReturnType<typeof useForm>
+
 export type FormRef = {
-  getForm: () => ReturnType<typeof useForm>
+  getForm: () => FormType
 }
 
 type FormProps = {
+  onReady: (form: FormType) => void
   children: React.ReactNode
 }
 
-export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
+export default forwardRef<FormRef, FormProps>(function Form({ onReady, children }, ref) {
   const { balancesValues, tokenListValues } = useWeb3()
-  const { balances } = balancesValues
-  const { userTokens } = tokenListValues
 
   const form = useForm({
     mode: 'controlled',
@@ -51,7 +52,7 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
         data: {
           maxTotalScore: 0,
           maxSelfScore: 10000,
-          minFollowers: 100,
+          minFollowers: 1,
         },
       },
       published: false,
@@ -84,14 +85,14 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
       airdrop: {
         symbol: value => (value ? null : 'Should not be empty'),
         amount: (value, values) => {
-          const token = userTokens.find(o => o.symbol === values.airdrop.symbol)
+          const token = tokenListValues.userTokens.find(o => o.symbol === values.airdrop.symbol)
           if (!token) {
             return 'Token not found'
           }
 
           if (Number(value) > 0) {
             const amount = formatAmount(value, token.decimals)
-            const bal = balances[token.symbol]
+            const bal = balancesValues.balances[token.symbol]
 
             if (!bal || amount.gt(bal.balance.toString())) {
               return 'Insufficient balance'
@@ -131,7 +132,7 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
       },
       setting: {
         data: {
-          minFollowers: value => (value >= 100 ? null : 'Should be greater than or equal to 100'),
+          minFollowers: value => (value > 0 ? null : 'Should be greater than 0'),
           maxTotalScore: value => (value > 0 ? null : 'Should be greater than 0'),
         },
       },
@@ -141,6 +142,10 @@ export default forwardRef<FormRef, FormProps>(function Form({ children }, ref) {
   useImperativeHandle(ref, () => ({
     getForm: () => form,
   }))
+
+  useEffect(() => {
+    onReady(form)
+  }, [])
 
   return <FormProvider form={form}>{children}</FormProvider>
 })

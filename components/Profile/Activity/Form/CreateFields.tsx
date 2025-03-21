@@ -46,7 +46,7 @@ export default function FormFields() {
     form.setFieldValue('setting.data', {
       maxTotalScore: amountNum * 1000,
       maxSelfScore: 10000,
-      minFollowers: 100,
+      minFollowers: 1,
     })
   }, [amount])
 

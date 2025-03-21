@@ -1,4 +1,5 @@
 import { isAddressEqual as _isAddressEqual, isAddress as _isAddress, type Hash } from 'viem'
+import type { KernelClient, WalletClient } from '@/types/wallet'
 
 export function unifyAddress(address: string) {
   return address.toLowerCase() as Hash
@@ -28,4 +29,12 @@ export function isAddressEqual(addr1: string, addr2: string) {
 
 export function isAddress(address: string) {
   return _isAddress(address, { strict: false })
+}
+
+export function isKernelClient(client: WalletClient | KernelClient): client is KernelClient {
+  return (client as KernelClient).sendUserOperation !== undefined
+}
+
+export function isWalletClient(client: WalletClient | KernelClient): client is WalletClient {
+  return (client as WalletClient).sendTransaction !== undefined
 }

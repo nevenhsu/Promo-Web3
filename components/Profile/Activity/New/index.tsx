@@ -2,12 +2,12 @@
 
 import * as _ from 'lodash-es'
 import { useRouter } from '@/i18n/routing'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useAsyncFn } from 'react-use'
 import { Stepper, Stack, Space, Group, Progress, Badge } from '@mantine/core'
 import { Text, Button, Checkbox } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import Form, { type FormRef } from '../Form'
+import Form from '../Form'
 import CreateFields from '../Form/CreateFields'
 import Completion, { Status } from '@/components/share/Completion'
 import { formatDate } from '@/utils/date'
@@ -16,6 +16,7 @@ import { useActivityTx } from './useActivityTx'
 import { defaultChain } from '@/wallet/variables'
 import { createOwnedActivity, updateActivityNFT } from '@/services/activity'
 import type { ActivityData } from '@/components/Profile/Activity/Form/Context'
+import type { FormType } from '../Form'
 
 export default function ProfileActivityNew() {
   const router = useRouter()
@@ -23,9 +24,8 @@ export default function ProfileActivityNew() {
   const { chainId, walletAddress } = useWeb3()
   const notConnected = !chainId || !walletAddress
 
-  const formRef = useRef<FormRef>(null)
-
   // state
+  const [form, setForm] = useState<FormType>()
   const [active, setActive] = useState(0)
   const [status, setStatus] = useState(Status.Init)
   const [error, setError] = useState<string>()
@@ -35,36 +35,54 @@ export default function ProfileActivityNew() {
   const [checked, setChecked] = useState(false)
   const [data, setData] = useState<ActivityData>()
 
-  const [createActivityState, createActivity] = useAsyncFn(async (data: ActivityData) => {
-    if (status === Status.Pending) return
-    setStatus(Status.Pending)
-    setActive(active + 1)
-
-    try {
-      // send transaction
-      const result = await createAndDepositWithPermit(data, async values => {
-        const { hash, success, chainId } = values
-
-        if (!success) {
-          setStatus(Status.Failed)
-          setError('Transaction failed')
-          return
-        }
-
-        // upload to db
-        const newActivity = await createOwnedActivity(data)
-        const updated = await updateActivityNFT(newActivity.slug, hash)
-
-        setSlug(newActivity.slug)
-        setStatus(Status.Success)
-      })
-    } catch (error) {
+  const submitTx = async (data: ActivityData) => {
+    const handleError = (error: unknown) => {
       console.error(error)
       setStatus(Status.Failed)
       if (error instanceof Error) {
         setError(error.message)
       }
     }
+
+    try {
+      // send transaction
+      const result = await createAndDepositWithPermit(
+        data,
+        async values => {
+          const { hash, success } = values
+
+          if (!success) {
+            setStatus(Status.Failed)
+            setError('Transaction failed')
+            return
+          }
+
+          // upload to db
+          const newActivity = await createOwnedActivity(data)
+          const updated = await updateActivityNFT(newActivity.slug, hash)
+
+          setSlug(newActivity.slug)
+          setStatus(Status.Success)
+        },
+        error => {
+          handleError(error)
+        }
+      )
+    } catch (error) {
+      handleError(error)
+    }
+  }
+
+  const [createActivityState, createActivity] = useAsyncFn(async (data: ActivityData) => {
+    console.log('createActivity', data)
+
+    if (status === Status.Pending) return
+    setStatus(Status.Pending)
+    setActive(prev => prev + 1)
+
+    setTimeout(() => {
+      submitTx(data)
+    }, 0)
   }, [])
 
   // TODO: refactor this
@@ -72,7 +90,7 @@ export default function ProfileActivityNew() {
 
   const handleSubmit = (data: ActivityData) => {
     setData(data)
-    setActive(1)
+    setActive(prev => prev + 1)
   }
 
   return (
@@ -92,9 +110,9 @@ export default function ProfileActivityNew() {
               allowStepSelect={false}
             >
               <Stack gap="xl">
-                <Form ref={formRef}>
+                <Form onReady={setForm}>
                   <form
-                    onSubmit={formRef.current?.getForm().onSubmit(
+                    onSubmit={form?.onSubmit(
                       values => {
                         const { startTime, endTime, activityType, ...rest } = values
                         if (startTime && endTime) {
@@ -120,7 +138,6 @@ export default function ProfileActivityNew() {
                       <CreateFields />
 
                       <span />
-
                       <Button type="submit" disabled={notConnected}>
                         Next
                       </Button>
@@ -184,8 +201,8 @@ export default function ProfileActivityNew() {
                 </Text>
 
                 <Group justify="right">
-                  <Button variant="outline" color="dark">
-                    Cancel
+                  <Button variant="outline" color="dark" onClick={() => setActive(active - 1)}>
+                    Back
                   </Button>
                   <Button disabled={!checked || !data} onClick={() => createActivity(data!)}>
                     Submit
@@ -199,7 +216,7 @@ export default function ProfileActivityNew() {
                 onOk={() => {
                   if (created) {
                     router.push({
-                      pathname: '/activity/[slug]',
+                      pathname: '/profile/activity/[slug]',
                       params: { slug },
                     })
                   } else {

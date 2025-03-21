@@ -35,7 +35,7 @@ export default function FormFields() {
   useEffect(() => {
     if (settingType === ActivitySettingType.None) {
       form.setFieldValue('setting.data', {
-        minFollowers: 100,
+        minFollowers: 1,
       })
     }
     if (settingType === ActivitySettingType.A) {
@@ -43,7 +43,7 @@ export default function FormFields() {
       form.setFieldValue('setting.data', {
         maxTotalScore: amount ? amount * 1000 : 0,
         maxSelfScore: 10000,
-        minFollowers: 100,
+        minFollowers: 1,
       })
     }
   }, [settingType])

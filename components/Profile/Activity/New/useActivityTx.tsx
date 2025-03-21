@@ -35,23 +35,23 @@ export function useActivityTx() {
 
     const startT = getUnixTime(startTime)
     const endT = getUnixTime(endTime)
+    const rawAmount = formatAmount(amount, token.decimals)
 
     const { v, r, s } = await permitToken(
       walletClient,
       token.address,
       activityManager.address,
-      BigInt(airdrop.amount),
+      BigInt(rawAmount.toString()),
       BigInt(endT)
     )
 
     const owner = walletClient.account.address
-    const rawAmount = formatAmount(amount, token.decimals)
 
     const result = addTx(
       {
         address: activityManager.address,
         functionName: 'createAndDepositWithPermit',
-        args: [owner, startT, endT, token.address, owner, rawAmount, endT, Number(v), r, s],
+        args: [owner, startT, endT, token.address, rawAmount, endT, Number(v), r, s],
         abi: activityManager.abi,
       },
       {

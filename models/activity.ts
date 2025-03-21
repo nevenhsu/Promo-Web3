@@ -26,7 +26,7 @@ const airdropSchema = new Schema({
 })
 
 const settingSchema = new Schema({
-  data: { type: Object, default: { minFollowers: 100 } }, // custom settings
+  data: { type: Object, default: { minFollowers: 1 } }, // custom settings
   type: { type: String, enum: ActivitySettingType, default: ActivitySettingType.None, index: true },
 })
 
@@ -57,7 +57,7 @@ export const schema = new Schema({
   setting: {
     type: settingSchema,
     default: {
-      data: { minFollowers: 100 },
+      data: { minFollowers: 1 },
       type: ActivitySettingType.None,
     },
   }, // custom settings
