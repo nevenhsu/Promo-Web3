@@ -7,6 +7,8 @@ import { useErrorHandler } from './useErrorHandler'
 import { TxStatus } from '@/types/db'
 import { isKernelClient } from '@/wallet/utils/helper'
 import { getReceipt, sendUserOp, simulateTx } from './tx'
+import { sendByKernelClient } from './kernel'
+import { sendByWalletClient } from './wallet'
 import type { Hash, SimulateContractParameters } from 'viem'
 import type { KernelClient, WalletClient } from '@/types/wallet'
 import type { CalldataArgs, Calldata } from './tx'
@@ -16,9 +18,10 @@ export type DataParams = TransactionParameters | SimulateContractParameters
 
 export type Tx = {
   timestamp: number // unique id
+  account: Hash // sender
   chainId: number
   status: TxStatus
-  params: DataParams
+  params: DataParams | DataParams[]
   hash?: Hash
   description?: string
   error?: string
@@ -30,11 +33,11 @@ type OtherValues = {
 
 export type TxCallback = (values: {
   hash: Hash
+  account: Hash // sender
   userOpHash?: Hash
   success: boolean
   timestamp: number // Date.now()
   chainId: number
-  account: Hash
   contract?: Hash
 }) => Promise<void>
 
@@ -51,7 +54,7 @@ type AddTxFunc<T> = (
 
 interface TxContextType {
   txs: Tx[]
-  addTx: AddTxFunc<DataParams>
+  addTx: AddTxFunc<DataParams | DataParams[]>
 }
 
 const TxContext = createContext<TxContextType | undefined>(undefined)
@@ -65,7 +68,8 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setTxs(prev => prev.map(o => (o.timestamp === timestamp ? { ...o, ...newValue } : o)))
   }
 
-  const addTx: AddTxFunc<DataParams> = (data, others, callback, errorHandle) => {
+  // FIXME: refactor this by new function
+  const addTx: AddTxFunc<DataParams | DataParams[]> = (data, others, callback, errorHandle) => {
     const chainId = walletClient?.chain.id
     if (!walletAddress || !chainId) return
 
@@ -79,6 +83,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         chainId,
         params: data,
         status: TxStatus.Init,
+        account: walletAddress,
         ...others,
       },
     ])
@@ -94,52 +99,35 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     return { timestamp }
   }
 
-  const sendContractTx = async (
+  const sendTxByKernelClient = async (
     timestamp: number,
-    data: SimulateContractParameters,
+    client: KernelClient,
+    data: DataParams | DataParams[],
     callback?: TxCallback,
     errorHandle?: TxErrorHandle
   ) => {
     try {
-      const chainId = walletClient?.chain.id
-      if (!chainId || !walletClient) {
-        throw new Error('Wallet not found')
-      }
-
-      updateTx(timestamp, { status: TxStatus.Pending })
-      const { calldata } = await simulateTx(walletClient, data)
-
-      await sendTx(timestamp, calldata, callback, errorHandle)
-    } catch (err) {
-      const error = _.get(err, 'details') || _.get(err, 'message', 'Unknown error')
-      updateTx(timestamp, { status: TxStatus.Failed, error })
-
-      handleFundError(err)
-
-      if (errorHandle) {
-        errorHandle(err)
-      } else {
-        handleError(err)
-        console.error(err)
-      }
-    }
-  }
-
-  const sendTx = async (
-    timestamp: number,
-    data: Calldata,
-    callback?: TxCallback,
-    errorHandle?: TxErrorHandle
-  ) => {
-    try {
-      const chainId = walletClient?.chain.id
-      if (!chainId || !walletClient) {
-        throw new Error('Wallet not found')
+      const chainId = client.chain.id
+      if (!chainId || !client) {
+        throw new Error('Kernel not found')
       }
 
       updateTx(timestamp, { status: TxStatus.Pending })
 
-      const { success, hash, opHash } = await sendAndWait(walletClient, data)
+      const list = Array.isArray(data) ? data : [data]
+      const values: Calldata[] = []
+
+      // set calldata for each tx
+      for (const d of list) {
+        if (isNativeData(d)) {
+          values.push(d)
+        } else {
+          const { calldata } = await simulateTx(client, d)
+          values.push(calldata)
+        }
+      }
+
+      const { success, hash, opHash } = await sendByKernelClient(client, values)
       console.log('Transaction', { hash, success })
 
       // update tx hash
@@ -156,61 +144,75 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
           success,
           timestamp,
           chainId,
-          account: walletClient.account.address,
+          account: client.account.address,
         })
       }
     } catch (err) {
-      const msg = _.get(err, 'details') || _.get(err, 'message', 'Unknown error')
-      const error = msg.includes('gas') ? 'Exceed gas limit. Please try again later.' : msg
-      updateTx(timestamp, { status: TxStatus.Failed, error })
+      handleErr(err, timestamp, errorHandle)
+    }
+  }
 
-      handleFundError(err)
-
-      if (errorHandle) {
-        errorHandle(err)
-      } else {
-        handleError(err)
-        console.error(err)
+  const sendTxByWalletClient = async (
+    timestamp: number,
+    client: WalletClient,
+    data: DataParams,
+    callback?: TxCallback,
+    errorHandle?: TxErrorHandle
+  ) => {
+    try {
+      const chainId = client.chain.id
+      if (!chainId || !client) {
+        throw new Error('Wallet not found')
       }
+
+      updateTx(timestamp, { status: TxStatus.Pending })
+
+      let value: Calldata
+      // set calldata for each tx
+      if (isNativeData(data)) {
+        value = data
+      } else {
+        const { calldata } = await simulateTx(client, data)
+        value = calldata
+      }
+
+      const { success, hash } = await sendByWalletClient(client, value)
+      console.log('Transaction', { hash, success })
+
+      // update tx hash
+      updateTx(timestamp, {
+        hash,
+        status: success ? TxStatus.Success : TxStatus.Failed,
+        error: success ? '' : 'Transaction failed',
+      })
+
+      if (callback) {
+        callback({
+          hash,
+          success,
+          timestamp,
+          chainId,
+          account: client.account.address,
+        })
+      }
+    } catch (err) {
+      handleErr(err, timestamp, errorHandle)
     }
   }
 
-  const sendAndWait = async (client: WalletClient | KernelClient, calldata: Calldata) => {
-    let hash: Hash
-    let success: boolean
-    let opHash: Hash | undefined
+  const handleErr = async (err: unknown, timestamp: number, errorHandle?: TxErrorHandle) => {
+    const msg = _.get(err, 'details') || _.get(err, 'message', 'Unknown error')
+    const error = msg.includes('gas') ? 'Exceed gas limit. Please try again later.' : msg
+    updateTx(timestamp, { status: TxStatus.Failed, error })
 
-    if (isKernelClient(client)) {
-      // Send transaction by smart account
-      console.log('Send tx by smart account:', calldata)
+    handleFundError(err)
 
-      const { userOpHash, wait } = await sendTxBySmartAccount(client, [calldata])
-      opHash = userOpHash // for callback
-      const result = await wait
-      hash = result.transactionHash
-      success = result.success
+    if (errorHandle) {
+      errorHandle(err)
     } else {
-      // Send transaction by wallet
-      console.log('Send tx by wallet:', calldata)
-
-      const { transactionHash, wait } = await sendTxByWallet(client, calldata)
-      hash = transactionHash // for callback
-      const result = await wait
-      success = result.success
+      handleError(err)
+      console.error(err)
     }
-
-    return { hash, success, opHash }
-  }
-
-  const sendTxByWallet = async (client: WalletClient, calldata: Calldata) => {
-    const transactionHash = await client.sendTransaction(calldata)
-    const wait = getReceipt(client.chain.id, transactionHash)
-    return { transactionHash, wait }
-  }
-
-  const sendTxBySmartAccount = async (client: KernelClient, args: CalldataArgs) => {
-    const { userOpHash, wait } = await sendUserOp(client, args)
-    return { userOpHash, wait }
   }
 
   return (

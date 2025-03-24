@@ -4,7 +4,7 @@ import * as _ from 'lodash-es'
 import { Link } from '@/i18n/routing'
 import { BaseError } from 'viem'
 import { modals } from '@mantine/modals'
-import { Box, Text, Button } from '@mantine/core'
+import { Box, Text } from '@mantine/core'
 
 export function useErrorHandler() {
   const handleError = (error: unknown) => {
