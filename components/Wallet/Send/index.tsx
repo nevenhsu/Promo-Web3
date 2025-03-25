@@ -35,7 +35,7 @@ export default function Send() {
   const { txs, addTx } = useTx()
   const {
     onSmartAccount,
-    walletAddress,
+    currentClient,
     balancesValues,
     pricesValues,
     tokenListValues,
@@ -44,6 +44,7 @@ export default function Send() {
   const { balances, updateBalances } = balancesValues
   const { prices } = pricesValues
   const { allTokens } = tokenListValues
+  const walletAddress = currentClient?.account.address
 
   const [txTimestamp, setTxTimestamp] = useState(0)
   const [feeData, setFeeData] = useState<FeeValuesEIP1559>()
@@ -103,7 +104,7 @@ export default function Send() {
     try {
       if (balance && publicClient) {
         const gas =
-          walletAddress && form.values.to
+          currentClient && form.values.to
             ? await publicClient.estimateGas({
                 to: form.values.to as any,
                 value: BigInt(0),
@@ -143,7 +144,7 @@ export default function Send() {
   }
 
   const confirmSubmit = (values: FormData) => {
-    if (!walletAddress) return
+    if (!currentClient) return
 
     if (!token) {
       form.setFieldError('amount', 'Invalid token')
@@ -202,6 +203,7 @@ export default function Send() {
 
   const handleSubmit = async (to: string, rawAmount: string) => {
     if (!token) return
+    if (!currentClient) return
 
     let result: AddTxReturn
 
@@ -224,6 +226,7 @@ export default function Send() {
         : data
 
       result = addTx(
+        currentClient,
         txData,
         {
           description,
@@ -234,6 +237,7 @@ export default function Send() {
 
     if (isErc20(token)) {
       result = addTx(
+        currentClient,
         {
           address: token.address,
           functionName: 'transfer',

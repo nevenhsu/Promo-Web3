@@ -9,7 +9,7 @@ import { useLoginStatus } from '@/hooks/useLoginStatus'
 
 export function useSyncWallets() {
   const { bothAuth } = useLoginStatus()
-  const { walletValues, walletAddress, onSmartAccount } = useWeb3()
+  const { walletValues, currentClient, onSmartAccount } = useWeb3()
   const { wallet } = walletValues
 
   useEffect(() => {
@@ -23,15 +23,15 @@ export function useSyncWallets() {
         supported: true,
       }).catch(console.error)
     }
-    if (walletAddress && onSmartAccount) {
+    if (currentClient && onSmartAccount) {
       updateWallet({
-        address: walletAddress,
+        address: currentClient.account.address,
         walletClientType: 'zerodev',
         connectorType: 'embedded',
         supported: true,
       }).catch(console.error)
     }
-  }, [bothAuth, wallet, walletAddress, onSmartAccount])
+  }, [bothAuth, wallet, currentClient, onSmartAccount])
 
   return null
 }

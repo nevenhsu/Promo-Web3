@@ -11,8 +11,7 @@ import { useTokenList } from '@/wallet/hooks/useTokenList'
 import { toChainId } from '@/wallet/utils/network'
 import { getPublicClient } from '@/wallet/lib/publicClients'
 import { supportedChains } from './variables'
-import type { Hash } from 'viem'
-import type { PublicClient, SignerClient } from '@/types/wallet'
+import type { PublicClient, WalletClient, KernelClient, SignerClient } from '@/types/wallet'
 
 type WalletValues = ReturnType<typeof useWallet>
 type SmartAccountValues = ReturnType<typeof useSmartAccount>
@@ -24,15 +23,17 @@ type Web3ContextType = {
   loading: boolean
   chainId?: number
   publicClient?: PublicClient
-  walletClient?: SignerClient
-  walletAddress?: Hash
+  walletClient?: WalletClient
+  kernelClient?: KernelClient
+  currentClient?: SignerClient // walletClient or kernelClient
+  onSmartAccount: boolean
+  switchChain: (chainId: number) => Promise<void>
+  // hooks
   walletValues: WalletValues
   smartAccountValues: SmartAccountValues
   balancesValues: BalancesValues
   pricesValues: PricesValues
   tokenListValues: tokenListValues
-  onSmartAccount: boolean
-  switchChain: (chainId: number) => Promise<void>
 }
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined)
@@ -42,21 +43,18 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Get wallet values
   const walletValues = useWallet()
-  const { wallet } = walletValues
+  const { wallet, walletClient } = walletValues
 
   // Select smart account
   const smartAccountValues = useSmartAccount()
+  const { kernelClient } = smartAccountValues
   const loading = walletLoading || smartAccountValues.loading
 
   // Current wallet value
-  const walletClient = !loading
-    ? onSmartAccount
-      ? smartAccountValues.kernelClient
-      : walletValues.walletClient
-    : undefined
-  const walletAddress = walletClient?.account?.address
+  const currentClient = !loading ? (onSmartAccount ? kernelClient : walletClient) : undefined
+  const walletAddress = currentClient?.account?.address
 
-  const chainId = toChainId(walletClient?.chain.id)
+  const chainId = toChainId(wallet?.chainId)
   const publicClient = getPublicClient(chainId)
 
   // hooks
@@ -92,7 +90,8 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
         chainId,
         publicClient,
         walletClient,
-        walletAddress,
+        kernelClient,
+        currentClient,
         walletValues,
         smartAccountValues,
         balancesValues,

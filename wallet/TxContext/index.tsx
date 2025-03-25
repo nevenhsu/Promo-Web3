@@ -2,16 +2,15 @@
 
 import * as _ from 'lodash-es'
 import React, { createContext, useContext, useState } from 'react'
-import { useWeb3 } from '@/wallet/Web3Context'
 import { useErrorHandler } from './useErrorHandler'
 import { TxStatus } from '@/types/db'
 import { isKernelClient } from '@/wallet/utils/helper'
-import { getReceipt, sendUserOp, simulateTx } from './tx'
+import { simulateTx } from './tx'
 import { sendByKernelClient } from './kernel'
 import { sendByWalletClient } from './wallet'
 import type { Hash, SimulateContractParameters } from 'viem'
-import type { KernelClient, WalletClient } from '@/types/wallet'
-import type { CalldataArgs, Calldata } from './tx'
+import type { KernelClient, WalletClient, SignerClient } from '@/types/wallet'
+import type { Calldata } from './tx'
 
 export type TransactionParameters = Calldata & { native: boolean }
 export type DataParams = TransactionParameters | SimulateContractParameters
@@ -45,8 +44,9 @@ export type TxErrorHandle = (error: unknown) => void
 
 export type AddTxReturn = { timestamp: number } | undefined
 
-type AddTxFunc<T> = (
-  data: T,
+type AddTxFunc<C = SignerClient> = (
+  client: C,
+  data: C extends KernelClient ? DataParams | DataParams[] : DataParams,
   others?: OtherValues,
   callback?: TxCallback,
   errorHandle?: TxErrorHandle
@@ -54,26 +54,27 @@ type AddTxFunc<T> = (
 
 interface TxContextType {
   txs: Tx[]
-  addTx: AddTxFunc<DataParams | DataParams[]>
+  addTx: AddTxFunc
 }
 
 const TxContext = createContext<TxContextType | undefined>(undefined)
 
 export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { handleError, handleFundError } = useErrorHandler()
-  const { walletAddress, walletClient } = useWeb3()
   const [txs, setTxs] = useState<Tx[]>([])
 
   const updateTx = (timestamp: number, newValue: Partial<Tx>) => {
     setTxs(prev => prev.map(o => (o.timestamp === timestamp ? { ...o, ...newValue } : o)))
   }
 
-  // FIXME: refactor this by new function
-  const addTx: AddTxFunc<DataParams | DataParams[]> = (data, others, callback, errorHandle) => {
-    const chainId = walletClient?.chain.id
-    if (!walletAddress || !chainId) return
-
+  const addTx: AddTxFunc = (client, data, others, callback, errorHandle) => {
+    const chainId = client.chain.id
+    const isKernel = isKernelClient(client)
     const timestamp = Date.now() // unique id
+
+    if (!isKernel && _.isArray(data)) {
+      throw new Error('Wallet client does not support multiple transactions')
+    }
 
     // add tx to list
     setTxs(prev => [
@@ -83,17 +84,15 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         chainId,
         params: data,
         status: TxStatus.Init,
-        account: walletAddress,
+        account: client.account.address,
         ...others,
       },
     ])
 
-    if (isNativeData(data)) {
-      // send tx
-      sendTx(timestamp, data, callback, errorHandle)
-    } else {
-      // simulate tx
-      sendContractTx(timestamp, data, callback, errorHandle)
+    if (isKernel) {
+      sendTxByKernelClient(timestamp, client, data, callback, errorHandle)
+    } else if (!_.isArray(data)) {
+      sendTxByWalletClient(timestamp, client, data, callback, errorHandle)
     }
 
     return { timestamp }
@@ -107,11 +106,6 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     errorHandle?: TxErrorHandle
   ) => {
     try {
-      const chainId = client.chain.id
-      if (!chainId || !client) {
-        throw new Error('Kernel not found')
-      }
-
       updateTx(timestamp, { status: TxStatus.Pending })
 
       const list = Array.isArray(data) ? data : [data]
@@ -143,7 +137,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
           userOpHash: opHash,
           success,
           timestamp,
-          chainId,
+          chainId: client.chain.id,
           account: client.account.address,
         })
       }
@@ -160,14 +154,10 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     errorHandle?: TxErrorHandle
   ) => {
     try {
-      const chainId = client.chain.id
-      if (!chainId || !client) {
-        throw new Error('Wallet not found')
-      }
-
       updateTx(timestamp, { status: TxStatus.Pending })
 
       let value: Calldata
+
       // set calldata for each tx
       if (isNativeData(data)) {
         value = data
@@ -191,7 +181,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
           hash,
           success,
           timestamp,
-          chainId,
+          chainId: client.chain.id,
           account: client.account.address,
         })
       }

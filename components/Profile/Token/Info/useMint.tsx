@@ -8,7 +8,7 @@ import { getTokenManager } from '@/contracts'
 import type { TxCallback, TxErrorHandle } from '@/wallet/TxContext'
 
 export function useMint() {
-  const { walletClient } = useWeb3()
+  const { currentClient } = useWeb3()
   const { txs, addTx } = useTx()
 
   const [txTimestamp, setTxTimestamp] = useState(0)
@@ -23,15 +23,15 @@ export function useMint() {
     callback?: TxCallback,
     errorHandle?: TxErrorHandle
   ) => {
-    if (!walletClient) {
+    if (!currentClient) {
       throw new Error('No wallet connected')
     }
 
-    const tokenManager = getTokenManager(walletClient)
-
+    const tokenManager = getTokenManager(currentClient)
     const description = `Mint ${name} (${symbol})`
 
     const result = addTx(
+      currentClient,
       {
         address: tokenManager.address,
         functionName: 'deploy',

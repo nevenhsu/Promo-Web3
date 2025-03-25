@@ -13,7 +13,7 @@ import { formatAmount, formatBalance } from '@/utils/math'
 export function useSyncTokenBal() {
   const { bothAuth } = useLoginStatus()
   const { tokenBalances, overwriteTokenBal } = useTokenBalances()
-  const { walletAddress, balancesValues, chainId } = useWeb3()
+  const { currentClient, balancesValues, chainId } = useWeb3()
   const { balances } = balancesValues
 
   const [clearState, clear] = useAsyncFn(async (userTokenIds: string[]) => {
@@ -25,7 +25,7 @@ export function useSyncTokenBal() {
   useEffect(() => {
     if (
       !bothAuth ||
-      !walletAddress ||
+      !currentClient ||
       !chainId ||
       _.isEmpty(balances) ||
       _.isEmpty(tokenBalances)
@@ -58,7 +58,7 @@ export function useSyncTokenBal() {
       overwriteTokenBal(values) // update tokenBalances
       clear(values.map(o => o.userTokenId)) // clear updatedAt
     }
-  }, [bothAuth, walletAddress, chainId, balances, tokenBalances])
+  }, [bothAuth, currentClient, chainId, balances, tokenBalances])
 
   return null
 }

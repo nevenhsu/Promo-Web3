@@ -21,8 +21,8 @@ import type { FormType } from '../Form'
 export default function ProfileActivityNew() {
   const router = useRouter()
   const { createAndDepositWithPermit } = useActivityTx()
-  const { chainId, walletAddress } = useWeb3()
-  const notConnected = !chainId || !walletAddress
+  const { chainId, currentClient } = useWeb3()
+  const notConnected = !chainId || !currentClient
 
   // state
   const [form, setForm] = useState<FormType>()

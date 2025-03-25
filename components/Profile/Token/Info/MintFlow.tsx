@@ -17,7 +17,7 @@ import { TransactionExecutionError } from 'viem'
 
 export default function MintFlow() {
   const { mintState, mint } = useUserToken()
-  const { chainId, walletAddress } = useWeb3()
+  const { chainId, currentClient } = useWeb3()
   const { callMint } = useMint()
 
   // state
@@ -31,7 +31,7 @@ export default function MintFlow() {
   const iconURI = iconError ? '' : iconImg
   const errorMsg = error || iconError
 
-  const notConnected = !chainId || !walletAddress
+  const notConnected = !chainId || !currentClient
 
   const handleSubmit = async (values: typeof form.values) => {
     const name = values.name.trim()
@@ -79,7 +79,7 @@ export default function MintFlow() {
     }
 
     const tryUpload = async () => {
-      mint({ chainId, walletAddress, iconURI })
+      mint({ chainId, walletAddress: currentClient.account.address, iconURI })
         .then(() => {
           setStatus(Status.Success)
         })
@@ -141,12 +141,12 @@ export default function MintFlow() {
 
   // Clear error
   useEffect(() => {
-    if (error && chainId && walletAddress) {
+    if (error && chainId && currentClient) {
       setError(undefined)
-    } else if (!chainId || !walletAddress) {
+    } else if (!chainId || !currentClient) {
       setError('No wallet connected')
     }
-  }, [error, chainId, walletAddress])
+  }, [error, chainId, currentClient])
 
   // Sync mint state
   useEffect(() => {

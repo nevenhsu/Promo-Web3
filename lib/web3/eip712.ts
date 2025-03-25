@@ -1,16 +1,9 @@
 import * as _ from 'lodash-es'
-import {
-  hexToBigInt,
-  getContract,
-  parseSignature,
-  parseCompactSignature,
-  compactSignatureToSignature,
-} from 'viem'
+import { getContract, parseSignature } from 'viem'
 import clubTokenJson from '@/contracts/ClubToken.sol/ClubToken.json'
 import { ClubToken$Type } from '@/contracts/ClubToken.sol/ClubToken'
-import { isKernelClient } from '@/wallet/utils/helper'
 import type { GetContractReturnType, Hash } from 'viem'
-import type { SignerClient } from '@/types/wallet'
+import type { WalletClient } from '@/types/wallet'
 
 const fieldNames = ['name', 'version', 'chainId', 'verifyingContract', 'salt'] as const
 
@@ -24,8 +17,9 @@ const types = {
   ],
 } as const
 
+// Only support EOA wallet
 export async function permitToken(
-  wallet: SignerClient,
+  wallet: WalletClient,
   token: Hash,
   spender: Hash,
   value: bigint,
@@ -48,19 +42,10 @@ export async function permitToken(
     message,
   })
 
-  // FIXME: kernel client should return compact signature
-  if (isKernelClient(wallet)) {
-    const parseCompacted = parseCompactSignature(signature)
-    const yParityAndSBigInt = hexToBigInt(parseCompacted.yParityAndS)
-    const v = yParityAndSBigInt >> BigInt(255) === BigInt(1) ? 28 : 27
-    const result = compactSignatureToSignature(parseCompacted)
-    return { ...result, v }
-  }
-
   return parseSignature(signature)
 }
 
-async function getPermitData(client: SignerClient, token: Hash) {
+async function getPermitData(client: WalletClient, token: Hash) {
   const contract = getTokenContract(client, token)
 
   const [fieldsString, name, version, chainId, verifyingContract, salt, extensions] =
@@ -84,9 +69,9 @@ async function getPermitData(client: SignerClient, token: Hash) {
 }
 
 function getTokenContract(
-  client: SignerClient,
+  client: WalletClient,
   address: Hash
-): GetContractReturnType<ClubToken$Type['abi'], SignerClient> {
+): GetContractReturnType<ClubToken$Type['abi'], WalletClient> {
   const contract = getContract({
     address,
     abi: clubTokenJson.abi,

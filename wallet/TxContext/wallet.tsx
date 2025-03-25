@@ -8,8 +8,6 @@ export async function sendByWalletClient(client: WalletClient, calldata: Calldat
   let success: boolean
 
   // Send transaction by wallet
-  console.log('Send tx by wallet:', calldata)
-
   const { transactionHash, wait } = await sendTxByWallet(client, calldata)
   hash = transactionHash // for callback
   const result = await wait
