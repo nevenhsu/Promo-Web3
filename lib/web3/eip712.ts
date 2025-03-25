@@ -23,7 +23,7 @@ export async function permitToken(
   token: Hash,
   spender: Hash,
   value: bigint,
-  deadline: bigint
+  deadline: number
 ) {
   const { domain, nonce } = await getPermitData(wallet, token)
 
@@ -32,7 +32,7 @@ export async function permitToken(
     spender,
     value,
     nonce,
-    deadline,
+    deadline: BigInt(deadline),
   }
 
   const signature = await wallet.signTypedData({
@@ -42,7 +42,13 @@ export async function permitToken(
     message,
   })
 
-  return parseSignature(signature)
+  const result = parseSignature(signature)
+
+  if (!result.v) {
+    throw Error('Invalid signature')
+  }
+
+  return result
 }
 
 async function getPermitData(client: WalletClient, token: Hash) {

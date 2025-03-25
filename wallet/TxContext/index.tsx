@@ -26,7 +26,7 @@ export type Tx = {
   error?: string
 }
 
-type OtherValues = {
+export type OtherValues = {
   description?: string
 }
 

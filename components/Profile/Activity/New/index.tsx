@@ -13,14 +13,13 @@ import Completion, { Status } from '@/components/share/Completion'
 import { formatDate } from '@/utils/date'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { useActivityTx } from './useActivityTx'
-import { defaultChain } from '@/wallet/variables'
 import { createOwnedActivity, updateActivityNFT } from '@/services/activity'
 import type { ActivityData } from '@/components/Profile/Activity/Form/Context'
 import type { FormType } from '../Form'
 
 export default function ProfileActivityNew() {
   const router = useRouter()
-  const { createAndDepositWithPermit } = useActivityTx()
+  const { createAndDeposit } = useActivityTx()
   const { chainId, currentClient } = useWeb3()
   const notConnected = !chainId || !currentClient
 
@@ -46,7 +45,7 @@ export default function ProfileActivityNew() {
 
     try {
       // send transaction
-      const result = await createAndDepositWithPermit(
+      const result = await createAndDeposit(
         data,
         async values => {
           const { hash, success } = values
@@ -57,12 +56,19 @@ export default function ProfileActivityNew() {
             return
           }
 
-          // upload to db
-          const newActivity = await createOwnedActivity(data)
-          const updated = await updateActivityNFT(newActivity.slug, hash)
-
-          setSlug(newActivity.slug)
-          setStatus(Status.Success)
+          try {
+            // upload to db
+            const newActivity = await createOwnedActivity(data)
+            const updated = await updateActivityNFT(newActivity.slug, hash)
+            if (updated) {
+              setSlug(newActivity.slug)
+              setStatus(Status.Success)
+            } else {
+              throw new Error('Failed to update activity NFT')
+            }
+          } catch (error) {
+            handleError(error)
+          }
         },
         error => {
           handleError(error)
@@ -73,21 +79,17 @@ export default function ProfileActivityNew() {
     }
   }
 
+  // Step 2: Create activity
   const [createActivityState, createActivity] = useAsyncFn(async (data: ActivityData) => {
-    console.log('createActivity', data)
-
     if (status === Status.Pending) return
     setStatus(Status.Pending)
     setActive(prev => prev + 1)
 
-    setTimeout(() => {
-      submitTx(data)
-    }, 0)
+    // submit transaction
+    submitTx(data)
   }, [])
 
-  // TODO: refactor this
-  const { loading, value } = createActivityState
-
+  // Step 1: Form submission
   const handleSubmit = (data: ActivityData) => {
     setData(data)
     setActive(prev => prev + 1)
@@ -115,10 +117,10 @@ export default function ProfileActivityNew() {
                     onSubmit={form?.onSubmit(
                       values => {
                         const { startTime, endTime, activityType, ...rest } = values
-                        if (startTime && endTime) {
+                        if (startTime && endTime && chainId) {
                           handleSubmit({
                             ...rest,
-                            chainId: chainId || defaultChain.id,
+                            chainId,
                             startTime,
                             endTime,
                             activityType: Number(activityType),
