@@ -48,16 +48,7 @@ export async function getActivityNFT(values: { chainId: number; nftId: number | 
     throw new Error(`Activity NFT not found: ${nftId}`)
   }
 
-  const {
-    token,
-    startTime,
-    endTime,
-    owner,
-    totalAmount,
-    distributedAmount,
-    feeAmount,
-    refundedAmount,
-  } = nft
+  const { token, startTime, endTime, owner, totalAmount, status } = nft
 
   const tokenContract = getTokenContractByAddress(publicClient, token)
   const [symbol, decimals] = await Promise.all([
@@ -74,8 +65,6 @@ export async function getActivityNFT(values: { chainId: number; nftId: number | 
     symbol,
     decimals,
     totalAmount: formatBalance(totalAmount, decimals).toString(),
-    distributedAmount: formatBalance(distributedAmount, decimals).toString(),
-    feeAmount: formatBalance(feeAmount, decimals).toString(),
-    refundedAmount: formatBalance(refundedAmount, decimals).toString(),
+    status, // 0: created, 1: distributed, 2: refunded
   }
 }

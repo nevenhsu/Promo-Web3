@@ -51,17 +51,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid activity NFT' }, { status: 400 })
     }
 
-    const {
-      nftId,
-      symbol,
-      startTime,
-      endTime,
-      owner,
-      totalAmount,
-      distributedAmount,
-      feeAmount,
-      refundedAmount,
-    } = nft
+    const { nftId, symbol, startTime, endTime, owner, totalAmount, status } = nft
 
     // Activity must be owned by the user
     const wallet = await getUserWallet(owner, true)
@@ -76,7 +66,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Update the activity NFT
-    const distributed = distributedAmount !== '0' || feeAmount !== '0' || refundedAmount !== '0'
+    const distributed = status !== 0
     const newActivity = await updateActivity(activity._id.toString(), {
       startTime,
       endTime,
@@ -84,9 +74,9 @@ export async function POST(req: NextRequest) {
         nftId,
         distributed,
         totalAmount,
-        distributedAmount,
-        feeAmount,
-        refundedAmount,
+        distributedAmount: '0',
+        feeAmount: '0',
+        refundedAmount: '0',
       },
       airdrop: {
         ...activity.airdrop,

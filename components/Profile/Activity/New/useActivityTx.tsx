@@ -82,7 +82,7 @@ export function useActivityTx() {
         {
           address: activityManager.address,
           functionName: 'createAndDepositWithPermit',
-          args: [owner, startT, endT, token.address, amount, endT, v, r, s],
+          args: [owner, startT, endT, owner, token.address, amount, endT, v, r, s],
           abi: activityManager.abi,
         },
         { description },

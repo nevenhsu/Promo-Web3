@@ -30,7 +30,7 @@ export const tokenManagers: { [id: string]: Manager } = {
 export const activityManagers: { [id: string]: Manager } = {
   [baseSepolia.id]: {
     chainId: baseSepolia.id,
-    address: unifyAddress('0x7E47449dFAcAA7f27E48964F33E995d16A65d3cf'),
+    address: unifyAddress('0xe431b55750440ee42a28f431a8da0ac844f9cb61'),
   },
 }
 
