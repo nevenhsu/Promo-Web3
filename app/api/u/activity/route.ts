@@ -41,7 +41,7 @@ export async function PUT(req: NextRequest) {
 }
 
 function filterData(data: any) {
-  const filtered = _.pickBy(data, [
+  const filtered = _.pick(data, [
     'chainId',
     'startTime',
     'endTime',

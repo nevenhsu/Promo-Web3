@@ -3,35 +3,22 @@ import { getPublicClient } from '@/wallet/lib/publicClients'
 import { wait } from '@/wallet/utils/helper'
 import type { Hash, Chain, Account } from 'viem'
 import type { SimulateContractParameters, SendTransactionParameters } from 'viem'
-import type { KernelClient, WalletClient } from '@/types/wallet'
+import type { KernelClient } from '@/types/wallet'
 
 type Data = { to: Hash; value: bigint; data?: Hash }
 export type CalldataArgs = Data[]
 export type Calldata = SendTransactionParameters<Chain, Account> & Data
 
-export async function simulateTx(
-  client: WalletClient | KernelClient,
-  params: SimulateContractParameters
-) {
-  const chainId = client.chain.id
-  const publicClient = getPublicClient(chainId)
-  const { request } = await publicClient!.simulateContract({
-    ...params,
-    account: client.account,
-  })
-
+export function encodeFnData(params: SimulateContractParameters) {
   const data = encodeFunctionData(params)
-  const { abi, address, args, dataSuffix, functionName, value, ...others } = request
+  const { address, dataSuffix, value } = params
   const calldata: Calldata = {
+    ...params,
     data: `${data}${dataSuffix ? dataSuffix.replace('0x', '') : ''}`,
     to: address,
     value: value || BigInt(0),
-    ...others,
   }
-  return {
-    request,
-    calldata,
-  }
+  return calldata
 }
 
 export async function getReceipt(chainId: number, hash: Hash, retry = 5) {

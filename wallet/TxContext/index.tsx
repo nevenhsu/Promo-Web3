@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState } from 'react'
 import { useErrorHandler } from './useErrorHandler'
 import { TxStatus } from '@/types/db'
 import { isKernelClient } from '@/wallet/utils/helper'
-import { simulateTx } from './tx'
+import { encodeFnData } from './tx'
 import { sendByKernelClient } from './kernel'
 import { sendByWalletClient } from './wallet'
 import type { Hash, SimulateContractParameters } from 'viem'
@@ -116,8 +116,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         if (isNativeData(d)) {
           values.push(d)
         } else {
-          const { calldata } = await simulateTx(client, d)
-          values.push(calldata)
+          values.push(encodeFnData(d))
         }
       }
 
@@ -162,8 +161,7 @@ export const TxProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       if (isNativeData(data)) {
         value = data
       } else {
-        const { calldata } = await simulateTx(client, data)
-        value = calldata
+        value = encodeFnData(data)
       }
 
       const { success, hash } = await sendByWalletClient(client, value)

@@ -1,4 +1,5 @@
 import * as _ from 'lodash-es'
+import { Types } from 'mongoose'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
@@ -79,7 +80,6 @@ export async function POST(req: NextRequest) {
         refundedAmount: '0',
       },
       airdrop: {
-        ...activity.airdrop,
         _userToken: userToken._id as any,
         amount: totalAmount,
         symbol,

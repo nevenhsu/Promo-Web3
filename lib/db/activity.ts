@@ -190,16 +190,4 @@ function unifyData(data: any) {
   if (data.endTime) {
     data.endTime = setMilliseconds(data.endTime, 0)
   }
-
-  // Convert _user to ObjectId
-  const userId = _.get(data, '_user')
-  if (userId) {
-    _.set(data, '_user', Types.ObjectId.createFromHexString(userId.toString()))
-  }
-
-  // Convert userTokenId to ObjectId
-  const userTokenId = _.get(data, 'airdrop._userToken')
-  if (userTokenId) {
-    _.set(data, 'airdrop._userToken', Types.ObjectId.createFromHexString(userTokenId.toString()))
-  }
 }

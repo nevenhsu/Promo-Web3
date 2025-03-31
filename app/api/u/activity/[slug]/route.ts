@@ -63,7 +63,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
 function filterData(data: Partial<ActivityData>) {
   const parsed = parseData(data)
-  return _.pickBy(parsed, [
+  return _.pick(parsed, [
     'title',
     'description',
     'details.externalLink',
