@@ -2,8 +2,35 @@ import * as _ from 'lodash-es'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import dbConnect from '@/lib/dbConnect'
-import { createActivity } from '@/lib/db/activity'
+import { createActivity, getCreatorActivities } from '@/lib/db/activity'
 import { getTokenBySymbol } from '@/lib/db/userToken'
+
+// Get creator activities
+export async function GET(req: NextRequest) {
+  try {
+    const token = await getToken({ req })
+    const userId = token?.user?.id!
+
+    // Parse query string parameters
+    const { searchParams } = new URL(req.url)
+    const page = Number(searchParams.get('page')) || 1
+    const limit = Number(searchParams.get('limit')) || 10
+    const chainId = Number(searchParams.get('chainId'))
+
+    if (!chainId) {
+      return NextResponse.json({ error: 'ChainId is required' }, { status: 400 })
+    }
+
+    await dbConnect()
+
+    const result = await getCreatorActivities({ userId, chainId }, { page, limit })
+
+    return NextResponse.json(result)
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
 
 // create an activity with chainId, etc...
 export async function PUT(req: NextRequest) {

@@ -1,15 +1,17 @@
 'use client'
 
 import { Link } from '@/i18n/routing'
-import { Title, Stack, Space, Paper, Group, ActionIcon } from '@mantine/core'
-import { Text, Button, ThemeIcon, Box } from '@mantine/core'
+import { Title, Stack, Space, Paper, Group, ActionIcon, Skeleton } from '@mantine/core'
+import { Text, Button, ThemeIcon, Box, Pagination, Center } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import { ActivityCard } from './ActivityCard'
 import { PiCoinVertical, PiCaretRight } from 'react-icons/pi'
 import { useUserToken } from '@/store/contexts/app/userTokenContext'
+import { useCreatorActivity } from '@/store/contexts/app/creator/activityContext'
 
 export default function ProfileActivity() {
   const { fetchState } = useUserToken()
+  const { total, current, data, loading, handlePageChange } = useCreatorActivity()
 
   const noToken = !fetchState.loading && !fetchState.value?.length
 
@@ -56,6 +58,29 @@ export default function ProfileActivity() {
               </Paper>
             </Link>
           ) : null}
+
+          {loading ? <Skeleton radius="md" h={160} /> : null}
+
+          {data.length ? (
+            data.map(activity => <ActivityCard key={activity._id} data={activity} />)
+          ) : (
+            <Paper pos="relative" p="lg" shadow="xs">
+              <Text ta="center" c="dimmed">
+                No activity yet...
+              </Text>
+            </Paper>
+          )}
+
+          <Space h="md" />
+
+          <Center>
+            <Pagination
+              total={total}
+              value={current}
+              onChange={handlePageChange}
+              disabled={loading}
+            />
+          </Center>
         </Stack>
       </RwdLayout>
 

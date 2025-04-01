@@ -88,3 +88,20 @@ export async function createOwnedActivity(data: ActivityData) {
 
   return created.activity
 }
+
+// ====================
+// Creator Activity
+// ====================
+
+export async function getCreatorActivity(param: { chainId: number; page: number; limit: number }) {
+  const { chainId, page, limit } = param
+  const url = new URL('/api/u/activity', window.location.origin)
+  url.searchParams.append('chainId', chainId.toString())
+  url.searchParams.append('page', page.toString())
+  url.searchParams.append('limit', limit.toString())
+
+  const { data } = await axios.get<{ activities: TActivity[]; total?: number; limit: number }>(
+    url.toString()
+  )
+  return data
+}

@@ -14,6 +14,7 @@ import { TransactionProvider } from '@/store/contexts/app/transactionContext'
 import { ActivityStatusProvider } from '@/store/contexts/app/activityStatusContext'
 import { UserTokenProvider } from '@/store/contexts/app/userTokenContext'
 import { TokenBalanceProvider } from '@/store/contexts/app/tokenBalanceContext'
+import { CreatorActivityProvider } from '@/store/contexts/app/creator/activityContext'
 import BackgroundTask from './BackgroundTask'
 
 export default function Providers({ children }: React.PropsWithChildren) {
@@ -22,16 +23,18 @@ export default function Providers({ children }: React.PropsWithChildren) {
       <AuthProvider>
         <ReduxProvider>
           <ThemeProvider>
-            <DataProviders>
-              <PrivyProvider>
-                <ModalsProvider modalProps={{ centered: true }}>
-                  <>
-                    {children}
-                    <BackgroundTask />
-                  </>
-                </ModalsProvider>
-              </PrivyProvider>
-            </DataProviders>
+            <ModalsProvider modalProps={{ centered: true }}>
+              <DataProviders>
+                <PrivyProvider>
+                  <Web3DataProviders>
+                    <>
+                      {children}
+                      <BackgroundTask />
+                    </>
+                  </Web3DataProviders>
+                </PrivyProvider>
+              </DataProviders>
+            </ModalsProvider>
           </ThemeProvider>
         </ReduxProvider>
       </AuthProvider>
@@ -39,6 +42,7 @@ export default function Providers({ children }: React.PropsWithChildren) {
   )
 }
 
+// DataProviders is above PrivyProvider
 function DataProviders({ children }: React.PropsWithChildren) {
   return (
     <>
@@ -55,6 +59,15 @@ function DataProviders({ children }: React.PropsWithChildren) {
           </ReferralProvider>
         </UserTokenProvider>
       </TokenBalanceProvider>
+    </>
+  )
+}
+
+// Web3DataProviders is under PrivyProvider
+function Web3DataProviders({ children }: React.PropsWithChildren) {
+  return (
+    <>
+      <CreatorActivityProvider>{children}</CreatorActivityProvider>
     </>
   )
 }

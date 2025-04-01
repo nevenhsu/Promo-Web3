@@ -15,6 +15,8 @@ export type GetFilters = {
   ongoing?: boolean
 }
 
+// TODO: add chainId filter
+
 // ========================
 // Public functions to fetch activities
 // ========================
@@ -105,6 +107,35 @@ export async function getPublicActivityDetails(slug: string) {
     .lean()
 
   return data?.details
+}
+
+// ========================
+// Only for creator to create, update activities
+// ========================
+
+type ActivityParams = {
+  userId: string
+  chainId: number
+}
+
+export async function getCreatorActivities(params: ActivityParams, options?: GetOptions) {
+  const { userId, chainId } = params
+  const { page = 1 } = options || {}
+  const limit = _.min([options?.limit || 10, 100]) || 1
+
+  const activities = await ActivityModel.find({ _user: userId, chainId })
+    .sort({ startTime: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .lean()
+
+  // return the total number of transactions
+  if (page === 1) {
+    const total = await ActivityModel.countDocuments({ _user: userId, chainId })
+    return { total, activities, limit }
+  }
+
+  return { activities, limit }
 }
 
 // ========================
