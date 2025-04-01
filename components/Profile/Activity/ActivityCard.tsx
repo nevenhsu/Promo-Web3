@@ -17,7 +17,7 @@ export function ActivityCard({ data }: { data: TActivity }) {
 
   return (
     <>
-      <Link href={{ pathname: '/activity/[slug]', params: { slug: data.slug } }}>
+      <Link href={{ pathname: '/profile/activity/[slug]', params: { slug: data.slug } }}>
         <Paper px="md" radius="sm" shadow="xs" mih={168} display="flex">
           <Group wrap="nowrap" align="stretch" w="100%">
             {/* Left */}

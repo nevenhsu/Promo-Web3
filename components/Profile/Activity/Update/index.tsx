@@ -1,28 +1,49 @@
 'use client'
 
-import { useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useAsyncFn } from 'react-use'
-import { useDisclosure } from '@mantine/hooks'
 import { Title, Stack, Space } from '@mantine/core'
 import { Text, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import Form, { type FormRef } from '../Form'
+import Form, { type FormType } from '../Form'
 import UpdateFields from '../Form/UpdateFields'
+import { getCreatorActivityData } from '@/services/activity'
 import type { ActivityData } from '@/types/activitySetting'
 
 export default function UpdateActivity({ slug }: { slug: string }) {
-  const formRef = useRef<FormRef>(null)
+  // state
+  const [form, setForm] = useState<FormType>()
 
-  const [opened, { open, close }] = useDisclosure(false)
+  const [activityState, fetchActivity] = useAsyncFn(async () => {
+    return getCreatorActivityData(slug)
+  }, [slug])
+  const { value } = activityState
+
   const [updateActivityState, updateActivity] = useAsyncFn(async (data: ActivityData) => {}, [])
-  const { loading, value, error } = updateActivityState
+  const { error } = updateActivityState
+
+  const loading = !value || activityState.loading || updateActivityState.loading
 
   const handleSubmit = async (data: ActivityData) => {
     console.log(data)
-    open()
   }
 
   // TODO: set data to form
+  useEffect(() => {
+    if (form && value) {
+      form.setFieldValue('title', value.title || '')
+      form.setFieldValue('description', value.description || '')
+      form.setFieldValue('details.externalLink', value.details.externalLink || '')
+      form.setFieldValue('setting.data.maxTotalScore', value.setting.data.maxTotalScore || 0)
+      form.setFieldValue('setting.data.minFollowers', value.setting.data.minFollowers || 0)
+    }
+  }, [form, value])
+
+  useEffect(() => {
+    if (slug) {
+      fetchActivity()
+    }
+  }, [slug])
 
   return (
     <>
@@ -35,11 +56,11 @@ export default function UpdateActivity({ slug }: { slug: string }) {
             </Text>
           </Stack>
 
-          <Form ref={formRef}>
+          <Form onReady={setForm}>
             <form
-              onSubmit={formRef.current?.getForm().onSubmit(
+              onSubmit={form?.onSubmit(
                 values => {
-                  const { title, description, details, setting, published } = values
+                  handleSubmit(values)
                 },
                 (validationErrors, values, event) => {
                   console.log(
@@ -51,7 +72,7 @@ export default function UpdateActivity({ slug }: { slug: string }) {
               )}
             >
               <Stack gap="lg">
-                <UpdateFields activity={{} as any} />
+                <UpdateFields activity={value} />
 
                 <span />
 

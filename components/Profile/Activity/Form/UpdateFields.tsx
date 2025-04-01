@@ -7,10 +7,10 @@ import { TextInput, Text, ThemeIcon, NumberInput, Textarea } from '@mantine/core
 import Token from '../Token'
 import { useFormContext } from './Context'
 import { PiNumberOneBold, PiNumberTwoBold } from 'react-icons/pi'
-import type { TActivity } from '@/models/activity'
+import type { TActivityWithAirdrop } from '@/types/activity'
 
-export default function FormFields({ activity }: { activity: TActivity }) {
-  const { airdrop } = activity
+export default function FormFields({ activity }: { activity?: TActivityWithAirdrop }) {
+  const { airdrop } = activity || {}
 
   const form = useFormContext()
   const { details } = form.values
@@ -74,10 +74,10 @@ export default function FormFields({ activity }: { activity: TActivity }) {
 
           <Box py="xs">
             <Token
-              symbol="USDC"
-              name="USD Coin"
-              icon="/icons/usdc-token.svg"
-              amount="10000"
+              symbol={airdrop?._userToken?.symbol || ''}
+              name={airdrop?._userToken?.name || ''}
+              icon={airdrop?._userToken?.icon || ''}
+              amount={airdrop?.amount || ''}
               paperProps={{
                 shadow: 'none',
                 bd: '1px solid var(--mantine-color-gray-4)',
@@ -127,7 +127,7 @@ export default function FormFields({ activity }: { activity: TActivity }) {
 
           <NumberInput
             label="Minimum followers"
-            description="Everyone should meet the requirement to earn"
+            description="Everyone should meet the requirement to earn prize"
             key={form.key('setting.data.minFollowers')}
             {...form.getInputProps('setting.data.minFollowers')}
           />

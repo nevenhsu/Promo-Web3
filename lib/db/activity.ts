@@ -4,7 +4,10 @@ import { setMilliseconds } from 'date-fns'
 import ActivityModel from '@/models/activity'
 import UserActivityStatusModel from '@/models/userActivityStatus'
 import { parseData } from './common'
-import type { ActivityData, Activity } from '@/models/activity'
+import type { ActivityData, Activity, ActivityAirdrop } from '@/models/activity'
+import type { TUserToken } from '@/models/userToken'
+
+export type TAirdrop = Omit<ActivityAirdrop, '_userToken'> & { _userToken: TUserToken }
 
 export type GetOptions = {
   page?: number
@@ -145,7 +148,9 @@ export async function getCreatorActivities(params: ActivityParams, options?: Get
 export async function getActivityBySlug(slug: string) {
   const data = await ActivityModel.findOne({
     slug,
-  }).lean()
+  })
+    .populate<{ airdrop: TAirdrop }>(['airdrop._userToken'])
+    .lean()
 
   return data
 }

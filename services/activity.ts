@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type { TPublicActivity, ActivityDetail, TActivity } from '@/models/activity'
 import type { ActivityData } from '@/components/Profile/Activity/Form/Context'
+import type { TActivityWithAirdrop } from '@/types/activity'
 
 // ====================
 // Public Activity
@@ -104,4 +105,9 @@ export async function getCreatorActivity(param: { chainId: number; page: number;
     url.toString()
   )
   return data
+}
+
+export async function getCreatorActivityData(slug: string) {
+  const { data } = await axios.get<{ activity: TActivityWithAirdrop }>(`/api/u/activity/${slug}`)
+  return data.activity
 }
