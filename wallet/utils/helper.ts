@@ -24,7 +24,11 @@ export function formatAddress(address?: string): string {
 }
 
 export function isAddressEqual(addr1: string, addr2: string) {
-  return _isAddressEqual(addr1 as any, addr2 as any)
+  try {
+    return _isAddressEqual(addr1 as any, addr2 as any)
+  } catch {
+    return false
+  }
 }
 
 export function isAddress(address: string) {

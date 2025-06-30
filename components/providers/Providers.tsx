@@ -23,8 +23,8 @@ export default function Providers({ children }: React.PropsWithChildren) {
       <AuthProvider>
         <ReduxProvider>
           <ThemeProvider>
-            <ModalsProvider modalProps={{ centered: true }}>
-              <DataProviders>
+            <DataProviders>
+              <ModalsProvider modalProps={{ centered: true }}>
                 <PrivyProvider>
                   <Web3DataProviders>
                     <>
@@ -33,8 +33,8 @@ export default function Providers({ children }: React.PropsWithChildren) {
                     </>
                   </Web3DataProviders>
                 </PrivyProvider>
-              </DataProviders>
-            </ModalsProvider>
+              </ModalsProvider>
+            </DataProviders>
           </ThemeProvider>
         </ReduxProvider>
       </AuthProvider>

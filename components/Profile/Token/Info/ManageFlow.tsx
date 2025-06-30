@@ -2,7 +2,6 @@
 
 import * as _ from 'lodash-es'
 import { useState, useEffect, useRef } from 'react'
-import { modals } from '@mantine/modals'
 import { Stack, Badge, Group, Button, ThemeIcon, Box } from '@mantine/core'
 import { useUserToken } from '@/store/contexts/app/userTokenContext'
 import IconButton from './IconButton'
@@ -11,9 +10,10 @@ import { PiImageFill } from 'react-icons/pi'
 
 type ManageFlowProps = {
   docId: string
+  onClose: () => void
 }
 
-export default function ManageFlow({ docId }: ManageFlowProps) {
+export default function ManageFlow({ docId, onClose }: ManageFlowProps) {
   const btnRef = useRef<HTMLDivElement>(null)
   const { fetchState, updateTokenDoc, updateState } = useUserToken()
   const token = _.find(fetchState.value, t => t._id === docId)
@@ -114,7 +114,7 @@ export default function ManageFlow({ docId }: ManageFlowProps) {
       )}
 
       <Group justify="right">
-        <Button color="dark" variant="outline" onClick={() => modals.closeAll()}>
+        <Button color="dark" variant="outline" onClick={onClose}>
           Close
         </Button>
         <Button onClick={handleUpdate} disabled={Boolean(iconError) || saved}>

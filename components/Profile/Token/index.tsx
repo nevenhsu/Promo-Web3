@@ -1,10 +1,11 @@
 'use client'
 
 import * as _ from 'lodash-es'
+import { useState } from 'react'
 import { useWallets } from '@privy-io/react-auth'
-import { modals } from '@mantine/modals'
+import { useDisclosure } from '@mantine/hooks'
 import { Title, Text, Stack, Space, Group, Divider } from '@mantine/core'
-import { Button, ThemeIcon, Box, Paper } from '@mantine/core'
+import { Modal, Button, ThemeIcon, Box, Paper } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import TokenPaper from './Info/TokenPaper'
 import MintFlow from './Info/MintFlow'
@@ -24,6 +25,8 @@ const PaperDiv = Paper.withProps({
 export default function Token() {
   const { setClientType } = useSelectWallet()
   const { fetchState } = useUserToken()
+  const [selectedDocId, setSelectedDocId] = useState('') // For Manage Modal
+  const [opened, { open, close }] = useDisclosure(false) // For Mint Modal
 
   // zerodev
   const { smartAccountValues, chainId, loading } = useWeb3()
@@ -46,28 +49,7 @@ export default function Token() {
 
   const openMintFlow = (type: string) => {
     setClientType(type as any)
-
-    modals.open({
-      title: 'Creator token',
-      withCloseButton: false,
-      closeOnClickOutside: false,
-      children: (
-        <>
-          <MintFlow />
-        </>
-      ),
-    })
-  }
-
-  const openManageFlow = (docId: string) => {
-    modals.open({
-      title: 'Manage token',
-      children: (
-        <>
-          <ManageFlow docId={docId} />
-        </>
-      ),
-    })
+    open() // Open Mint Modal
   }
 
   return (
@@ -137,7 +119,7 @@ export default function Token() {
                       leftSection={
                         <Button
                           onClick={() => {
-                            openManageFlow(zerodevToken._id)
+                            setSelectedDocId(zerodevToken._id)
                           }}
                           size="sm"
                           loading={fetchState.loading}
@@ -179,7 +161,7 @@ export default function Token() {
                     leftSection={
                       <Button
                         onClick={() => {
-                          openManageFlow(privyToken._id)
+                          setSelectedDocId(privyToken._id)
                         }}
                         size="sm"
                         loading={fetchState.loading}
@@ -201,6 +183,30 @@ export default function Token() {
       </RwdLayout>
 
       <Space h={100} />
+
+      <>
+        <Modal
+          opened={Boolean(selectedDocId)}
+          onClose={() => setSelectedDocId('')}
+          title="Manage token"
+          centered
+        >
+          <ManageFlow docId={selectedDocId} onClose={() => setSelectedDocId('')} />
+        </Modal>
+      </>
+
+      <>
+        <Modal
+          opened={opened}
+          onClose={close}
+          title="Creator token"
+          withCloseButton={false}
+          closeOnClickOutside={false}
+          centered
+        >
+          <MintFlow onClose={close} />
+        </Modal>
+      </>
     </>
   )
 }

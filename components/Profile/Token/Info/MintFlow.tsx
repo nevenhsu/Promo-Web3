@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { modals } from '@mantine/modals'
 import { Stepper, Stack, Group, Badge, Space, List } from '@mantine/core'
 import { Button, TextInput, Text, Progress } from '@mantine/core'
 import { useForm, hasLength } from '@mantine/form'
@@ -15,7 +14,7 @@ import { cleanSymbol, cleanName } from '@/utils/helper'
 import { checkToken } from '@/services/userTokens'
 import { TransactionExecutionError } from 'viem'
 
-export default function MintFlow() {
+export default function MintFlow({ onClose }: { onClose: () => void }) {
   const { mintState, mint } = useUserToken()
   const { chainId, currentClient } = useWeb3()
   const { callMint } = useMint()
@@ -218,7 +217,7 @@ export default function MintFlow() {
                 <Space h={24} />
 
                 <Group justify="space-between">
-                  <Button color="dark" variant="outline" onClick={() => modals.closeAll()}>
+                  <Button color="dark" variant="outline" onClick={onClose}>
                     Close
                   </Button>
                   <Button type="submit" disabled={name.length < 3 || symbol.length < 2}>
@@ -247,7 +246,7 @@ export default function MintFlow() {
             <Space h={144} />
 
             <Group justify="space-between">
-              <Button color="dark" variant="outline" onClick={() => modals.closeAll()}>
+              <Button color="dark" variant="outline" onClick={onClose}>
                 Close
               </Button>
               <Group>
@@ -265,7 +264,7 @@ export default function MintFlow() {
         <Stepper.Completed>
           <Stack align="center" justify="center">
             <Completion
-              onOk={() => modals.closeAll()}
+              onOk={onClose}
               status={status}
               text={{
                 pending: 'Minting...',
