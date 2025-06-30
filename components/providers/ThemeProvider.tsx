@@ -6,8 +6,9 @@ import { DatesProvider } from '@mantine/dates'
 import { theme } from '@/theme'
 import { resolver } from '@/theme/cssVariables'
 import { publicEnv } from '@/utils/env'
+import 'dayjs/locale/zh-TW'
 
-const { defaultColorScheme, timezone } = publicEnv
+const { defaultColorScheme } = publicEnv
 
 export default function ThemeProvider({ children }: React.PropsWithChildren) {
   return (
@@ -16,7 +17,7 @@ export default function ThemeProvider({ children }: React.PropsWithChildren) {
       cssVariablesResolver={resolver}
       defaultColorScheme={defaultColorScheme}
     >
-      <DatesProvider settings={{ timezone }}>
+      <DatesProvider settings={{ locale: 'zhTW' }}>
         <>
           {children}
           <Notifications />

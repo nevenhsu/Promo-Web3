@@ -5,7 +5,7 @@ import { draftMode } from 'next/headers'
 import { getMessages, setRequestLocale } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
 import { notFound } from 'next/navigation'
-import { ColorSchemeScript } from '@mantine/core'
+import { ColorSchemeScript, mantineHtmlProps } from '@mantine/core'
 import { detectDevice } from '@/lib/userAgent'
 import { AppProvider } from '@/store/AppContext'
 import Providers from '@/components/providers/Providers'
@@ -53,7 +53,7 @@ export default async function LocaleLayout({
   }
 
   return (
-    <html lang={lang} className={fontVariables} suppressHydrationWarning>
+    <html lang={lang} className={fontVariables} {...mantineHtmlProps}>
       <head>
         <Script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></Script>
         <Script id="google-analytics">

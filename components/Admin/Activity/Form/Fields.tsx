@@ -72,7 +72,9 @@ export default function FormFields() {
         key={form.key('endTime')}
         {...form.getInputProps('endTime')}
         excludeDate={date =>
-          Boolean(form.getValues().startTime && isBefore(date, form.getValues().startTime!))
+          Boolean(
+            form.getValues().startTime && isBefore(new Date(date), form.getValues().startTime!)
+          )
         }
       />
 
