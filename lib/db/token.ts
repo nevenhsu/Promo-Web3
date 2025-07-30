@@ -1,5 +1,7 @@
 import { Types } from 'mongoose'
 import TokenModel from '@/models/token'
+import { filterUserData } from '@/lib/db/user'
+import type { TUUserToken } from '@/models/userToken'
 
 export async function addTokenDoc(_user: string, _userToken: string) {
   return TokenModel.findOneAndUpdate(
@@ -23,4 +25,16 @@ export async function clearTokenUpdatedAt(_user: string, userTokenIds: string[])
     { updatedAt: null },
     { new: true }
   )
+}
+
+export async function getTokens(_user: string) {
+  const docs = await TokenModel.find({ _user })
+    .lean()
+    .populate<{ _userToken: TUUserToken }>([{ path: '_userToken', populate: { path: '_user' } }])
+
+  return docs.map(o => ({
+    ...o,
+    totalBalance: o.totalBalance.toString(),
+    _userToken: { ...o._userToken, decimals: 6, _user: filterUserData(o._userToken._user) },
+  }))
 }

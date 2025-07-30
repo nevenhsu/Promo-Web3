@@ -45,6 +45,7 @@ export const schema = new Schema({
 export type LinkedAccount = InferSchemaType<typeof linkedAccountSchema>
 export type User = InferSchemaType<typeof schema> & { _id: string }
 export type TUser = LeanDocumentArray<User> & { _id: string }
+export type TUserDoc = Pick<User, 'username' | 'name' | 'details'>
 
 // Function to generate a random string
 function randomUsername() {

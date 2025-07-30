@@ -29,7 +29,7 @@ export default function MyAppShell({ children }: React.PropsWithChildren) {
       footer={{ height: 56, collapsed: !showFooter }}
       withBorder={false}
       styles={{
-        header: { background: 'transparent' },
+        header: { background: 'transparent', backdropFilter: 'blur(5px)' },
       }}
     >
       <AppShell.Header>

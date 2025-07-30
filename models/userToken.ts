@@ -1,5 +1,5 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
-import UserModel from '@/models/user'
+import UserModel, { TUserDoc } from '@/models/user'
 import UserWalletModel, { UserWallet } from '@/models/userWallet'
 
 export const schema = new Schema({
@@ -28,6 +28,11 @@ schema.index({ symbol: 1, chainId: 1 }, { unique: true })
 export type UserToken = InferSchemaType<typeof schema> & { _id: string }
 export type TUserToken = Omit<UserToken, '_wallet'> & {
   _wallet: UserWallet
+  decimals: number // manually added
+}
+
+export type TUUserToken = Omit<UserToken, '_user'> & {
+  _user: TUserDoc
   decimals: number // manually added
 }
 

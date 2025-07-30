@@ -102,7 +102,7 @@ export default function FormFields({ activity }: { activity?: TActivityWithAirdr
             >
               <TextInput
                 w="100%"
-                leftSection={<Avatar size={24} src="/icons/usdc-token.svg" />}
+                leftSection={<Avatar size={24} src={airdrop?._userToken?.icon || ''} />}
                 value={prize}
                 onChange={e => setPrize(e.currentTarget.value)}
                 error={form.errors['setting.data.maxTotalScore']}

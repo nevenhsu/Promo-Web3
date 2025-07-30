@@ -8,12 +8,14 @@ import { Space, Group, Stack, Box, AspectRatio, Paper } from '@mantine/core'
 import { Tabs, Avatar, Text, ThemeIcon, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import RwdModal from '@/components/share/RwdModal'
+import TokenPaper from './TokenPaper'
 import { PiRocket, PiGlobe, PiArrowSquareOut } from 'react-icons/pi'
 import { PiCoinVertical, PiGear } from 'react-icons/pi'
 import { FaXTwitter } from 'react-icons/fa6'
 import { LinkAccountPlatform } from '@/types/db'
 import type { TUser } from '@/models/user'
 import type { TUserToken } from '@/models/userToken'
+import type { TUTokenDoc } from '@/models/token'
 import classes from './index.module.css'
 
 enum Tab {
@@ -33,11 +35,12 @@ const ThemeAction = ThemeIcon.withProps({
 
 type UserProfileProps = {
   data: TUser
-  tokens: TUserToken[]
+  userTokens: TUserToken[]
+  tokens: TUTokenDoc[]
 }
 
 export default function UserProfile(props: UserProfileProps) {
-  const { data, tokens } = props
+  const { data, userTokens, tokens } = props
 
   // profile data
   const { name, username, details, linkedAccounts } = data
@@ -50,7 +53,9 @@ export default function UserProfile(props: UserProfileProps) {
   const isSelf = fetched && userState?._id === profileId
 
   const { chainId } = useWeb3()
-  const hasToken = Boolean(chainId) && tokens.some(token => token.chainId === chainId)
+  const creatorTokens = userTokens.filter(token => token.chainId === Number(chainId))
+
+  console.log('UserProfile', { data, tokens, userTokens })
 
   // Get linked accounts
   const x = linkedAccounts?.find(account => account.platform === LinkAccountPlatform.X)
@@ -133,6 +138,34 @@ export default function UserProfile(props: UserProfileProps) {
                 </Link>
               </Group>
             </Paper>
+          ) : null}
+
+          {creatorTokens.length > 0 ? (
+            <Stack gap="sm">
+              <Text fz="sm" fw={500}>
+                Created Tokens
+              </Text>
+
+              <Stack gap="xs">
+                {creatorTokens.map(o => (
+                  <TokenPaper key={o._id} data={o} />
+                ))}
+              </Stack>
+            </Stack>
+          ) : null}
+
+          {tokens.length > 0 ? (
+            <Stack gap="sm">
+              <Text fz="sm" fw={500}>
+                Held Tokens
+              </Text>
+
+              <Stack gap="xs">
+                {tokens.map(o => (
+                  <TokenPaper key={o._id} data={o._userToken} balance={o.totalBalance} />
+                ))}
+              </Stack>
+            </Stack>
           ) : null}
         </Stack>
       </RwdLayout>
