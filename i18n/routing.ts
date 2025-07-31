@@ -48,6 +48,11 @@ export const routing = defineRouting({
     '/profile/activity/new': '/profile/activity/new',
     '/profile/activity/[slug]': '/profile/activity/[slug]',
 
+    // token
+    '/token': '/token',
+    '/token/[chain]': '/token/[chain]',
+    '/token/[chain]/[symbol]': '/token/[chain]/[symbol]',
+
     // refer
     '/refer': '/refer',
     '/refer/list': '/refer/list',

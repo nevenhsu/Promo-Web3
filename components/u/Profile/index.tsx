@@ -5,7 +5,7 @@ import { useAppSelector } from '@/hooks/redux'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { Link } from '@/i18n/routing'
 import { Space, Group, Stack, Box, AspectRatio, Paper } from '@mantine/core'
-import { Tabs, Avatar, Text, ThemeIcon, Button } from '@mantine/core'
+import { Avatar, Text, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import RwdModal from '@/components/share/RwdModal'
 import TokenPaper from './TokenPaper'
@@ -54,8 +54,6 @@ export default function UserProfile(props: UserProfileProps) {
 
   const { chainId } = useWeb3()
   const creatorTokens = userTokens.filter(token => token.chainId === Number(chainId))
-
-  console.log('UserProfile', { data, tokens, userTokens })
 
   // Get linked accounts
   const x = linkedAccounts?.find(account => account.platform === LinkAccountPlatform.X)
@@ -148,7 +146,15 @@ export default function UserProfile(props: UserProfileProps) {
 
               <Stack gap="xs">
                 {creatorTokens.map(o => (
-                  <TokenPaper key={o._id} data={o} />
+                  <Link
+                    key={o._id}
+                    href={{
+                      pathname: '/token/[chain]/[symbol]',
+                      params: { chain: `${o.chainId}`, symbol: o.symbol },
+                    }}
+                  >
+                    <TokenPaper data={o} />
+                  </Link>
                 ))}
               </Stack>
             </Stack>
@@ -162,7 +168,15 @@ export default function UserProfile(props: UserProfileProps) {
 
               <Stack gap="xs">
                 {tokens.map(o => (
-                  <TokenPaper key={o._id} data={o._userToken} balance={o.totalBalance} />
+                  <Link
+                    key={o._id}
+                    href={{
+                      pathname: '/token/[chain]/[symbol]',
+                      params: { chain: `${o._userToken.chainId}`, symbol: o._userToken.symbol },
+                    }}
+                  >
+                    <TokenPaper data={o._userToken} balance={o.totalBalance} />
+                  </Link>
                 ))}
               </Stack>
             </Stack>

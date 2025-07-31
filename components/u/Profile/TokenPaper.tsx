@@ -1,5 +1,6 @@
 import { Avatar, Group, Paper, Stack, Text } from '@mantine/core'
 import { formatFixedNumber } from '@/utils/math'
+import classes from './index.module.css'
 
 type TokenPaperProps = {
   data: { name: string; symbol: string; icon?: string | null }
@@ -10,7 +11,7 @@ export default function TokenPaper(props: TokenPaperProps) {
   const { data, balance } = props
   const { name, symbol, icon } = data
   return (
-    <Paper radius="md" p="md" shadow="xs">
+    <Paper radius="md" p="md" className={classes.paper}>
       <Group justify="space-between">
         <Group>
           <Avatar src={icon} name={''} color="initials" size={40}>

@@ -38,3 +38,8 @@ export async function getTokens(_user: string) {
     _userToken: { ...o._userToken, decimals: 6, _user: filterUserData(o._userToken._user) },
   }))
 }
+
+export async function countTokenDoc(_userToken: string) {
+  const count = await TokenModel.countDocuments({ _userToken })
+  return count
+}
