@@ -77,7 +77,8 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
             <form
               onSubmit={formRef.current?.getForm().onSubmit(
                 values => {
-                  const { chainId, startTime, endTime, activityType } = values
+                  const { chainId, startTime, endTime, activityType, airdrop } = values
+                  const amount = Number(airdrop.amount)
                   if (startTime && endTime) {
                     handleSubmit({
                       ...values,
@@ -85,6 +86,15 @@ export default forwardRef<UpdateModalRef, {}>(function UpdateModal(props, ref) {
                       endTime,
                       chainId: Number(chainId),
                       activityType: Number(activityType),
+                      airdrop,
+                      setting: {
+                        type: ActivitySettingType.A,
+                        data: {
+                          maxSelfScore: 10000,
+                          minFollowers: 1,
+                          maxTotalScore: amount ? amount * 1000 : 0,
+                        },
+                      },
                     })
                   }
                 },

@@ -8,6 +8,7 @@ import { Modal, Stack, Box, Button, Text } from '@mantine/core'
 import Form, { type FormRef } from './Form'
 import FormFields from './Form/Fields'
 import { publicEnv } from '@/utils/env'
+import { ActivitySettingType } from '@/types/db'
 import type { ActivityData } from '@/models/activity'
 
 export type AddModalRef = {
@@ -58,14 +59,24 @@ export default forwardRef<AddModalRef, {}>(function AddModal(props, ref) {
             <form
               onSubmit={formRef.current?.getForm().onSubmit(
                 values => {
-                  const { chainId, startTime, endTime, activityType, ...rest } = values
+                  const { chainId, startTime, endTime, activityType, airdrop, ...rest } = values
+                  const amount = Number(airdrop.amount)
                   if (startTime && endTime) {
                     handleSubmit({
                       ...rest,
                       startTime,
                       endTime,
+                      airdrop,
                       chainId: Number(chainId),
                       activityType: Number(activityType),
+                      setting: {
+                        type: ActivitySettingType.A,
+                        data: {
+                          maxSelfScore: 10000,
+                          minFollowers: 1,
+                          maxTotalScore: amount ? amount * 1000 : 0,
+                        },
+                      },
                     })
                   }
                 },
