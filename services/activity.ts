@@ -48,16 +48,8 @@ export async function updateActivityNFT(slug: string, hash: string) {
 }
 
 // ====================
-// Owned Activity
+// Creator Activity
 // ====================
-
-export async function getOwnedActivity(slug: string) {
-  const { data } = await axios.get<{
-    activity: TActivity
-  }>(`/api/u/activity/${slug}`)
-
-  return data.activity
-}
 
 export type UpdateData = {
   title: string
@@ -74,7 +66,7 @@ export type UpdateData = {
   published: boolean
 }
 
-export async function updateOwnedActivity(slug: string, data: Partial<UpdateData>) {
+export async function updateCreatorActivity(slug: string, data: Partial<UpdateData>) {
   const { data: updated } = await axios.post<{ activity: TActivity }>(`/api/u/activity/${slug}`, {
     data,
   })
@@ -82,17 +74,13 @@ export async function updateOwnedActivity(slug: string, data: Partial<UpdateData
   return updated.activity
 }
 
-export async function createOwnedActivity(data: ActivityData) {
+export async function createCreatorActivity(data: ActivityData) {
   const { data: created } = await axios.put<{ activity: TActivity }>('/api/u/activity', {
     data,
   })
 
   return created.activity
 }
-
-// ====================
-// Creator Activity
-// ====================
 
 export async function getCreatorActivity(param: { chainId: number; page: number; limit: number }) {
   const { chainId, page, limit } = param

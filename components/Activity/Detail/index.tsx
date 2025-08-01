@@ -69,7 +69,7 @@ export default function ActivityDetail({ data, children }: ActivityDetailProps) 
   // Platform linked account from database
   const { linkedAccounts } = userData
   const { linked } = useMemo(() => {
-    const linkedAccount = linkedAccounts?.find(({ platform }) => platform === socialMedia)
+    const linkedAccount = linkedAccounts?.find(({ platform }) => platform === `${socialMedia}`)
     const linked = Boolean(linkedAccount)
     return { linked, linkedAccount }
   }, [linkedAccounts, socialMedia])

@@ -48,6 +48,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     }
 
     const filtered = filterData(data)
+    filtered.published = true
     const updated = await updateActivity(doc._id.toString(), filtered)
 
     if (!updated) {

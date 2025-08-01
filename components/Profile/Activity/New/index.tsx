@@ -13,7 +13,7 @@ import Completion, { Status } from '@/components/share/Completion'
 import { formatDate } from '@/utils/date'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { useActivityTx } from './useActivityTx'
-import { createOwnedActivity, updateActivityNFT } from '@/services/activity'
+import { createCreatorActivity, updateActivityNFT } from '@/services/activity'
 import type { ActivityData } from '@/components/Profile/Activity/Form/Context'
 import type { FormType } from '../Form'
 
@@ -58,7 +58,7 @@ export default function ProfileActivityNew() {
 
           try {
             // upload to db
-            const newActivity = await createOwnedActivity(data)
+            const newActivity = await createCreatorActivity(data)
             const updated = await updateActivityNFT(newActivity.slug, hash)
             if (updated) {
               setSlug(newActivity.slug)

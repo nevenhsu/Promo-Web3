@@ -28,7 +28,6 @@ type TokenProps = {
 }
 
 export default function Token({ data, username, count, ranking, activities }: TokenProps) {
-  console.log('Token data:', { data, username, count, ranking, activities })
   const { name, symbol, icon } = data
   const [activeTab, setActiveTab] = useState(TabValue.Ranking)
 

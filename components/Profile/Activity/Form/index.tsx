@@ -1,8 +1,7 @@
 'use client'
 
 import * as _ from 'lodash-es'
-import React, { useEffect } from 'react'
-import { forwardRef, useImperativeHandle } from 'react'
+import React, { useState, useEffect } from 'react'
 import { isBefore } from 'date-fns'
 import { useWeb3 } from '@/wallet/Web3Context'
 import { FormProvider, useForm } from './Context'
@@ -23,7 +22,7 @@ type FormProps = {
   children: React.ReactNode
 }
 
-export default forwardRef<FormRef, FormProps>(function Form({ onReady, children }, ref) {
+function MyForm({ onReady, children }: FormProps) {
   const { balancesValues, tokenListValues } = useWeb3()
 
   const form = useForm({
@@ -86,6 +85,7 @@ export default forwardRef<FormRef, FormProps>(function Form({ onReady, children 
         symbol: value => (value ? null : 'Should not be empty'),
         amount: (value, values) => {
           const token = tokenListValues.userTokens.find(o => o.symbol === values.airdrop.symbol)
+
           if (!token) {
             return 'Token not found'
           }
@@ -139,16 +139,24 @@ export default forwardRef<FormRef, FormProps>(function Form({ onReady, children 
     },
   })
 
-  useImperativeHandle(ref, () => ({
-    getForm: () => form,
-  }))
-
   useEffect(() => {
     onReady(form)
   }, [])
 
   return <FormProvider form={form}>{children}</FormProvider>
-})
+}
+
+// WrapForm is used to reset the form when balances or token list changes
+export default function WrapForm(props: FormProps) {
+  const [formKey, setFormKey] = useState(0)
+  const { balancesValues, tokenListValues } = useWeb3()
+
+  useEffect(() => {
+    setFormKey(prevKey => prevKey + 1)
+  }, [balancesValues, tokenListValues])
+
+  return <MyForm key={formKey} {...props} />
+}
 
 function checkURL(url: string) {
   try {

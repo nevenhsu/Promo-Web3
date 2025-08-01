@@ -1,18 +1,20 @@
 'use client'
 
+import { addDays } from 'date-fns'
+import { notifications } from '@mantine/notifications'
 import { useState, useEffect } from 'react'
 import { useAsyncFn } from 'react-use'
-import { Title, Stack, Space } from '@mantine/core'
-import { Text, Button } from '@mantine/core'
+import { Title, Stack, Space, Text, Button } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
 import Form, { type FormType } from '../Form'
 import UpdateFields from '../Form/UpdateFields'
-import { getCreatorActivityData } from '@/services/activity'
+import { getCreatorActivityData, updateCreatorActivity } from '@/services/activity'
 import type { ActivityData } from '@/types/activitySetting'
 
 export default function UpdateActivity({ slug }: { slug: string }) {
   // state
   const [form, setForm] = useState<FormType>()
+  const [formError, setFormError] = useState<string>('')
 
   const [activityState, fetchActivity] = useAsyncFn(async () => {
     return getCreatorActivityData(slug)
@@ -20,17 +22,27 @@ export default function UpdateActivity({ slug }: { slug: string }) {
   const { value } = activityState
 
   const [updateActivityState, updateActivity] = useAsyncFn(async (data: ActivityData) => {
-    // TODO: update activity data
+    return updateCreatorActivity(slug, data)
   }, [])
-  const { error } = updateActivityState
+  const { value: newValue } = updateActivityState
 
   const loading = !value || activityState.loading || updateActivityState.loading
 
   const handleSubmit = async (data: ActivityData) => {
-    console.log(data)
+    const result = await updateActivity(data)
+
+    if (result) {
+      notifications.show({
+        title: 'Activity updated',
+        message: 'Your activity has been updated successfully',
+        color: 'green',
+      })
+      setFormError('')
+    } else {
+      setFormError('Failed to update activity')
+    }
   }
 
-  // TODO: set data to form
   useEffect(() => {
     if (form && value) {
       form.setFieldValue('title', value.title || '')
@@ -38,6 +50,14 @@ export default function UpdateActivity({ slug }: { slug: string }) {
       form.setFieldValue('details.externalLink', value.details.externalLink || '')
       form.setFieldValue('setting.data.maxTotalScore', value.setting.data.maxTotalScore || 0)
       form.setFieldValue('setting.data.minFollowers', value.setting.data.minFollowers || 0)
+
+      // set other fields as needed
+      form.setFieldValue('airdrop.amount', value.airdrop?.amount || '0')
+      form.setFieldValue('airdrop.symbol', value.airdrop?.symbol || '')
+      form.setFieldValue('details.fullLink', value.details.fullLink || '')
+      form.setFieldValue('details.link', value.details.link || '')
+      form.setFieldValue('endTime', addDays(new Date(), 7))
+      form.setFieldValue('startTime', value.startTime ? new Date(value.startTime) : null)
     }
   }, [form, value])
 
@@ -70,6 +90,7 @@ export default function UpdateActivity({ slug }: { slug: string }) {
                     values, // <- form.getValues() at the moment of submit
                     event // <- form element submit event
                   )
+                  setFormError('Please fill all required fields')
                 }
               )}
             >
@@ -79,8 +100,12 @@ export default function UpdateActivity({ slug }: { slug: string }) {
                 <span />
 
                 <Button type="submit" loading={loading}>
-                  Submit
+                  {!formError && newValue ? 'Updated' : 'Update'}
                 </Button>
+
+                <Text c="red" fz="xs" ta="center">
+                  {formError}
+                </Text>
               </Stack>
             </form>
           </Form>
