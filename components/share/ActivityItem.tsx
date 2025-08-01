@@ -8,9 +8,9 @@ import { formatDate } from '@/utils/date'
 import { formatNumber } from '@/utils/math'
 import { toUpper } from '@/utils/helper'
 import { ActivityType } from '@/types/db'
-import type { TPublicActivity } from '@/models/activity'
+import type { TActivity } from '@/models/activity'
 
-export default function ActivityItem({ data }: { data: TPublicActivity }) {
+export default function ActivityItem({ data }: { data: TActivity & { joined?: boolean } }) {
   const isEnd = isAfter(new Date(), new Date(data.endTime))
   return (
     <>
@@ -43,10 +43,10 @@ export default function ActivityItem({ data }: { data: TPublicActivity }) {
             <Stack gap={32} py="md" w="100%" justify="space-between">
               <Box>
                 <Title order={4} fw={500} mb={8} mt={-4} lh={1.25}>
-                  {data.title}
+                  {data.title || 'No Title'}
                 </Title>
                 <Text fz="xs" c="dark" lineClamp={2}>
-                  {data.description}
+                  {data.description || 'No Description'}
                 </Text>
               </Box>
 

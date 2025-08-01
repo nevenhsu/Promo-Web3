@@ -31,7 +31,7 @@ export type TUserToken = Omit<UserToken, '_wallet'> & {
   decimals: number // manually added
 }
 
-export type TUUserToken = Omit<UserToken, '_user'> & {
+export type TUserTokenWithUser = Omit<UserToken, '_user'> & {
   _user: TUserDoc
   decimals: number // manually added
 }

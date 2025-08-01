@@ -2,13 +2,17 @@
 
 import { useState } from 'react'
 import { Link } from '@/i18n/routing'
-import { Group, Stack, Paper, Space, Box, Tabs, Center, Pagination } from '@mantine/core'
-import { Avatar, Title, Text, Button, Divider, Skeleton, ThemeIcon } from '@mantine/core'
+import { Group, Stack, Space, Tabs, Paper, Center } from '@mantine/core'
+import { Avatar, Text, ThemeIcon } from '@mantine/core'
 import RwdLayout from '@/components/share/RwdLayout'
-import { formatNumber, formatPercent } from '@/utils/math'
+import UserPaper from './UserPaper'
+import ActivityItem from '@/components/share/ActivityItem'
+import { formatNumber } from '@/utils/math'
 import { isEnumMember } from '@/utils/helper'
 import { PiLink } from 'react-icons/pi'
 import type { UserToken } from '@/models/userToken'
+import type { TTokenWithUser } from '@/models/token'
+import type { TActivity } from '@/models/activity'
 
 enum TabValue {
   Ranking = 'Ranking',
@@ -19,10 +23,12 @@ type TokenProps = {
   data: UserToken
   username: string
   count: number
+  ranking: TTokenWithUser[]
+  activities: TActivity[]
 }
 
-export default function Token({ data, username, count }: TokenProps) {
-  console.log('Token data:', data, username, count)
+export default function Token({ data, username, count, ranking, activities }: TokenProps) {
+  console.log('Token data:', { data, username, count, ranking, activities })
   const { name, symbol, icon } = data
   const [activeTab, setActiveTab] = useState(TabValue.Ranking)
 
@@ -91,11 +97,29 @@ export default function Token({ data, username, count }: TokenProps) {
           </Tabs.List>
 
           <Tabs.Panel value={TabValue.Ranking}>
-            <Stack py={40}>1</Stack>
+            <Stack py={40} gap="xs">
+              {ranking.length ? (
+                ranking.map((item, index) => (
+                  <UserPaper key={item._id} data={item} ranking={index + 1} />
+                ))
+              ) : (
+                <Center h={64}>
+                  <Text c="dimmed">No ranking available</Text>
+                </Center>
+              )}
+            </Stack>
           </Tabs.Panel>
 
           <Tabs.Panel value={TabValue.Activity}>
-            <Stack py={40}>2</Stack>
+            <Stack py={40}>
+              {activities.length ? (
+                activities.map(item => <ActivityItem key={item._id} data={item} />)
+              ) : (
+                <Center h={64}>
+                  <Text c="dimmed">No activity available</Text>
+                </Center>
+              )}
+            </Stack>
           </Tabs.Panel>
         </Tabs>
 

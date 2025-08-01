@@ -16,6 +16,7 @@ export type GetOptions = {
 
 export type GetFilters = {
   ongoing?: boolean
+  userToken?: string // for specific user token
 }
 
 // TODO: add chainId filter
@@ -40,7 +41,7 @@ export async function getPublicActivities(
   userId?: string // for joined status
 ) {
   const { page = 1 } = options || {}
-  const { ongoing } = filter || {}
+  const { ongoing, userToken } = filter || {}
 
   // Limit the number of transactions to 100
   const limit = _.min([options?.limit || 10, 100]) || 1
@@ -49,12 +50,19 @@ export async function getPublicActivities(
   const query: Record<string, any> = {
     published: true,
   }
+
+  // Filter by ongoing status
   if (ongoing !== undefined) {
     const now = new Date()
     query.endTime = ongoing ? { $gt: now } : { $lte: now }
     if (ongoing) {
       query.startTime = { $lte: now }
     }
+  }
+
+  // Filter by specific user token
+  if (userToken) {
+    query['airdrop._userToken'] = userToken
   }
 
   const docs = await ActivityModel.find(query)

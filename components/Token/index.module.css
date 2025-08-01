@@ -1,0 +1,8 @@
+.paper {
+  --paper-shadow: var(--mantine-shadow-xs);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.paper:hover {
+  --paper-shadow: var(--mantine-shadow-sm);
+}

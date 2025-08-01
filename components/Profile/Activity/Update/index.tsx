@@ -19,7 +19,9 @@ export default function UpdateActivity({ slug }: { slug: string }) {
   }, [slug])
   const { value } = activityState
 
-  const [updateActivityState, updateActivity] = useAsyncFn(async (data: ActivityData) => {}, [])
+  const [updateActivityState, updateActivity] = useAsyncFn(async (data: ActivityData) => {
+    // TODO: update activity data
+  }, [])
   const { error } = updateActivityState
 
   const loading = !value || activityState.loading || updateActivityState.loading

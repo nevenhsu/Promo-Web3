@@ -15,7 +15,7 @@ import { FaXTwitter } from 'react-icons/fa6'
 import { LinkAccountPlatform } from '@/types/db'
 import type { TUser } from '@/models/user'
 import type { TUserToken } from '@/models/userToken'
-import type { TUTokenDoc } from '@/models/token'
+import type { TTokenWithUserToken } from '@/models/token'
 import classes from './index.module.css'
 
 enum Tab {
@@ -36,7 +36,7 @@ const ThemeAction = ThemeIcon.withProps({
 type UserProfileProps = {
   data: TUser
   userTokens: TUserToken[]
-  tokens: TUTokenDoc[]
+  tokens: TTokenWithUserToken[]
 }
 
 export default function UserProfile(props: UserProfileProps) {

@@ -1,7 +1,7 @@
 import { models, model, Model, Schema, InferSchemaType } from 'mongoose'
-import UserModel from '@/models/user'
+import UserModel, { TUserDoc } from '@/models/user'
 import UserTokenModel from '@/models/userToken'
-import type { UserToken, TUUserToken } from '@/models/userToken'
+import type { UserToken, TUserTokenWithUser } from '@/models/userToken'
 
 // make sure to user with only one token on one chain
 
@@ -22,8 +22,12 @@ schema.index({ _user: 1, _userToken: 1 }, { unique: true })
 
 export type TokenDoc = InferSchemaType<typeof schema> & { _id: string }
 export type TTokenDoc = Omit<TokenDoc, '_userToken'> & { _userToken: UserToken }
-export type TUTokenDoc = Omit<TokenDoc, '_userToken'> & {
-  _userToken: TUUserToken
+export type TTokenWithUser = Omit<TokenDoc, '_user'> & {
+  _user: TUserDoc
+  totalBalance: string
+}
+export type TTokenWithUserToken = Omit<TokenDoc, '_userToken'> & {
+  _userToken: TUserTokenWithUser
   totalBalance: string
 }
 

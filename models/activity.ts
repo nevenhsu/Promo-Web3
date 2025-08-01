@@ -18,6 +18,7 @@ const airdropSchema = new Schema({
     // Only for Club token
     type: Schema.Types.ObjectId,
     ref: UserTokenModel,
+    index: true,
   },
   symbol: { type: String, required: true },
   finalized: { type: Boolean, default: false, index: true }, // airdrop share finalized
